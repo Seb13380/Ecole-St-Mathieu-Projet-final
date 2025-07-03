@@ -1,23 +1,22 @@
 <header class="w-full bg-base-150">
 	<nav
 		class="navbar w-full px-8">
-		<!-- Logo à gauche -->
+	
 		<div class="flex-none">
 			<a href="/" class="flex items-center gap-5">
-				<img src="/assets/images/testimage.jpg" alt="Logo École" class="h-30 w-auto mt-4"/>
+				<img src="/assets/images/logo-st-mathieu-vert.png?v={{ 'now'|date('U') }}" alt="Logo École" class="h-[150px] w-auto object-contain" style="animation: bounce 1s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
-		<!-- Menu centré -->
+
 		<div class="flex-1 flex justify-center">
 			<ul
 				class="menu menu-horizontal px-1 text-xl">
-				{# Ajoute text-xl ici #}
 				<li>
-					<a href="/">Présentation</a>
+					<a href="/">Accueil</a>
 				</li>
 				<li>
-					<a href="/">Infos pratiques</a>
+					<a href="/">L'école</a>
 				</li>
 				<li>
 					<a href="">Actus</a>
@@ -32,22 +31,33 @@
 					<a href="">Restauration</a>
 				</li>
 				<li>
-					<a href="">Apel</a>
+					<a href="">APEL</a>
 				</li>
 				<li>
 					<a href="">Contact</a>
 				</li>
 			</ul>
 		</div>
-		<!-- Burger à droite -->
-		<div class="flex-none">
-			<button
-				class="btn btn-square btn-ghost text-xl">
-				{# Ajoute text-xl ici #}
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="inline-block h-7 w-7 stroke-current">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-				</svg>
-			</button>
+		<div class="flex-none gap-2">
+			{% if isAuthenticated %}
+				<div class="dropdown dropdown-end">
+					<div tabindex="0" role="button" class="btn btn-ghost">
+						👤 {{ user.firstName }}
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+						<li><a href="/dashboard">Tableau de bord</a></li>
+						<li><a href="/profile">Mon profil</a></li>
+						<li>
+							<form action="/auth/logout" method="POST" class="w-full">
+								<button type="submit" class="w-full text-left">Déconnexion</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			{% else %}
+				<a href="/auth/login" class="btn btn-primary">Connexion</a>
+				<a href="/auth/register" class="btn btn-outline">Inscription</a>
+			{% endif %}
 		</div>
 	</nav>
 </header>

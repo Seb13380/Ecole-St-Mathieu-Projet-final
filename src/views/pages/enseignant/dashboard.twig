@@ -1,0 +1,181 @@
+{% extends "layouts/base.twig" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Espace Enseignant</h1>
+            <p class="mt-2 text-gray-600">Bienvenue, {{ user.firstName }} {{ user.lastName }}</p>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <a href="/enseignant/notes" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">Gestion des notes</h3>
+                        <p class="text-gray-500">Saisir, modifier notes</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/enseignant/absences" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">Gestion des absences</h3>
+                        <p class="text-gray-500">Marquer absences</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/enseignant/horaires" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">Mes horaires</h3>
+                        <p class="text-gray-500">Emploi du temps</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/enseignant/messages" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">Messagerie</h3>
+                        <p class="text-gray-500">Communication parents</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Mes classes -->
+        {% if mesClasses|length > 0 %}
+        <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Mes classes</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for classe in mesClasses %}
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center mb-3">
+                            <div class="bg-green-100 rounded-full p-2">
+                                <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-lg font-medium text-gray-900">{{ classe.nom }}</h4>
+                                <p class="text-sm text-gray-500">{{ classe.niveau }} - {{ classe.anneeScolaire }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mb-4 text-center">
+                            <div>
+                                <div class="text-2xl font-bold text-blue-600">{{ classe._count.eleves }}</div>
+                                <div class="text-xs text-gray-500">Élèves</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-green-600">{{ classe._count.horaires }}</div>
+                                <div class="text-xs text-gray-500">Cours/sem.</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-purple-600">{{ classe._count.notes }}</div>
+                                <div class="text-xs text-gray-500">Notes</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <a href="/enseignant/notes?classeId={{ classe.id }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
+                                Notes
+                            </a>
+                            <a href="/enseignant/absences?classeId={{ classe.id }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200">
+                                Absences
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Horaires du jour -->
+        {% if horairesDuJour|length > 0 %}
+        <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Mes cours aujourd'hui</h3>
+                <div class="space-y-3">
+                    {% for horaire in horairesDuJour %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 rounded-full p-2 mr-3">
+                                <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">{{ horaire.matiere }}</div>
+                                <div class="text-sm text-gray-500">{{ horaire.classe.nom }}</div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            {{ horaire.heureDebut }} - {{ horaire.heureFin }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actualités récentes -->
+        {% if actualites|length > 0 %}
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Actualités récentes</h3>
+                    <a href="/actualites" class="text-sm text-blue-600 hover:text-blue-800">Voir toutes</a>
+                </div>
+                <div class="space-y-4">
+                    {% for actualite in actualites %}
+                    <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h4 class="text-md font-medium text-gray-900 mb-1">
+                                    {% if actualite.important %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-2">
+                                        Important
+                                    </span>
+                                    {% endif %}
+                                    {{ actualite.titre }}
+                                </h4>
+                                <p class="text-sm text-gray-600 mb-2">{{ actualite.contenu|slice(0, 150) }}{% if actualite.contenu|length > 150 %}...{% endif %}</p>
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <span>Par {{ actualite.auteur.firstName }} {{ actualite.auteur.lastName }}</span>
+                                    <span class="mx-2">•</span>
+                                    <span>{{ actualite.datePublication|date('d/m/Y à H:i') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

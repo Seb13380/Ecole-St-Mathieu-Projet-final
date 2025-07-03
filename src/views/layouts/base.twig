@@ -6,11 +6,11 @@
 		<link href="/assets/css/tailwind.css" rel="stylesheet">
 		<link rel="stylesheet" href="/assets/css/style.css"> {% block title %}{% endblock %}
 		</head>
-		<body class="bg-[#a7e3dd] shadow-xl w-full sticky top-0 z-50">
-			{% include "../partials/header.twig" %}
+		<body class="bg-[#a7e3dd] shadow-xl w-full sticky top-0 z-20">
+			{% include "partials/header.twig" %}
 			<main class="flex-1"> {% block main %}{% endblock %}
 				</main>
 
-				{% include "../partials/footer.twig" %}
+				{% include "partials/footer.twig" %}
 			</body>
 		</html>

@@ -1,6 +1,66 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* Styles personnalisés pour la validation des formulaires */
+.input-error {
+    border-color: #0d9488 !important;
+    box-shadow: 0 0 0 1px #0d9488 !important;
+}
+
+.input:invalid {
+    border-color: #0d9488;
+}
+
+.input:valid {
+    border-color: #14b8a6;
+}
+
+/* Animation pour les champs invalides */
+.input-error {
+    animation: shake 0.3s ease-in-out;
+}
+
+/* Alertes personnalisées en vert d'eau */
+.alert-error {
+    background-color: #ccfbf1 !important;
+    border-color: #0d9488 !important;
+    color: #0f766e !important;
+}
+
+.alert-error svg {
+    color: #0d9488 !important;
+}
+
+.alert-success {
+    background-color: #d1fae5 !important;
+    border-color: #14b8a6 !important;
+    color: #065f46 !important;
+}
+
+.alert-success svg {
+    color: #14b8a6 !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* Animation bounce personnalisée pour le logo */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-25px);
+    }
+}
+
+.logo-bounce {
+    animation: bounce 1s infinite;
+}
+
 @plugin "daisyui/theme" {
   name: "cupcake";
   default: false;
@@ -34,5 +94,25 @@
   --border: 2px;
   --depth: 1;
   --noise: 0;
+}
+
+.h-[150px] {
+    height: 150px;
+}
+
+.w-auto {
+    width: auto;
+}
+
+.object-contain {
+    object-fit: contain;
+}
+
+.transition-transform {
+    transition-property: transform;
+}
+
+.hover\:scale-110:hover {
+    transform: scale(1.1);
 }
 
