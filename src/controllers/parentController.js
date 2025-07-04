@@ -3,7 +3,6 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const parentController = {
-  // === TABLEAU DE BORD PARENT ===
   async getDashboard(req, res) {
     try {
       const parentId = req.session.user.id;
@@ -59,7 +58,6 @@ const parentController = {
     }
   },
 
-  // === SUIVI SCOLAIRE ===
   async getSuiviScolaire(req, res) {
     try {
       const parentId = req.session.user.id;
@@ -90,7 +88,6 @@ const parentController = {
         }
       });
 
-      // Calculer les moyennes par matière
       const enfantsAvecMoyennes = enfants.map(enfant => {
         const moyennesParMatiere = {};
         
@@ -108,7 +105,6 @@ const parentController = {
           moyennesParMatiere[note.matiere].coefficientTotal += note.coefficient;
         });
 
-        // Calculer la moyenne pondérée pour chaque matière
         Object.keys(moyennesParMatiere).forEach(matiere => {
           const data = moyennesParMatiere[matiere];
           data.moyenne = data.coefficientTotal > 0 ? 
@@ -133,7 +129,6 @@ const parentController = {
     }
   },
 
-  // === HORAIRES ===
   async getHoraires(req, res) {
     try {
       const parentId = req.session.user.id;
@@ -159,7 +154,6 @@ const parentController = {
         }
       });
 
-      // Organiser les horaires par jour de la semaine
       const joursOrdre = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
       
       enfants.forEach(enfant => {
@@ -183,7 +177,6 @@ const parentController = {
     }
   },
 
-  // === MESSAGERIE ===
   async getMessages(req, res) {
     try {
       const userId = req.session.user.id;
@@ -204,7 +197,6 @@ const parentController = {
         orderBy: { dateEnvoi: 'desc' }
       });
 
-      // Marquer les messages comme lus
       await prisma.message.updateMany({
         where: { 
           destinataireId: userId,

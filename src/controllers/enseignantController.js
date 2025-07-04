@@ -3,7 +3,6 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const enseignantController = {
-  // === TABLEAU DE BORD ENSEIGNANT ===
   async getDashboard(req, res) {
     try {
       const enseignantId = req.session.user.id;
@@ -46,7 +45,6 @@ const enseignantController = {
         }
       });
 
-      // Horaires du jour
       const aujourdhui = new Date().toLocaleDateString('fr-FR', { weekday: 'long' });
       const horairesDuJour = mesHoraires.filter(h => 
         h.jourSemaine.toLowerCase() === aujourdhui.toLowerCase()
@@ -66,7 +64,6 @@ const enseignantController = {
     }
   },
 
-  // === GESTION DES NOTES ===
   async getNotesManagement(req, res) {
     try {
       const enseignantId = req.session.user.id;
@@ -159,7 +156,6 @@ const enseignantController = {
     }
   },
 
-  // === GESTION DES ABSENCES ===
   async getAbsencesManagement(req, res) {
     try {
       const enseignantId = req.session.user.id;
@@ -249,7 +245,6 @@ const enseignantController = {
     }
   },
 
-  // === HORAIRES ===
   async getHoraires(req, res) {
     try {
       const enseignantId = req.session.user.id;
@@ -267,7 +262,6 @@ const enseignantController = {
         ]
       });
 
-      // Organiser les horaires par jour
       const joursOrdre = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
       const horairesParJour = {};
       
@@ -288,7 +282,6 @@ const enseignantController = {
     }
   },
 
-  // === MESSAGERIE ===
   async getMessages(req, res) {
     try {
       const userId = req.session.user.id;
@@ -309,13 +302,11 @@ const enseignantController = {
         orderBy: { dateEnvoi: 'desc' }
       });
 
-      // Liste des parents pour l'envoi de messages
       const parents = await prisma.user.findMany({
         where: { role: 'PARENT' },
         select: { id: true, firstName: true, lastName: true }
       });
 
-      // Marquer les messages comme lus
       await prisma.message.updateMany({
         where: { 
           destinataireId: userId,

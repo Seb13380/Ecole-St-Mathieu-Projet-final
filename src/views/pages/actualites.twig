@@ -3,18 +3,16 @@
 {% block content %}
 <div class="min-h-screen bg-gray-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Actualités de l'école</h1>
             <p class="mt-2 text-gray-600">Retrouvez toutes les informations et actualités de l'École Saint-Mathieu</p>
         </div>
 
-        <!-- Actualités -->
+ 
         <div class="space-y-8">
             {% for actualite in actualites %}
             <article class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-8">
-                    <!-- En-tête de l'actualité -->
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex-1">
                             <div class="flex items-center mb-2">
@@ -44,14 +42,12 @@
                         </div>
                     </div>
 
-                    <!-- Contenu de l'actualité -->
                     <div class="prose max-w-none">
                         <div class="text-gray-700 leading-relaxed">
                             {{ actualite.contenu|nl2br }}
                         </div>
                     </div>
 
-                    <!-- Footer de l'actualité -->
                     <div class="mt-6 pt-4 border-t border-gray-200">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
@@ -90,7 +86,6 @@
             {% endfor %}
         </div>
 
-        <!-- Liens de navigation -->
         {% if isAuthenticated %}
         <div class="mt-8 text-center">
             {% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}

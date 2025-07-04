@@ -6,22 +6,26 @@ const session = require("express-session");
 dotenv.config();
 const app = express();
 
-// Middleware pour parser les données de formulaire
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Configuration des sessions
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.url}`);
+  next();
+});
+
+app.use(express.static(__dirname + '/public'));
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     secure: false, // mettre à true en production avec HTTPS
     maxAge: 24 * 60 * 60 * 1000 // 24 heures
   }
 }));
 
-// Configuration Twig
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
 
@@ -39,9 +43,6 @@ app.use((req, res, next) => {
   res.locals.isAuthenticated = !!req.session.user;
   next();
 });
-
-// Fichiers statiques
-app.use(express.static(__dirname + '/public'));
 
 // Routes
 const homeRoutes = require("./src/routes/homeRoutes");

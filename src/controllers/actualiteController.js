@@ -3,7 +3,6 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const actualiteController = {
-  // === AFFICHAGE DES ACTUALITÉS ===
   async getActualites(req, res) {
     try {
       const actualites = await prisma.actualite.findMany({
@@ -31,7 +30,6 @@ const actualiteController = {
     }
   },
 
-  // === GESTION DES ACTUALITÉS (ADMIN/DIRECTION) ===
   async getActualitesManagement(req, res) {
     try {
       const actualites = await prisma.actualite.findMany({

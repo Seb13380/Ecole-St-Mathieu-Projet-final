@@ -72,7 +72,6 @@
             </a>
         </div>
 
-        <!-- Mes enfants -->
         {% if enfants|length > 0 %}
         <div class="bg-white shadow rounded-lg mb-8">
             <div class="px-4 py-5 sm:p-6">
@@ -92,7 +91,6 @@
                             </div>
                         </div>
                         
-                        <!-- Dernières notes -->
                         {% if enfant.notes|length > 0 %}
                         <div class="mb-3">
                             <h5 class="text-sm font-medium text-gray-700 mb-2">Dernières notes</h5>
@@ -107,7 +105,6 @@
                         </div>
                         {% endif %}
                         
-                        <!-- Absences récentes -->
                         {% if enfant.absences|length > 0 %}
                         <div class="mb-3">
                             <h5 class="text-sm font-medium text-gray-700 mb-2">Absences récentes</h5>
@@ -134,7 +131,6 @@
         </div>
         {% endif %}
 
-        <!-- Actualités récentes -->
         {% if actualites|length > 0 %}
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">

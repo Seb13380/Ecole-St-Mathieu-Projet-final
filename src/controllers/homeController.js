@@ -14,7 +14,6 @@ const homeController = {
     try {
       const { name, email, message } = req.body;
       
-      // Sauvegarder le message en base de données
       await prisma.contact.create({
         data: {
           nom: name,
@@ -27,7 +26,6 @@ const homeController = {
       
       console.log('Message de contact sauvegardé:', { name, email, message });
       
-      // Rediriger avec un message de succès
       res.redirect('/?message=Votre message a été envoyé avec succès. Nous vous recontacterons rapidement.');
     } catch (error) {
       console.error('Erreur lors de l\'envoi du message de contact:', error);
@@ -35,7 +33,6 @@ const homeController = {
     }
   },
 
-  // === GESTION DES MESSAGES DE CONTACT (ADMIN) ===
   async getContactMessages(req, res) {
     try {
       const messages = await prisma.contact.findMany({

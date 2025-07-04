@@ -1,175 +1,130 @@
 {% extends "layouts/base.twig" %}
 
 {% block title %}
-<title>Inscription - École Saint-Mathieu</title>
+	<title>Inscription - École Saint-Mathieu</title>
 {% endblock %}
 
 {% block main %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Inscription Parent
-            </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
-                École Saint-Mathieu
-            </p>
-        </div>
-        
-        <form class="mt-8 space-y-6" action="/auth/register" method="POST">
-            {% if error %}
-            <div class="alert alert-error">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ error }}</span>
-            </div>
-            {% endif %}
-            
-            {% if success %}
-            <div class="alert alert-success">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ success }}</span>
-            </div>
-            {% endif %}
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Prénom</span>
-                    </label>
-                    <input type="text" name="firstName" value="{{ formData.firstName }}" 
-                           placeholder="Prénom" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-                </div>
-                
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Nom</span>
-                    </label>
-                    <input type="text" name="lastName" value="{{ formData.lastName }}" 
-                           placeholder="Nom" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-                </div>
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Email</span>
-                </label>
-                <input type="email" name="email" value="{{ formData.email }}" 
-                       placeholder="votre@email.com" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Téléphone</span>
-                </label>
-                <input type="tel" name="phone" value="{{ formData.phone }}" 
-                       placeholder="06 12 34 56 78" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Adresse</span>
-                </label>
-                <textarea name="adress" placeholder="Votre adresse complète" 
-                          class="textarea border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>{{ formData.adress }}</textarea>
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Mot de passe</span>
-                </label>
-                <input type="password" name="password" placeholder="Mot de passe" 
-                       class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required 
-                       minlength="6"
-                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$"
-                       title="Le mot de passe doit contenir au moins 6 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)">
-                <div class="label">
-                    <span class="label-text-alt text-xs text-gray-500">
-                        Min. 6 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
-                    </span>
-                </div>
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Confirmation mot de passe</span>
-                </label>
-                <input type="password" name="confirmPassword" placeholder="Confirmez votre mot de passe" 
-                       class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required 
-                       minlength="6">
-                <div class="label">
-                    <span class="label-text-alt text-xs text-gray-500">
-                        Ressaisissez le même mot de passe
-                    </span>
-                </div>
-            </div>
-            
-            <div class="form-control mt-6">
-                <button type="submit" class="btn bg-teal-600 hover:bg-teal-700 text-white border-none w-full">
-                    S'inscrire
-                </button>
-            </div>
-            
-            <div class="text-center">
-                <p class="text-sm text-gray-600">
-                    Déjà un compte ? 
-                    <a href="/auth/login" class="text-teal-600 hover:text-teal-800 font-medium underline">
-                        Se connecter
-                    </a>
-                </p>
-            </div>
-        </form>
-    </div>
-</div>
+	<div class="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
+		<div class="max-w-md w-full space-y-8">
+			<div>
+				<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-700">
+					Inscription Parent
+				</h2>
+				<p class="mt-3 text-center text-sm text-gray-600">
+					École Saint-Mathieu
+				</p>
+			</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const password = document.querySelector('input[name="password"]');
-    const confirmPassword = document.querySelector('input[name="confirmPassword"]');
-    const form = document.querySelector('form');
-    
-    function validatePassword() {
-        const passwordValue = password.value;
-        const confirmPasswordValue = confirmPassword.value;
-        
-        // Vérifier si les mots de passe correspondent
-        if (passwordValue !== confirmPasswordValue && confirmPasswordValue !== '') {
-            confirmPassword.setCustomValidity('Les mots de passe ne correspondent pas');
-            confirmPassword.classList.add('input-error');
-        } else {
-            confirmPassword.setCustomValidity('');
-            confirmPassword.classList.remove('input-error');
-        }
-    }
-    
-    // Valider en temps réel
-    password.addEventListener('input', validatePassword);
-    confirmPassword.addEventListener('input', validatePassword);
-    
-    // Valider avant soumission
-    form.addEventListener('submit', function(e) {
-        validatePassword();
-        
-        if (!form.checkValidity()) {
-            e.preventDefault();
-            
-            // Afficher le premier champ invalide
-            const firstInvalid = form.querySelector(':invalid');
-            if (firstInvalid) {
-                firstInvalid.focus();
-                
-                // Afficher un message d'erreur personnalisé
-                if (firstInvalid.name === 'password') {
-                    alert('Le mot de passe doit contenir au moins 6 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)');
-                } else if (firstInvalid.name === 'confirmPassword') {
-                    alert('Les mots de passe ne correspondent pas');
-                }
-            }
-        }
-    });
-});
-</script>
+			<form class="mt-8 space-y-6" action="/auth/register" method="POST">
+				{% if error %}
+					<div class="alert alert-error">
+						<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+						</svg>
+						<span>{{ error }}</span>
+					</div>
+				{% endif %}
+
+				{% if success %}
+					<div class="alert alert-success">
+						<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+						</svg>
+						<span>{{ success }}</span>
+					</div>
+				{% endif %}
+
+				<div class="grid grid-cols-2 gap-4">
+					<div class="form-control">
+						<label class="label">
+							<span class="label-text">Prénom</span>
+						</label>
+						<input type="text" name="firstName" value="{{ formData.firstName }}" placeholder="Prénom" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
+					</div>
+
+					<div class="form-control">
+						<label class="label">
+							<span class="label-text">Nom</span>
+						</label>
+						<input type="text" name="lastName" value="{{ formData.lastName }}" placeholder="Nom" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
+					</div>
+				</div>
+
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Email</span>
+					</label>
+					<input type="email" name="email" value="{{ formData.email }}" placeholder="votre@email.com" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
+				</div>
+
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Code d'invitation (optionnel)</span>
+					</label>
+					<input type="text" name="invitationCode" value="{{ formData.invitationCode }}" placeholder="Code pour APEL/Enseignant/Direction" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2">
+					<div class="label">
+						<span class="label-text-alt text-xs text-gray-500">
+							Laissez vide pour une inscription Parent. Contactez l'administration pour obtenir un code.
+						</span>
+					</div>
+				</div>
+
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Téléphone</span>
+					</label>
+					<input type="tel" name="phone" value="{{ formData.phone }}" placeholder="06 12 34 56 78" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
+				</div>
+
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Adresse</span>
+					</label>
+					<textarea name="adress" placeholder="Votre adresse complète" class="textarea border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>{{ formData.adress }}</textarea>
+				</div>
+
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Mot de passe</span>
+					</label>
+					<input type="password" name="password" placeholder="Mot de passe" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$" title="Le mot de passe doit contenir au moins 6 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)">
+					<div class="label">
+						<span class="label-text-alt text-xs text-gray-500">
+							Min. 6 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
+						</span>
+					</div>
+				</div>
+
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Confirmation mot de passe</span>
+					</label>
+					<input type="password" name="confirmPassword" placeholder="Confirmez votre mot de passe" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required minlength="6">
+					<div class="label">
+						<span class="label-text-alt text-xs text-gray-500">
+							Ressaisissez le même mot de passe
+						</span>
+					</div>
+				</div>
+
+				<div class="form-control mt-6">
+					<button type="submit" class="btn bg-teal-600 hover:bg-teal-700 text-white border-none w-full">
+						S'inscrire
+					</button>
+				</div>
+
+				<div class="text-center">
+					<p class="text-sm text-gray-600">
+						Déjà un compte ?
+						<a href="/auth/login" class="text-teal-600 hover:text-teal-800 font-medium underline">
+							Se connecter
+						</a>
+					</p>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script src="/assets/js/register.js"></script>
 {% endblock %}

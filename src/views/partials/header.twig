@@ -1,7 +1,6 @@
 <header class="w-full bg-base-150">
-	<nav
-		class="navbar w-full px-8">
-	
+	<nav class="navbar w-full px-8">
+
 		<div class="flex-none">
 			<a href="/" class="flex items-center gap-5">
 				<img src="/assets/images/logo-st-mathieu-vert.png?v={{ 'now'|date('U') }}" alt="Logo École" class="h-[150px] w-auto object-contain" style="animation: bounce 1s infinite; transform-origin: center bottom;"/>
@@ -10,8 +9,7 @@
 		</div>
 
 		<div class="flex-1 flex justify-center">
-			<ul
-				class="menu menu-horizontal px-1 text-xl">
+			<ul class="menu menu-horizontal px-1 text-xl">
 				<li>
 					<a href="/">Accueil</a>
 				</li>
@@ -42,11 +40,30 @@
 			{% if isAuthenticated %}
 				<div class="dropdown dropdown-end">
 					<div tabindex="0" role="button" class="btn btn-ghost">
-						👤 {{ user.firstName }}
+						👤
+						{{ user.firstName }}
 					</div>
 					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-						<li><a href="/dashboard">Tableau de bord</a></li>
-						<li><a href="/profile">Mon profil</a></li>
+						{% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
+							<li>
+								<a href="/admin/dashboard">Tableau de bord</a>
+							</li>
+						{% elseif user.role == 'ENSEIGNANT' %}
+							<li>
+								<a href="/enseignant/dashboard">Tableau de bord</a>
+							</li>
+						{% elseif user.role == 'PARENT' %}
+							<li>
+								<a href="/parent/dashboard">Tableau de bord</a>
+							</li>
+						{% else %}
+							<li>
+								<a href="/dashboard">Tableau de bord</a>
+							</li>
+						{% endif %}
+						<li>
+							<a href="/profile">Mon profil</a>
+						</li>
 						<li>
 							<form action="/auth/logout" method="POST" class="w-full">
 								<button type="submit" class="w-full text-left">Déconnexion</button>
@@ -56,7 +73,9 @@
 				</div>
 			{% else %}
 				<a href="/auth/login" class="btn btn-primary">Connexion</a>
-				<a href="/auth/register" class="btn btn-outline">Inscription</a>
+				
+				<a href="/auth/register" class="btn btn-success">Inscription</a>
+				
 			{% endif %}
 		</div>
 	</nav>

@@ -1,10 +1,10 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -15,127 +15,119 @@ model User {
   phone     String
   email     String   @unique
   password  String
-  role      String   // (PARENT, APEL, ENSEIGNANT, DIRECTION, ADMIN)
+  role      String 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  // Relations
-  enfants   Student[]    @relation("ParentEnfants")
-  messages  Message[]    @relation("UserMessages")
+
+  enfants    Student[]   @relation("ParentEnfants")
+  messages   Message[]   @relation("UserMessages")
   actualites Actualite[] @relation("UserActualites")
-  horaires  Horaire[]    @relation("EnseignantHoraires")
-  notes     Note[]       @relation("EnseignantNotes")
+  horaires   Horaire[]   @relation("EnseignantHoraires")
+  notes      Note[]      @relation("EnseignantNotes")
 }
 
 model Student {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
+  id            Int      @id @default(autoincrement())
+  firstName     String
+  lastName      String
   dateNaissance DateTime
-  classeId  Int
-  parentId  Int
-  photoUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relations
-  parent    User     @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
-  classe    Classe   @relation("ClasseEleves", fields: [classeId], references: [id])
-  notes     Note[]   @relation("EleveNotes")
-  absences  Absence[] @relation("EleveAbsences")
+  classeId      Int
+  parentId      Int
+  photoUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  parent   User      @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
+  classe   Classe    @relation("ClasseEleves", fields: [classeId], references: [id])
+  notes    Note[]    @relation("EleveNotes")
+  absences Absence[] @relation("EleveAbsences")
 }
 
 model Classe {
-  id        Int      @id @default(autoincrement())
-  nom       String   @unique // CP, CE1, CE2, etc.
-  niveau    String   // Elementaire, Maternelle
-  enseignantId Int?
+  id            Int      @id @default(autoincrement())
+  nom           String   @unique 
+  niveau        String 
+  enseignantId  Int?
   anneeScolaire String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relations
-  eleves    Student[] @relation("ClasseEleves")
-  horaires  Horaire[] @relation("ClasseHoraires")
-  notes     Note[]    @relation("ClasseNotes")
-  absences  Absence[] @relation("ClasseAbsences")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  eleves   Student[] @relation("ClasseEleves")
+  horaires Horaire[] @relation("ClasseHoraires")
+  notes    Note[]    @relation("ClasseNotes")
+  absences Absence[] @relation("ClasseAbsences")
 }
 
 model Note {
-  id        Int      @id @default(autoincrement())
-  eleveId   Int
-  classeId  Int
-  enseignantId Int
-  matiere   String
-  note      Float
-  coefficient Float   @default(1)
-  commentaire String?
+  id             Int      @id @default(autoincrement())
+  eleveId        Int
+  classeId       Int
+  enseignantId   Int
+  matiere        String
+  note           Float
+  coefficient    Float    @default(1)
+  commentaire    String?
   dateEvaluation DateTime
-  createdAt DateTime @default(now())
-  
-  // Relations
-  eleve     Student  @relation("EleveNotes", fields: [eleveId], references: [id])
-  classe    Classe   @relation("ClasseNotes", fields: [classeId], references: [id])
+  createdAt      DateTime @default(now())
+
+  eleve      Student @relation("EleveNotes", fields: [eleveId], references: [id])
+  classe     Classe  @relation("ClasseNotes", fields: [classeId], references: [id])
   enseignant User    @relation("EnseignantNotes", fields: [enseignantId], references: [id], onDelete: Cascade)
 }
 
 model Absence {
-  id        Int      @id @default(autoincrement())
-  eleveId   Int
-  classeId  Int
-  dateDebut DateTime
-  dateFin   DateTime?
-  motif     String
-  justifiee Boolean  @default(false)
+  id          Int       @id @default(autoincrement())
+  eleveId     Int
+  classeId    Int
+  dateDebut   DateTime
+  dateFin     DateTime?
+  motif       String
+  justifiee   Boolean   @default(false)
   commentaire String?
-  createdAt DateTime @default(now())
-  
-  // Relations
-  eleve     Student  @relation("EleveAbsences", fields: [eleveId], references: [id])
-  classe    Classe   @relation("ClasseAbsences", fields: [classeId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  eleve  Student @relation("EleveAbsences", fields: [eleveId], references: [id])
+  classe Classe  @relation("ClasseAbsences", fields: [classeId], references: [id])
 }
 
 model Horaire {
-  id        Int      @id @default(autoincrement())
-  classeId  Int
+  id           Int      @id @default(autoincrement())
+  classeId     Int
   enseignantId Int
-  jourSemaine String  // Lundi, Mardi, etc.
-  heureDebut String   // "08:30"
-  heureFin  String    // "12:00"
-  matiere   String
-  createdAt DateTime @default(now())
-  
-  // Relations
-  classe    Classe   @relation("ClasseHoraires", fields: [classeId], references: [id])
-  enseignant User    @relation("EnseignantHoraires", fields: [enseignantId], references: [id], onDelete: Cascade)
+  jourSemaine  String 
+  heureDebut   String 
+  heureFin     String 
+  matiere      String
+  createdAt    DateTime @default(now())
+
+  classe     Classe @relation("ClasseHoraires", fields: [classeId], references: [id])
+  enseignant User   @relation("EnseignantHoraires", fields: [enseignantId], references: [id], onDelete: Cascade)
 }
 
 model Actualite {
-  id        Int      @id @default(autoincrement())
-  titre     String
-  contenu   String
-  auteurId  Int
+  id              Int      @id @default(autoincrement())
+  titre           String
+  contenu         String
+  auteurId        Int
   datePublication DateTime @default(now())
-  visible   Boolean  @default(true)
-  important Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relations
-  auteur    User     @relation("UserActualites", fields: [auteurId], references: [id], onDelete: Cascade)
+  visible         Boolean  @default(true)
+  important       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  auteur User @relation("UserActualites", fields: [auteurId], references: [id], onDelete: Cascade)
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
-  expediteurId Int
-  destinataireId Int?  // null pour message général
-  sujet     String
-  contenu   String
-  lu        Boolean  @default(false)
-  dateEnvoi DateTime @default(now())
-  
-  // Relations
-  expediteur User    @relation("UserMessages", fields: [expediteurId], references: [id], onDelete: Cascade)
+  id             Int      @id @default(autoincrement())
+  expediteurId   Int
+  destinataireId Int? 
+  sujet          String
+  contenu        String
+  lu             Boolean  @default(false)
+  dateEnvoi      DateTime @default(now())
+
+  expediteur User @relation("UserMessages", fields: [expediteurId], references: [id], onDelete: Cascade)
 }
 
 model Contact {
@@ -149,3 +141,14 @@ model Contact {
   createdAt DateTime @default(now())
 }
 
+model InvitationCode {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  role        String // APEL, ENSEIGNANT, DIRECTION, ADMIN
+  utilisePar  String? // Email de l'utilisateur qui a utilisé le code
+  utilise     Boolean   @default(false)
+  valideJusqu DateTime? // Date d'expiration
+  createdBy   Int // ID de l'admin qui a créé le code
+  createdAt   DateTime  @default(now())
+  usedAt      DateTime?
+}
