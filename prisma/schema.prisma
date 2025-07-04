@@ -144,7 +144,7 @@ model Contact {
 model InvitationCode {
   id          Int       @id @default(autoincrement())
   code        String    @unique
-  role        String // APEL, ENSEIGNANT, DIRECTION, ADMIN
+  role        String // SUPER_ADMIN, DIRECTEUR, ASSISTANT_DIRECTION, APEL, ENSEIGNANT, PARENT
   utilisePar  String? // Email de l'utilisateur qui a utilisé le code
   utilise     Boolean   @default(false)
   valideJusqu DateTime? // Date d'expiration

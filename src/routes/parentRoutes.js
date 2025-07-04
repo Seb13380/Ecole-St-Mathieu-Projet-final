@@ -3,7 +3,6 @@ const router = express.Router();
 const parentController = require('../controllers/parentController');
 const { requireParent } = require('../middleware/auth');
 
-// Appliquer le middleware d'authentification parent à toutes les routes
 router.use(requireParent);
 
 router.get('/dashboard', parentController.getDashboard);

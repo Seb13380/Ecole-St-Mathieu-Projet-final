@@ -1,18 +1,19 @@
 {% extends "layouts/base.twig" %}
 
 {% block main %}
-	<div class="min-h-screen bg-gray-400 py-8">
-		<div
-			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+	<div class="min-h-screen bg-blue-50 py-8">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="mb-8">
-				<h1 class="text-3xl font-bold text-gray-900">Tableau de bord administrateur</h1>
-				<p class="mt-2 text-gray-600">Bienvenue,
+				<h1 class="text-3xl font-bold text-blue-900">🏫 Tableau de bord - Direction</h1>
+				<p class="mt-2 text-blue-700">Bienvenue,
 					{{ user.firstName }}
 					{{ user.lastName }}</p>
+				<p class="text-sm text-blue-600">Directeur de l'École Saint-Mathieu</p>
 			</div>
 
+			<!-- Statistiques générales -->
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-				<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-blue-500">
 					<div class="p-5">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
@@ -22,7 +23,7 @@
 							</div>
 							<div class="ml-5 w-0 flex-1">
 								<dl>
-									<dt class="text-sm font-medium text-gray-500 truncate">Utilisateurs</dt>
+									<dt class="text-sm font-medium text-gray-500 truncate">Personnel</dt>
 									<dd class="text-lg font-medium text-gray-900">{{ stats.totalUsers }}</dd>
 								</dl>
 							</div>
@@ -30,7 +31,7 @@
 					</div>
 				</div>
 
-				<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-green-500">
 					<div class="p-5">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
@@ -48,7 +49,7 @@
 					</div>
 				</div>
 
-				<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-yellow-500">
 					<div class="p-5">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
@@ -66,7 +67,7 @@
 					</div>
 				</div>
 
-				<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-purple-500">
 					<div class="p-5">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
@@ -84,7 +85,7 @@
 					</div>
 				</div>
 
-				<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-red-500">
 					<div class="p-5">
 						<div class="flex items-center">
 							<div class="flex-shrink-0">
@@ -103,62 +104,86 @@
 				</div>
 			</div>
 
-			<!-- Actions rapides -->
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-				<a href="/admin/users" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+			<!-- Actions de direction -->
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+				<a href="/admin/users" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-l-4 border-blue-500">
 					<div class="flex items-center">
 						<svg class="h-8 w-8 text-blue-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
 						</svg>
 						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Gestion des utilisateurs</h3>
-							<p class="text-gray-500">Créer, modifier, supprimer</p>
+							<h3 class="text-lg font-medium text-gray-900">Gestion du personnel</h3>
+							<p class="text-gray-500">Enseignants, administration</p>
 						</div>
 					</div>
 				</a>
 
-				<a href="/admin/students" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+				<a href="/admin/students" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-l-4 border-green-500">
 					<div class="flex items-center">
 						<svg class="h-8 w-8 text-green-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
 						</svg>
 						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Gestion des élèves</h3>
-							<p class="text-gray-500">Ajouter, modifier élèves</p>
+							<h3 class="text-lg font-medium text-gray-900">Suivi pédagogique</h3>
+							<p class="text-gray-500">Élèves, résultats</p>
 						</div>
 					</div>
 				</a>
 
-				<a href="/admin/classes" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+				<a href="/admin/classes" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-l-4 border-yellow-500">
 					<div class="flex items-center">
 						<svg class="h-8 w-8 text-yellow-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
 						</svg>
 						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Gestion des classes</h3>
-							<p class="text-gray-500">Créer, organiser classes</p>
+							<h3 class="text-lg font-medium text-gray-900">Organisation scolaire</h3>
+							<p class="text-gray-500">Classes, emplois du temps</p>
 						</div>
 					</div>
 				</a>
 
-				<a href="/actualites/manage" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+				<a href="/actualites/manage" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-l-4 border-red-500">
 					<div class="flex items-center">
 						<svg class="h-8 w-8 text-red-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
 						</svg>
 						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Gestion des actualités</h3>
-							<p class="text-gray-500">Publier, modifier actualités</p>
+							<h3 class="text-lg font-medium text-gray-900">Communication</h3>
+							<p class="text-gray-500">Actualités, annonces</p>
+						</div>
+					</div>
+				</a>
+
+				<a href="/admin/contact-messages" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-l-4 border-purple-500">
+					<div class="flex items-center">
+						<svg class="h-8 w-8 text-purple-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+						</svg>
+						<div class="ml-4">
+							<h3 class="text-lg font-medium text-gray-900">Messages parents</h3>
+							<p class="text-gray-500">Contact, demandes</p>
+						</div>
+					</div>
+				</a>
+
+				<a href="/admin/reports" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-l-4 border-indigo-500">
+					<div class="flex items-center">
+						<svg class="h-8 w-8 text-indigo-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+						</svg>
+						<div class="ml-4">
+							<h3 class="text-lg font-medium text-gray-900">Rapports & statistiques</h3>
+							<p class="text-gray-500">Analyse, bilans</p>
 						</div>
 					</div>
 				</a>
 			</div>
 
-			<div
-				class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				<div class="bg-white shadow rounded-lg">
+			<!-- Informations récentes -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div class="bg-white shadow-lg rounded-lg">
 					<div class="px-4 py-5 sm:p-6">
-						<h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Nouveaux utilisateurs</h3>
+						<h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">👥 Nouveaux membres du personnel</h3>
 						<div class="space-y-3">
 							{% for user in recentUsers %}
 								<div class="flex items-center justify-between">
@@ -170,25 +195,25 @@
 									<span class="text-xs text-gray-400">{{ user.createdAt|date('d/m/Y') }}</span>
 								</div>
 							{% else %}
-								<p class="text-gray-500 text-sm">Aucun nouvel utilisateur</p>
+								<p class="text-gray-500 text-sm">Aucun nouveau membre</p>
 							{% endfor %}
 						</div>
 					</div>
 				</div>
 
-				<div class="bg-white shadow rounded-lg">
+				<div class="bg-white shadow-lg rounded-lg">
 					<div class="px-4 py-5 sm:p-6">
-						<h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Messages de contact non traités</h3>
+						<h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">✉️ Messages parents à traiter</h3>
 						<div class="space-y-3">
 							{% for message in recentMessages %}
 								<div class="flex items-center justify-between">
 									<div>
 										<p class="text-sm font-medium text-gray-900">{{ message.nom }}</p>
-										<p class="text-sm text-gray-500">{{ message.sujet }}</p>
+										<p class="text-sm text-gray-500 truncate">{{ message.sujet }}</p>
 									</div>
 									<div class="text-right">
 										<span class="text-xs text-gray-400">{{ message.createdAt|date('d/m/Y') }}</span>
-										<a href="/admin/contact-messages" class="block text-xs text-blue-600 hover:text-blue-800">Voir</a>
+										<a href="/admin/contact-messages" class="block text-xs text-blue-600 hover:text-blue-800">Traiter</a>
 									</div>
 								</div>
 							{% else %}

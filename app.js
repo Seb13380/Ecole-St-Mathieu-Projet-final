@@ -48,6 +48,7 @@ app.use((req, res, next) => {
 const homeRoutes = require("./src/routes/homeRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const adminRoutes = require("./src/routes/adminRoutes");
+const directeurRoutes = require("./src/routes/directeurRoutes");
 const parentRoutes = require("./src/routes/parentRoutes");
 const enseignantRoutes = require("./src/routes/enseignantRoutes");
 const actualiteRoutes = require("./src/routes/actualiteRoutes");
@@ -55,6 +56,7 @@ const actualiteRoutes = require("./src/routes/actualiteRoutes");
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/directeur', directeurRoutes);
 app.use('/parent', parentRoutes);
 app.use('/enseignant', enseignantRoutes);
 app.use('/actualites', actualiteRoutes);

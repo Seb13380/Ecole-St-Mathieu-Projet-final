@@ -12,7 +12,7 @@ const invitationController = {
                 return res.status(403).json({ error: 'Accès refusé' });
             }
 
-            const rolesAutorises = ['APEL', 'ENSEIGNANT', 'DIRECTION'];
+            const rolesAutorises = ['ASSISTANT_DIRECTION', 'APEL', 'ENSEIGNANT', 'PARENT'];
             if (!rolesAutorises.includes(role)) {
                 return res.status(400).json({ error: 'Rôle non autorisé' });
             }

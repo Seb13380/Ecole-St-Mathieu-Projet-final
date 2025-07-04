@@ -3,7 +3,6 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { requireAdmin } = require('../middleware/auth');
 
-// Appliquer le middleware d'authentification admin à toutes les routes
 router.use(requireAdmin);
 
 router.get('/dashboard', adminController.getDashboard);

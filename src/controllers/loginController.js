@@ -108,7 +108,23 @@ const loginController = {
         console.log('🎯 Redirection selon le rôle:', role);
 
         switch (role) {
-            case 'ADMIN':
+            case 'SUPER_ADMIN':
+                console.log('➡️ Redirection vers tableau de bord super admin');
+                res.redirect('/admin/dashboard');
+                break;
+            case 'DIRECTEUR':
+                console.log('➡️ Redirection vers tableau de bord directeur');
+                res.redirect('/directeur/dashboard');
+                break;
+            case 'ASSISTANT_DIRECTION':
+                console.log('➡️ Redirection vers tableau de bord assistant direction');
+                res.redirect('/admin/dashboard');
+                break;
+            case 'APEL':
+                console.log('➡️ Redirection vers tableau de bord APEL');
+                res.redirect('/admin/dashboard');
+                break;
+            case 'ADMIN': // Garde compatibilité
                 console.log('➡️ Redirection vers tableau de bord admin');
                 res.redirect('/admin/dashboard');
                 break;

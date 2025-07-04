@@ -6,7 +6,6 @@ async function createCodes() {
     try {
         console.log('📝 Création des codes d\'invitation...');
 
-        // Récupérer l'admin
         const admin = await prisma.user.findFirst({
             where: { role: 'ADMIN' }
         });
@@ -16,7 +15,6 @@ async function createCodes() {
             return;
         }
 
-        // Créer les codes directement dans la table (sans utiliser le modèle)
         const codes = [
             { code: 'DIR2024STM', role: 'DIRECTION' },
             { code: 'ENS2024STM', role: 'ENSEIGNANT' },
@@ -24,7 +22,6 @@ async function createCodes() {
         ];
 
         for (const codeData of codes) {
-            // Utiliser une requête SQL directe
             await prisma.$executeRaw`
         INSERT INTO InvitationCode (code, role, createdBy, valideJusqu, createdAt, utilise)
         VALUES (${codeData.code}, ${codeData.role}, ${admin.id}, DATE_ADD(NOW(), INTERVAL 30 DAY), NOW(), false)

@@ -7,11 +7,9 @@ async function resetAdminPassword() {
     try {
         console.log('🔐 Réinitialisation du mot de passe admin...\n');
 
-        // Nouveau mot de passe
-        const newPassword = 'AdminStMathieu2024!';
+        const newPassword = 'StMathieu2025!';
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Mise à jour de l'admin existant
         const admin = await prisma.user.update({
             where: { email: 'l.camboulives@orange.fr' },
             data: { password: hashedPassword }
@@ -22,7 +20,6 @@ async function resetAdminPassword() {
         console.log('🔑 Nouveau mot de passe: AdminStMathieu2024!');
         console.log('⚠️  IMPORTANT: Changez ce mot de passe après la première connexion !');
 
-        // Test de vérification
         console.log('\n🔍 Vérification...');
         const testValid = await bcrypt.compare(newPassword, hashedPassword);
         console.log('✅ Vérification du hash:', testValid ? 'OK' : 'ERREUR');
