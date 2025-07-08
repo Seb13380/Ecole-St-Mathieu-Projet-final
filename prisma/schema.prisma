@@ -15,7 +15,7 @@ model User {
   phone     String
   email     String   @unique
   password  String
-  role      String 
+  role      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -45,8 +45,8 @@ model Student {
 
 model Classe {
   id            Int      @id @default(autoincrement())
-  nom           String   @unique 
-  niveau        String 
+  nom           String   @unique
+  niveau        String
   enseignantId  Int?
   anneeScolaire String
   createdAt     DateTime @default(now())
@@ -94,9 +94,9 @@ model Horaire {
   id           Int      @id @default(autoincrement())
   classeId     Int
   enseignantId Int
-  jourSemaine  String 
-  heureDebut   String 
-  heureFin     String 
+  jourSemaine  String
+  heureDebut   String
+  heureFin     String
   matiere      String
   createdAt    DateTime @default(now())
 
@@ -121,7 +121,7 @@ model Actualite {
 model Message {
   id             Int      @id @default(autoincrement())
   expediteurId   Int
-  destinataireId Int? 
+  destinataireId Int?
   sujet          String
   contenu        String
   lu             Boolean  @default(false)

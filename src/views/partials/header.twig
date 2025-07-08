@@ -1,49 +1,65 @@
 <header class="w-full bg-base-150">
-	<nav class="navbar w-full px-8">
+	<nav class="navbar w-full px-8 font-poppins">
 
 		<div class="flex-none">
 			<a href="/" class="flex items-center gap-5">
-				<img src="/assets/images/logo-st-mathieu-vert.png?v={{ 'now'|date('U') }}" alt="Logo École" class="h-[150px] w-auto object-contain" style="animation: bounce 1s infinite; transform-origin: center bottom;"/>
+				<img src="/assets/images/logo-st-mathieu-vert.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 95px; animation: bounce 1s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
 
 		<div class="flex-1 flex justify-center">
-			<ul class="menu menu-horizontal px-1 text-xl">
+			<ul class="menu menu-horizontal px-1 text-xl font-poppins-medium">
 				<li>
-					<a href="/">Accueil</a>
+					<a href="/" class="hover:font-poppins-semibold transition-all">Accueil</a>
+				</li>
+				<li class="dropdown dropdown-hover">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all">
+						L'école
+						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base">
+						<li>
+							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all">Règlement intérieur</a>
+						</li>
+						<li>
+							<a href="/frais-scolarite" class="hover:font-poppins-medium transition-all">Frais de scolarité</a>
+						</li>
+						<li>
+							<a href="/horaires" class="hover:font-poppins-medium transition-all">Horaires</a>
+						</li>
+					</ul>
 				</li>
 				<li>
-					<a href="/">L'école</a>
+					<a href="" class="hover:font-poppins-semibold transition-all">Actus</a>
 				</li>
 				<li>
-					<a href="">Actus</a>
+					<a href="" class="hover:font-poppins-semibold transition-all">Classes</a>
 				</li>
 				<li>
-					<a href="">Classes</a>
+					<a href="" class="hover:font-poppins-semibold transition-all">Agendas</a>
 				</li>
 				<li>
-					<a href="">Agendas</a>
+					<a href="" class="hover:font-poppins-semibold transition-all">Restauration</a>
 				</li>
 				<li>
-					<a href="">Restauration</a>
+					<a href="" class="hover:font-poppins-semibold transition-all">APEL</a>
 				</li>
 				<li>
-					<a href="">APEL</a>
-				</li>
-				<li>
-					<a href="">Contact</a>
+					<a href="" class="hover:font-poppins-semibold transition-all">Contact</a>
 				</li>
 			</ul>
 		</div>
-		<div class="flex-none gap-2">
+		<div class="flex-none gap-4">
 			{% if isAuthenticated %}
 				<div class="dropdown dropdown-end">
-					<div tabindex="0" role="button" class="btn btn-ghost">
+					<div tabindex="0" role="button" class="btn btn-ghost font-poppins-medium">
 						👤
 						{{ user.firstName }}
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow font-poppins-regular">
 						{% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
 							<li>
 								<a href="/admin/dashboard">Tableau de bord</a>
@@ -72,10 +88,10 @@
 					</ul>
 				</div>
 			{% else %}
-				<a href="/auth/login" class="btn btn-primary">Connexion</a>
-				
-				<a href="/auth/register" class="btn btn-success">Inscription</a>
-				
+				<a href="/auth/login" class="btn btn-primary font-poppins-medium">Connexion</a>
+
+				<a href="/auth/register" class="btn btn-success font-poppins-medium">Inscription</a>
+
 			{% endif %}
 		</div>
 	</nav>

@@ -1,64 +1,153 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+/* === POLICES PERSONNALISÉES === */
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* === CAROUSEL FLOWBITE === */
+/* S'assurer que le premier item est visible */
+/* Pour que les images gardent bien leur position et taille */
+[data-carousel="slide"] [data-carousel-item] {
+  transition: transform 4s ease-in-out !important;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+/* Classes utilitaires pour différents poids */
+.font-montserrat-light {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+.font-montserrat-regular {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+}
+
+.font-montserrat-medium {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+.font-montserrat-semibold {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+.font-montserrat-bold {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.font-poppins-light {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+}
+
+.font-poppins-regular {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+}
+
+.font-poppins-medium {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.font-poppins-semibold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+}
+
+.font-poppins-bold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
 
 /* Styles personnalisés pour la validation des formulaires */
 .input-error {
-    border-color: #0d9488 !important;
-    box-shadow: 0 0 0 1px #0d9488 !important;
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 1px #0d9488 !important;
 }
 
 .input:invalid {
-    border-color: #0d9488;
+  border-color: #0d9488;
 }
 
 .input:valid {
-    border-color: #14b8a6;
+  border-color: #14b8a6;
 }
 
 /* Animation pour les champs invalides */
 .input-error {
-    animation: shake 0.3s ease-in-out;
+  animation: shake 0.3s ease-in-out;
 }
 
 /* Alertes personnalisées en vert d'eau */
 .alert-error {
-    background-color: #ccfbf1 !important;
-    border-color: #0d9488 !important;
-    color: #0f766e !important;
+  background-color: #ccfbf1 !important;
+  border-color: #0d9488 !important;
+  color: #0f766e !important;
 }
 
 .alert-error svg {
-    color: #0d9488 !important;
+  color: #0d9488 !important;
 }
 
 .alert-success {
-    background-color: #d1fae5 !important;
-    border-color: #14b8a6 !important;
-    color: #065f46 !important;
+  background-color: #d1fae5 !important;
+  border-color: #14b8a6 !important;
+  color: #065f46 !important;
 }
 
 .alert-success svg {
-    color: #14b8a6 !important;
+  color: #14b8a6 !important;
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-2px); }
-    75% { transform: translateX(2px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  75% {
+    transform: translateX(2px);
+  }
 }
 
 /* Animation bounce personnalisée pour le logo */
 @keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-25px);
-    }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-25px);
+  }
 }
 
 .logo-bounce {
-    animation: bounce 1s infinite;
+  animation: bounce 1s infinite;
 }
 
 @plugin "daisyui/theme" {
@@ -97,18 +186,60 @@
 }
 
 .w-auto {
-    width: auto;
+  width: auto;
 }
 
 .object-contain {
-    object-fit: contain;
+  object-fit: contain;
 }
 
 .transition-transform {
-    transition-property: transform;
+  transition-property: transform;
 }
 
 .hover\:scale-110:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
+/* Carousel CSS pur */
+.carousel-slide {
+  transition: opacity 0.7s ease-in-out;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+}
+
+.carousel-slide:not(.active) {
+  opacity: 0;
+}
+
+.carousel-indicator {
+  transition: all 0.3s ease;
+}
+
+.carousel-indicator:hover {
+  transform: scale(1.1);
+}
+
+.carousel-prev,
+.carousel-next {
+  transition: all 0.3s ease;
+}
+
+.carousel-prev:hover,
+.carousel-next:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.carousel-container:hover .carousel-prev,
+.carousel-container:hover .carousel-next {
+  opacity: 1;
+}
+
+/* Responsive carousel */
+@media (max-width: 768px) {
+  .carousel-container {
+    height: 300px !important;
+  }
+}
