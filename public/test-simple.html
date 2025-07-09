@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple Connexion</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f9ff; }
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #0f766e; }
+        input { width: 100%; padding: 10px; border: 2px solid #0d9488; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0d9488; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #0f766e; }
+        h1 { color: #0d9488; text-align: center; }
+        .info { background: #ecfdf5; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #10b981; }
+        .note { background: #fef7ff; padding: 10px; border-radius: 4px; margin-top: 20px; font-size: 14px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Test Connexion Ultra Simple</h1>
+        
+        <div class="info">
+            <p><strong>Identifiants de test :</strong></p>
+            <ul>
+                <li><strong>Email :</strong> l.camboulives@orange.fr</li>
+                <li><strong>Mot de passe :</strong> AdminStMathieu2024!</li>
+            </ul>
+        </div>
+        
+        <form action="/auth/login" method="POST">
+            <div class="form-group">
+                <label for="email">Email :</label>
+                <input type="email" id="email" name="email" value="l.camboulives@orange.fr" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe :</label>
+                <input type="password" id="password" name="password" value="AdminStMathieu2024!" required>
+            </div>
+            
+            <button type="submit">🚀 SE CONNECTER</button>
+        </form>
+        
+        <div class="note">
+            <p><strong>🧪 Note de test :</strong> Cette page n'a aucun JavaScript. Si la connexion ne fonctionne pas ici, le problème vient du serveur Express, pas du frontend.</p>
+        </div>
+    </div>
+</body>
+</html>

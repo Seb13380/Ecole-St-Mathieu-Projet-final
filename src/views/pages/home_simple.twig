@@ -1,0 +1,64 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	<title>Ecole Saint-Mathieu</title>
+{% endblock %}
+
+{% block main %}
+	<div class="flex flex-col items-center px-4 gap-6">
+		<h1 class="text-center font-bold text-3xl text-[#304a4d] mb-0">
+			Bienvenue à l'Ecole Saint-Mathieu
+		</h1>
+		<h2 class="text-lg text-center text-[#304a4d] mb-6">
+			L'école Saint-Mathieu est un établissement scolaire privé situé à Marseille Château Gombert, offrant une éducation de qualité aux élèves de la maternelle au primaire.
+		</h2>
+	</div>
+
+	<!-- Carousel simple -->
+	<div class="w-full max-w-4xl mx-auto my-8">
+		<div class="relative w-full h-64 overflow-hidden rounded-lg">
+			<div class="flex h-full" id="carousel-container" style="width: 400%; transition: transform 0.5s ease;">
+				<div class="w-1/4 h-full">
+					<img src="/assets/images/20250326_114849.jpg" alt="École" class="w-full h-full object-cover">
+				</div>
+				<div class="w-1/4 h-full">
+					<img src="/assets/images/20250326_114954.jpg" alt="Activités" class="w-full h-full object-cover">
+				</div>
+				<div class="w-1/4 h-full">
+					<img src="/assets/images/20250328_164349.jpg" alt="Projets" class="w-full h-full object-cover">
+				</div>
+				<div class="w-1/4 h-full">
+					<img src="/assets/images/20250514_114720.jpg" alt="Équipe" class="w-full h-full object-cover">
+				</div>
+			</div>
+			<button onclick="prev()" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center">‹</button>
+			<button onclick="next()" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center">›</button>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block scripts %}
+	<script>
+		let currentSlide = 0;
+
+function prev() {
+currentSlide = currentSlide > 0 ? currentSlide - 1 : 3;
+updateCarousel();
+}
+
+function next() {
+currentSlide = currentSlide < 3 ? currentSlide + 1 : 0;
+updateCarousel();
+}
+
+function updateCarousel() {
+const container = document.getElementById('carousel-container');
+const translateX = -(currentSlide * 25);
+container.style.transform = `translateX(${translateX}%)`;
+}
+
+// Auto-slide toutes les 4 secondes
+setInterval(next, 4000);
+	</script>
+{% endblock %}

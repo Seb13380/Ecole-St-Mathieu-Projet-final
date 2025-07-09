@@ -24,6 +24,7 @@ model User {
   actualites Actualite[] @relation("UserActualites")
   horaires   Horaire[]   @relation("EnseignantHoraires")
   notes      Note[]      @relation("EnseignantNotes")
+  menus      Menu[]      @relation("UserMenus")
 }
 
 model Student {
@@ -151,4 +152,20 @@ model InvitationCode {
   createdBy   Int // ID de l'admin qui a créé le code
   createdAt   DateTime  @default(now())
   usedAt      DateTime?
+}
+
+model Menu {
+  id        Int      @id @default(autoincrement())
+  semaine   String // "Semaine du 15 au 19 Janvier 2025"
+  lundi     String? // Menu du lundi
+  mardi     String? // Menu du mardi
+  mercredi  String? // Menu du mercredi
+  jeudi     String? // Menu du jeudi
+  vendredi  String? // Menu du vendredi
+  actif     Boolean  @default(true)
+  auteurId  Int // Qui a créé/modifié le menu
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auteur User @relation("UserMenus", fields: [auteurId], references: [id], onDelete: Cascade)
 }

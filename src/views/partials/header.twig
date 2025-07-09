@@ -1,9 +1,9 @@
-<header class="w-full bg-base-150">
+<header class="w-full bg-[#a7e3dd]">
 	<nav class="navbar w-full px-8 font-poppins">
 
 		<div class="flex-none">
 			<a href="/" class="flex items-center gap-5">
-				<img src="/assets/images/logo-st-mathieu-vert.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 95px; animation: bounce 1s infinite; transform-origin: center bottom;"/>
+				<img src="/assets/images/logo-st-mathieu-vert.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 1s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
@@ -30,6 +30,9 @@
 						<li>
 							<a href="/horaires" class="hover:font-poppins-medium transition-all">Horaires</a>
 						</li>
+						<li>
+							<a href="/horaires" class="hover:font-poppins-medium transition-all">Commande de Polos Verts</a>
+						</li>
 					</ul>
 				</li>
 				<li>
@@ -41,8 +44,21 @@
 				<li>
 					<a href="" class="hover:font-poppins-semibold transition-all">Agendas</a>
 				</li>
-				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all">Restauration</a>
+				<li class="dropdown dropdown-hover">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all">
+						Restauration
+						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base">
+						<li>
+							<a href="https://www.dupont-restauration.fr/" target="_blank" class="hover:font-poppins-medium transition-all">Dupont Restauration</a>
+						</li>
+						<li>
+							<a href="/restauration/menus" class="hover:font-poppins-medium transition-all">Le chef Serge vous propose</a>
+						</li>
+					</ul>
 				</li>
 				<li>
 					<a href="" class="hover:font-poppins-semibold transition-all">APEL</a>

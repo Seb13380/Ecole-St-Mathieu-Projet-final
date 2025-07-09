@@ -52,6 +52,7 @@ const directeurRoutes = require("./src/routes/directeurRoutes");
 const parentRoutes = require("./src/routes/parentRoutes");
 const enseignantRoutes = require("./src/routes/enseignantRoutes");
 const actualiteRoutes = require("./src/routes/actualiteRoutes");
+const restaurationRoutes = require("./src/routes/restaurationRoutes");
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -60,6 +61,7 @@ app.use('/directeur', directeurRoutes);
 app.use('/parent', parentRoutes);
 app.use('/enseignant', enseignantRoutes);
 app.use('/actualites', actualiteRoutes);
+app.use('/restauration', restaurationRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
