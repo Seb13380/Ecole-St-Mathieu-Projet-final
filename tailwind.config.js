@@ -1,8 +1,9 @@
 module.exports = {
     content: [
-        "./pages/**/*.{js,ts,jsx,tsx}",
-        "./components/**/*.{js,ts,jsx,tsx}",
-        "./app/**/*.{js,ts,jsx,tsx}",
+        "./src/views/**/*.{twig,html}",
+        "./public/**/*.{js,html}",
+        "./src/**/*.{js,twig}",
+        "./**/*.{html,twig,js}"
     ],
     plugins: [
         require('daisyui'),
