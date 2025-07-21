@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Auto-dismiss seulement pour les alerts de notification (avec classe 'alert-success', 'alert-error', etc.)
-    // Exclut les alerts permanentes comme 'alert-info' qui doivent rester affichées
     const dismissibleAlerts = document.querySelectorAll('.alert.alert-success, .alert.alert-error, .alert.alert-warning:not(.permanent)');
     dismissibleAlerts.forEach(alert => {
         setTimeout(() => {

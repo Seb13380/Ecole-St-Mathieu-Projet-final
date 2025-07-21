@@ -1,20 +1,119 @@
-/* @import "tailwindcss"; */
-@plugin "daisyui";
-/* @import "flowbite/src/themes/default"; */
-@plugin "flowbite/plugin";
-@source "../node_modules/flowbite";
+/* DIRECTIVES TAILWIND EN PREMIER */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PLUGINS */
+@import "daisyui";
+@import "flowbite/plugin";
+
+/* Effet Jelly pour les boutons */
+.Btn,
+.Btn:link,
+.Btn:visited {
+  position: relative;
+  min-width: 150px;
+  height: 55px;
+  border-radius: 45px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  background-color: #006B6D;
+  color: white;
+  box-shadow: 0px 10px 10px rgba(0, 144, 147, 0.4) inset,
+    0px 5px 10px rgba(5, 5, 5, 0.212),
+    0px -10px 10px rgba(0, 86, 88, 0.9) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Classe spéciale pour les boutons pleine largeur */
+.Btn.full-width {
+  width: 100% !important;
+}
+
+.Btn::before,
+.Btn:link::before,
+.Btn:visited::before {
+  width: 70%;
+  height: 2px;
+  position: absolute;
+  background-color: rgba(250, 250, 250, 0.678);
+  content: "";
+  filter: blur(1px);
+  top: 7px;
+  border-radius: 50%;
+}
+
+.Btn::after,
+.Btn:link::after,
+.Btn:visited::after {
+  width: 70%;
+  height: 2px;
+  position: absolute;
+  background-color: rgba(250, 250, 250, 0.137);
+  content: "";
+  filter: blur(1px);
+  bottom: 7px;
+  border-radius: 50%;
+}
+
+.Btn:hover,
+.Btn:focus {
+  animation: jello-horizontal 0.9s both;
+}
+
+@keyframes jello-horizontal {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+
+  30% {
+    transform: scale3d(1.25, 0.75, 1);
+  }
+
+  40% {
+    transform: scale3d(0.75, 1.25, 1);
+  }
+
+  50% {
+    transform: scale3d(1.15, 0.85, 1);
+  }
+
+  65% {
+    transform: scale3d(0.95, 1.05, 1);
+  }
+
+  75% {
+    transform: scale3d(1.05, 0.95, 1);
+  }
+
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+
 
 /* === HARMONISATION HEADER/FOOTER === */
 /* Couleurs cohérentes pour le header et footer */
 .navbar {
   background-color: #a7e3dd;
   color: #304a4d;
+  font-size: 2rem;
 }
 
 .navbar .menu a {
   color: #304a4d;
   transition: all 0.3s ease;
+  font-size: 2.2rem;
+  font-weight: 600;
 }
+
+
 
 .navbar .menu a:hover {
   color: #1a2e30;
@@ -29,6 +128,8 @@
 
 .navbar .dropdown-content a {
   color: #304a4d;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 .navbar .dropdown-content a:hover {
@@ -62,10 +163,12 @@
 footer {
   background-color: #a7e3dd;
   color: #304a4d;
+  font-size: 1.25rem !important;
 }
 
 footer .link {
   color: #304a4d;
+  font-size: 1.25rem !important;
 }
 
 footer .link:hover {
@@ -81,6 +184,10 @@ footer svg:hover {
   fill: #1a2e30;
 }
 
+footer p {
+  font-size: 1.125rem !important;
+}
+
 /* === POLICES PERSONNALISÉES === */
 .font-montserrat {
   font-family: 'Montserrat', sans-serif;
@@ -91,8 +198,6 @@ footer svg:hover {
 }
 
 /* === CAROUSEL FLOWBITE === */
-/* S'assurer que le premier item est visible */
-/* Pour que les images gardent bien leur position et taille */
 [data-carousel="slide"] [data-carousel-item] {
   transition: transform 4s ease-in-out !important;
   object-fit: cover;
@@ -100,8 +205,6 @@ footer svg:hover {
   width: 100%;
   height: 100%;
 }
-
-
 
 /* Classes utilitaires pour différents poids */
 .font-montserrat-light {
@@ -227,41 +330,6 @@ footer svg:hover {
   animation: bounce 1s infinite;
 }
 
-@plugin "daisyui/theme" {
-  name: "cupcake";
-  default: false;
-  prefersdark: false;
-  color-scheme: "dark";
-  --color-base-100: oklch(97.788% 0.004 56.375);
-  --color-base-200: oklch(93.982% 0.007 61.449);
-  --color-base-300: oklch(91.586% 0.006 53.44);
-  --color-base-content: oklch(23.574% 0.066 313.189);
-  --color-primary: oklch(85% 0.138 181.071);
-  --color-primary-content: oklch(43% 0.078 188.216);
-  --color-secondary: oklch(89% 0.061 343.231);
-  --color-secondary-content: oklch(45% 0.187 3.815);
-  --color-accent: oklch(90% 0.076 70.697);
-  --color-accent-content: oklch(47% 0.157 37.304);
-  --color-neutral: oklch(27% 0.006 286.033);
-  --color-neutral-content: oklch(92% 0.004 286.32);
-  --color-info: oklch(68% 0.169 237.323);
-  --color-info-content: oklch(29% 0.066 243.157);
-  --color-success: oklch(69% 0.17 162.48);
-  --color-success-content: oklch(26% 0.051 172.552);
-  --color-warning: oklch(79% 0.184 86.047);
-  --color-warning-content: oklch(28% 0.066 53.813);
-  --color-error: oklch(65% 0.241 354.308);
-  --color-error-content: oklch(27% 0.105 12.094);
-  --radius-selector: 1rem;
-  --radius-field: 2rem;
-  --radius-box: 1rem;
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-  --border: 2px;
-  --depth: 1;
-  --noise: 0;
-}
-
 .w-auto {
   width: auto;
 }
@@ -318,5 +386,88 @@ footer svg:hover {
 @media (max-width: 768px) {
   .carousel-container {
     height: 300px !important;
+  }
+}
+
+/* === BOUTONS ANIMÉS === */
+@layer components {
+  /* .headerbutton {
+    position: relative;
+    width: 180px;
+    height: 60px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 24px 0 rgba(64, 201, 255, 0.15);
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+    text-decoration: none;
+    z-index: 1;
+  }
+
+  .headerbutton::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: -4px;
+    top: -1px;
+    margin: auto;
+    width: 196px;
+    height: 68px;
+    border-radius: 14px;
+    background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+    z-index: -1;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 1;
+  }
+
+  .headerbutton::after {
+    content: "";
+    z-index: -2;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100%);
+    transform: translate3d(0, 0, 0) scale(0.95);
+    filter: blur(30px);
+    opacity: 0.5;
+  }
+
+  .headerbutton:hover {
+    background: rgba(64, 201, 255, 0.10);
+    color: #fff;
+    box-shadow: 0 8px 32px 0 rgba(232, 28, 255, 0.25);
+  }
+
+  .headerbutton:hover::after {
+    filter: blur(40px);
+    opacity: 0.7;
+  }
+
+  .headerbutton:hover::before {
+    transform: rotate(-180deg);
+    opacity: 1;
+  }
+
+  .headerbutton:active::before {
+    scale: 0.7;
+  }
+} */
+
+  /* From Uiverse.io by adamgiebl */
+  .card {
+    width: 900px;
+    height: 600px;
+    border-radius: 30px;
+    background: #e0e0e0;
+    box-shadow: 15px 15px 30px #bebebe,
+      -15px -15px 30px #ffffff;
   }
 }

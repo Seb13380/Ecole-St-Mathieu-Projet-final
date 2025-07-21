@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -155,17 +155,22 @@ model InvitationCode {
 }
 
 model Menu {
-  id        Int      @id @default(autoincrement())
-  semaine   String // "Semaine du 15 au 19 Janvier 2025"
-  lundi     String? // Menu du lundi
-  mardi     String? // Menu du mardi
-  mercredi  String? // Menu du mercredi
-  jeudi     String? // Menu du jeudi
-  vendredi  String? // Menu du vendredi
-  actif     Boolean  @default(true)
-  auteurId  Int // Qui a créé/modifié le menu
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int       @id @default(autoincrement())
+  semaine     String // "Semaine du 15 au 19 Janvier 2025"
+  dateDebut   DateTime? // Date de début de la semaine
+  dateFin     DateTime? // Date de fin de la semaine
+  lundi       String? // Menu du lundi (ancienne version)
+  mardi       String? // Menu du mardi (ancienne version)
+  mercredi    String? // Menu du mercredi (ancienne version)
+  jeudi       String? // Menu du jeudi (ancienne version)
+  vendredi    String? // Menu du vendredi (ancienne version)
+  pdfUrl      String? // URL du fichier PDF
+  pdfFilename String? // Nom original du fichier PDF
+  statut      String    @default("BROUILLON") // BROUILLON, PLANIFIE, ACTIF, ARCHIVE
+  actif       Boolean   @default(false)
+  auteurId    Int // Qui a créé/modifié le menu
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   auteur User @relation("UserMenus", fields: [auteurId], references: [id], onDelete: Cascade)
 }

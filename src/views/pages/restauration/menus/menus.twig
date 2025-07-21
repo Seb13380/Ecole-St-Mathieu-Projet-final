@@ -1,0 +1,79 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}École Saint-Mathieu - Menus de la semaine
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto px-4 py-8">
+		<div class="text-center mb-8">
+			<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
+				Le Chef Serge vous propose
+			</h1>
+			<p class="text-lg text-[#304a4d] opacity-80">
+				Les menus de la semaine préparés avec soin par notre chef cuisinier
+			</p>
+		</div>
+
+		{% if menus and menus|length > 0 %}
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				{% for menu in menus %}
+					<div
+						class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+						<!-- Header de la carte -->
+						<div class="bg-gradient-to-r from-[#304a4d] to-[#4a6b70] p-4">
+							<h2 class="text-lg font-semibold text-center text-[#304a4d]">
+								🍽️
+								{{ menu.semaine }}
+							</h2>
+							{% if menu.auteur %}
+								<p class="text-center text-xs opacity-90 mt-1 text-[#304a4d]">
+									Préparé par Serge
+								</p>
+							{% endif %}
+						</div>
+
+
+					<div class="bg-gray-50 px-4 py-2 border-t">
+						<div class="flex justify-between items-center text-xs text-gray-600">
+							<span>📅
+								{{ menu.createdAt|date('d/m/Y') }}</span>
+							<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">✅ Actif</span>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="max-w-2xl mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+			<div class="text-6xl mb-4">🍽️</div>
+			<h3 class="text-xl font-semibold text-yellow-800 mb-2">Aucun menu disponible</h3>
+			<p class="text-yellow-700">
+				Les menus de la semaine ne sont pas encore disponibles. Revenez bientôt !
+			</p>
+		</div>
+	{% endif %}
+
+	<!-- Information supplémentaire -->
+	<div class="max-w-4xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+		<h3 class="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+			<span class="text-xl mr-2">ℹ️</span>
+			Informations pratiques
+		</h3>
+		<ul class="text-sm text-blue-700 space-y-1">
+			<li>• Service de 11h30 à 13h30</li>
+			<li>• Tous nos plats sont préparés sur place avec des produits frais</li>
+			<li>• Menus adaptés aux allergies sur demande</li>
+			<li>• Produits locaux et de saison privilégiés</li>
+		</ul>
+	</div>
+
+	<!-- Lien vers Dupont Restauration -->
+	<div class="text-center mt-8">
+		<a href="https://www.dupont-restauration.fr/" target="_blank" class="inline-flex items-center px-6 py-3 bg-[#304a4d] text-white rounded-lg hover:bg-[#1a2e30] transition-colors">
+			<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+			</svg>
+			Découvrir Dupont Restauration
+		</a>
+	</div>
+</div>{% endblock %}

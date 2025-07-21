@@ -35,7 +35,7 @@ const requireAdmin = (req, res, next) => {
         return res.redirect('/auth/login?message=Vous devez être connecté pour accéder à cette page');
     }
 
-    const allowedRoles = ['ADMIN', 'DIRECTION'];
+    const allowedRoles = ['ADMIN', 'DIRECTION', 'MAINTENANCE_SITE'];
     console.log('🎭 Rôle utilisateur:', req.session.user.role, 'Rôles autorisés:', allowedRoles);
 
     if (!allowedRoles.includes(req.session.user.role)) {

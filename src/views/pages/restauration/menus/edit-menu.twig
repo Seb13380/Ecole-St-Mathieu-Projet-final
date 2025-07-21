@@ -1,0 +1,72 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Modifier le menu - Administration
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto px-4 py-8">
+		<div class="flex items-center mb-8">
+			<a href="/admin/menus" class="text-[#304a4d] hover:text-[#1a2e30] mr-4">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+				</svg>
+			</a>
+			<h1 class="text-3xl font-bold text-[#304a4d]">Modifier le menu</h1>
+		</div>
+
+		<div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+			<form action="/admin/menus/{{ menu.id }}/edit" method="POST">
+				<div class="mb-6">
+					<label for="semaine" class="block text-sm font-medium text-gray-700 mb-2">
+						Semaine
+						<span class="text-red-500">*</span>
+					</label>
+					<input type="text" id="semaine" name="semaine" required value="{{ menu.semaine }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+					<div>
+						<label for="lundi" class="block text-sm font-medium text-gray-700 mb-2">Lundi</label>
+						<textarea id="lundi" name="lundi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">{{ menu.lundi }}</textarea>
+					</div>
+
+					<div>
+						<label for="mardi" class="block text-sm font-medium text-gray-700 mb-2">Mardi</label>
+						<textarea id="mardi" name="mardi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">{{ menu.mardi }}</textarea>
+					</div>
+
+					<div>
+						<label for="mercredi" class="block text-sm font-medium text-gray-700 mb-2">Mercredi</label>
+						<textarea id="mercredi" name="mercredi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">{{ menu.mercredi }}</textarea>
+					</div>
+
+					<div>
+						<label for="jeudi" class="block text-sm font-medium text-gray-700 mb-2">Jeudi</label>
+						<textarea id="jeudi" name="jeudi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">{{ menu.jeudi }}</textarea>
+					</div>
+
+					<div>
+						<label for="vendredi" class="block text-sm font-medium text-gray-700 mb-2">Vendredi</label>
+						<textarea id="vendredi" name="vendredi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">{{ menu.vendredi }}</textarea>
+					</div>
+				</div>
+
+				<div class="mb-6">
+					<label class="flex items-center">
+						<input type="checkbox" name="actif" {{ menu.actif ? 'checked' : '' }} class="rounded border-gray-300 text-[#304a4d] focus:ring-[#304a4d]">
+						<span class="ml-2 text-sm text-gray-700">Menu actif (visible sur le site)</span>
+					</label>
+				</div>
+
+				<div class="flex justify-end space-x-4">
+					<a href="/admin/menus" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+						Annuler
+					</a>
+					<button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+						Sauvegarder
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

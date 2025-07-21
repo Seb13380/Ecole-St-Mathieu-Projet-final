@@ -1,0 +1,187 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Modifier le menu - Administration
+{% endblock %}
+
+{% block main %}
+	<style>
+		/* From Uiverse.io by vinodjangid07 */
+		.Btn {
+			position: relative;
+			width: 150px;
+			height: 55px;
+			border-radius: 45px;
+			border: none;
+			background-color: rgb(34, 197, 94);
+			color: white;
+			box-shadow: 0 10px 10px rgb(187, 247, 208) inset, 0 5px 10px rgba(5, 5, 5, 0.212), 0 -10px 10px rgb(21, 128, 61) inset;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			font-size: 16px;
+		}
+
+		.Btn::before {
+			width: 70%;
+			height: 2px;
+			position: absolute;
+			background-color: rgba(250, 250, 250, 0.678);
+			content: "";
+			filter: blur(1px);
+			top: 7px;
+			border-radius: 50%;
+		}
+
+		.Btn::after {
+			width: 70%;
+			height: 2px;
+			position: absolute;
+			background-color: rgba(250, 250, 250, 0.137);
+			content: "";
+			filter: blur(1px);
+			bottom: 7px;
+			border-radius: 50%;
+		}
+
+		.Btn:hover {
+			animation: jello-horizontal 0.9s both;
+		}
+
+		@keyframes jello-horizontal {
+			0% {
+				transform: scale3d(1, 1, 1);
+			}
+
+			30% {
+				transform: scale3d(1.25, 0.75, 1);
+			}
+
+			40% {
+				transform: scale3d(0.75, 1.25, 1);
+			}
+
+			50% {
+				transform: scale3d(1.15, 0.85, 1);
+			}
+
+			65% {
+				transform: scale3d(0.95, 1.05, 1);
+			}
+
+			75% {
+				transform: scale3d(1.05, 0.95, 1);
+			}
+
+			100% {
+				transform: scale3d(1, 1, 1);
+			}
+		}
+
+		/* Bouton Annuler style moderne */
+		.BtnCancel {
+			position: relative;
+			width: 120px;
+			height: 55px;
+			border-radius: 45px;
+			border: none;
+			background-color: rgb(107, 114, 128);
+			color: white;
+			box-shadow: 0 10px 10px rgb(209, 213, 219) inset, 0 5px 10px rgba(5, 5, 5, 0.212), 0 -10px 10px rgb(75, 85, 99) inset;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			font-size: 16px;
+			text-decoration: none;
+		}
+
+		.BtnCancel:hover {
+			animation: jello-horizontal 0.9s both;
+			text-decoration: none;
+			color: white;
+		}
+	</style>
+
+	<div class="container mx-auto px-4 py-8">
+		<div class="flex items-center mb-8">
+			{% if user.role == 'ADMIN' %}
+				<a href="/admin/menus" class="text-teal-700 hover:text-teal-900 mr-4">
+				{% else %}
+					<a href="/directeur/menus" class="text-teal-700 hover:text-teal-900 mr-4">
+					{% endif %}
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+					</svg>
+				</a>
+				<h1 class="text-3xl font-bold text-teal-700">Modifier le menu</h1>
+			</div>
+
+			<div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+				{% if user.role == 'ADMIN' %}
+					<form action="/admin/menus/{{ menu.id }}/edit" method="POST">
+					{% else %}
+						<form action="/directeur/menus/{{ menu.id }}/edit" method="POST">
+						{% endif %}
+						<div class="mb-6">
+							<label for="semaine" class="block text-sm font-medium text-gray-700 mb-2">
+								Semaine
+								<span class="text-red-500">*</span>
+							</label>
+							<input type="text" id="semaine" name="semaine" required value="{{ menu.semaine }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600">
+						</div>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+							<div>
+								<label for="lundi" class="block text-sm font-medium text-gray-700 mb-2">Lundi</label>
+								<textarea id="lundi" name="lundi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600">{{ menu.lundi }}</textarea>
+							</div>
+
+							<div>
+								<label for="mardi" class="block text-sm font-medium text-gray-700 mb-2">Mardi</label>
+								<textarea id="mardi" name="mardi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600">{{ menu.mardi }}</textarea>
+							</div>
+
+							<div>
+								<label for="mercredi" class="block text-sm font-medium text-gray-700 mb-2">Mercredi</label>
+								<textarea id="mercredi" name="mercredi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600">{{ menu.mercredi }}</textarea>
+							</div>
+
+							<div>
+								<label for="jeudi" class="block text-sm font-medium text-gray-700 mb-2">Jeudi</label>
+								<textarea id="jeudi" name="jeudi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600">{{ menu.jeudi }}</textarea>
+							</div>
+
+							<div>
+								<label for="vendredi" class="block text-sm font-medium text-gray-700 mb-2">Vendredi</label>
+								<textarea id="vendredi" name="vendredi" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600">{{ menu.vendredi }}</textarea>
+							</div>
+						</div>
+
+						<div class="mb-6">
+							<div class="flex items-center">
+								<input type="checkbox" id="actif" name="actif" {% if menu.actif %} checked {% endif %} class="h-4 w-4 text-teal-600 focus:ring-teal-600 border-gray-300 rounded">
+								<label for="actif" class="ml-2 block text-sm text-gray-700">
+									Menu actif (visible sur le site public)
+								</label>
+							</div>
+						</div>
+
+						<div class="flex justify-end space-x-4">
+							{% if user.role == 'ADMIN' %}
+								<a href="/admin/menus" class="BtnCancel">
+								{% else %}
+									<a href="/directeur/menus" class="BtnCancel">
+									{% endif %}
+									Annuler
+								</a>
+								<button type="submit" class="Btn">
+									Sauvegarder
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			{% endblock %}

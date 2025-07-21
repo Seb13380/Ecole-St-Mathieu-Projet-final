@@ -14,99 +14,14 @@
 			</p>
 		</div>
 
-		{% if menus and menus|length > 0 %}
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-				{% for menu in menus %}
-					<div
-						class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-						<!-- Header de la carte -->
-						<div class="bg-gradient-to-r from-[#304a4d] to-[#4a6b70] p-4">
-							<h2 class="text-lg font-semibold text-center text-[#304a4d]">
-								🍽️
-								{{ menu.semaine }}
-							</h2>
-							{% if menu.auteur %}
-								<p class="text-center text-xs opacity-90 mt-1 text-[#304a4d]">
-									Préparé par Serge
-								</p>
-							{% endif %}
-						</div>
-
-						<!-- Contenu de la carte -->
-						<div class="p-4">
-							<div class="space-y-3">
-								{% if menu.lundi %}
-									<div class="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
-										<h3 class="font-semibold text-blue-800 mb-2 text-sm text-center">
-											<span class="inline-block mr-2">🌅</span>
-											Lundi
-										</h3>
-										<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.lundi }}</div>
-									</div>
-								{% endif %}
-
-								{% if menu.mardi %}
-									<div class="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg border border-green-200">
-										<h3 class="font-semibold text-green-800 mb-2 text-sm text-center">
-											<span class="inline-block mr-2">🌿</span>
-											Mardi
-										</h3>
-										<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.mardi }}</div>
-									</div>
-								{% endif %}
-
-								{% if menu.mercredi %}
-									<div class="bg-gradient-to-br from-orange-50 to-orange-100 p-3 rounded-lg border border-orange-200">
-										<h3 class="font-semibold text-orange-800 mb-2 text-sm text-center">
-											<span class="inline-block mr-2">🌞</span>
-											Mercredi
-										</h3>
-										<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.mercredi }}</div>
-									</div>
-								{% endif %}
-
-								{% if menu.jeudi %}
-									<div class="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
-										<h3 class="font-semibold text-purple-800 mb-2 text-sm text-center">
-											<span class="inline-block mr-2">🌸</span>
-											Jeudi
-										</h3>
-										<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.jeudi }}</div>
-									</div>
-								{% endif %}
-
-								{% if menu.vendredi %}
-									<div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200">
-										<h3 class="font-semibold text-indigo-800 mb-2 text-sm text-center">
-											<span class="inline-block mr-2">🎉</span>
-											Vendredi
-										</h3>
-										<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.vendredi }}</div>
-									</div>
-								{% endif %}
-							</div>
-						</div>
-
-						<!-- Footer de la carte -->
-						<div class="bg-gray-50 px-4 py-2 border-t">
-							<div class="flex justify-between items-center text-xs text-gray-600">
-								<span>📅
-									{{ menu.createdAt|date('d/m/Y') }}</span>
-								<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">✅ Actif</span>
-							</div>
-						</div>
-					</div>
-				{% endfor %}
+		<!-- Intégration directe du PDF -->
+		<div class="w-full flex justify-center">
+			<div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-4">
+				<div class="pdf-container" style="width: 100%; height: 800px; border-radius: 8px; overflow: hidden;">
+					<embed src="/assets/documents/menus/menu-2025-07-11T12-54-31-401Z-menus-sem26-du-23-au-27juin2025.pdf" type="application/pdf" width="100%" height="100%"/>
+				</div>
 			</div>
-		{% else %}
-			<div class="max-w-2xl mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
-				<div class="text-6xl mb-4">🍽️</div>
-				<h3 class="text-xl font-semibold text-yellow-800 mb-2">Aucun menu disponible</h3>
-				<p class="text-yellow-700">
-					Les menus de la semaine ne sont pas encore disponibles. Revenez bientôt !
-				</p>
-			</div>
-		{% endif %}
+		</div>
 
 		<!-- Information supplémentaire -->
 		<div class="max-w-4xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -133,3 +48,109 @@
 		</div>
 	</div>
 {% endblock %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+	{% for menu in menus %}
+		<div
+			class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+			<!-- Header de la carte -->
+			<div class="bg-gradient-to-r from-[#304a4d] to-[#4a6b70] p-4">
+				<h2 class="text-lg font-semibold text-center text-[#304a4d]">
+					🍽️
+					{{ menu.semaine }}
+				</h2>
+				{% if menu.auteur %}
+					<p class="text-center text-xs opacity-90 mt-1 text-[#304a4d]">
+						Préparé par Serge
+					</p>
+				{% endif %}
+			</div>
+
+			<!-- Contenu de la carte -->
+			<div class="p-4">
+				<div class="space-y-3">
+					{% if menu.lundi %}
+						<div class="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+							<h3 class="font-semibold text-blue-800 mb-2 text-sm text-center">
+								<span class="inline-block mr-2">🌅</span>
+								Lundi
+							</h3>
+							<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.lundi }}</div>
+						</div>
+					{% endif %}
+
+					{% if menu.mardi %}
+						<div class="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg border border-green-200">
+							<h3 class="font-semibold text-green-800 mb-2 text-sm text-center">
+								<span class="inline-block mr-2">🌿</span>
+								Mardi
+							</h3>
+							<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.mardi }}</div>
+						</div>
+					{% endif %}
+
+					{% if menu.mercredi %}
+						<div class="bg-gradient-to-br from-orange-50 to-orange-100 p-3 rounded-lg border border-orange-200">
+							<h3 class="font-semibold text-orange-800 mb-2 text-sm text-center">
+								<span class="inline-block mr-2">🌞</span>
+								Mercredi
+							</h3>
+							<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.mercredi }}</div>
+						</div>
+					{% endif %}
+
+					{% if menu.jeudi %}
+						<div class="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+							<h3 class="font-semibold text-purple-800 mb-2 text-sm text-center">
+								<span class="inline-block mr-2">🌸</span>
+								Jeudi
+							</h3>
+							<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.jeudi }}</div>
+						</div>
+					{% endif %}
+
+					{% if menu.vendredi %}
+						<div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200">
+							<h3 class="font-semibold text-indigo-800 mb-2 text-sm text-center">
+								<span class="inline-block mr-2">🎉</span>
+								Vendredi
+							</h3>
+							<div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed text-center">{{ menu.vendredi }}</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Footer de la carte -->
+			<div class="bg-gray-50 px-4 py-2 border-t">
+				<div class="flex justify-between items-center text-xs text-gray-600">
+					<span>📅
+						{{ menu.createdAt|date('d/m/Y') }}</span>
+					<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">✅ Actif</span>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+</div>{% else %}
+<div class="max-w-2xl mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+	<div class="text-6xl mb-4">🍽️</div>
+	<h3 class="text-xl font-semibold text-yellow-800 mb-2">Aucun menu disponible</h3>
+	<p class="text-yellow-700">
+		Les menus de la semaine ne sont pas encore disponibles. Revenez bientôt !
+	</p>
+</div>{% endif %}<!-- Information supplémentaire --><div class="max-w-4xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+<h3 class="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+	<span class="text-xl mr-2">ℹ️</span>
+	Informations pratiques
+</h3>
+<ul class="text-sm text-blue-700 space-y-1">
+	<li>• Service de 11h30 à 13h30</li>
+	<li>• Tous nos plats sont préparés sur place avec des produits frais</li>
+	<li>• Menus adaptés aux allergies sur demande</li>
+	<li>• Produits locaux et de saison privilégiés</li>
+</ul></div><!-- Lien vers Dupont Restauration --><div class="text-center mt-8">
+<a href="https://www.dupont-restauration.fr/" target="_blank" class="inline-flex items-center px-6 py-3 bg-[#304a4d] text-white rounded-lg hover:bg-[#1a2e30] transition-colors">
+	<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+	</svg>
+	Découvrir Dupont Restauration
+</a></div></div>{% endblock %}

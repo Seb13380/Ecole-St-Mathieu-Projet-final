@@ -1,26 +1,32 @@
 <header class="w-full bg-[#a7e3dd]">
-	<nav class="navbar w-full px-8 font-poppins">
+	<nav class="navbar w-full px-11 font-poppins">
 
-		<div class="flex-none">
-			<a href="/" class="flex items-center gap-5">
-				<img src="/assets/images/logo-st-mathieu-vert.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 1s infinite; transform-origin: center bottom;"/>
+		<div class="flex-none mt-5">
+			<a href="/" class="flex items-center gap-6">
+				<img src="/assets/images/logo-st-mathieu-vert.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+				<span class="text-xl font-bold text-[#304a4d]"></span>
+			</a>
+		</div>
+		<div class="flex-none mt-5">
+			<a href="https://enseignement-catholique.fr/" target="_blank" rel="noopener" class="flex items-center gap-6">
+				<img src="/assets/images/logo_diocese.png" alt="Logo Diocèse" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
 
 		<div class="flex-1 flex justify-center">
-			<ul class="menu menu-horizontal px-1 text-xl font-poppins-medium">
+			<ul class="menu menu-horizontal px-2 font-poppins-medium">
 				<li>
-					<a href="/" class="hover:font-poppins-semibold transition-all">Accueil</a>
+					<a href="/" class="hover:font-poppins-semibold transition-all text-4xl">Accueil</a>
 				</li>
 				<li class="dropdown dropdown-hover">
-					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all text-4xl font-poppins-semibold">
 						L'école
 						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base">
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
 						<li>
 							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all">Règlement intérieur</a>
 						</li>
@@ -31,27 +37,42 @@
 							<a href="/horaires" class="hover:font-poppins-medium transition-all">Horaires</a>
 						</li>
 						<li>
-							<a href="/horaires" class="hover:font-poppins-medium transition-all">Commande de Polos Verts</a>
+							<a href="/horaires" class="hover:font-poppins-medium transition-all">Classes</a>
 						</li>
 					</ul>
 				</li>
-				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all">Actus</a>
+				<li class="dropdown dropdown-hover">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all text-4xl font-poppins-semibold">
+						Actus
+						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
+						<li>
+							<a href="/lettres-familles" class="hover:font-poppins-medium transition-all">Lettres aux familles</a>
+						</li>
+						<li>
+							<a href="/circulaire-rentree" class="hover:font-poppins-medium transition-all">Circulaire de rentrée</a>
+						</li>
+						<li>
+							<a href="/inscription-2026" class="hover:font-poppins-medium transition-all">Inscription PS 2026</a>
+						</li>
+
+					</ul>
 				</li>
+
 				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all">Classes</a>
-				</li>
-				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all">Agendas</a>
+					<a href="" class="hover:font-poppins-semibold transition-all text-4xl">Agendas</a>
 				</li>
 				<li class="dropdown dropdown-hover">
-					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all text-4xl font-poppins-semibold">
 						Restauration
 						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base">
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
 						<li>
 							<a href="https://www.dupont-restauration.fr/" target="_blank" class="hover:font-poppins-medium transition-all">Dupont Restauration</a>
 						</li>
@@ -61,11 +82,9 @@
 					</ul>
 				</li>
 				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all">APEL</a>
+					<a href="" class="hover:font-poppins-semibold transition-all text-4xl">APEL</a>
 				</li>
-				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all">Contact</a>
-				</li>
+
 			</ul>
 		</div>
 		<div class="flex-none gap-4">
@@ -79,6 +98,14 @@
 						{% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
 							<li>
 								<a href="/admin/dashboard">Tableau de bord</a>
+							</li>
+						{% elseif user.role == 'DIRECTEUR' %}
+							<li>
+								<a href="/directeur/dashboard">Tableau de bord</a>
+							</li>
+						{% elseif user.role == 'MAINTENANCE_SITE' %}
+							<li>
+								<a href="/frank/dashboard">Tableau de bord</a>
 							</li>
 						{% elseif user.role == 'ENSEIGNANT' %}
 							<li>
@@ -104,9 +131,9 @@
 					</ul>
 				</div>
 			{% else %}
-				<a href="/auth/login" class="btn btn-primary font-poppins-medium">Connexion</a>
+				<a href="/auth/login" class="headerbutton Btn">Connexion</a>
 
-				<a href="/auth/register" class="btn btn-success font-poppins-medium">Inscription</a>
+				<a href="/auth/register" class="headerbutton Btn">Pré-inscription</a>
 
 			{% endif %}
 		</div>
