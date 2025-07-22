@@ -1,0 +1,161 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	{{ pageTitle }}
+{% endblock %}
+
+{% block main %}
+	<div class="min-h-screen bg-gray-50 py-8">
+		<div
+			class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+
+			<!-- En-tête -->
+			<div class="mb-8">
+				<h1 class="text-3xl font-bold text-gray-900 mb-2">✏️ Modifier mon profil</h1>
+				<p class="text-gray-600">Mettez à jour vos informations personnelles</p>
+			</div>
+
+			<!-- Messages de succès/erreur -->
+			{% set success = app.request.query.get('success') %}
+			{% set error = app.request.query.get('error') %}
+
+			{% if success %}
+				<div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+					<strong>Succès :</strong>
+					{{ success }}
+				</div>
+			{% endif %}
+
+			{% if error %}
+				<div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+					<strong>Erreur :</strong>
+					{{ error }}
+				</div>
+			{% endif %}
+
+			<!-- Formulaire d'édition -->
+			<div class="bg-white rounded-lg shadow-lg p-6">
+				<form
+					action="/profile/edit" method="POST">
+
+					<!-- Informations de base -->
+					<div class="mb-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">📋 Informations personnelles</h3>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
+									Prénom *
+								</label>
+								<input type="text" id="firstName" name="firstName" value="{{ user.firstName }}" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+							</div>
+
+							<div>
+								<label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
+									Nom *
+								</label>
+								<input type="text" id="lastName" name="lastName" value="{{ user.lastName }}" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+							</div>
+						</div>
+					</div>
+
+					<!-- Contact -->
+					<div class="mb-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">📞 Contact</h3>
+
+						<div class="space-y-4">
+							<div>
+								<label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+									Email *
+								</label>
+								<input type="email" id="email" name="email" value="{{ user.email }}" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+							</div>
+
+							<div>
+								<label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+									Téléphone
+								</label>
+								<input type="tel" id="phone" name="phone" value="{{ user.phone|default('') }}" placeholder="06 12 34 56 78" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+							</div>
+
+							<div>
+								<label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+									Adresse
+								</label>
+								<textarea id="address" name="address" rows="3" placeholder="Votre adresse complète" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">{{ user.address|default('') }}</textarea>
+							</div>
+						</div>
+					</div>
+
+					<!-- Préférences -->
+					<div class="mb-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">⚙️ Préférences</h3>
+
+						<div class="space-y-4">
+							<div class="flex items-center">
+								<input type="checkbox" id="notifications" name="notifications" {% if user.notifications %} checked {% endif %} class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+								<label for="notifications" class="ml-2 block text-sm text-gray-900">
+									Recevoir les notifications par email
+								</label>
+							</div>
+
+							<div class="text-sm text-gray-600">
+								<p>Les notifications incluent :</p>
+								<ul class="list-disc list-inside mt-1 space-y-1">
+									<li>Confirmations d'achat de tickets</li>
+									<li>Rappels de réservation de repas</li>
+									<li>Informations importantes de l'école</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<!-- Informations en lecture seule -->
+					<div class="mb-6 bg-gray-50 p-4 rounded-lg">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">🔒 Informations système</h3>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+							<div>
+								<label class="block text-gray-600">Rôle</label>
+								<p class="font-semibold">{{ user.role }}</p>
+							</div>
+
+							<div>
+								<label class="block text-gray-600">ID utilisateur</label>
+								<p class="font-semibold">#{{ user.id }}</p>
+							</div>
+						</div>
+
+						<div class="mt-3 text-xs text-gray-500">
+							Ces informations ne peuvent pas être modifiées. Contactez l'administration si nécessaire.
+						</div>
+					</div>
+
+					<!-- Boutons d'action -->
+					<div class="flex flex-col sm:flex-row gap-4">
+						<button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+							✅ Enregistrer les modifications
+						</button>
+
+						<a href="/profile" class="flex-1 text-center bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors">
+							❌ Annuler
+						</a>
+					</div>
+				</form>
+			</div>
+
+			<!-- Liens utiles -->
+			<div class="mt-8 text-center">
+				<div class="space-x-4">
+					<a href="/profile/change-password" class="text-blue-600 hover:text-blue-800">
+						🔒 Changer le mot de passe
+					</a>
+					<span class="text-gray-300">|</span>
+					<a href="/profile" class="text-blue-600 hover:text-blue-800">
+						👤 Retour au profil
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

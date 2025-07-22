@@ -3,8 +3,43 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PARENT
+  ENSEIGNANT
+  ADMIN
+  DIRECTION
+  APEL
+  MAINTENANCE_SITE
+}
+
+enum TicketBookletStatus {
+  ACTIVE
+  EXPIRED
+  USED
+}
+
+enum MealReservationStatus {
+  RESERVED
+  CONSUMED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  STRIPE
+  PAYPAL
+  VIREMENT
+  CASH
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
 }
 
 model User {
@@ -15,16 +50,18 @@ model User {
   phone     String
   email     String   @unique
   password  String
-  role      String
+  role      UserRole @default(PARENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  enfants    Student[]   @relation("ParentEnfants")
-  messages   Message[]   @relation("UserMessages")
-  actualites Actualite[] @relation("UserActualites")
-  horaires   Horaire[]   @relation("EnseignantHoraires")
-  notes      Note[]      @relation("EnseignantNotes")
-  menus      Menu[]      @relation("UserMenus")
+  enfants        Student[]        @relation("ParentEnfants")
+  messages       Message[]        @relation("UserMessages")
+  actualites     Actualite[]      @relation("UserActualites")
+  horaires       Horaire[]        @relation("EnseignantHoraires")
+  notes          Note[]           @relation("EnseignantNotes")
+  menus          Menu[]           @relation("UserMenus")
+  TicketBooklet  TicketBooklet[]
+  TicketPurchase TicketPurchase[]
 }
 
 model Student {
@@ -38,10 +75,13 @@ model Student {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  parent   User      @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
-  classe   Classe    @relation("ClasseEleves", fields: [classeId], references: [id])
-  notes    Note[]    @relation("EleveNotes")
-  absences Absence[] @relation("EleveAbsences")
+  parent          User              @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
+  classe          Classe            @relation("ClasseEleves", fields: [classeId], references: [id])
+  notes           Note[]            @relation("EleveNotes")
+  absences        Absence[]         @relation("EleveAbsences")
+  TicketBooklet   TicketBooklet[]
+  MealReservation MealReservation[]
+  TicketPurchase  TicketPurchase[]
 }
 
 model Classe {
@@ -173,4 +213,64 @@ model Menu {
   updatedAt   DateTime  @updatedAt
 
   auteur User @relation("UserMenus", fields: [auteurId], references: [id], onDelete: Cascade)
+}
+
+model TicketBooklet {
+  id               Int                 @id @default(autoincrement())
+  parentId         Int
+  studentId        Int
+  ticketsTotal     Int                 @default(10)
+  ticketsRemaining Int                 @default(10)
+  purchaseDate     DateTime            @default(now())
+  price            Decimal             @default(35.00)
+  status           TicketBookletStatus @default(ACTIVE)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  parent          User              @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student         Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  MealReservation MealReservation[]
+
+  @@index([parentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model MealReservation {
+  id              Int                   @id @default(autoincrement())
+  studentId       Int
+  mealDate        DateTime
+  ticketBookletId Int
+  createdAt       DateTime              @default(now())
+  status          MealReservationStatus @default(RESERVED)
+  updatedAt       DateTime              @updatedAt
+
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  ticketBooklet TicketBooklet @relation(fields: [ticketBookletId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, mealDate])
+  @@index([mealDate])
+  @@index([ticketBookletId])
+  @@index([status])
+}
+
+model TicketPurchase {
+  id              Int           @id @default(autoincrement())
+  parentId        Int
+  studentId       Int
+  amount          Decimal
+  ticketsQuantity Int           @default(10)
+  paymentMethod   PaymentMethod @default(STRIPE)
+  paymentStatus   PaymentStatus @default(PENDING)
+  stripePaymentId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  parent  User    @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([parentId])
+  @@index([studentId])
+  @@index([paymentStatus])
+  @@index([createdAt])
 }

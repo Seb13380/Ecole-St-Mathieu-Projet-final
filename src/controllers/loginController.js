@@ -28,6 +28,35 @@ const loginController = {
             });
         }
 
+        // COMPTES TEST TEMPORAIRES - À supprimer quand MySQL sera configuré
+        if (email === 'sebcecg@gmail.com' && password === 'Paul3726&') {
+            console.log('✅ Connexion avec compte de test parent réussie');
+            req.session.user = {
+                id: 1,
+                firstName: 'Sébastien',
+                lastName: 'Parent Test',
+                email: 'sebcecg@gmail.com',
+                role: 'PARENT'
+            };
+
+            console.log('🎯 Redirection vers dashboard parent');
+            return res.redirect('/parent/dashboard');
+        }
+
+        if (email === 'restaurant@ecole-saint-mathieu.fr' && password === 'Restaurant123!') {
+            console.log('✅ Connexion avec compte de test restaurant réussie');
+            req.session.user = {
+                id: 2,
+                firstName: 'Marie',
+                lastName: 'Cantinière',
+                email: 'restaurant@ecole-saint-mathieu.fr',
+                role: 'RESTAURANT'
+            };
+
+            console.log('🎯 Redirection vers dashboard restaurant');
+            return res.redirect('/restaurant/dashboard');
+        }
+
         try {
             console.log('🔍 Recherche utilisateur:', email);
             const user = await prisma.user.findUnique({

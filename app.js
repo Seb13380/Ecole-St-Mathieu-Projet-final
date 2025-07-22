@@ -55,6 +55,9 @@ const restaurationRoutes = require("./src/routes/restaurationRoutes");
 const menuPdfRoutes = require("./src/routes/menuPdfRoutes");
 const contactRoutes = require('./src/routes/contactRoutes');
 const frankRoutes = require("./src/routes/frankRoutes_new");
+const ticketRoutes = require("./src/routes/ticketRoutes");
+const restaurantRoutes = require("./src/routes/restaurantRoutes");
+const profileRoutes = require("./src/routes/profileRoutes");
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -66,7 +69,10 @@ app.use('/actualites', actualiteRoutes);
 app.use('/restauration', restaurationRoutes);
 app.use('/', menuPdfRoutes);
 app.use('/frank', frankRoutes);
-// app.use('/contact', contactRoutes);
+app.use('/parent', ticketRoutes);
+app.use('/', restaurantRoutes);
+app.use('/', profileRoutes);
+app.use('/contact', contactRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
