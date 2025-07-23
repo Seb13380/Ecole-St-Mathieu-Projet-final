@@ -6,19 +6,32 @@
 {% endblock %}
 
 {% block main %}
+
 	<div class="p-8 md:p-24">
-		<div class="text-center py-8">
-			<h1 class="text-6xl md:text-6xl font-bold text-[#304a4d] mb-4">
-				Bienvenue à l'École Saint-Mathieu
-			</h1>
-			<p class="text-xl text-[#304a4d] opacity-80">
-				L'école Saint Mathieu est ouverte à tous, conformément à la volonté de l'Eglise catholique de
-																																			mettre à la disposition de tous ses orientations éducatives. Elle est associée à l'Etat par contrat dans le
-																																			cadre de la loi Debré de 1959.
-																																			Ce projet, propre à l'école Saint Mathieu, puise sa source dans l'Evangile. Ses propositions
-																																			éducatives se fondent sur la vision chrétienne de la personne humaine, partagée par tous les
-																																			établissements catholiques.
-			</p>
+		<div
+			class="flex items-center justify-between py-8 gap-8">
+			<!-- Section principale avec titre et texte -->
+			<div class="flex-1 text-center">
+				<h1 class="text-6xl md:text-6xl font-bold text-[#304a4d] mb-4">
+					Bienvenue à l'École Saint-Mathieu
+				</h1>
+				<p class="text-xl text-[#304a4d] opacity-80">
+					L'école Saint Mathieu est ouverte à tous, conformément à la volonté de l'Eglise catholique de
+																																													mettre à la disposition de tous ses orientations éducatives. Elle est associée à l'Etat par contrat dans le
+																																													cadre de la loi Debré de 1959.
+																																													Ce projet, propre à l'école Saint Mathieu, puise sa source dans l'Evangile. Ses propositions
+																																													éducatives se fondent sur la vision chrétienne de la personne humaine, partagée par tous les
+																																													établissements catholiques.
+				</p>
+			</div>
+
+			<!-- Logo Educartable à droite -->
+			<div class="flex-none">
+				<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="flex items-center gap-6">
+					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md" style="height: 140px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+					<span class="text-xl font-bold text-[#304a4d]"></span>
+				</a>
+			</div>
 		</div>
 
 		<!-- Carousel avec marges left/right -->
@@ -113,57 +126,131 @@
 		</div>
 	</div>
 
-	<div class="flex flex-row gap-8 mt-4 mb-12 justify-center items-center">
-		<div class="w-full md:w-1/2 flex flex-col items-center justify-center">
-			<h2 class="text-4xl font-bold text-[#304a4d] mb-10 text-center">Actualités</h2>
-			<div class="card bg-white rounded-xl p-8 w-full max-w-xl flex flex-col items-center">
-				<p class="text-lg text-[#304a4d] text-center">Retrouvez ici toutes les dernières informations et événements de l'école.</p>
+	<div>
+		<h2 class="text-4xl font-bold text-[#304a4d] mb-10 text-center">Actualités & Travaux</h2>
+		<div
+			class="flex flex-row gap-8 mt-4 mb-12 justify-center items-start max-w-7xl mx-auto">
+			<!-- Section Images - 2/3 -->
+			<div class="w-full md:w-2/3 flex flex-col">
+				<div class="card bg-white rounded-xl p-6 shadow-lg">
+					<h3 class="text-2xl font-bold text-[#304a4d] mb-6 text-center">"Les Echos liés de St Mathieu"</h3>
+
+					<!-- Mini carousel d'images -->
+					<div id="actualites-carousel" class="relative" data-carousel="slide" data-carousel-interval="4000">
+						<div
+							class="relative h-96 overflow-hidden rounded-lg">
+							<!-- Image 1 - Actualités -->
+							<div data-carousel-item="active" class="duration-1000 ease-in-out">
+								<img src="/assets/images/20250326_114849.jpg" class="block w-full h-full object-cover" alt="Actualités école">
+								<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+									<h4 class="font-bold">Rentrée scolaire 2025</h4>
+									<p class="text-sm">Préparatifs en cours pour accueillir nos élèves</p>
+								</div>
+							</div>
+
+							<!-- Image 2 - Travaux -->
+							<div data-carousel-item class="hidden duration-1000 ease-in-out">
+								<img src="/assets/images/20250710_123601.jpg" class="block w-full h-full object-cover" alt="Travaux école">
+								<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+									<h4 class="font-bold">Rénovation en cours</h4>
+									<p class="text-sm">Amélioration des espaces de vie scolaire</p>
+								</div>
+							</div>
+
+							<!-- Image 3 - Vie scolaire -->
+							<div data-carousel-item class="hidden duration-1000 ease-in-out">
+								<img src="/assets/images/entreePrincipale.jpg" class="block w-full h-full object-cover" alt="Vie scolaire">
+								<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+									<h4 class="font-bold">Vie de l'école</h4>
+									<p class="text-sm">Moments de partage et d'apprentissage</p>
+								</div>
+							</div>
+
+							<!-- Image 4 - Projets -->
+							<div data-carousel-item class="hidden duration-1000 ease-in-out">
+								<img src="/assets/images/20250710_123943.jpg" class="block w-full h-full object-cover" alt="Projets école">
+								<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+									<h4 class="font-bold">Nouveaux projets</h4>
+									<p class="text-sm">Innovation et modernisation continue</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Navigation carousel -->
+						<div class="absolute z-30 flex -translate-x-1/2 bottom-2 left-1/2 space-x-2">
+							<button type="button" class="w-2 h-2 rounded-full bg-white/70 hover:bg-white" data-carousel-slide-to="0"></button>
+							<button type="button" class="w-2 h-2 rounded-full bg-white/70 hover:bg-white" data-carousel-slide-to="1"></button>
+							<button type="button" class="w-2 h-2 rounded-full bg-white/70 hover:bg-white" data-carousel-slide-to="2"></button>
+							<button type="button" class="w-2 h-2 rounded-full bg-white/70 hover:bg-white" data-carousel-slide-to="3"></button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Section Texte - 1/3 -->
+			<div class="w-full md:w-1/3 flex flex-col">
+				<div class="card bg-white rounded-xl p-6 shadow-lg h-full">
+					<h3 class="text-xl font-bold text-[#304a4d] mb-4">📰 Actualités</h3>
+					<div class="space-y-3 mb-6">
+						<div class="border-l-4 border-[#a7e3dd] pl-3">
+							<h4 class="text-sm font-semibold text-[#304a4d] mb-1">Rentrée scolaire 2025</h4>
+							<p class="text-xs text-gray-700 mb-1">La rentrée aura lieu le lundi 2 septembre 2025.</p>
+							<span class="text-xs text-gray-500">📅 15 juillet 2025</span>
+						</div>
+
+						<div class="border-l-4 border-[#a7e3dd] pl-3">
+							<h4 class="text-sm font-semibold text-[#304a4d] mb-1">Inscriptions ouvertes</h4>
+							<p class="text-xs text-gray-700 mb-1">Année scolaire 2025-2026, contactez le secrétariat.</p>
+							<span class="text-xs text-gray-500">📅 10 juillet 2025</span>
+						</div>
+					</div>
+
+					<h3 class="text-xl font-bold text-[#304a4d] mb-4">🔨 Travaux</h3>
+					<div class="space-y-3">
+						<div class="border-l-4 border-[#304a4d] pl-3">
+							<h4 class="text-sm font-semibold text-[#304a4d] mb-1">Rénovation cour</h4>
+							<p class="text-xs text-gray-700 mb-2">Nouveaux jeux et revêtement prévu pour septembre.</p>
+							<div class="w-full bg-gray-200 rounded-full h-1 mb-1">
+								<div class="bg-[#a7e3dd] h-1 rounded-full" style="width: 75%"></div>
+							</div>
+							<span class="text-xs text-gray-500">🔧 75%</span>
+						</div>
+
+						<div class="border-l-4 border-[#304a4d] pl-3">
+							<h4 class="text-sm font-semibold text-[#304a4d] mb-1">Tableaux numériques</h4>
+							<p class="text-xs text-gray-700 mb-2">Équipement de toutes les classes.</p>
+							<div class="w-full bg-gray-200 rounded-full h-1 mb-1">
+								<div class="bg-[#a7e3dd] h-1 rounded-full" style="width: 45%"></div>
+							</div>
+							<span class="text-xs text-gray-500">🔧 45%</span>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 
-		<div class="w-full md:w-1/2 flex flex-col items-center justify-center">
-			<h2 class="text-4xl font-bold text-[#304a4d] mb-10 text-center">Travaux</h2>
-			<div class="card bg-white rounded-xl p-8 w-full max-w-xl flex flex-col items-center">
-				<p class="text-lg text-[#304a4d] text-center">Suivez l'avancement des travaux et des projets d'amélioration de l'établissement.</p>
-			</div>
-		</div>
+
 	</div>
 
-	<div class="flex justify-center mt-16 mb-8">
-		<iframe src="https://www.google.com/maps?q=22+Pl.+des+H%C3%A9ros,+13013+Marseille&output=embed" width="1000" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-	</div>
 
-{% endblock %}
+</p></div></div></div><div class="flex justify-center mt-16 mb-8"><iframe src="https://www.google.com/maps?q=22+Pl.+des+H%C3%A9ros,+13013+Marseille&output=embed" width="1000" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></div>{% endblock %}{% block styles %}{{ parent() }}<style>/* Unique override utile : bien couvrir le conteneur */
+[data-carousel="slide"] img {
+	object-fit: cover;
+	object-position: center;
+	width: 100%;
+	height: 100%;
+}
 
-{% block styles %}
-	{{ parent() }}
-	<style>
-		/* Unique override utile : bien couvrir le conteneur */
-		[data-carousel="slide"] img {
-			object-fit: cover;
-			object-position: center;
-			width: 100%;
-			height: 100%;
-		}
+/* Style spécifique pour l'image de la chapelle */
+[data-carousel="slide"] img[src*="entreeChapelle"] {
+	object-fit: contain;
+}
 
-		/* Style spécifique pour l'image de la chapelle */
-		[data-carousel="slide"] img[src*="entreeChapelle"] {
-			object-fit: contain;
-		}
+/* Ajouter un espace entre les cartes et la carte Google Maps */
+.flex.flex-row.gap-8.mt-4.mb-12 {
+	margin-bottom: 80px !important;
+}
 
-		/* Ajouter un espace entre les cartes et la carte Google Maps */
-		.flex.flex-row.gap-8.mt-4.mb-12 {
-			margin-bottom: 80px !important;
-		}
-
-		.flex.justify-center.mt-16.mb-8 {
-			margin-top: 80px !important;
-		}
-	</style>
-{% endblock %}
-
-{% block scripts %}
-	{{ parent() }}
-	<!-- Bundle Flowbite (initialise automatiquement tous les carousels data-carousel) -->
-	<script src="https://unpkg.com/flowbite@latest/dist/flowbite.bundle.js"></script>
-{% endblock %}
+.flex.justify-center.mt-16.mb-8 {
+	margin-top: 80px !important;
+}</style>{% endblock %}{% block scripts %}{{ parent() }}<!-- Bundle Flowbite (initialise automatiquement tous les carousels data-carousel) --><script src="https://unpkg.com/flowbite@latest/dist/flowbite.bundle.js"></script>{% endblock %}
