@@ -8,34 +8,31 @@
 {% block main %}
 
 	<div class="p-8 md:p-24">
-		<div
-			class="flex items-center justify-between py-8 gap-8">
-			<!-- Section principale avec titre et texte -->
+		<div class="flex items-center justify-between py-8 gap-8">
 			<div class="flex-1 text-center">
 				<h1 class="text-6xl md:text-6xl font-bold text-[#304a4d] mb-4">
 					Bienvenue à l'École Saint-Mathieu
 				</h1>
 				<p class="text-xl text-[#304a4d] opacity-80">
 					L'école Saint Mathieu est ouverte à tous, conformément à la volonté de l'Eglise catholique de
-																																													mettre à la disposition de tous ses orientations éducatives. Elle est associée à l'Etat par contrat dans le
-																																													cadre de la loi Debré de 1959.
-																																													Ce projet, propre à l'école Saint Mathieu, puise sa source dans l'Evangile. Ses propositions
-																																													éducatives se fondent sur la vision chrétienne de la personne humaine, partagée par tous les
-																																													établissements catholiques.
+																																																							mettre à la disposition de tous ses orientations éducatives. Elle est associée à l'Etat par contrat dans le
+																																																							cadre de la loi Debré de 1959.
+																																																							Ce projet, propre à l'école Saint Mathieu, puise sa source dans l'Evangile. Ses propositions
+																																																							éducatives se fondent sur la vision chrétienne de la personne humaine, partagée par tous les
+																																																							établissements catholiques.
 				</p>
 			</div>
 
 			<div class="flex-none">
 				<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="flex items-center gap-6">
-					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md" style="height: 140px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300" style="height: 140px; animation: pulse-glow 4s ease-in-out infinite;"/>
 					<span class="text-xl font-bold text-[#304a4d]"></span>
 				</a>
 			</div>
 		</div>
 
 		<div class="container mx-auto px-4 my-8 max-w-[2600px]">
-			<div
-				id="default-carousel" class="relative w-full" data-carousel="slide" data-carousel-interval="5000">
+			<div id="default-carousel" class="relative w-full" data-carousel="slide" data-carousel-interval="5000">
 				<div
 					class="relative h-[900px] overflow-hidden rounded-lg shadow-lg">
 					<!-- Item 1 -->
@@ -72,7 +69,7 @@
 					</div>
 					<!-- Item 9 -->
 					<div data-carousel-item class="hidden duration-700 ease-in-out">
-						<img src="/assets/images/entreeChapelle.jpg" class="block w-full h-full object-cover" alt="Vie scolaire">
+						<img src="/assets/images/entreeChapelle2.jpg" class="block w-full h-full object-cover" alt="Vie scolaire">
 					</div>
 					<!-- Item 10 -->
 					<div data-carousel-item class="hidden duration-700 ease-in-out">
@@ -240,6 +237,12 @@
 	object-fit: contain;
 }
 
+/* Style spécifique pour entreeChapelle2 - prend toute la largeur */
+[data-carousel="slide"] img[src*="entreeChapelle2"] {
+	object-fit: cover !important;
+	object-position: center;
+}
+
 /* Ajouter un espace entre les cartes et la carte Google Maps */
 .flex.flex-row.gap-8.mt-4.mb-12 {
 	margin-bottom: 80px !important;
@@ -247,4 +250,19 @@
 
 .flex.justify-center.mt-16.mb-8 {
 	margin-top: 80px !important;
+}
+
+/* Animation moderne pulse-glow pour le logo Educartable */
+@keyframes pulse-glow {
+	0,
+	100% {
+		opacity: 1;
+		filter: drop-shadow(0 0 5px rgba(167, 227, 221, 0.3));
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.9;
+		filter: drop-shadow(0 0 15px rgba(167, 227, 221, 0.6));
+		transform: scale(1.02);
+	}
 }</style>{% endblock %}{% block scripts %}{{ parent() }}<!-- Bundle Flowbite (initialise automatiquement tous les carousels data-carousel) --><script src="https://unpkg.com/flowbite@latest/dist/flowbite.bundle.js"></script>{% endblock %}
