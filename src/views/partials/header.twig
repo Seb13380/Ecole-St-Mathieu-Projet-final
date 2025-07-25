@@ -3,11 +3,11 @@
 
 		<div class="flex-none mt-5">
 			<a href="/" class="flex items-center gap-6">
-				<img src="/assets/images/LogoStMathieuFondVert.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+				<img src="/assets/images/LogoStMathieuV.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
-		<div class="flex-none mt-1">
+		<div class="flex-none mt-5">
 			<a href="https://www.enseignementcatho-marseille.fr//" target="_blank" rel="noopener" class="flex items-center gap-6">
 				<img src="/assets/images/logo_diocese.png" alt="Logo Diocèse" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
@@ -66,7 +66,7 @@
 							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all">Axe Pastoral</a>
 						</li>
 						<li>
-							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all">Fiche d'inscriptionau temps priant</a>
+							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all">Fiche d'inscription au temps priant</a>
 						</li>
 					</ul>
 				</li>
@@ -92,7 +92,7 @@
 				</li>
 
 				<li>
-					<a href="" class="hover:font-poppins-semibold transition-all" style="font-size: 31px !important;">Inscription</a>
+					<a href="/auth/register" class="hover:font-poppins-semibold transition-all" style="font-size: 31px !important;">Inscription</a>
 				</li>
 			</ul>
 		</div>
@@ -104,11 +104,11 @@
 						{{ user.firstName }}
 					</div>
 					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow font-poppins-regular">
-						{% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
+						{% if user.role == 'ADMIN' %}
 							<li>
 								<a href="/admin/dashboard">Tableau de bord</a>
 							</li>
-						{% elseif user.role == 'DIRECTEUR' %}
+						{% elseif user.role == 'DIRECTION' %}
 							<li>
 								<a href="/directeur/dashboard">Tableau de bord</a>
 							</li>
@@ -141,8 +141,6 @@
 				</div>
 			{% else %}
 				<a href="/auth/login" class="headerbutton Btn">Connexion</a>
-
-				<a href="/auth/register" class="headerbutton Btn">Pré-inscription</a>
 
 			{% endif %}
 		</div>

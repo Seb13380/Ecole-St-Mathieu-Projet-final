@@ -141,7 +141,7 @@ const loginController = {
                 console.log('➡️ Redirection vers tableau de bord super admin');
                 res.redirect('/admin/dashboard');
                 break;
-            case 'DIRECTEUR':
+            case 'DIRECTION': // Corrigé: DIRECTION au lieu de DIRECTEUR
                 console.log('➡️ Redirection vers tableau de bord directeur');
                 res.redirect('/directeur/dashboard');
                 break;

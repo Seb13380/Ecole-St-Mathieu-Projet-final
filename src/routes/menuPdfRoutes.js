@@ -7,38 +7,38 @@ router.get('/menus', menuPdfController.getPublicMenus);
 
 router.get('/admin/menus-pdf',
     requireAuth,
-    requireRole(['DIRECTEUR', 'MAINTENANCE_SITE', 'ADMIN']),
+    requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']),
     menuPdfController.getMenusManagement
 );
 
 router.post('/admin/menus-pdf/create',
     requireAuth,
-    requireRole(['DIRECTEUR', 'MAINTENANCE_SITE', 'ADMIN']),
+    requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']),
     menuPdfController.uploadMiddleware,
     menuPdfController.createMenu
 );
 
 router.put('/admin/menus-pdf/:id/status',
     requireAuth,
-    requireRole(['DIRECTEUR', 'MAINTENANCE_SITE', 'ADMIN']),
+    requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']),
     menuPdfController.updateMenuStatus
 );
 
 router.post('/admin/menus-pdf/:id/toggle',
     requireAuth,
-    requireRole(['DIRECTEUR', 'MAINTENANCE_SITE', 'ADMIN']),
+    requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']),
     menuPdfController.toggleMenu
 );
 
 router.post('/admin/menus-pdf/:id/activate',
     requireAuth,
-    requireRole(['DIRECTEUR', 'MAINTENANCE_SITE', 'ADMIN']),
+    requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']),
     menuPdfController.activateMenu
 );
 
 router.delete('/admin/menus-pdf/:id',
     requireAuth,
-    requireRole(['DIRECTEUR', 'MAINTENANCE_SITE', 'ADMIN']),
+    requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']),
     menuPdfController.deleteMenu
 );
 

@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const pdf = require('pdf-poppler');
 
 const prisma = new PrismaClient();
 
@@ -111,6 +112,38 @@ const menuPdfController = {
             // Générer un nom automatique basé sur le nom du fichier
             const nomMenu = req.file.originalname.replace('.pdf', '');
 
+            // Convertir le PDF en images
+            console.log('🖼️ Conversion du PDF en images...');
+            const pdfPath = path.join(__dirname, '../../public/assets/documents/menus', req.file.filename);
+            const imageDir = path.join(__dirname, '../../public/assets/images/menus');
+
+            // Créer le dossier d'images s'il n'existe pas
+            if (!fs.existsSync(imageDir)) {
+                fs.mkdirSync(imageDir, { recursive: true });
+            }
+
+            const options = {
+                format: 'jpeg',
+                out_dir: imageDir,
+                out_prefix: path.parse(req.file.filename).name,
+                page: null // toutes les pages
+            };
+
+            let imageUrls = [];
+            try {
+                const pages = await pdf.convert(pdfPath, options);
+                console.log('📸 Pages converties:', pages);
+
+                // Générer les URLs des images
+                pages.forEach((page, index) => {
+                    const imageName = `${path.parse(req.file.filename).name}-${index + 1}.jpg`;
+                    imageUrls.push(`/assets/images/menus/${imageName}`);
+                });
+            } catch (conversionError) {
+                console.warn('⚠️ Échec de la conversion PDF en images:', conversionError);
+                // On continue sans les images si la conversion échoue
+            }
+
             // Créer le nouveau menu
             const nouveauMenu = await prisma.menu.create({
                 data: {
@@ -119,6 +152,7 @@ const menuPdfController = {
                     dateFin: friday,
                     pdfUrl: `/assets/documents/menus/${req.file.filename}`,
                     pdfFilename: req.file.originalname,
+                    imageUrls: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null,
                     actif: actif === 'on',
                     statut: actif === 'on' ? 'ACTIF' : 'BROUILLON',
                     auteurId: req.session.user.id

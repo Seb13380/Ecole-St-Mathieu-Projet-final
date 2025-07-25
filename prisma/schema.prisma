@@ -12,6 +12,7 @@ enum UserRole {
   ENSEIGNANT
   ADMIN
   DIRECTION
+  ASSISTANT_DIRECTION
   APEL
   MAINTENANCE_SITE
 }
@@ -194,6 +195,24 @@ model InvitationCode {
   usedAt      DateTime?
 }
 
+model ParentInvitation {
+  id                 Int       @id @default(autoincrement())
+  token              String    @unique // Token unique pour le lien
+  parentEmail        String // Email du parent invité
+  parentFirstName    String // Prénom du parent
+  parentLastName     String // Nom du parent
+  childFirstName     String // Prénom de l'enfant
+  childLastName      String // Nom de l'enfant
+  childDateNaissance DateTime? // Date de naissance de l'enfant
+  classeId           Int? // Classe assignée (optionnel)
+  emailSent          Boolean   @default(false) // Email envoyé
+  used               Boolean   @default(false) // Invitation utilisée
+  createdBy          Int // ID du directeur qui a créé l'invitation
+  createdAt          DateTime  @default(now())
+  usedAt             DateTime? // Date d'utilisation
+  expiresAt          DateTime? // Date d'expiration
+}
+
 model Menu {
   id          Int       @id @default(autoincrement())
   semaine     String // "Semaine du 15 au 19 Janvier 2025"
@@ -206,6 +225,7 @@ model Menu {
   vendredi    String? // Menu du vendredi (ancienne version)
   pdfUrl      String? // URL du fichier PDF
   pdfFilename String? // Nom original du fichier PDF
+  imageUrls   String? // URLs des images du PDF (JSON array)
   statut      String    @default("BROUILLON") // BROUILLON, PLANIFIE, ACTIF, ARCHIVE
   actif       Boolean   @default(false)
   auteurId    Int // Qui a créé/modifié le menu

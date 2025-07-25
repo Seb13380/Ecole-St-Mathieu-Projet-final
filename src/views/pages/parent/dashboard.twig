@@ -1,187 +1,275 @@
 {% extends "layouts/base.twig" %}
 
 {% block main %}
-	<div class="min-h-screen bg-gray-100 py-8">
-		<div
-			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<!-- Header -->
-			<div class="mb-8">
-				<h1 class="text-3xl font-bold text-teal-600 text-center">
-					Espace Parents
-				</h1>
-				<p class="mt-2 text-gray-600">Bienvenue,
-					{{ user.firstName }}
-					{{ user.lastName }}
-				</p>
-				{% if messagesNonLus > 0 %}
-					<div class="mt-2">
-						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-							{{ messagesNonLus }}
-							nouveau{{ messagesNonLus > 1 ? 'x' : '' }}
-							message{{ messagesNonLus > 1 ? 's' : '' }}
-						</span>
+	<div class="min-h-screen relative" style="background-image: url('/assets/images/pexels-jessbaileydesign-743986.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: brightness(1) contrast(1);">
+		<div class="absolute inset-0 bg-gradient-to-br from-white/85 via-white/80 to-white/75"></div>
+
+		<div class="relative z-10 py-8">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+				<div class="mb-8">
+					<h1 class="text-3xl font-bold text-teal-600 text-center">
+						Espace Parents
+					</h1>
+					<p class="mt-2 text-gray-400 text-center">Bienvenue,
+						{{ user.firstName }}
+						{{ user.lastName }}
+					</p>
+
+					<!-- Affichage des enfants dans l'en-tête -->
+					{% if enfants|length > 0 %}
+						<div class="mt-4 text-center">
+							<p class="text-lg font-medium text-gray-700 mb-2">
+								{% if enfants|length == 1 %}
+									Suivi de la scolarité de
+								{% else %}
+									Suivi de la scolarité de vos enfants
+								{% endif %}
+							</p>
+							<div class="flex justify-center flex-wrap gap-3">
+								{% for enfant in enfants %}
+									<div class="bg-teal-100 border border-teal-300 rounded-lg px-4 py-2">
+										<span class="text-teal-800 font-semibold text-lg">
+											👶
+											{{ enfant.firstName }}
+											{{ enfant.lastName }}
+										</span>
+										<span class="text-teal-600 text-sm ml-2">
+											({{ enfant.classe.nom }})
+										</span>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					{% else %}
+						<div class="mt-4 text-center">
+							<p class="text-orange-600 font-medium">
+								Aucun enfant associé à votre compte
+							</p>
+						</div>
+					{% endif %}
+
+					{% if messagesNonLus > 0 %}
+						<div class="mt-4 text-center">
+							<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+								{{ messagesNonLus }}
+								nouveau{{ messagesNonLus > 1 ? 'x' : '' }}
+								message{{ messagesNonLus > 1 ? 's' : '' }}
+							</span>
+						</div>
+					{% endif %}
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+					<a href="/parent/tickets/purchase" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+						<div class="flex items-center">
+							<svg class="h-8 w-8 text-orange-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+							</svg>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Tickets cantine</h3>
+								<p class="text-gray-500">Acheter et gérer</p>
+							</div>
+						</div>
+					</a>
+
+					<a href="/parent/horaires" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+						<div class="flex items-center">
+							<svg class="h-8 w-8 text-green-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+							</svg>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Horaires</h3>
+								<p class="text-gray-500">Emplois du temps</p>
+							</div>
+						</div>
+					</a>
+
+					<a href="/parent/messages" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+						<div class="flex items-center">
+							<svg class="h-8 w-8 text-purple-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+							</svg>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Messagerie</h3>
+								<p class="text-gray-500">Communication école</p>
+								{% if messagesNonLus > 0 %}
+									<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">
+										{{ messagesNonLus }}
+									</span>
+								{% endif %}
+							</div>
+						</div>
+					</a>
+
+					<a href="/actualites" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+						<div class="flex items-center">
+							<svg class="h-8 w-8 text-red-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+							</svg>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Actualités</h3>
+								<p class="text-gray-500">Informations école</p>
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<!-- Section Accès rapide aux enfants -->
+				{% if enfants|length > 0 %}
+					<div class="bg-white shadow rounded-lg mb-8">
+						<div class="px-6 py-4 border-b border-gray-200">
+							<h2 class="text-xl font-semibold text-gray-900 flex items-center">
+								<svg class="h-6 w-6 text-blue-600 mr-2" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+								</svg>
+								Accès rapide - Mes enfants
+							</h2>
+						</div>
+						<div class="p-6">
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								{% for enfant in enfants %}
+									<a href="/parent/suivi-scolaire/{{ enfant.id }}" class="block p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 hover:border-blue-400 transition-all duration-200 hover:shadow-md">
+										<div class="flex items-center">
+											<div class="bg-blue-500 rounded-full p-3">
+												<svg class="h-6 w-6 text-white" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+												</svg>
+											</div>
+											<div class="ml-4 flex-1">
+												<h3 class="text-lg font-bold text-gray-900">
+													{{ enfant.firstName }}
+													{{ enfant.lastName }}
+												</h3>
+												<p class="text-sm text-blue-600 font-medium">
+													{{ enfant.classe.nom }}
+													-
+													{{ enfant.classe.niveau }}
+												</p>
+												{% if enfant.notes|length > 0 %}
+													<p class="text-xs text-gray-500 mt-1">
+														Dernière note :
+														{{ enfant.notes[0].note }}/20 en
+														{{ enfant.notes[0].matiere }}
+													</p>
+												{% endif %}
+											</div>
+											<div class="text-blue-400">
+												<svg class="h-5 w-5" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+												</svg>
+											</div>
+										</div>
+									</a>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+				{% endif %}
+
+				{% if enfants|length > 0 %}
+					<div class="bg-white shadow rounded-lg mb-8">
+						<div class="px-4 py-5 sm:p-6">
+							<h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Mes enfants</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+								{% for enfant in enfants %}
+									<div class="border border-gray-200 rounded-lg p-4">
+										<div class="flex items-center mb-3">
+											<div class="bg-blue-100 rounded-full p-2">
+												<svg class="h-6 w-6 text-blue-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+												</svg>
+											</div>
+											<div class="ml-3">
+												<h4 class="text-lg font-medium text-gray-900">{{ enfant.firstName }}
+													{{ enfant.lastName }}</h4>
+												<p class="text-sm text-gray-500">{{ enfant.classe.nom }}
+													-
+													{{ enfant.classe.niveau }}</p>
+											</div>
+										</div>
+
+										{% if enfant.notes|length > 0 %}
+											<div class="mb-3">
+												<h5 class="text-sm font-medium text-gray-700 mb-2">Dernières notes</h5>
+												<div class="space-y-1">
+													{% for note in enfant.notes|slice(0, 3) %}
+														<div class="flex justify-between text-sm">
+															<span class="text-gray-600">{{ note.matiere }}</span>
+															<span class="font-medium">{{ note.note }}/20</span>
+														</div>
+													{% endfor %}
+												</div>
+											</div>
+										{% endif %}
+
+										{% if enfant.absences|length > 0 %}
+											<div class="mb-3">
+												<h5 class="text-sm font-medium text-gray-700 mb-2">Absences récentes</h5>
+												<div class="space-y-1">
+													{% for absence in enfant.absences|slice(0, 2) %}
+														<div class="text-sm text-gray-600">
+															<span class="{% if absence.justifiee %}text-green-600{% else %}text-red-600{% endif %}">
+																{{ absence.dateDebut|date('d/m/Y') }}
+																-
+																{{ absence.motif }}
+															</span>
+														</div>
+													{% endfor %}
+												</div>
+											</div>
+										{% endif %}
+
+										<a href="/parent/suivi-scolaire/{{ enfant.id }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+											Voir le détail
+										</a>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+				{% endif %}
+
+				{% if actualites|length > 0 %}
+					<div class="bg-white shadow rounded-lg">
+						<div class="px-4 py-5 sm:p-6">
+							<div class="flex items-center justify-between mb-4">
+								<h3 class="text-lg leading-6 font-medium text-gray-900">Actualités récentes</h3>
+								<a href="/actualites" class="text-sm text-blue-600 hover:text-blue-800">Voir toutes</a>
+							</div>
+							<div class="space-y-4">
+								{% for actualite in actualites %}
+									<div class="border-b border-gray-200 pb-4 last:border-b-0">
+										<div class="flex items-start justify-between">
+											<div class="flex-1">
+												<h4 class="text-md font-medium text-gray-900 mb-1">
+													{% if actualite.important %}
+														<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-2">
+															Important
+														</span>
+													{% endif %}
+													{{ actualite.titre }}
+												</h4>
+												<p class="text-sm text-gray-600 mb-2">{{ actualite.contenu|slice(0, 150) }}
+													{% if actualite.contenu|length > 150 %}...
+													{% endif %}
+												</p>
+												<div class="flex items-center text-xs text-gray-500">
+													<span>Par
+														{{ actualite.auteur.firstName }}
+														{{ actualite.auteur.lastName }}</span>
+													<span class="mx-2">•</span>
+													<span>{{ actualite.datePublication|date('d/m/Y à H:i') }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
 					</div>
 				{% endif %}
 			</div>
-
-			<!-- Actions rapides -->
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-				<a href="/parent/tickets/purchase" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-					<div class="flex items-center">
-						<svg class="h-8 w-8 text-orange-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-						</svg>
-						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Tickets cantine</h3>
-							<p class="text-gray-500">Acheter et gérer</p>
-						</div>
-					</div>
-				</a>
-
-				<a href="/parent/horaires" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-					<div class="flex items-center">
-						<svg class="h-8 w-8 text-green-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-						</svg>
-						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Horaires</h3>
-							<p class="text-gray-500">Emplois du temps</p>
-						</div>
-					</div>
-				</a>
-
-				<a href="/parent/messages" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-					<div class="flex items-center">
-						<svg class="h-8 w-8 text-purple-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-						</svg>
-						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Messagerie</h3>
-							<p class="text-gray-500">Communication école</p>
-							{% if messagesNonLus > 0 %}
-								<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">
-									{{ messagesNonLus }}
-								</span>
-							{% endif %}
-						</div>
-					</div>
-				</a>
-
-				<a href="/actualites" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-					<div class="flex items-center">
-						<svg class="h-8 w-8 text-red-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
-						</svg>
-						<div class="ml-4">
-							<h3 class="text-lg font-medium text-gray-900">Actualités</h3>
-							<p class="text-gray-500">Informations école</p>
-						</div>
-					</div>
-				</a>
-			</div>
-
-			{% if enfants|length > 0 %}
-				<div class="bg-white shadow rounded-lg mb-8">
-					<div class="px-4 py-5 sm:p-6">
-						<h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Mes enfants</h3>
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{% for enfant in enfants %}
-								<div class="border border-gray-200 rounded-lg p-4">
-									<div class="flex items-center mb-3">
-										<div class="bg-blue-100 rounded-full p-2">
-											<svg class="h-6 w-6 text-blue-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-											</svg>
-										</div>
-										<div class="ml-3">
-											<h4 class="text-lg font-medium text-gray-900">{{ enfant.firstName }}
-												{{ enfant.lastName }}</h4>
-											<p class="text-sm text-gray-500">{{ enfant.classe.nom }}
-												-
-												{{ enfant.classe.niveau }}</p>
-										</div>
-									</div>
-
-									{% if enfant.notes|length > 0 %}
-										<div class="mb-3">
-											<h5 class="text-sm font-medium text-gray-700 mb-2">Dernières notes</h5>
-											<div class="space-y-1">
-												{% for note in enfant.notes|slice(0, 3) %}
-													<div class="flex justify-between text-sm">
-														<span class="text-gray-600">{{ note.matiere }}</span>
-														<span class="font-medium">{{ note.note }}/20</span>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									{% endif %}
-
-									{% if enfant.absences|length > 0 %}
-										<div class="mb-3">
-											<h5 class="text-sm font-medium text-gray-700 mb-2">Absences récentes</h5>
-											<div class="space-y-1">
-												{% for absence in enfant.absences|slice(0, 2) %}
-													<div class="text-sm text-gray-600">
-														<span class="{% if absence.justifiee %}text-green-600{% else %}text-red-600{% endif %}">
-															{{ absence.dateDebut|date('d/m/Y') }}
-															-
-															{{ absence.motif }}
-														</span>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									{% endif %}
-
-									<a href="/parent/suivi-scolaire/{{ enfant.id }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-										Voir le détail
-									</a>
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-				</div>
-			{% endif %}
-
-			{% if actualites|length > 0 %}
-				<div class="bg-white shadow rounded-lg">
-					<div class="px-4 py-5 sm:p-6">
-						<div class="flex items-center justify-between mb-4">
-							<h3 class="text-lg leading-6 font-medium text-gray-900">Actualités récentes</h3>
-							<a href="/actualites" class="text-sm text-blue-600 hover:text-blue-800">Voir toutes</a>
-						</div>
-						<div class="space-y-4">
-							{% for actualite in actualites %}
-								<div class="border-b border-gray-200 pb-4 last:border-b-0">
-									<div class="flex items-start justify-between">
-										<div class="flex-1">
-											<h4 class="text-md font-medium text-gray-900 mb-1">
-												{% if actualite.important %}
-													<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-2">
-														Important
-													</span>
-												{% endif %}
-												{{ actualite.titre }}
-											</h4>
-											<p class="text-sm text-gray-600 mb-2">{{ actualite.contenu|slice(0, 150) }}
-												{% if actualite.contenu|length > 150 %}...
-												{% endif %}
-											</p>
-											<div class="flex items-center text-xs text-gray-500">
-												<span>Par
-													{{ actualite.auteur.firstName }}
-													{{ actualite.auteur.lastName }}</span>
-												<span class="mx-2">•</span>
-												<span>{{ actualite.datePublication|date('d/m/Y à H:i') }}</span>
-											</div>
-										</div>
-									</div>
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-				</div>
-			{% endif %}
 		</div>
 	</div>
 {% endblock %}

@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 // Middleware pour vérifier le rôle directeur
-router.use(requireRole(['DIRECTEUR']));
+router.use(requireRole(['DIRECTION', 'ADMIN'])); // DIRECTION au lieu de DIRECTEUR
 
 // Routes du directeur
 router.get('/dashboard', directeurController.dashboard);

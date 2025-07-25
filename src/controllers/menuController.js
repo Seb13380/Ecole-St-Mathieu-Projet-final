@@ -6,6 +6,9 @@ const menuController = {
     // Afficher les menus de la semaine (page publique)
     getMenus: async (req, res) => {
         try {
+            console.log('🍽️ DEBUT - Accès à /restauration/menus');
+            console.log('📍 Tentative de récupération des menus actifs...');
+
             const menusActifs = await prisma.menu.findMany({
                 where: { actif: true },
                 include: {
@@ -16,12 +19,17 @@ const menuController = {
                 orderBy: { createdAt: 'desc' }
             });
 
+            console.log(`📊 Menus actifs trouvés: ${menusActifs.length}`);
+            console.log('📍 Tentative de rendu du template...');
+
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',
                 menus: menusActifs // Maintenant on passe tous les menus actifs
             });
+
+            console.log('✅ Template rendu avec succès');
         } catch (error) {
-            console.error('Erreur lors de la récupération des menus:', error);
+            console.error('❌ Erreur lors de la récupération des menus:', error);
             res.status(500).render('pages/error', {
                 message: 'Erreur lors de la récupération des menus'
             });

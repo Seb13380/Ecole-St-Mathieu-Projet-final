@@ -9,7 +9,7 @@ const directeurController = {
             console.log('🏫 Accès au tableau de bord directeur');
 
             // Vérifier que l'utilisateur est bien directeur
-            if (req.session.user.role !== 'DIRECTEUR') {
+            if (req.session.user.role !== 'DIRECTION') {
                 return res.status(403).render('pages/error.twig', {
                     message: 'Accès refusé - Réservé au directeur'
                 });

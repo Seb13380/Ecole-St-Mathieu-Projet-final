@@ -58,6 +58,7 @@ const frankRoutes = require("./src/routes/frankRoutes_new");
 const ticketRoutes = require("./src/routes/ticketRoutes");
 const restaurantRoutes = require("./src/routes/restaurantRoutes");
 const profileRoutes = require("./src/routes/profileRoutes");
+const parentInvitationRoutes = require("./src/routes/parentInvitationRoutes");
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -73,6 +74,7 @@ app.use('/parent', ticketRoutes);
 app.use('/', restaurantRoutes);
 app.use('/', profileRoutes);
 app.use('/contact', contactRoutes);
+app.use('/parent-invitations', parentInvitationRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

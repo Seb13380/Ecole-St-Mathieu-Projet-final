@@ -1,0 +1,277 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	<title>Gestion des Invitations Parents - École Saint-Mathieu</title>
+{% endblock %}
+
+{% block main %}
+	<div class="min-h-screen bg-gray-50 py-8">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="mb-8">
+				<h1 class="text-3xl font-bold text-gray-900">
+					Gestion des Invitations Parents
+				</h1>
+				<p class="mt-2 text-gray-600">
+					Envoyez des liens d'inscription personnalisés aux parents par email
+				</p>
+			</div>
+
+			<!-- Formulaire de création d'invitation -->
+			<div class="bg-white shadow rounded-lg mb-8 text-center">
+				<div class="px-6 py-4 border-b border-gray-200">
+					<h2 class="text-lg font-medium text-gray-900">
+						📧 Créer une nouvelle invitation
+					</h2>
+				</div>
+				<div class="p-6">
+					<form id="invitationForm" class="space-y-6">
+						<div
+							class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<!-- Informations du parent -->
+							<div class="space-y-4">
+								<h3 class="text-md font-medium text-gray-700 border-b pb-2">
+									👨‍👩‍👧‍👦 Informations du parent
+								</h3>
+								<div>
+									<label class="block text-sm font-medium text-gray-700">Email du parent *</label>
+									<input type="email" name="parentEmail" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+								</div>
+								<div class="grid grid-cols-2 gap-4">
+									<div>
+										<label class="block text-sm font-medium text-gray-700">Prénom *</label>
+										<input type="text" name="parentFirstName" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+									</div>
+									<div>
+										<label class="block text-sm font-medium text-gray-700">Nom *</label>
+										<input type="text" name="parentLastName" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+									</div>
+								</div>
+							</div>
+
+							<!-- Informations de l'enfant -->
+							<div class="space-y-4">
+								<h3 class="text-md font-medium text-gray-700 border-b pb-2">
+									👶 Informations de l'enfant
+								</h3>
+								<div class="grid grid-cols-2 gap-4">
+									<div>
+										<label class="block text-sm font-medium text-gray-700">Prénom de l'enfant *</label>
+										<input type="text" name="childFirstName" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+									</div>
+									<div>
+										<label class="block text-sm font-medium text-gray-700">Nom de l'enfant *</label>
+										<input type="text" name="childLastName" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+									</div>
+								</div>
+								<div>
+									<label class="block text-sm font-medium text-gray-700">Date de naissance</label>
+									<input type="date" name="childDateNaissance" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+								</div>
+								<div>
+									<label class="block text-sm font-medium text-gray-700">Classe</label>
+									<select name="classeId" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+										<option value="">Sélectionner une classe</option>
+										{% for classe in classes %}
+											<option value="{{ classe.id }}">{{ classe.nom }}
+												-
+												{{ classe.niveau }}</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<div class="flex justify-center">
+							<button type="submit" class="bg-teal-600 text-green-600 px-6 py-2 rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+								📧 Créer et envoyer l'invitation
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- Liste des invitations -->
+			<div class="bg-white shadow rounded-lg">
+				<div class="px-6 py-4 border-b border-gray-200">
+					<h2 class="text-lg font-medium text-gray-900">
+						📋 Invitations récentes
+					</h2>
+				</div>
+				<div class="overflow-x-auto">
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Parent
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Enfant
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Email
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Statut
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Créé le
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Actions
+								</th>
+							</tr>
+						</thead>
+						<tbody class="bg-white divide-y divide-gray-200">
+							{% for invitation in invitations %}
+								<tr>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm font-medium text-gray-900">
+											{{ invitation.parentFirstName }}
+											{{ invitation.parentLastName }}
+										</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm text-gray-900">
+											{{ invitation.childFirstName }}
+											{{ invitation.childLastName }}
+										</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm text-gray-900">{{ invitation.parentEmail }}</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										{% if invitation.used %}
+											<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+												✅ Utilisée
+											</span>
+										{% elseif invitation.expiresAt and invitation.expiresAt < "now"|date %}
+											<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+												⏰ Expirée
+											</span>
+										{% elseif invitation.emailSent %}
+											<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+												📧 Envoyée
+											</span>
+										{% else %}
+											<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+												⏳ Créée
+											</span>
+										{% endif %}
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+										{{ invitation.createdAt|date('d/m/Y H:i') }}
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+										<div class="flex space-x-2">
+											{% if not invitation.used %}
+												<button onclick="resendInvitation({{ invitation.id }})" class="text-blue-600 hover:text-blue-900">
+													🔄 Renvoyer
+												</button>
+												<button onclick="deleteInvitation({{ invitation.id }})" class="text-red-600 hover:text-red-900">
+													🗑️ Supprimer
+												</button>
+											{% endif %}
+											<button onclick="copyInvitationLink('{{ invitation.token }}')" class="text-gray-600 hover:text-gray-900">
+												📋 Copier lien
+											</button>
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Gestion du formulaire de création d'invitation
+document.getElementById('invitationForm').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const formData = new FormData(this);
+const data = Object.fromEntries(formData);
+
+try {
+const response = await fetch('/parent-invitations/create', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+});
+
+const result = await response.json();
+
+if (result.success) {
+alert('✅ ' + result.message);
+location.reload();
+} else {
+alert('❌ ' + result.error);
+}
+} catch (error) {
+alert('❌ Erreur lors de la création de l\'invitation');
+console.error(error);
+}
+});
+
+// Renvoyer une invitation
+async function resendInvitation(id) {
+if (!confirm('Voulez-vous renvoyer cette invitation par email ?')) 
+return;
+
+
+try {
+const response = await fetch (`/parent-invitations/${id}/resend`, {method: 'POST'});
+
+const result = await response.json();
+
+if (result.success) {
+alert('✅ ' + result.message);
+location.reload();
+} else {
+alert('❌ ' + result.error);
+}
+} catch (error) {
+alert('❌ Erreur lors du renvoi');
+console.error(error);
+}
+}
+
+// Supprimer une invitation
+async function deleteInvitation(id) {
+if (!confirm('Voulez-vous vraiment supprimer cette invitation ?')) 
+return;
+
+
+try {
+const response = await fetch (`/parent-invitations/${id}`, {method: 'DELETE'});
+
+const result = await response.json();
+
+if (result.success) {
+alert('✅ ' + result.message);
+location.reload();
+} else {
+alert('❌ ' + result.error);
+}
+} catch (error) {
+alert('❌ Erreur lors de la suppression');
+console.error(error);
+}
+}
+
+// Copier le lien d'invitation
+function copyInvitationLink(token) {
+const link = `${
+window.location.origin
+}/auth/register/${token}`;
+navigator.clipboard.writeText(link).then(() => {
+alert('📋 Lien copié dans le presse-papiers !');
+}).catch(() => {
+prompt('Copiez ce lien :', link);
+});
+}
+	</script>
+{% endblock %}

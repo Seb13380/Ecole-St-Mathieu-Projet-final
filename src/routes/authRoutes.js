@@ -1,12 +1,17 @@
 const express = require('express');
 const loginRoutes = require('./loginRoutes');
 const registerRoutes = require('./registerRoutes');
+const parentInvitationController = require('../controllers/parentInvitationController');
 
 const router = express.Router();
 
 router.use('/login', loginRoutes);
 
 router.use('/register', registerRoutes);
+
+// Routes pour les invitations avec token
+router.get('/register/:token', parentInvitationController.showRegistrationForm);
+router.post('/register/:token', parentInvitationController.processInvitationRegistration);
 
 router.get('/logout', (req, res) => {
     console.log('� Déconnexion directe pour:', req.session.user?.email);

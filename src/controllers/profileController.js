@@ -216,7 +216,7 @@ const ProfileController = {
             'PARENT': '👨‍👩‍👧‍👦',
             'RESTAURANT': '👨‍🍳',
             'ADMIN': '👨‍💼',
-            'DIRECTEUR': '🎯',
+            'DIRECTION': '🎯',
             'ENSEIGNANT': '👨‍🏫'
         };
         return images[role] || '👤';
