@@ -1,38 +1,46 @@
 {% extends "layouts/base.twig" %}
 
-{% block main %}
-	<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-		<div
-			class="max-w-7xl mx-auto px-6 py-8">
+{% block title %}Tableau de bord Admin - École Saint-Mathieu
+{% endblock %}
 
-			<!-- En-tête du directeur -->
-			<div class="bg-white rounded-3xl shadow-lg border-2 border-[#a7e3dd] p-8 mb-8">
+{% block body %}
+	<div
+		class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+		<!-- Header -->
+		<header class="bg-white shadow-sm border-b border-gray-100">
+			<div class="max-w-6xl mx-auto px-4 py-6">
 				<div class="flex items-center justify-between">
-					<div class="flex items-center space-x-6">
-						<div class="bg-[#a7e3dd] rounded-full p-4">
-							<svg class="h-12 w-12 text-[#304a4d]" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+					<div class="flex items-center space-x-4">
+						<div class="bg-gradient-to-br from-[#a7e3dd] to-[#304a4d] p-3 rounded-xl">
+							<svg class="h-8 w-8 text-white" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
 							</svg>
 						</div>
 						<div>
-							<h1 class="text-4xl font-bold text-[#304a4d] mb-2">
-								Tableau de Bord Direction
-							</h1>
-							<p class="text-xl text-gray-600">
-								Bienvenue
-								<span class="font-bold text-[#304a4d]">{{ user.firstName }}
-									{{ user.lastName }}</span>
-							</p>
-							<p class="text-sm text-gray-500">Directeur de l'École Saint-Mathieu</p>
+							<h1 class="text-3xl font-bold text-[#304a4d]">Administration</h1>
+							<p class="text-gray-600">École Saint-Mathieu</p>
 						</div>
 					</div>
-					<div class="text-right hidden lg:block">
-						<div class="text-6xl mb-2">🏫</div>
-						<p class="text-gray-500 font-medium">Direction</p>
+					<div class="flex items-center space-x-4">
+						<div class="text-right">
+							<p class="text-sm text-gray-500">Connecté en tant que</p>
+							<p class="font-semibold text-[#304a4d]">{{ user.email }}</p>
+						</div>
+						<div class="bg-[#a7e3dd] p-2 rounded-full">
+							<svg class="h-6 w-6 text-[#304a4d]" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+							</svg>
+						</div>
 					</div>
 				</div>
 			</div>
+		</header>
 
+		<!-- Contenu principal -->
+		<div
+			class="max-w-6xl mx-auto px-4 py-8">
 			<!-- Statistiques Rapides -->
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
 				<div class="bg-white rounded-2xl shadow-md border border-blue-200 p-6 text-center hover:shadow-lg transition-all">
@@ -57,29 +65,13 @@
 				</div>
 			</div>
 
-			<!-- GESTION DU PERSONNEL -->
+			<!-- GESTION ADMINISTRATIVE -->
 			<div class="mb-8">
 				<h2 class="text-2xl font-bold text-[#304a4d] mb-6 flex items-center">
 					<span class="bg-blue-100 rounded-full p-2 mr-3">👥</span>
-					Gestion du Personnel
+					Gestion Administrative
 				</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					<a href="/parent-invitations/manage" class="group bg-white rounded-2xl shadow-md border-l-4 border-teal-500 p-6 hover:shadow-xl transition-all duration-300">
-						<div class="flex items-center justify-between mb-4">
-							<div class="bg-teal-100 rounded-xl p-3">
-								<svg class="h-8 w-8 text-teal-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 7.89a2 2 0 002.83 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-								</svg>
-							</div>
-							<span class="text-2xl">📧</span>
-						</div>
-						<h3 class="text-xl font-bold text-gray-800 mb-2">Invitations Parents</h3>
-						<p class="text-gray-600 mb-4">Inviter de nouveaux parents à rejoindre la plateforme</p>
-						<div class="text-teal-600 font-medium group-hover:text-teal-800">
-							Gérer les invitations →
-						</div>
-					</a>
-
 					<a href="/admin/users" class="group bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-6 hover:shadow-xl transition-all duration-300">
 						<div class="flex items-center justify-between mb-4">
 							<div class="bg-blue-100 rounded-xl p-3">
@@ -111,16 +103,7 @@
 							Suivre les élèves →
 						</div>
 					</a>
-				</div>
-			</div>
 
-			<!-- ORGANISATION SCOLAIRE -->
-			<div class="mb-8">
-				<h2 class="text-2xl font-bold text-[#304a4d] mb-6 flex items-center">
-					<span class="bg-orange-100 rounded-full p-2 mr-3">🏛️</span>
-					Organisation Scolaire
-				</h2>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<a href="/admin/classes" class="group bg-white rounded-2xl shadow-md border-l-4 border-amber-500 p-6 hover:shadow-xl transition-all duration-300">
 						<div class="flex items-center justify-between mb-4">
 							<div class="bg-amber-100 rounded-xl p-3">
@@ -134,22 +117,6 @@
 						<p class="text-gray-600 mb-4">Organisation des classes et emplois du temps</p>
 						<div class="text-amber-600 font-medium group-hover:text-amber-800">
 							Organiser les classes →
-						</div>
-					</a>
-
-					<a href="/restauration/menus/menus-pdf" class="group bg-white rounded-2xl shadow-md border-l-4 border-orange-500 p-6 hover:shadow-xl transition-all duration-300">
-						<div class="flex items-center justify-between mb-4">
-							<div class="bg-orange-100 rounded-xl p-3">
-								<svg class="h-8 w-8 text-orange-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-								</svg>
-							</div>
-							<span class="text-2xl">🍽️</span>
-						</div>
-						<h3 class="text-xl font-bold text-gray-800 mb-2">Menus Cantine</h3>
-						<p class="text-gray-600 mb-4">Gestion des menus de la restauration scolaire</p>
-						<div class="text-orange-600 font-medium group-hover:text-orange-800">
-							Gérer les menus →
 						</div>
 					</a>
 				</div>
@@ -196,26 +163,26 @@
 				</div>
 			</div>
 
-			<!-- OUTILS ADMINISTRATION -->
+			<!-- OUTILS SYSTÈME -->
 			<div class="mb-8">
 				<h2 class="text-2xl font-bold text-[#304a4d] mb-6 flex items-center">
 					<span class="bg-gray-100 rounded-full p-2 mr-3">⚙️</span>
-					Outils d'Administration
+					Outils Système
 				</h2>
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-					<a href="/admin/reports" class="group bg-white rounded-2xl shadow-md border-l-4 border-indigo-500 p-6 hover:shadow-xl transition-all duration-300">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+					<a href="http://localhost:5555" target="_blank" class="group bg-white rounded-2xl shadow-md border-l-4 border-indigo-500 p-6 hover:shadow-xl transition-all duration-300">
 						<div class="flex items-center justify-between mb-4">
 							<div class="bg-indigo-100 rounded-xl p-3">
 								<svg class="h-8 w-8 text-indigo-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
 								</svg>
 							</div>
-							<span class="text-2xl">📊</span>
+							<span class="text-2xl">💾</span>
 						</div>
-						<h3 class="text-lg font-bold text-gray-800 mb-2">Rapports</h3>
-						<p class="text-gray-600 text-sm mb-4">Statistiques et bilans</p>
+						<h3 class="text-lg font-bold text-gray-800 mb-2">Prisma Studio</h3>
+						<p class="text-gray-600 text-sm mb-4">Base de données</p>
 						<div class="text-indigo-600 font-medium group-hover:text-indigo-800 text-sm">
-							Voir les rapports →
+							Accéder →
 						</div>
 					</a>
 
@@ -236,6 +203,22 @@
 						</div>
 					</a>
 
+					<a href="/admin/menus-pdf" class="group bg-white rounded-2xl shadow-md border-l-4 border-orange-500 p-6 hover:shadow-xl transition-all duration-300">
+						<div class="flex items-center justify-between mb-4">
+							<div class="bg-orange-100 rounded-xl p-3">
+								<svg class="h-8 w-8 text-orange-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+								</svg>
+							</div>
+							<span class="text-2xl">🍽️</span>
+						</div>
+						<h3 class="text-lg font-bold text-gray-800 mb-2">Menus Cantine</h3>
+						<p class="text-gray-600 text-sm mb-4">Gestion des menus</p>
+						<div class="text-orange-600 font-medium group-hover:text-orange-800 text-sm">
+							Gérer les menus →
+						</div>
+					</a>
+
 					<a href="/profile" class="group bg-white rounded-2xl shadow-md border-l-4 border-slate-500 p-6 hover:shadow-xl transition-all duration-300">
 						<div class="flex items-center justify-between mb-4">
 							<div class="bg-slate-100 rounded-xl p-3">
@@ -252,73 +235,6 @@
 						</div>
 					</a>
 				</div>
-			</div>
-
-			<!-- Activité Récente -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-				{% if recentUsers|length > 0 %}
-					<div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-						<div class="flex items-center justify-between mb-6">
-							<h3 class="text-xl font-bold text-gray-800 flex items-center">
-								<span class="bg-blue-100 rounded-full p-2 mr-3">👥</span>
-								Nouveaux Utilisateurs
-							</h3>
-							<a href="/admin/users" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-								Voir tous →
-							</a>
-						</div>
-						<div class="space-y-4">
-							{% for user in recentUsers %}
-								<div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-									<div>
-										<p class="font-bold text-gray-800">{{ user.firstName }}
-											{{ user.lastName }}</p>
-										<p class="text-sm text-gray-600">{{ user.email }}</p>
-									</div>
-									<div class="text-right">
-										<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-											{{ user.role }}
-										</span>
-										<p class="text-xs text-gray-500 mt-1">{{ user.createdAt|date('d/m/Y') }}</p>
-									</div>
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-				{% endif %}
-
-				{% if recentMessages|length > 0 %}
-					<div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-						<div class="flex items-center justify-between mb-6">
-							<h3 class="text-xl font-bold text-gray-800 flex items-center">
-								<span class="bg-purple-100 rounded-full p-2 mr-3">📧</span>
-								Messages Récents
-							</h3>
-							<a href="/admin/contact-messages" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
-								Voir tous →
-							</a>
-						</div>
-						<div class="space-y-4">
-							{% for message in recentMessages %}
-								<div class="p-4 bg-gray-50 rounded-xl">
-									<div class="flex items-start justify-between">
-										<div class="flex-1">
-											<p class="font-bold text-gray-800">{{ message.nom }}</p>
-											<p class="text-sm text-gray-600 mb-1">{{ message.sujet }}</p>
-											<p class="text-xs text-gray-500">{{ message.email }}</p>
-										</div>
-										<div class="text-right ml-4">
-											<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-												Non traité
-											</span>
-											<p class="text-xs text-gray-500 mt-1">{{ message.createdAt|date('d/m/Y') }}</p>
-										</div>
-									</div>
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-				{% endif %}
 			</div>
 		</div>
 	</div>

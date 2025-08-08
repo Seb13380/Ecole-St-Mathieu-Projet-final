@@ -1,0 +1,339 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Pré-inscription - École St Mathieu
+{% endblock %}
+
+{% block meta %}
+	<meta name="description" content="Formulaire de pré-inscription pour l'École St Mathieu. Inscrivez votre enfant et recevez une confirmation par email.">
+	<meta name="keywords" content="pré-inscription, école, Saint-Mathieu, inscription, élève">
+{% endblock %}
+
+{% block styles %}
+	<style>
+		.form-container {
+			background: linear-gradient(135deg, #a7e3dd 0%, #764ba2 100%);
+			min-height: 100vh;
+			padding: 2rem 0;
+		}
+
+		.form-card {
+			background: white;
+			border-radius: 20px;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+		}
+
+		.form-header {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 2rem;
+			text-align: center;
+		}
+
+		.form-content {
+			padding: 2rem;
+		}
+
+		.section-divider {
+			border-top: 2px solid #e5e7eb;
+			margin: 2rem 0;
+			padding-top: 1.5rem;
+		}
+
+		.section-title {
+			color: #374151;
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin-bottom: 1rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.input-group {
+			margin-bottom: 1.5rem;
+		}
+
+		.input-label {
+			display: block;
+			color: #374151;
+			font-weight: 500;
+			margin-bottom: 0.5rem;
+		}
+
+		.form-input {
+			width: 100%;
+			padding: 0.75rem 1rem;
+			border: 2px solid #e5e7eb;
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: all 0.3s ease;
+		}
+
+		.form-input:focus {
+			outline: none;
+			border-color: #667eea;
+			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+		}
+
+		.submit-btn {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 1rem 2rem;
+			border: none;
+			border-radius: 8px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			width: 100%;
+		}
+
+		.submit-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+		}
+
+		.required {
+			color: #ef4444;
+		}
+
+		.grid-2 {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+		}
+
+		@media(max-width: 768px) {
+			.grid-2 {
+				grid-template-columns: 1fr;
+			}
+
+			.form-container {
+				padding: 1rem;
+			}
+
+			.form-content {
+				padding: 1.5rem;
+			}
+		}
+	</style>
+{% endblock %}
+
+{% block main %}
+	<div class="form-container">
+		<div class="max-w-4xl mx-auto">
+			<div class="form-card">
+				<div class="form-header">
+					<h1 class="text-3xl font-bold mb-2">Pré-inscription</h1>
+					<p class="text-lg opacity-90">École St Mathieu</p>
+					<p class="text-sm opacity-75 mt-2">Remplissez ce formulaire pour demander une pré-inscription. Vous recevrez une confirmation par email une fois votre demande traitée par la direction.</p>
+				</div>
+
+				<div class="form-content">
+					<form
+						method="POST" action="/pre-inscription" novalidate>
+						<!-- Section Enfant -->
+						<div class="section">
+							<h2 class="section-title">
+								<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+								</svg>
+								Informations de l'enfant
+							</h2>
+
+							<div class="grid-2">
+								<div class="input-group">
+									<label for="childFirstName" class="input-label">
+										Prénom de l'enfant
+										<span class="required">*</span>
+									</label>
+									<input type="text" id="childFirstName" name="childFirstName" class="form-input" required placeholder="Prénom">
+								</div>
+
+								<div class="input-group">
+									<label for="childLastName" class="input-label">
+										Nom de l'enfant
+										<span class="required">*</span>
+									</label>
+									<input type="text" id="childLastName" name="childLastName" class="form-input" required placeholder="Nom">
+								</div>
+							</div>
+
+							<div class="input-group">
+								<label for="childDateNaissance" class="input-label">
+									Date de naissance de l'enfant
+								</label>
+								<input type="date" id="childDateNaissance" name="childDateNaissance" class="form-input">
+							</div>
+						</div>
+
+						<!-- Section Parent -->
+						<div class="section-divider">
+							<h2 class="section-title">
+								<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+								</svg>
+								Informations du parent/responsable
+							</h2>
+
+							<div class="grid-2">
+								<div class="input-group">
+									<label for="parentFirstName" class="input-label">
+										Prénom du parent
+										<span class="required">*</span>
+									</label>
+									<input type="text" id="parentFirstName" name="parentFirstName" class="form-input" required placeholder="Prénom">
+								</div>
+
+								<div class="input-group">
+									<label for="parentLastName" class="input-label">
+										Nom du parent
+										<span class="required">*</span>
+									</label>
+									<input type="text" id="parentLastName" name="parentLastName" class="form-input" required placeholder="Nom">
+								</div>
+							</div>
+
+							<div class="grid-2">
+								<div class="input-group">
+									<label for="parentEmail" class="input-label">
+										Email
+										<span class="required">*</span>
+									</label>
+									<input type="email" id="parentEmail" name="parentEmail" class="form-input" required placeholder="votre.email@example.com">
+								</div>
+
+								<div class="input-group">
+									<label for="parentPhone" class="input-label">
+										Téléphone
+										<span class="required">*</span>
+									</label>
+									<input type="tel" id="parentPhone" name="parentPhone" class="form-input" required placeholder="06 12 34 56 78">
+								</div>
+							</div>
+
+							<div class="input-group">
+								<label for="parentAdress" class="input-label">
+									Adresse complète
+									<span class="required">*</span>
+								</label>
+								<textarea id="parentAdress" name="parentAdress" class="form-input" rows="3" required placeholder="Numéro, rue, code postal, ville"></textarea>
+							</div>
+						</div>
+
+						<!-- Section Mot de passe -->
+						<div class="section-divider">
+							<h2 class="section-title">
+								<svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+								</svg>
+								Mot de passe pour votre futur compte
+							</h2>
+
+							<div class="input-group">
+								<label for="parentPassword" class="input-label">
+									Mot de passe
+									<span class="required">*</span>
+								</label>
+								<input type="password" id="parentPassword" name="parentPassword" class="form-input" required placeholder="Choisissez un mot de passe sécurisé" minlength="6">
+								<p class="text-sm text-gray-600 mt-1">
+									Minimum 6 caractères. Ce mot de passe sera utilisé pour vous connecter une fois votre compte approuvé.
+								</p>
+							</div>
+						</div>
+
+						<!-- Information importante -->
+						<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+							<div class="flex items-start">
+								<svg class="w-6 h-6 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
+								<div>
+									<h3 class="font-semibold text-blue-900 mb-1">Information importante</h3>
+									<p class="text-blue-800 text-sm">
+										Votre demande de pré-inscription sera envoyée à la direction de l'école. 
+																																								                  Vous recevrez un email de confirmation une fois votre demande traitée. 
+																																								                  Si elle est approuvée, votre compte parent sera automatiquement créé et vous pourrez vous connecter avec l'email et le mot de passe que vous avez fournis.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Bouton de soumission -->
+						<button type="submit" class="submit-btn">
+							<svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+							</svg>
+							Envoyer ma demande de pré-inscription
+						</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- Informations de contact -->
+			<div class="text-center mt-8 text-white">
+				<p class="text-lg mb-2">Besoin d'aide ?</p>
+				<p class="text-sm opacity-75">
+					Contactez-nous au
+					<strong>04 XX XX XX XX</strong>
+					ou par email à
+					<strong>contact@ecole-st-mathieu.fr</strong>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () { // Validation du formulaire côté client
+const form = document.querySelector('form');
+const inputs = form.querySelectorAll('input[required], textarea[required]');
+
+form.addEventListener('submit', function (e) {
+let hasErrors = false;
+
+inputs.forEach(input => {
+if (!input.value.trim()) {
+input.style.borderColor = '#ef4444';
+hasErrors = true;
+} else {
+input.style.borderColor = '#e5e7eb';
+}
+});
+
+// Validation email
+const emailInput = document.getElementById('parentEmail');
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (! emailRegex.test(emailInput.value)) {
+emailInput.style.borderColor = '#ef4444';
+hasErrors = true;
+}
+
+// Validation mot de passe
+const passwordInput = document.getElementById('parentPassword');
+if (passwordInput.value.length < 6) {
+passwordInput.style.borderColor = '#ef4444';
+hasErrors = true;
+}
+
+if (hasErrors) {
+e.preventDefault();
+// Ne rien faire, laisser la validation HTML native
+}
+});
+
+// Animation des inputs
+inputs.forEach(input => {
+input.addEventListener('focus', function () {
+this.style.borderColor = '#667eea';
+});
+
+input.addEventListener('blur', function () {
+if (!this.value.trim()) {
+this.style.borderColor = '#e5e7eb';
+}
+});
+});
+});
+	</script>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "layouts/main.twig" %}
+{% extends "layouts/base.twig" %}
 
 {% block content %}
 	<div class="container mx-auto px-4 py-8">
@@ -21,7 +21,7 @@
 					<table class="w-full border-collapse border border-gray-300">
 						<thead>
 							<tr class="bg-gray-100">
-								
+
 								<th class="border border-gray-300 px-4 py-2 text-left">Fichier</th>
 								<th class="border border-gray-300 px-4 py-2 text-left">Statut</th>
 								<th class="border border-gray-300 px-4 py-2 text-left">Actif</th>
@@ -44,9 +44,9 @@
 									</td>
 									<td class="border border-gray-300 px-4 py-2">
 										<span class="inline-block px-2 py-1 rounded-full text-xs font-medium
-												                                    {% if menu.statut == 'ACTIF' %}bg-green-100 text-green-800
-												                                    {% elseif menu.statut == 'PLANIFIE' %}bg-yellow-100 text-yellow-800
-												                                    {% else %}bg-red-100 text-red-800{% endif %}">
+																								                                    {% if menu.statut == 'ACTIF' %}bg-green-100 text-green-800
+																								                                    {% elseif menu.statut == 'PLANIFIE' %}bg-yellow-100 text-yellow-800
+																								                                    {% else %}bg-red-100 text-red-800{% endif %}">
 											{{ menu.statut }}
 										</span>
 									</td>

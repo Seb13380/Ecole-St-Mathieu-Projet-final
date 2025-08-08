@@ -1,0 +1,449 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Gestion des pré-inscriptions
+{% endblock %}
+
+{% block styles %}
+	<style>
+		.pre-inscription-card {
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 <h1 class="text-3xl font-bold mb-2">Gestion des pré-inscriptions</h1> <p class="text-lg opacity-90">Gérez les demandes de pré-inscription des parents</p> </div> <div class="bg-white rounded-lg shadow-md p-6">, 0.1 );
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+			border-left: 4px solid #e5e7eb;
+			transition: all 0.3s ease;
+		}
+
+		.pre-inscription-card:hover {
+			box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			transform: translateY(-2px);
+		}
+
+		.status-pending {
+			border-left-color: #f59e0b;
+			background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+		}
+
+		.status-approved {
+			border-left-color: #10b981;
+			background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+		}
+
+		.status-rejected {
+			border-left-color: #ef4444;
+			background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+		}
+
+		.status-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.5rem 1rem;
+			border-radius: 9999px;
+			font-size: 0.875rem;
+			font-weight: 600;
+		}
+
+		.status-pending-badge {
+			background-color: #fbbf24;
+			color: #92400e;
+		}
+
+		.status-approved-badge {
+			background-color: #34d399;
+			color: #065f46;
+		}
+
+		.status-rejected-badge {
+			background-color: #f87171;
+			color: #991b1b;
+		}
+
+		.info-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin: 1rem 0;
+		}
+
+		.info-item {
+			background: rgba(255, 255, 255, 0.8);
+			padding: 0.75rem;
+			border-radius: 8px;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+		}
+
+		.info-label {
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: #6b7280;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.25rem;
+		}
+
+		.info-value {
+			font-size: 0.875rem;
+			color: #374151;
+			font-weight: 500;
+		}
+
+		.action-buttons {
+			display: flex;
+			gap: 0.75rem;
+			margin-top: 1.5rem;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			padding: 0.75rem 1.5rem;
+			border-radius: 8px;
+			font-weight: 600;
+			font-size: 0.875rem;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			border: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			text-decoration: none;
+		}
+
+		.btn-approve {
+			background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+			color: white;
+		}
+
+		.btn-approve:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+		}
+
+		.btn-reject {
+			background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+			color: white;
+		}
+
+		.btn-reject:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+		}
+
+		.btn:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			transform: none !important;
+			box-shadow: none !important;
+		}
+
+		.header {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 2rem;
+			border-radius: 12px;
+			margin-bottom: 2rem;
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		.stat-card {
+			background: white;
+			padding: 1.5rem;
+			border-radius: 12px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			text-align: center;
+		}
+
+		.stat-number {
+			font-size: 2rem;
+			font-weight: bold;
+			margin-bottom: 0.5rem;
+		}
+
+		.stat-label {
+			color: #6b7280;
+			font-size: 0.875rem;
+			font-weight: 500;
+		}
+
+		.empty-state {
+			text-align: center;
+			padding: 3rem;
+			color: #6b7280;
+		}
+
+		.filter-tabs {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 2rem;
+			flex-wrap: wrap;
+		}
+
+		.filter-tab {
+			padding: 0.75rem 1.5rem;
+			border-radius: 8px;
+			background: #f3f4f6;
+			color: #374151;
+			text-decoration: none;
+			font-weight: 500;
+			transition: all 0.3s ease;
+		}
+
+		.filter-tab.active,
+		.filter-tab:hover {
+			background: #667eea;
+			color: white;
+		}
+
+		@media(max-width: 768px) {
+			.info-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.action-buttons {
+				flex-direction: column;
+			}
+
+			.stats-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<div
+		class="max-w-7xl mx-auto">
+		<!-- En-tête -->
+		<div class="header">
+			<h1 class="text-3xl font-bold mb-2">Gestion des pré-inscriptions</h1>
+			<p class="text-lg opacity-90">Gérez les demandes de pré-inscription des parents</p>
+		</div>
+
+		<!-- Messages d'alerte -->
+		{% if success %}
+			<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+				<strong>✓ Succès!</strong>
+				{{ success }}
+			</div>
+		{% endif %}
+
+		{% if errors %}
+			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+				<strong>✗ Erreur:</strong>
+				{{ errors }}
+			</div>
+		{% endif %}
+
+		<!-- Statistiques -->
+		{% set pendingCount = 0 %}
+		{% set approvedCount = 0 %}
+		{% set rejectedCount = 0 %}
+
+		{% for preInscription in preInscriptions %}
+			{% if preInscription.status == 'PENDING' %}
+				{% set pendingCount = pendingCount + 1 %}
+			{% elseif preInscription.status == 'APPROVED' %}
+				{% set approvedCount = approvedCount + 1 %}
+			{% elseif preInscription.status == 'REJECTED' %}
+				{% set rejectedCount = rejectedCount + 1 %}
+			{% endif %}
+		{% endfor %}
+
+		<div class="stats-grid">
+			<div class="stat-card">
+				<div class="stat-number text-yellow-600">{{ pendingCount }}</div>
+				<div class="stat-label">En attente</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-number text-green-600">{{ approvedCount }}</div>
+				<div class="stat-label">Approuvées</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-number text-red-600">{{ rejectedCount }}</div>
+				<div class="stat-label">Rejetées</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-number text-blue-600">{{ preInscriptions|length }}</div>
+				<div class="stat-label">Total</div>
+			</div>
+		</div>
+
+		<!-- Filtres -->
+		<div class="filter-tabs">
+			<a href="#" class="filter-tab active" onclick="filterPreInscriptions('all')">Toutes</a>
+			<a href="#" class="filter-tab" onclick="filterPreInscriptions('PENDING')">En attente</a>
+			<a href="#" class="filter-tab" onclick="filterPreInscriptions('APPROVED')">Approuvées</a>
+			<a href="#" class="filter-tab" onclick="filterPreInscriptions('REJECTED')">Rejetées</a>
+		</div>
+
+		<!-- Liste des pré-inscriptions -->
+		{% if preInscriptions|length > 0 %}
+			<div id="preInscriptionsList">
+				{% for preInscription in preInscriptions %}
+					<div
+						class="pre-inscription-card status-{{ preInscription.status|lower }}" data-status="{{ preInscription.status }}">
+						<!-- En-tête avec statut -->
+						<div class="flex justify-between items-start mb-4">
+							<div>
+								<h3 class="text-xl font-bold text-gray-800 mb-2">
+									{{ preInscription.childFirstName }}
+									{{ preInscription.childLastName }}
+								</h3>
+								<div class="status-badge status-{{ preInscription.status|lower }}-badge">
+									{% if preInscription.status == 'PENDING' %}
+										<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20">
+											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+										</svg>
+										En attente
+									{% elseif preInscription.status == 'APPROVED' %}
+										<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20">
+											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+										</svg>
+										Approuvée
+									{% elseif preInscription.status == 'REJECTED' %}
+										<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20">
+											<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+										</svg>
+										Rejetée
+									{% endif %}
+								</div>
+							</div>
+							<div class="text-sm text-gray-600">
+								<div>Demande #{{ preInscription.id }}</div>
+								<div>{{ preInscription.createdAt|date('d/m/Y H:i') }}</div>
+							</div>
+						</div>
+
+						<!-- Informations détaillées -->
+						<div class="info-grid">
+							<div class="info-item">
+								<div class="info-label">Parent</div>
+								<div class="info-value">{{ preInscription.parentFirstName }}
+									{{ preInscription.parentLastName }}</div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">Email</div>
+								<div class="info-value">{{ preInscription.parentEmail }}</div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">Téléphone</div>
+								<div class="info-value">{{ preInscription.parentPhone }}</div>
+							</div>
+							{% if preInscription.childDateNaissance %}
+								<div class="info-item">
+									<div class="info-label">Date de naissance</div>
+									<div class="info-value">{{ preInscription.childDateNaissance|date('d/m/Y') }}</div>
+								</div>
+							{% endif %}
+							<div class="info-item">
+								<div class="info-label">Adresse</div>
+								<div class="info-value">{{ preInscription.parentAdress }}</div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">Notification</div>
+								<div class="info-value">
+									{% if preInscription.notificationSent %}
+										<span class="text-green-600">✓ Envoyée</span>
+									{% else %}
+										<span class="text-red-600">✗ Non envoyée</span>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+
+						<!-- Informations de traitement -->
+						{% if preInscription.status != 'PENDING' %}
+							<div class="mt-4 p-3 bg-gray-50 rounded-lg">
+								<div class="text-sm text-gray-600">
+									<strong>Traitée le:</strong>
+									{{ preInscription.processedAt|date('d/m/Y H:i') }}
+									{% if preInscription.processedByUser %}
+										par
+										<strong>{{ preInscription.processedByUser.firstName }}
+											{{ preInscription.processedByUser.lastName }}</strong>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+
+						<!-- Actions -->
+						{% if preInscription.status == 'PENDING' %}
+							<div class="action-buttons">
+								<form method="POST" action="/admin/pre-inscriptions/{{ preInscription.id }}/approve" style="display: inline;">
+									<button type="submit" class="btn btn-approve" onclick="return confirm('Êtes-vous sûr de vouloir approuver cette pré-inscription ? Un compte parent sera créé automatiquement.')">
+										<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20">
+											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+										</svg>
+										Approuver
+									</button>
+								</form>
+
+								<form method="POST" action="/admin/pre-inscriptions/{{ preInscription.id }}/reject" style="display: inline;">
+									<button type="submit" class="btn btn-reject" onclick="return confirm('Êtes-vous sûr de vouloir rejeter cette pré-inscription ?')">
+										<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20">
+											<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+										</svg>
+										Rejeter
+									</button>
+								</form>
+							</div>
+						{% endif %}
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="empty-state">
+				<svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+				</svg>
+				<h3 class="text-lg font-semibold mb-2">Aucune pré-inscription</h3>
+				<p>Il n'y a actuellement aucune demande de pré-inscription.</p>
+			</div>
+		{% endif %}
+	</div>
+
+	<script>
+		function filterPreInscriptions(status) {
+const cards = document.querySelectorAll('.pre-inscription-card');
+const tabs = document.querySelectorAll('.filter-tab');
+
+// Mettre à jour les onglets
+tabs.forEach(tab => tab.classList.remove('active'));
+event.target.classList.add('active');
+
+// Filtrer les cartes
+cards.forEach(card => {
+if (status === 'all' || card.dataset.status === status) {
+card.style.display = 'block';
+} else {
+card.style.display = 'none';
+}
+});
+
+event.preventDefault();
+return false;
+}
+
+// Animation au chargement
+document.addEventListener('DOMContentLoaded', function () {
+const cards = document.querySelectorAll('.pre-inscription-card');
+cards.forEach((card, index) => {
+card.style.opacity = '0';
+card.style.transform = 'translateY(20px)';
+
+setTimeout(() => {
+card.style.transition = 'all 0.5s ease';
+card.style.opacity = '1';
+card.style.transform = 'translateY(0)';
+}, index * 100);
+});
+});
+	</script>
+{% endblock %}

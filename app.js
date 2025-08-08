@@ -2,6 +2,7 @@ const express = require("express");
 const twig = require('twig');
 const dotenv = require('dotenv');
 const session = require("express-session");
+const flash = require('connect-flash');
 
 dotenv.config();
 const app = express();
@@ -25,6 +26,9 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000 // 24 heures
   }
 }));
+
+// Flash messages middleware
+app.use(flash());
 
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
@@ -59,6 +63,7 @@ const ticketRoutes = require("./src/routes/ticketRoutes");
 const restaurantRoutes = require("./src/routes/restaurantRoutes");
 const profileRoutes = require("./src/routes/profileRoutes");
 const parentInvitationRoutes = require("./src/routes/parentInvitationRoutes");
+const preInscriptionRoutes = require("./src/routes/preInscriptionRoutes");
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -75,6 +80,7 @@ app.use('/', restaurantRoutes);
 app.use('/', profileRoutes);
 app.use('/contact', contactRoutes);
 app.use('/parent-invitations', parentInvitationRoutes);
+app.use('/', preInscriptionRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

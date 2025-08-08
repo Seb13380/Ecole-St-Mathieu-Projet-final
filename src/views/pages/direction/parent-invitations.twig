@@ -205,14 +205,13 @@ body: JSON.stringify(data)
 const result = await response.json();
 
 if (result.success) {
-alert('✅ ' + result.message);
 location.reload();
 } else {
-alert('❌ ' + result.error);
+location.reload();
 }
 } catch (error) {
-alert('❌ Erreur lors de la création de l\'invitation');
 console.error(error);
+location.reload();
 }
 });
 
@@ -222,20 +221,20 @@ if (!confirm('Voulez-vous renvoyer cette invitation par email ?'))
 return;
 
 
+
 try {
 const response = await fetch (`/parent-invitations/${id}/resend`, {method: 'POST'});
 
 const result = await response.json();
 
 if (result.success) {
-alert('✅ ' + result.message);
 location.reload();
 } else {
-alert('❌ ' + result.error);
+location.reload();
 }
 } catch (error) {
-alert('❌ Erreur lors du renvoi');
 console.error(error);
+location.reload();
 }
 }
 
@@ -245,20 +244,20 @@ if (!confirm('Voulez-vous vraiment supprimer cette invitation ?'))
 return;
 
 
+
 try {
 const response = await fetch (`/parent-invitations/${id}`, {method: 'DELETE'});
 
 const result = await response.json();
 
 if (result.success) {
-alert('✅ ' + result.message);
 location.reload();
 } else {
-alert('❌ ' + result.error);
+location.reload();
 }
 } catch (error) {
-alert('❌ Erreur lors de la suppression');
 console.error(error);
+location.reload();
 }
 }
 
@@ -267,8 +266,7 @@ function copyInvitationLink(token) {
 const link = `${
 window.location.origin
 }/auth/register/${token}`;
-navigator.clipboard.writeText(link).then(() => {
-alert('📋 Lien copié dans le presse-papiers !');
+navigator.clipboard.writeText(link).then(() => { // Lien copié silencieusement
 }).catch(() => {
 prompt('Copiez ce lien :', link);
 });

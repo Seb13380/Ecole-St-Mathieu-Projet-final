@@ -1,15 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const actualiteController = require('../controllers/actualiteController');
-const { requireAuth, requireDirection } = require('../middleware/auth');
+const actualiteController = require('../controllers/actualiteController-simple');
 
+// Route de test
+router.get('/test', (req, res) => {
+    res.json({ message: 'Routes actualités OK!', date: new Date() });
+});
 
+// 🔍 CONSULTATION PUBLIQUE
 router.get('/', actualiteController.getActualites);
 
-router.get('/manage', requireDirection, actualiteController.getActualitesManagement);
-router.post('/', requireDirection, actualiteController.createActualite);
-router.put('/:id', requireDirection, actualiteController.updateActualite);
-router.delete('/:id', requireDirection, actualiteController.deleteActualite);
-router.patch('/:id/toggle-visibility', requireDirection, actualiteController.toggleVisibility);
+// 🛠️ GESTION ACTUALITÉS
+router.get('/manage', actualiteController.getActualitesManagement);
+router.get('/gestion', actualiteController.getActualitesManagement);
+
+// Actions CRUD
+router.post('/', actualiteController.createActualiteWithUpload);
+router.put('/:id', actualiteController.updateActualite);
+router.delete('/:id', actualiteController.deleteActualite);
+router.patch('/:id/toggle-visibility', actualiteController.toggleVisibility);
 
 module.exports = router;
