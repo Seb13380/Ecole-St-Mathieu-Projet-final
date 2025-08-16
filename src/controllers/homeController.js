@@ -49,14 +49,36 @@ const homeController = {
         take: 4 // Limiter à 4 travaux les plus récents
       });
 
-      console.log('🏠 Page d\'accueil - Données récupérées:', { actualites: actualites.length, travaux: travaux.length });
+      // Récupérer les images actives du carrousel
+      const carouselImages = await prisma.carouselImage.findMany({
+        where: { active: true },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
+        },
+        orderBy: { ordre: 'asc' }
+      });
+
+      // Récupérer les images actives du hero carrousel (grand carrousel)
+      const heroCarouselImages = await prisma.heroCarousel.findMany({
+        where: { active: true },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
+        },
+        orderBy: { ordre: 'asc' }
+      });
 
       res.render('pages/home', {
         title: 'École Saint-Mathieu - Accueil',
         message: req.query.message || req.query.success || req.query.error,
         menuActif: menuActif,
         actualites: actualites,
-        travaux: travaux
+        travaux: travaux,
+        carouselImages: carouselImages,
+        heroCarouselImages: heroCarouselImages
       });
     } catch (error) {
       console.error('Erreur lors de la récupération des données pour la page d\'accueil:', error);
@@ -65,7 +87,9 @@ const homeController = {
         message: req.query.message || req.query.success || req.query.error,
         menuActif: null,
         actualites: [],
-        travaux: []
+        travaux: [],
+        carouselImages: [],
+        heroCarouselImages: []
       });
     }
   },
@@ -101,8 +125,6 @@ const homeController = {
           message
         }
       });
-
-      console.log('Message de contact sauvegardé:', { name, email, message });
 
       res.redirect('/?message=Votre message a été envoyé avec succès. Nous vous recontacterons rapidement.');
     } catch (error) {
@@ -152,7 +174,4 @@ const homeController = {
   }
 };
 
-
-
 module.exports = homeController;
-

@@ -15,6 +15,8 @@ enum UserRole {
   ASSISTANT_DIRECTION
   APEL
   MAINTENANCE_SITE
+  SECRETAIRE_DIRECTION
+  RESTAURATION
 }
 
 enum TicketBookletStatus {
@@ -62,6 +64,8 @@ model User {
   horaires       Horaire[]        @relation("EnseignantHoraires")
   notes          Note[]           @relation("EnseignantNotes")
   menus          Menu[]           @relation("UserMenus")
+  carouselImages CarouselImage[]  @relation("UserCarouselImages")
+  heroCarousel   HeroCarousel[]   @relation("UserHeroCarousel")
   TicketBooklet  TicketBooklet[]
   TicketPurchase TicketPurchase[]
 }
@@ -311,4 +315,40 @@ model TicketPurchase {
   @@index([studentId])
   @@index([paymentStatus])
   @@index([createdAt])
+}
+
+model CarouselImage {
+  id          Int      @id @default(autoincrement())
+  filename    String // Nom du fichier (ex: "photo_2025_01_15.jpg")
+  originalUrl String // URL de l'image originale
+  titre       String? // Titre optionnel de l'image
+  description String? // Description optionnelle
+  ordre       Int      @default(0) // Ordre d'affichage dans le carousel
+  active      Boolean  @default(true) // Image active ou non
+  auteurId    Int // Qui a ajouté l'image
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  auteur User @relation("UserCarouselImages", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([active])
+  @@index([ordre])
+}
+
+model HeroCarousel {
+  id          Int      @id @default(autoincrement())
+  filename    String // Nom du fichier (ex: "hero_photo_2025_01_15.jpg")
+  originalUrl String // URL de l'image originale
+  titre       String? // Titre optionnel de l'image
+  description String? // Description optionnelle
+  ordre       Int      @default(0) // Ordre d'affichage dans le carousel principal
+  active      Boolean  @default(true) // Image active ou non
+  auteurId    Int // Qui a ajouté l'image
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  auteur User @relation("UserHeroCarousel", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([active])
+  @@index([ordre])
 }
