@@ -19,8 +19,24 @@
 				</p>
 			</div>
 
-			<form
-				class="mt-8 space-y-6" action="/auth/register" method="POST">
+			<form class="mt-8 space-y-6" action="/auth/register" method="POST">
+				{% if error %}
+					<div class="alert alert-error">
+						<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+						</svg>
+						<span>{{ error }}</span>
+					</div>
+				{% endif %}
+
+				{% if success %}
+					<div class="alert alert-success">
+						<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+						</svg>
+						<span>{{ success }}</span>
+					</div>
+				{% endif %}
 
 				<!-- Section Informations de l'enfant -->
 				<div class="bg-gray-50 rounded-lg p-6 border-l-4 border-teal-500">
@@ -117,7 +133,7 @@
 				<div class="pt-6">
 					<div class="form-control">
 						<button type="submit" class="Btn full-width">
-							Créer mon compte
+							 Créer mon compte
 						</button>
 					</div>
 

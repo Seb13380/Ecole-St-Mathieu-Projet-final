@@ -9,14 +9,12 @@ datasource db {
 
 enum UserRole {
   PARENT
-  ENSEIGNANT // Professeurs - Accès classes, notes, actualités pédagogiques
-  ADMIN // Sébastien GIORDANO - Accès total
-  DIRECTION // Lionel - Accès direction (sauf techniques)
-  MAINTENANCE_SITE // Franck - Gestion contenu site
-  SECRETAIRE_DIRECTION // Yamina - Comptabilité et admin
-  RESTAURATION // Cécile & Nadine - Tickets restauration/étude
+  ENSEIGNANT
+  ADMIN
+  DIRECTION
   ASSISTANT_DIRECTION
   APEL
+  MAINTENANCE_SITE
 }
 
 enum TicketBookletStatus {
@@ -57,15 +55,14 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  enfants                  Student[]        @relation("ParentEnfants")
-  messages                 Message[]        @relation("UserMessages")
-  actualites               Actualite[]      @relation("UserActualites")
-  horaires                 Horaire[]        @relation("EnseignantHoraires")
-  notes                    Note[]           @relation("EnseignantNotes")
-  menus                    Menu[]           @relation("UserMenus")
-  TicketBooklet            TicketBooklet[]
-  TicketPurchase           TicketPurchase[]
-  processedPreInscriptions PreInscription[] @relation("ProcessedPreInscriptions")
+  enfants        Student[]        @relation("ParentEnfants")
+  messages       Message[]        @relation("UserMessages")
+  actualites     Actualite[]      @relation("UserActualites")
+  horaires       Horaire[]        @relation("EnseignantHoraires")
+  notes          Note[]           @relation("EnseignantNotes")
+  menus          Menu[]           @relation("UserMenus")
+  TicketBooklet  TicketBooklet[]
+  TicketPurchase TicketPurchase[]
 }
 
 model Student {
@@ -152,13 +149,11 @@ model Horaire {
 model Actualite {
   id              Int      @id @default(autoincrement())
   titre           String
-  contenu         String   @db.LongText // Pour le contenu HTML riche
+  contenu         String
   auteurId        Int
   datePublication DateTime @default(now())
   visible         Boolean  @default(true)
   important       Boolean  @default(false)
-  imageUrl        String? // URL de l'image principale
-  documentsUrls   String? // JSON array des documents joints
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -186,31 +181,6 @@ model Contact {
   message   String
   traite    Boolean  @default(false)
   createdAt DateTime @default(now())
-}
-
-model PreInscription {
-  id                 Int       @id @default(autoincrement())
-  // Informations de l'enfant
-  childFirstName     String // Prénom de l'enfant
-  childLastName      String // Nom de l'enfant
-  childDateNaissance DateTime? // Date de naissance (optionnel)
-  // Informations du parent
-  parentFirstName    String // Prénom du parent
-  parentLastName     String // Nom du parent
-  parentEmail        String    @unique // Email du parent
-  parentPhone        String // Téléphone du parent
-  parentAdress       String // Adresse complète
-  parentPassword     String // Mot de passe hasché
-  // Statut de la pré-inscription
-  status             String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  notificationSent   Boolean   @default(false) // Email de notification envoyé
-  processedBy        Int? // ID de l'admin qui a traité
-  processedAt        DateTime? // Date de traitement
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-
-  // Relations
-  processedByUser User? @relation("ProcessedPreInscriptions", fields: [processedBy], references: [id])
 }
 
 model InvitationCode {

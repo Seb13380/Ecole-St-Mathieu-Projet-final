@@ -1,0 +1,188 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<div class="container mx-auto px-4 py-8">
+		<div class="max-w-2xl mx-auto">
+			<div class="bg-white rounded-lg shadow-lg p-6">
+				<div class="flex justify-between items-center mb-6">
+					<h1 class="text-3xl font-bold text-gray-800">Ajouter un menu</h1>
+					<a href="/directeur/menus" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+						Retour
+					</a>
+				</div>
+
+				<!-- Alertes -->
+				<div id="alert-container" class="mb-4 hidden">
+					<div id="alert" class="p-4 rounded-lg"></div>
+				</div>
+
+				<form id="menu-form" enctype="multipart/form-data">
+					<div class="mb-4">
+						<label for="semaine" class="block text-sm font-medium text-gray-700 mb-2">
+							Titre de la semaine
+						</label>
+						<input type="text" id="semaine" name="semaine" placeholder="Ex: Semaine du 15 au 19 Janvier 2025" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+						<div>
+							<label for="dateDebut" class="block text-sm font-medium text-gray-700 mb-2">
+								Date de début
+							</label>
+							<input type="date" id="dateDebut" name="dateDebut" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+						</div>
+						<div>
+							<label for="dateFin" class="block text-sm font-medium text-gray-700 mb-2">
+								Date de fin
+							</label>
+							<input type="date" id="dateFin" name="dateFin" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+						</div>
+					</div>
+
+					<div class="mb-6">
+						<label for="pdfFile" class="block text-sm font-medium text-gray-700 mb-2">
+							Fichier PDF du menu
+						</label>
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+							<input type="file" id="pdfFile" name="pdfFile" accept=".pdf" class="hidden" required>
+							<label for="pdfFile" class="cursor-pointer">
+								<div class="text-gray-600">
+									<svg class="mx-auto h-12 w-12 text-gray-400 mb-2" stroke="currentColor" fill="none" viewbox="0 0 48 48">
+										<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+									</svg>
+									<p class="text-sm">Cliquez pour sélectionner un fichier PDF</p>
+									<p class="text-xs text-gray-500">Maximum 10MB</p>
+								</div>
+							</label>
+						</div>
+						<div id="file-info" class="mt-2 text-sm text-gray-600 hidden"></div>
+					</div>
+
+					<div class="flex gap-4">
+						<button type="submit" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+							Ajouter le menu
+						</button>
+						<a href="/directeur/menus" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center">
+							Annuler
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		document.getElementById('pdfFile').addEventListener('change', function (e) {
+const file = e.target.files[0];
+const fileInfo = document.getElementById('file-info');
+
+if (file) {
+fileInfo.textContent = `Fichier sélectionné: ${
+file.name
+} (${
+(file.size / 1024 / 1024).toFixed(2)
+} MB)`;
+fileInfo.classList.remove('hidden');
+
+// Validation de la taille
+if (file.size > 10 * 1024 * 1024) {
+fileInfo.textContent = 'Erreur: Le fichier dépasse 10MB';
+fileInfo.className = 'mt-2 text-sm text-red-600';
+e.target.value = '';
+} else {
+fileInfo.className = 'mt-2 text-sm text-green-600';
+}
+} else {
+fileInfo.classList.add('hidden');
+}
+});
+
+// Auto-génération du titre de semaine
+document.getElementById('dateDebut').addEventListener('change', updateSemaineTitre);
+document.getElementById('dateFin').addEventListener('change', updateSemaineTitre);
+
+function updateSemaineTitre() {
+const dateDebut = document.getElementById('dateDebut').value;
+const dateFin = document.getElementById('dateFin').value;
+
+if (dateDebut && dateFin) {
+const debut = new Date(dateDebut);
+const fin = new Date(dateFin);
+
+const mois = [
+'Janvier',
+'Février',
+'Mars',
+'Avril',
+'Mai',
+'Juin',
+'Juillet',
+'Août',
+'Septembre',
+'Octobre',
+'Novembre',
+'Décembre'
+];
+
+const titre = `Semaine du ${
+debut.getDate()
+} au ${
+fin.getDate()
+} ${
+mois[fin.getMonth()]
+} ${
+fin.getFullYear()
+}`;
+document.getElementById('semaine').value = titre;
+}
+}
+
+function showAlert(message, type = 'success') {
+const alertContainer = document.getElementById('alert-container');
+const alert = document.getElementById('alert');
+
+alert.className = `p-4 rounded-lg ${
+type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+}`;
+alert.textContent = message;
+
+alertContainer.classList.remove('hidden');
+
+setTimeout(() => {
+alertContainer.classList.add('hidden');
+}, 5000);
+}
+
+document.getElementById('menu-form').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const formData = new FormData(this);
+const submitButton = this.querySelector('button[type="submit"]');
+
+submitButton.disabled = true;
+submitButton.textContent = 'Ajout en cours...';
+
+try {
+const response = await fetch('/directeur/menus/ajouter', {
+method: 'POST',
+body: formData
+});
+
+if (response.ok) {
+showAlert('Menu ajouté avec succès');
+setTimeout(() => {
+window.location.href = '/directeur/menus';
+}, 1500);
+} else {
+const error = await response.json();
+showAlert(error.error || 'Erreur lors de l\'ajout', 'error');
+}
+} catch (error) {
+showAlert('Erreur de communication avec le serveur', 'error');
+} finally {
+submitButton.disabled = false;
+submitButton.textContent = 'Ajouter le menu';
+}
+});
+	</script>
+{% endblock %}

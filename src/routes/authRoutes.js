@@ -1,21 +1,13 @@
 const express = require('express');
 const loginRoutes = require('./loginRoutes');
+const registerRoutes = require('./registerRoutes');
 const parentInvitationController = require('../controllers/parentInvitationController');
 
 const router = express.Router();
 
 router.use('/login', loginRoutes);
 
-// Redirection de l'ancien système d'inscription vers le nouveau système de pré-inscription
-router.get('/register', (req, res) => {
-    console.log('🔄 Redirection /auth/register vers /pre-inscription');
-    res.redirect('/pre-inscription');
-});
-
-router.post('/register', (req, res) => {
-    console.log('🔄 Redirection POST /auth/register vers /pre-inscription');
-    res.redirect('/pre-inscription');
-});
+router.use('/register', registerRoutes);
 
 // Routes pour les invitations avec token
 router.get('/register/:token', parentInvitationController.showRegistrationForm);
