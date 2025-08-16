@@ -1,13 +1,13 @@
 const express = require('express');
 const loginRoutes = require('./loginRoutes');
-const registerRoutes = require('./registerRoutes');
+// const registerRoutes = require('./registerRoutes'); // Fichier non existant
 const parentInvitationController = require('../controllers/parentInvitationController');
 
 const router = express.Router();
 
 router.use('/login', loginRoutes);
 
-router.use('/register', registerRoutes);
+// router.use('/register', registerRoutes); // Fichier non existant
 
 // Routes pour les invitations avec token
 router.get('/register/:token', parentInvitationController.showRegistrationForm);

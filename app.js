@@ -2,12 +2,14 @@ const express = require("express");
 const twig = require('twig');
 const dotenv = require('dotenv');
 const session = require("express-session");
+const methodOverride = require('method-override');
 
 dotenv.config();
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(methodOverride('_method'));
 
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.url}`);
@@ -51,6 +53,7 @@ const directeurRoutes = require("./src/routes/directeurRoutes");
 const parentRoutes = require("./src/routes/parentRoutes");
 const enseignantRoutes = require("./src/routes/enseignantRoutes");
 const actualiteRoutes = require("./src/routes/actualiteRoutes");
+const travauxRoutes = require("./src/routes/travauxRoutes");
 const restaurationRoutes = require("./src/routes/restaurationRoutes");
 const menuPdfRoutes = require("./src/routes/menuPdfRoutes");
 const contactRoutes = require('./src/routes/contactRoutes');
@@ -67,6 +70,7 @@ app.use('/directeur', directeurRoutes);
 app.use('/parent', parentRoutes);
 app.use('/enseignant', enseignantRoutes);
 app.use('/actualites', actualiteRoutes);
+app.use('/travaux', travauxRoutes);
 app.use('/restauration', restaurationRoutes);
 app.use('/', menuPdfRoutes);
 app.use('/frank', frankRoutes);

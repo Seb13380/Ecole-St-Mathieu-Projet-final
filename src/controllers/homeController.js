@@ -3,11 +3,71 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const homeController = {
-  getHome: (req, res) => {
-    res.render('pages/home', {
-      title: 'École Saint-Mathieu - Accueil',
-      message: req.query.message || req.query.success || req.query.error
-    });
+  getHome: async (req, res) => {
+    try {
+      // Récupérer le menu actif pour l'afficher sur la page d'accueil
+      const menuActif = await prisma.menu.findFirst({
+        where: {
+          actif: true,
+          statut: 'ACTIF'
+        },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
+        },
+        orderBy: { dateDebut: 'desc' }
+      });
+
+      // Récupérer les actualités récentes visibles pour la page d'accueil
+      const actualites = await prisma.actualite.findMany({
+        where: { visible: true },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
+        },
+        orderBy: [
+          { important: 'desc' },
+          { datePublication: 'desc' }
+        ],
+        take: 4 // Limiter à 4 actualités les plus récentes
+      });
+
+      // Récupérer les travaux récents visibles pour la page d'accueil
+      const travaux = await prisma.travaux.findMany({
+        where: { visible: true },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
+        },
+        orderBy: [
+          { important: 'desc' },
+          { dateDebut: 'desc' }
+        ],
+        take: 4 // Limiter à 4 travaux les plus récents
+      });
+
+      console.log('🏠 Page d\'accueil - Données récupérées:', { actualites: actualites.length, travaux: travaux.length });
+
+      res.render('pages/home', {
+        title: 'École Saint-Mathieu - Accueil',
+        message: req.query.message || req.query.success || req.query.error,
+        menuActif: menuActif,
+        actualites: actualites,
+        travaux: travaux
+      });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données pour la page d\'accueil:', error);
+      res.render('pages/home', {
+        title: 'École Saint-Mathieu - Accueil',
+        message: req.query.message || req.query.success || req.query.error,
+        menuActif: null,
+        actualites: [],
+        travaux: []
+      });
+    }
   },
 
   getReglementInterieur: (req, res) => {

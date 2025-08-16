@@ -58,6 +58,7 @@ model User {
   enfants        Student[]        @relation("ParentEnfants")
   messages       Message[]        @relation("UserMessages")
   actualites     Actualite[]      @relation("UserActualites")
+  travaux        Travaux[]        @relation("UserTravaux")
   horaires       Horaire[]        @relation("EnseignantHoraires")
   notes          Note[]           @relation("EnseignantNotes")
   menus          Menu[]           @relation("UserMenus")
@@ -158,6 +159,23 @@ model Actualite {
   updatedAt       DateTime @updatedAt
 
   auteur User @relation("UserActualites", fields: [auteurId], references: [id], onDelete: Cascade)
+}
+
+model Travaux {
+  id          Int       @id @default(autoincrement())
+  titre       String
+  description String
+  auteurId    Int
+  dateDebut   DateTime?
+  dateFin     DateTime?
+  progression Int       @default(0) // Pourcentage de 0 à 100
+  statut      String    @default("PLANIFIE") // PLANIFIE, EN_COURS, TERMINE, SUSPENDU
+  visible     Boolean   @default(true)
+  important   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auteur User @relation("UserTravaux", fields: [auteurId], references: [id], onDelete: Cascade)
 }
 
 model Message {
