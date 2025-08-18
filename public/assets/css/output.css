@@ -26,11 +26,20 @@
 .relative {
   position: relative;
 }
+.top-1\/2 {
+  top: calc(1/2 * 100%);
+}
+.right-1\/2 {
+  right: calc(1/2 * 100%);
+}
 .left-1\/2 {
   left: calc(1/2 * 100%);
 }
 .z-30 {
   z-index: 30;
+}
+.z-40 {
+  z-index: 40;
 }
 .z-50 {
   z-index: 50;
@@ -49,6 +58,12 @@
 }
 .mt-auto {
   margin-top: auto;
+}
+.-mr-\[50vw\] {
+  margin-right: calc(50vw * -1);
+}
+.-ml-\[50vw\] {
+  margin-left: calc(50vw * -1);
 }
 .line-clamp-2 {
   overflow: hidden;
@@ -92,8 +107,17 @@
 .table {
   display: table;
 }
+.h-1\/2 {
+  height: calc(1/2 * 100%);
+}
+.h-\[600px\] {
+  height: 600px;
+}
 .h-\[900px\] {
   height: 900px;
+}
+.h-\[1200px\] {
+  height: 1200px;
 }
 .h-auto {
   height: auto;
@@ -104,11 +128,20 @@
 .max-h-screen {
   max-height: 100vh;
 }
+.min-h-\[600px\] {
+  min-height: 600px;
+}
 .min-h-\[800px\] {
   min-height: 800px;
 }
 .min-h-screen {
   min-height: 100vh;
+}
+.w-1\/3 {
+  width: calc(1/3 * 100%);
+}
+.w-2\/3 {
+  width: calc(2/3 * 100%);
 }
 .w-auto {
   width: auto;
@@ -116,8 +149,8 @@
 .w-full {
   width: 100%;
 }
-.max-w-\[2600px\] {
-  max-width: 2600px;
+.w-screen {
+  width: 100vw;
 }
 .max-w-full {
   max-width: 100%;
@@ -151,6 +184,10 @@
 }
 .-translate-x-1\/2 {
   --tw-translate-x: calc(calc(1/2 * 100%) * -1);
+  translate: var(--tw-translate-x) var(--tw-translate-y);
+}
+.-translate-y-1\/2 {
+  --tw-translate-y: calc(calc(1/2 * 100%) * -1);
   translate: var(--tw-translate-x) var(--tw-translate-y);
 }
 .transform {
@@ -233,6 +270,9 @@
 .rounded-full {
   border-radius: calc(infinity * 1px);
 }
+.rounded-none {
+  border-radius: 0;
+}
 .border {
   border-style: var(--tw-border-style);
   border-width: 1px;
@@ -256,6 +296,14 @@
 .border-b {
   border-bottom-style: var(--tw-border-style);
   border-bottom-width: 1px;
+}
+.border-b-2 {
+  border-bottom-style: var(--tw-border-style);
+  border-bottom-width: 2px;
+}
+.border-b-4 {
+  border-bottom-style: var(--tw-border-style);
+  border-bottom-width: 4px;
 }
 .border-l-4 {
   border-left-style: var(--tw-border-style);
@@ -292,6 +340,10 @@
   --tw-gradient-position: to right in oklab;
   background-image: linear-gradient(var(--tw-gradient-stops));
 }
+.bg-gradient-to-t {
+  --tw-gradient-position: to top in oklab;
+  background-image: linear-gradient(var(--tw-gradient-stops));
+}
 .from-\[\#304a4d\] {
   --tw-gradient-from: #304a4d;
   --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
@@ -302,6 +354,10 @@
 }
 .to-\[\#a7e3dd\] {
   --tw-gradient-to: #a7e3dd;
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+}
+.to-transparent {
+  --tw-gradient-to: transparent;
   --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
 }
 .fill-\[\#304a4d\] {

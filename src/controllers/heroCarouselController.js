@@ -50,7 +50,7 @@ const heroCarouselController = {
             }
 
             // Récupérer toutes les images hero carousel
-            const heroImages = await prisma.heroCarousel.findMany({
+            const images = await prisma.heroCarousel.findMany({
                 include: {
                     auteur: {
                         select: { firstName: true, lastName: true }
@@ -59,10 +59,26 @@ const heroCarouselController = {
                 orderBy: { ordre: 'asc' }
             });
 
+            // Ajouter les URLs des images
+            const imagesWithUrls = images.map(image => ({
+                ...image,
+                originalUrl: `/uploads/hero-carousel/${image.filename}`
+            }));
+
+            // Calculer les statistiques
+            const stats = {
+                total: images.length,
+                active: images.filter(img => img.active).length,
+                inactive: images.filter(img => !img.active).length
+            };
+
             res.render('pages/admin/hero-carousel-management', {
                 title: 'Gestion du Carrousel Principal',
-                heroImages: heroImages,
-                user: req.session.user
+                images: imagesWithUrls,
+                stats: stats,
+                user: req.session.user,
+                success: req.query.success,
+                error: req.query.error
             });
         } catch (error) {
             console.error('Erreur lors de la récupération des images hero carousel:', error);
@@ -74,40 +90,37 @@ const heroCarouselController = {
 
     // Ajouter une nouvelle image au hero carousel
     addImage: [
-        upload.single('heroImage'),
+        upload.single('image'),
         async (req, res) => {
             try {
                 // Vérifier que l'utilisateur a les permissions
                 if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE'].includes(req.session.user.role)) {
-                    return res.status(403).json({
-                        success: false,
-                        message: 'Accès non autorisé.'
-                    });
+                    return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
                 }
 
                 if (!req.file) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Aucun fichier image fourni.'
-                    });
+                    return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Aucun fichier image fourni.'));
                 }
 
-                const { titre, description } = req.body;
+                const { titre, description, ordre } = req.body;
 
-                // Récupérer le prochain ordre disponible
-                const lastImage = await prisma.heroCarousel.findFirst({
-                    orderBy: { ordre: 'desc' }
-                });
-                const nextOrdre = lastImage ? lastImage.ordre + 1 : 1;
+                // Utiliser l'ordre fourni ou calculer le prochain ordre disponible
+                let finalOrdre = parseInt(ordre) || 0;
+                if (finalOrdre === 0) {
+                    const lastImage = await prisma.heroCarousel.findFirst({
+                        orderBy: { ordre: 'desc' }
+                    });
+                    finalOrdre = lastImage ? lastImage.ordre + 1 : 1;
+                }
 
                 // Créer l'entrée en base de données
                 const newHeroImage = await prisma.heroCarousel.create({
                     data: {
                         filename: req.file.filename,
-                        originalUrl: req.file.originalname,
+                        originalUrl: `/uploads/hero-carousel/${req.file.filename}`,
                         titre: titre || null,
                         description: description || null,
-                        ordre: nextOrdre,
+                        ordre: finalOrdre,
                         active: true,
                         auteurId: req.session.user.id
                     },
@@ -124,11 +137,7 @@ const heroCarouselController = {
                     auteur: `${newHeroImage.auteur.firstName} ${newHeroImage.auteur.lastName}`
                 });
 
-                res.json({
-                    success: true,
-                    message: 'Image ajoutée avec succès au carrousel principal.',
-                    heroImage: newHeroImage
-                });
+                res.redirect('/hero-carousel/management?success=' + encodeURIComponent('Image ajoutée avec succès au carrousel principal.'));
             } catch (error) {
                 console.error('Erreur lors de l\'ajout d\'image hero carousel:', error);
 
@@ -141,10 +150,7 @@ const heroCarouselController = {
                     }
                 }
 
-                res.status(500).json({
-                    success: false,
-                    message: 'Erreur lors de l\'ajout de l\'image au carrousel principal.'
-                });
+                res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Erreur lors de l\'ajout de l\'image au carrousel principal.'));
             }
         }
     ],
@@ -153,14 +159,11 @@ const heroCarouselController = {
     updateImage: async (req, res) => {
         try {
             const { id } = req.params;
-            const { titre, description, ordre } = req.body;
+            const { titre, description, ordre, active } = req.body;
 
             // Vérifier que l'utilisateur a les permissions
             if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Accès non autorisé.'
-                });
+                return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
             }
 
             const updatedHeroImage = await prisma.heroCarousel.update({
@@ -168,7 +171,8 @@ const heroCarouselController = {
                 data: {
                     titre: titre || null,
                     description: description || null,
-                    ordre: ordre ? parseInt(ordre) : undefined
+                    ordre: ordre ? parseInt(ordre) : undefined,
+                    active: active === 'on'
                 },
                 include: {
                     auteur: {
@@ -177,17 +181,16 @@ const heroCarouselController = {
                 }
             });
 
-            res.json({
-                success: true,
-                message: 'Image hero carousel mise à jour avec succès.',
-                heroImage: updatedHeroImage
+            console.log('✏️ Image hero carousel mise à jour:', {
+                id: updatedHeroImage.id,
+                titre: updatedHeroImage.titre,
+                active: updatedHeroImage.active
             });
+
+            res.redirect('/hero-carousel/management?success=' + encodeURIComponent('Image mise à jour avec succès.'));
         } catch (error) {
             console.error('Erreur lors de la mise à jour de l\'image hero carousel:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la mise à jour de l\'image.'
-            });
+            res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Erreur lors de la mise à jour de l\'image.'));
         }
     },
 
@@ -198,10 +201,7 @@ const heroCarouselController = {
 
             // Vérifier que l'utilisateur a les permissions
             if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Accès non autorisé.'
-                });
+                return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
             }
 
             // Récupérer l'image avant de la supprimer
@@ -210,10 +210,7 @@ const heroCarouselController = {
             });
 
             if (!heroImage) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Image non trouvée.'
-                });
+                return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Image non trouvée.'));
             }
 
             // Supprimer l'entrée de la base de données
@@ -226,21 +223,22 @@ const heroCarouselController = {
             try {
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
+                    console.log('🗑️ Fichier supprimé:', filePath);
                 }
             } catch (deleteError) {
                 console.error('Erreur lors de la suppression du fichier:', deleteError);
             }
 
-            res.json({
-                success: true,
-                message: 'Image hero carousel supprimée avec succès.'
+            console.log('🗑️ Image hero carousel supprimée:', {
+                id: heroImage.id,
+                filename: heroImage.filename,
+                titre: heroImage.titre
             });
+
+            res.redirect('/hero-carousel/management?success=' + encodeURIComponent('Image supprimée avec succès.'));
         } catch (error) {
             console.error('Erreur lors de la suppression de l\'image hero carousel:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la suppression de l\'image.'
-            });
+            res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Erreur lors de la suppression de l\'image.'));
         }
     },
 
@@ -251,10 +249,7 @@ const heroCarouselController = {
 
             // Vérifier que l'utilisateur a les permissions
             if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Accès non autorisé.'
-                });
+                return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
             }
 
             // Récupérer l'image actuelle
@@ -263,10 +258,7 @@ const heroCarouselController = {
             });
 
             if (!heroImage) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Image non trouvée.'
-                });
+                return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Image non trouvée.'));
             }
 
             // Basculer le statut
@@ -275,17 +267,16 @@ const heroCarouselController = {
                 data: { active: !heroImage.active }
             });
 
-            res.json({
-                success: true,
-                message: `Image ${updatedHeroImage.active ? 'activée' : 'désactivée'} avec succès.`,
-                heroImage: updatedHeroImage
+            console.log('🔄 Statut image hero carousel modifié:', {
+                id: updatedHeroImage.id,
+                titre: updatedHeroImage.titre || 'Sans titre',
+                active: updatedHeroImage.active
             });
+
+            res.redirect('/hero-carousel/management?success=' + encodeURIComponent(`Image ${updatedHeroImage.active ? 'activée' : 'désactivée'} avec succès.`));
         } catch (error) {
             console.error('Erreur lors du changement de statut de l\'image hero carousel:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors du changement de statut de l\'image.'
-            });
+            res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Erreur lors du changement de statut de l\'image.'));
         }
     }
 };

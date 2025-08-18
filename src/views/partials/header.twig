@@ -95,6 +95,12 @@
 					<a href="/auth/register" class="hover:font-poppins-semibold transition-all" style="font-size: 31px !important;">Inscription</a>
 				</li>
 			</ul>
+			<div class="flex-none">
+				<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="flex items-center gap-6">
+					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300" style="height: 140px; animation: pulse-glow 4s ease-in-out infinite;"/>
+					<span class="text-xl font-bold text-[#304a4d]"></span>
+				</a>
+			</div>
 		</div>
 		<div class="flex-none gap-4">
 			{% if isAuthenticated %}
@@ -132,6 +138,7 @@
 						<li>
 							<a href="/profile">Mon profil</a>
 						</li>
+
 						<li>
 							<form action="/auth/logout" method="POST" class="w-full">
 								<button type="submit" class="w-full text-left">Déconnexion</button>

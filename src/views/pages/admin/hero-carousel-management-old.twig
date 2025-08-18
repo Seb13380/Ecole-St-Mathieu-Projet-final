@@ -1,6 +1,6 @@
 {% extends "layouts/base.twig" %}
 
-{% block title %}Gestion du Carousel - École Saint-Mathieu
+{% block title %}Gestion du Carrousel Principal - École Saint-Mathieu
 {% endblock %}
 
 {% block main %}
@@ -10,10 +10,10 @@
 			<!-- Header Section -->
 			<div class="text-center mb-8">
 				<h1 class="text-4xl font-bold text-slate-800 mb-4">
-					<span class="mr-3">📸</span>
-					Gestion du Carousel
+					<span class="mr-3">🖼️</span>
+					Gestion du Carrousel Principal
 				</h1>
-				<p class="text-slate-600">Gérez les images qui s'affichent sur le carousel de la page d'accueil</p>
+				<p class="text-slate-600">Gérez les images du grand carrousel de la page d'accueil (900px de hauteur)</p>
 			</div>
 
 			<!-- Messages -->
@@ -96,7 +96,7 @@
 						Ajouter une Nouvelle Image
 					</h2>
 
-					<form action="/carousel/add" method="POST" enctype="multipart/form-data" class="space-y-6">
+					<form action="/hero-carousel/add" method="POST" enctype="multipart/form-data" class="space-y-6">
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 							<div class="md:col-span-2">
 								<label for="image" class="block text-sm font-medium text-slate-700 mb-2">
@@ -146,13 +146,13 @@
 			<div class="mb-8">
 				<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
 					<span class="mr-2">🖼️</span>
-					Images du Carousel ({{ images|length }})
+					Images du Carrousel Principal ({{ images|length }})
 				</h2>
 
 				{% if images and images|length > 0 %}
 					<div class="grid gap-6 max-w-6xl mx-auto">
 						{% for image in images %}
-							<div id="image-{{ image.id }}" class="bg-white shadow-md border-l-4 {{ image.active ? 'border-green-500' : 'border-gray-300' }} p-6 hover:shadow-lg transition-all duration-300">
+							<div id="image-{{ image.id }}" class="bg-white shadow-md border-l-4 {{ image.active ? 'border-green-500' : 'border-gray-300' }} p-6 hover:shadow-lg transition-all duration-300 rounded-lg">
 								<div
 									class="flex flex-col md:flex-row gap-6">
 									<!-- Image preview -->
@@ -226,7 +226,7 @@
 											</button>
 
 											<!-- Bouton Statut -->
-											<form action="/carousel/{{ image.id }}/toggle" method="POST" class="inline">
+											<form action="/hero-carousel/{{ image.id }}/toggle" method="POST" class="inline">
 												<button type="submit" class="w-full {% if image.active %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center justify-center">
 													{% if image.active %}
 														<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -258,9 +258,9 @@
 				{% else %}
 					<div class="text-center py-12">
 						<div class="bg-white shadow-md rounded-lg p-8 max-w-2xl mx-auto">
-							<div class="text-6xl mb-4">📸</div>
-							<h3 class="text-xl font-bold text-slate-800 mb-2">Aucune image dans le carousel</h3>
-							<p class="text-slate-600">Ajoutez vos premières images pour le carousel de la page d'accueil.</p>
+							<div class="text-6xl mb-4">🖼️</div>
+							<h3 class="text-xl font-bold text-slate-800 mb-2">Aucune image dans le carrousel principal</h3>
+							<p class="text-slate-600">Ajoutez vos premières images pour le grand carrousel de la page d'accueil.</p>
 						</div>
 					</div>
 				{% endif %}
@@ -273,9 +273,9 @@
 					Informations importantes
 				</h3>
 				<div class="text-blue-800 text-sm space-y-2">
-					<p>• Les images actives s'affichent automatiquement dans le carousel de la page d'accueil.</p>
+					<p>• Les images actives s'affichent automatiquement dans le grand carrousel de la page d'accueil.</p>
 					<p>• L'ordre d'affichage détermine la séquence des images (0 = première image).</p>
-					<p>• Formats recommandés: JPEG ou PNG, taille optimale: 1920x1080px.</p>
+					<p>• Formats recommandés: JPEG ou PNG, taille optimale: 1920x900px pour le grand carrousel.</p>
 					<p>• Vous pouvez désactiver temporairement une image sans la supprimer.</p>
 					<p>• Les images prises avec vos téléphones seront automatiquement redimensionnées.</p>
 				</div>
@@ -372,7 +372,7 @@ document.getElementById('editTitre').value = titre || '';
 document.getElementById('editDescription').value = description || '';
 document.getElementById('editOrdre').value = ordre || 0;
 document.getElementById('editActive').checked = active === 1;
-document.getElementById('editForm').action = `/carousel/${id}`;
+document.getElementById('editForm').action = `/hero-carousel/${id}`;
 document.getElementById('editModal').classList.remove('hidden');
 }
 
@@ -384,7 +384,7 @@ function confirmDelete(imageId, imageTitle) {
 console.log('🗑️ Suppression image:', {imageId, imageTitle});
 
 document.getElementById('imageTitle').textContent = imageTitle || 'Image';
-document.getElementById('deleteForm').action = `/carousel/${imageId}/delete`;
+document.getElementById('deleteForm').action = `/hero-carousel/${imageId}/delete`;
 document.getElementById('deleteModal').classList.remove('hidden');
 }
 
@@ -423,4 +423,387 @@ targetElement.scrollIntoView({behavior: 'smooth', block: 'center'});
 });
 	</script>
 
+{% endblock %}
+						<div class="ml-4">
+							<dt class="text-sm font-medium text-slate-500 truncate">Images Actives</dt>
+							<dd class="text-lg font-semibold text-slate-900">
+								{% set activeCount = 0 %}
+								{% for image in heroImages %}
+									{% if image.active %}
+										{% set activeCount = activeCount + 1 %}
+									{% endif %}
+								{% endfor %}
+								{{ activeCount }}
+							</dd>
+						</div>
+					</div>
+				</div>
+
+				<div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+								<span class="text-orange-600 font-bold">⏸️</span>
+							</div>
+						</div>
+						<div class="ml-4">
+							<dt class="text-sm font-medium text-slate-500 truncate">Images Inactives</dt>
+							<dd class="text-lg font-semibold text-slate-900">{{ heroImages|length - activeCount }}</dd>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Bouton Ajouter Image -->
+			<div class="max-w-4xl mx-auto mb-8">
+				<button onclick="openAddModal()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+					<span class="mr-2">➕</span>
+					Ajouter une nouvelle image
+				</button>
+			</div>
+
+			<!-- Liste des Images -->
+			<div class="max-w-6xl mx-auto">
+				{% if heroImages|length > 0 %}
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{% for image in heroImages %}
+							<div
+								class="bg-white rounded-lg shadow-md overflow-hidden border border-slate-200 hero-image-card" data-id="{{ image.id }}">
+								<!-- Image Preview -->
+								<div class="relative h-48 bg-slate-100">
+									<img
+									src="/assets/images/hero-carousel/{{ image.filename }}" alt="{{ image.titre ?: 'Image carrousel principal' }}" class="w-full h-full object-cover">
+
+									<!-- Status Badge -->
+									<div class="absolute top-2 right-2">
+										{% if image.active %}
+											<span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">ACTIF</span>
+										{% else %}
+											<span class="bg-gray-500 text-white text-xs font-bold px-2 py-1 rounded-full">INACTIF</span>
+										{% endif %}
+									</div>
+
+									<!-- Ordre Badge -->
+									<div class="absolute top-2 left-2">
+										<span class="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+											#{{ image.ordre }}
+										</span>
+									</div>
+								</div>
+
+								<!-- Contenu -->
+								<div class="p-4">
+									<h3 class="font-semibold text-slate-800 mb-2">
+										{{ image.titre ?: 'Sans titre' }}
+									</h3>
+
+									{% if image.description %}
+										<p class="text-sm text-slate-600 mb-3 line-clamp-2">{{ image.description }}</p>
+									{% endif %}
+
+									<div class="text-xs text-slate-500 mb-4">
+										<p>Ajouté par:
+											{{ image.auteur.firstName }}
+											{{ image.auteur.lastName }}</p>
+										<p>Le:
+											{{ image.createdAt|date('d/m/Y à H:i') }}</p>
+									</div>
+
+									<!-- Actions -->
+									<div class="flex justify-between items-center">
+										<div class="flex space-x-2">
+											<button onclick="editHeroImage({{ image.id }}, '{{ image.titre|e('js') }}', '{{ image.description|e('js') }}', {{ image.ordre }})" class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-200" title="Modifier">
+												✏️
+											</button>
+
+											<button onclick="toggleHeroImageStatus({{ image.id }}, {{ image.active ? 'false' : 'true' }})" class="bg-{{ image.active ? 'yellow' : 'green' }}-500 hover:bg-{{ image.active ? 'yellow' : 'green' }}-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-200" title="{{ image.active ? 'Désactiver' : 'Activer' }}">
+												{{ image.active ? '⏸️' : '▶️' }}
+											</button>
+										</div>
+
+										<button onclick="deleteHeroImage({{ image.id }}, '{{ image.titre|e('js') }}')" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-200" title="Supprimer">
+											🗑️
+										</button>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				{% else %}
+					<div class="text-center py-12">
+						<div class="text-slate-400 text-6xl mb-4">🖼️</div>
+						<h3 class="text-xl font-semibold text-slate-600 mb-2">Aucune image dans le carrousel principal</h3>
+						<p class="text-slate-500 mb-6">Commencez par ajouter votre première image au carrousel principal.</p>
+						<button onclick="openAddModal()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+							Ajouter une image
+						</button>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Ajouter Image -->
+	<div id="addModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+			<h3 class="text-lg font-bold mb-4">Ajouter une nouvelle image</h3>
+
+			<form id="addHeroImageForm" enctype="multipart/form-data">
+				<div class="mb-4">
+					<label class="block text-sm font-bold mb-2" for="heroImage">
+						Image (obligatoire)
+					</label>
+					<input type="file" id="heroImage" name="heroImage" accept="image/*" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-purple-500">
+					<p class="text-xs text-slate-500 mt-1">Formats acceptés: JPG, PNG, GIF, WebP (max 10MB)</p>
+				</div>
+
+				<div class="mb-4">
+					<label class="block text-sm font-bold mb-2" for="titre">
+						Titre (optionnel)
+					</label>
+					<input type="text" id="titre" name="titre" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Titre de l'image">
+				</div>
+
+				<div class="mb-6">
+					<label class="block text-sm font-bold mb-2" for="description">
+						Description (optionnelle)
+					</label>
+					<textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Description de l'image"></textarea>
+				</div>
+
+				<div class="flex justify-end space-x-3">
+					<button type="button" onclick="closeAddModal()" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+						Annuler
+					</button>
+					<button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+						Ajouter
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modal Modifier Image -->
+	<div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+			<h3 class="text-lg font-bold mb-4">Modifier l'image</h3>
+
+			<form id="editHeroImageForm">
+				<input type="hidden" id="editImageId">
+
+				<div class="mb-4">
+					<label class="block text-sm font-bold mb-2" for="editTitre">
+						Titre
+					</label>
+					<input type="text" id="editTitre" name="titre" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-purple-500">
+				</div>
+
+				<div class="mb-4">
+					<label class="block text-sm font-bold mb-2" for="editDescription">
+						Description
+					</label>
+					<textarea id="editDescription" name="description" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-purple-500"></textarea>
+				</div>
+
+				<div class="mb-6">
+					<label class="block text-sm font-bold mb-2" for="editOrdre">
+						Ordre d'affichage
+					</label>
+					<input type="number" id="editOrdre" name="ordre" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-purple-500">
+				</div>
+
+				<div class="flex justify-end space-x-3">
+					<button type="button" onclick="closeEditModal()" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+						Annuler
+					</button>
+					<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+						Modifier
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	{{ parent() }}
+	<script>
+		// Fonctions pour gérer les modals
+function openAddModal() {
+document.getElementById('addModal').classList.remove('hidden');
+}
+
+function closeAddModal() {
+document.getElementById('addModal').classList.add('hidden');
+document.getElementById('addHeroImageForm').reset();
+}
+
+function openEditModal() {
+document.getElementById('editModal').classList.remove('hidden');
+}
+
+function closeEditModal() {
+document.getElementById('editModal').classList.add('hidden');
+document.getElementById('editHeroImageForm').reset();
+}
+
+// Fonction pour afficher les messages
+function showMessage(message, type = 'success') {
+const container = document.getElementById('message-container');
+const messageDiv = document.getElementById('message');
+const messageText = document.getElementById('message-text');
+const messageIcon = document.getElementById('message-icon');
+
+messageText.textContent = message;
+
+if (type === 'success') {
+messageDiv.className = 'bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg';
+messageIcon.innerHTML = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>';
+} else {
+messageDiv.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg';
+messageIcon.innerHTML = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>';
+} container.classList.remove('hidden');
+
+setTimeout(() => {
+container.classList.add('hidden');
+}, 5000);
+}
+
+// Ajouter une nouvelle image
+document.getElementById('addHeroImageForm').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const formData = new FormData(this);
+
+try {
+const response = await fetch('/hero-carousel/add', {
+method: 'POST',
+body: formData
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage(result.message, 'success');
+closeAddModal();
+setTimeout(() => {
+window.location.reload();
+}, 1000);
+} else {
+showMessage(result.message, 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('Erreur lors de l\'ajout de l\'image.', 'error');
+}
+});
+
+// Modifier une image
+function editHeroImage(id, titre, description, ordre) {
+document.getElementById('editImageId').value = id;
+document.getElementById('editTitre').value = titre || '';
+document.getElementById('editDescription').value = description || '';
+document.getElementById('editOrdre').value = ordre;
+openEditModal();
+}
+
+document.getElementById('editHeroImageForm').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const id = document.getElementById('editImageId').value;
+const formData = new FormData(this);
+
+try {
+const response = await fetch (`/hero-carousel/${id}`, {
+method: 'PUT',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{
+titre: formData.get('titre'),
+description: formData.get('description'),
+ordre: parseInt(formData.get('ordre'))
+}
+)
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage(result.message, 'success');
+closeEditModal();
+setTimeout(() => {
+window.location.reload();
+}, 1000);
+} else {
+showMessage(result.message, 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('Erreur lors de la modification de l\'image.', 'error');
+}
+});
+
+// Basculer le statut d'une image
+async function toggleHeroImageStatus(id, newStatus) {
+try {
+const response = await fetch (`/hero-carousel/${id}/toggle-status`, {method: 'PATCH'});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage(result.message, 'success');
+setTimeout(() => {
+window.location.reload();
+}, 1000);
+} else {
+showMessage(result.message, 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('Erreur lors du changement de statut.', 'error');
+}
+}
+
+// Supprimer une image
+async function deleteHeroImage(id, titre) {
+if (!confirm (`Êtes-vous sûr de vouloir supprimer l'image "${
+titre || 'Sans titre'
+}" ? Cette action est irréversible.`)) {
+return;
+}
+
+try {
+const response = await fetch (`/hero-carousel/${id}`, {method: 'DELETE'});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage(result.message, 'success');
+setTimeout(() => {
+window.location.reload();
+}, 1000);
+} else {
+showMessage(result.message, 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('Erreur lors de la suppression de l\'image.', 'error');
+}
+}
+
+// Fermer les modals en cliquant à l'extérieur
+window.addEventListener('click', function (event) {
+const addModal = document.getElementById('addModal');
+const editModal = document.getElementById('editModal');
+
+if (event.target === addModal) {
+closeAddModal();
+}
+if (event.target === editModal) {
+closeEditModal();
+}
+});
+	</script>
 {% endblock %}
