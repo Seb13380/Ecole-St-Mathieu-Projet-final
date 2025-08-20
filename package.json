@@ -37,7 +37,6 @@
     "method-override": "^3.0.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
-    "pdf-poppler": "^0.2.1",
     "pdf2pic": "^3.2.0",
     "puppeteer": "^24.12.0",
     "session-file-store": "^1.5.0",
