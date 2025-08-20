@@ -7,7 +7,7 @@ CREATE TABLE `User` (
     `phone` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
-    `role` ENUM('PARENT', 'ENSEIGNANT', 'ADMIN', 'DIRECTION', 'APEL', 'MAINTENANCE_SITE') NOT NULL DEFAULT 'PARENT',
+    `role` ENUM('PARENT', 'ENSEIGNANT', 'ADMIN', 'DIRECTION', 'ASSISTANT_DIRECTION', 'APEL', 'MAINTENANCE_SITE', 'SECRETAIRE_DIRECTION', 'RESTAURATION') NOT NULL DEFAULT 'PARENT',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -105,6 +105,24 @@ CREATE TABLE `Actualite` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Travaux` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `titre` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
+    `auteurId` INTEGER NOT NULL,
+    `dateDebut` DATETIME(3) NULL,
+    `dateFin` DATETIME(3) NULL,
+    `progression` INTEGER NOT NULL DEFAULT 0,
+    `statut` VARCHAR(191) NOT NULL DEFAULT 'PLANIFIE',
+    `visible` BOOLEAN NOT NULL DEFAULT true,
+    `important` BOOLEAN NOT NULL DEFAULT false,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Message` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `expediteurId` INTEGER NOT NULL,
@@ -148,6 +166,28 @@ CREATE TABLE `InvitationCode` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `ParentInvitation` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `token` VARCHAR(191) NOT NULL,
+    `parentEmail` VARCHAR(191) NOT NULL,
+    `parentFirstName` VARCHAR(191) NOT NULL,
+    `parentLastName` VARCHAR(191) NOT NULL,
+    `childFirstName` VARCHAR(191) NOT NULL,
+    `childLastName` VARCHAR(191) NOT NULL,
+    `childDateNaissance` DATETIME(3) NULL,
+    `classeId` INTEGER NULL,
+    `emailSent` BOOLEAN NOT NULL DEFAULT false,
+    `used` BOOLEAN NOT NULL DEFAULT false,
+    `createdBy` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `usedAt` DATETIME(3) NULL,
+    `expiresAt` DATETIME(3) NULL,
+
+    UNIQUE INDEX `ParentInvitation_token_key`(`token`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Menu` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `semaine` VARCHAR(191) NOT NULL,
@@ -160,6 +200,7 @@ CREATE TABLE `Menu` (
     `vendredi` VARCHAR(191) NULL,
     `pdfUrl` VARCHAR(191) NULL,
     `pdfFilename` VARCHAR(191) NULL,
+    `imageUrls` VARCHAR(191) NULL,
     `statut` VARCHAR(191) NOT NULL DEFAULT 'BROUILLON',
     `actif` BOOLEAN NOT NULL DEFAULT false,
     `auteurId` INTEGER NOT NULL,
@@ -225,6 +266,42 @@ CREATE TABLE `TicketPurchase` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `CarouselImage` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `filename` VARCHAR(191) NOT NULL,
+    `originalUrl` VARCHAR(191) NOT NULL,
+    `titre` VARCHAR(191) NULL,
+    `description` VARCHAR(191) NULL,
+    `ordre` INTEGER NOT NULL DEFAULT 0,
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `auteurId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    INDEX `CarouselImage_active_idx`(`active`),
+    INDEX `CarouselImage_ordre_idx`(`ordre`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `HeroCarousel` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `filename` VARCHAR(191) NOT NULL,
+    `originalUrl` VARCHAR(191) NOT NULL,
+    `titre` VARCHAR(191) NULL,
+    `description` VARCHAR(191) NULL,
+    `ordre` INTEGER NOT NULL DEFAULT 0,
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `auteurId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    INDEX `HeroCarousel_active_idx`(`active`),
+    INDEX `HeroCarousel_ordre_idx`(`ordre`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Student` ADD CONSTRAINT `Student_parentId_fkey` FOREIGN KEY (`parentId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -256,6 +333,9 @@ ALTER TABLE `Horaire` ADD CONSTRAINT `Horaire_enseignantId_fkey` FOREIGN KEY (`e
 ALTER TABLE `Actualite` ADD CONSTRAINT `Actualite_auteurId_fkey` FOREIGN KEY (`auteurId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Travaux` ADD CONSTRAINT `Travaux_auteurId_fkey` FOREIGN KEY (`auteurId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Message` ADD CONSTRAINT `Message_expediteurId_fkey` FOREIGN KEY (`expediteurId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -278,3 +358,9 @@ ALTER TABLE `TicketPurchase` ADD CONSTRAINT `TicketPurchase_parentId_fkey` FOREI
 
 -- AddForeignKey
 ALTER TABLE `TicketPurchase` ADD CONSTRAINT `TicketPurchase_studentId_fkey` FOREIGN KEY (`studentId`) REFERENCES `Student`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `CarouselImage` ADD CONSTRAINT `CarouselImage_auteurId_fkey` FOREIGN KEY (`auteurId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `HeroCarousel` ADD CONSTRAINT `HeroCarousel_auteurId_fkey` FOREIGN KEY (`auteurId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
