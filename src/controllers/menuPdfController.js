@@ -108,7 +108,7 @@ const menuPdfController = {
             friday.setDate(monday.getDate() + 4); // Vendredi de cette semaine
 
             // Générer un nom automatique basé sur le nom du fichier
-            const nomMenu = req.file.originalname.replace('.pdf', '');
+            const nomMenu = "Menu";
 
             // Convertir le PDF en images
             console.log('🖼️ Conversion du PDF en images...');
@@ -130,8 +130,8 @@ const menuPdfController = {
                     saveFilename: baseFilename,
                     savePath: imageDir,
                     format: "jpeg",         // Format de sortie
-                    width: 600,            // Largeur de l'image
-                    height: 800            // Hauteur de l'image
+                    width: "100%",            // Largeur de l'image
+                    height: "100%"            // Hauteur de l'image
                 };
 
                 // Convertir le PDF en images

@@ -1,13 +1,13 @@
 <header class="w-full bg-[#a7e3dd]">
 	<nav class="navbar w-full px-9 font-poppins">
 
-		<div class="flex-none mt-5">
+		<div class="flex-none" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 1rem; margin-left: 1rem;">
 			<a href="/" class="flex items-center gap-6">
 				<img src="/assets/images/LogoStMathieuV.png" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
-		<div class="flex-none mt-5">
+		<div class="flex-none" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 1rem; margin-left: 1rem;">
 			<a href="https://www.enseignementcatho-marseille.fr//" target="_blank" rel="noopener" class="flex items-center gap-6">
 				<img src="/assets/images/logo_diocese.png" alt="Logo Diocèse" class="w-auto object-contain rounded-xl shadow-md" style="height: 130px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
@@ -29,21 +29,56 @@
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
+					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
 						<li>
-							<a href="/projet-educatif" class="hover:font-poppins-medium transition-all">Projet éducatif</a>
+							<a href="/projet-educatif" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Projet éducatif</a>
 						</li>
 						<li>
-							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all">Projet d'établissement</a>
+							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Projet d'établissement</a>
 						</li>
 						<li>
-							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all">Règlement intérieur</a>
+							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Règlement intérieur</a>
 						</li>
 						<li>
-							<a href="/organigramme" class="hover:font-poppins-medium transition-all">Organigramme</a>
+							<a href="/organigramme" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Organigramme</a>
 						</li>
-						<li>
-							<a href="/chartes" class="hover:font-poppins-medium transition-all">Chartes</a>
+						<li class="relative">
+							<div class="hover:font-poppins-medium transition-all flex items-center justify-between w-full cursor-pointer chartes-menu" onmouseover="showChartesMenu()" onmouseout="hideChartesMenu()" onclick="toggleChartesMenu()">
+								Chartes
+								<svg class="fill-current ml-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+									<path d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.24 4.24a.75.75 0 010 1.06l-4.24 4.24a.75.75 0 01-1.08-.02z"/>
+								</svg>
+							</div>
+							<div id="chartes-submenu" class="absolute left-full top-0 hidden z-50 w-80 bg-[#a7e3dd] rounded-box shadow-lg p-2" onmouseover="showChartesMenu()" onmouseout="hideChartesMenu()">
+								{% if isAuthenticated %}
+									<ul class="menu font-poppins-regular text-sm">
+										<li>
+											<a href="/documents/charte-laicite.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
+												📄 Charte de la laïcité
+											</a>
+										</li>
+										<li>
+											<a href="/documents/charte-numerique.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
+												📄 Charte du numérique
+											</a>
+										</li>
+										<li>
+											<a href="/documents/charte-vie-scolaire.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
+												📄 Charte de vie scolaire
+											</a>
+										</li>
+										<li>
+											<a href="/documents/charte-restauration.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
+												📄 Charte de restauration
+											</a>
+										</li>
+									</ul>
+								{% else %}
+									<div class="text-gray-700 italic px-4 py-2">
+										🔒 Connexion requise pour accéder aux chartes
+									</div>
+								{% endif %}
+							</div>
 						</li>
 						<li>
 							<a href="/agenda" class="hover:font-poppins-medium transition-all">Agenda</a>
@@ -58,15 +93,15 @@
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
+					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
 						<li>
-							<a href="/projet-educatif" class="hover:font-poppins-medium transition-all">Ensemble pastoral de l'étoile</a>
+							<a href="/projet-educatif" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Ensemble pastoral de l'étoile</a>
 						</li>
 						<li>
-							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all">Axe Pastoral</a>
+							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Axe Pastoral</a>
 						</li>
 						<li>
-							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all">Fiche d'inscription au temps priant</a>
+							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Fiche d'inscription au temps priant</a>
 						</li>
 					</ul>
 				</li>
@@ -77,12 +112,12 @@
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
+					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-base" style="margin-top:-0.1rem;">
 						<li>
-							<a href="https://www.dupont-restauration.fr/" target="_blank" class="hover:font-poppins-medium transition-all">Dupont Restauration</a>
+							<a href="https://www.dupont-restauration.fr/" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Dupont Restauration</a>
 						</li>
 						<li>
-							<a href="/restauration/menus" class="hover:font-poppins-medium transition-all">Le chef Serge vous propose</a>
+							<a href="/restauration/menus" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Le chef Serge vous propose</a>
 						</li>
 					</ul>
 				</li>
@@ -109,7 +144,7 @@
 						👤
 						{{ user.firstName }}
 					</div>
-					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow font-poppins-regular">
+					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-52 p-2 shadow font-poppins-regular">
 						{% if user.role == 'ADMIN' %}
 							<li>
 								<a href="/admin/dashboard">Tableau de bord</a>
@@ -153,3 +188,31 @@
 		</div>
 	</nav>
 </header>
+
+<script>
+	let chartesMenuTimeout;
+
+function showChartesMenu() {
+clearTimeout(chartesMenuTimeout);
+const submenu = document.getElementById('chartes-submenu');
+if (submenu) {
+submenu.classList.remove('hidden');
+}
+}
+
+function hideChartesMenu() {
+chartesMenuTimeout = setTimeout(() => {
+const submenu = document.getElementById('chartes-submenu');
+if (submenu) {
+submenu.classList.add('hidden');
+}
+}, 300); // Délai de 300ms pour permettre le passage de la souris
+}
+
+function toggleChartesMenu() {
+const submenu = document.getElementById('chartes-submenu');
+if (submenu) {
+submenu.classList.toggle('hidden');
+}
+}
+</script>

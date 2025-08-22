@@ -14,10 +14,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 		<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
-		<link href="https://unpkg.com/flowbite@2.2.1/dist/flowbite.min.css" rel="stylesheet">
-		<link
-		href="/assets/css/tailwind.css" rel="stylesheet">
-		<!-- Suppression du CDN Tailwind et de la config JS, tout passe par le CSS généré -->
+		<link href="/assets/css/tailwind.css?v=20250820" rel="stylesheet">
 		<link rel="stylesheet" href="/assets/css/style.css"> {% block styles %}{% endblock %}
 		</head>
 		<body class="bg-[#a7e3dd] min-h-screen font-poppins">
@@ -25,8 +22,6 @@
 			<main class="min-h-screen pt-4 pb-8"> {% block main %}{% endblock %}
 				</main>
 				{% include "partials/footer.twig" %}
-
-				<script src="https://unpkg.com/flowbite@2.2.1/dist/flowbite.min.js"></script>
 
 				{% block scripts %}{% endblock %}
 			</body>
