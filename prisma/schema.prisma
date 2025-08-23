@@ -57,17 +57,18 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  enfants        Student[]        @relation("ParentEnfants")
-  messages       Message[]        @relation("UserMessages")
-  actualites     Actualite[]      @relation("UserActualites")
-  travaux        Travaux[]        @relation("UserTravaux")
-  horaires       Horaire[]        @relation("EnseignantHoraires")
-  notes          Note[]           @relation("EnseignantNotes")
-  menus          Menu[]           @relation("UserMenus")
-  carouselImages CarouselImage[]  @relation("UserCarouselImages")
-  heroCarousel   HeroCarousel[]   @relation("UserHeroCarousel")
-  TicketBooklet  TicketBooklet[]
-  TicketPurchase TicketPurchase[]
+  enfants             Student[]            @relation("ParentEnfants")
+  messages            Message[]            @relation("UserMessages")
+  actualites          Actualite[]          @relation("UserActualites")
+  travaux             Travaux[]            @relation("UserTravaux")
+  horaires            Horaire[]            @relation("EnseignantHoraires")
+  notes               Note[]               @relation("EnseignantNotes")
+  menus               Menu[]               @relation("UserMenus")
+  carouselImages      CarouselImage[]      @relation("UserCarouselImages")
+  heroCarousel        HeroCarousel[]       @relation("UserHeroCarousel")
+  TicketBooklet       TicketBooklet[]
+  TicketPurchase      TicketPurchase[]
+  inscriptionRequests InscriptionRequest[] @relation("InscriptionReviewer")
 }
 
 model Student {
@@ -351,4 +352,40 @@ model HeroCarousel {
 
   @@index([active])
   @@index([ordre])
+}
+
+enum InscriptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model InscriptionRequest {
+  id              Int    @id @default(autoincrement())
+  // Informations du parent
+  parentFirstName String
+  parentLastName  String
+  parentEmail     String @unique
+  parentPhone     String
+  parentAddress   String
+  password        String // Mot de passe hashé
+
+  // Informations des enfants (JSON pour gérer plusieurs enfants)
+  children Json // [{firstName: "", lastName: "", birthDate: ""}]
+
+  // Statut de la demande
+  status        InscriptionStatus @default(PENDING)
+  reviewedAt    DateTime?
+  reviewedBy    Int? // ID de l'admin qui a traité la demande
+  reviewComment String? // Commentaire de l'admin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation avec l'admin qui a traité la demande
+  reviewer User? @relation("InscriptionReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([status])
+  @@index([parentEmail])
+  @@index([createdAt])
 }

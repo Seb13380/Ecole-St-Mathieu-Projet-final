@@ -7,10 +7,10 @@
 	<div class="container mx-auto px-4 py-8">
 		<div class="text-center mb-8">
 			<h1 class="text-4xl font-bold text-slate-800 mb-4">
-				🍽️ Le Chef Serge vous propose
+				🍽️ Le Chef vous propose
 			</h1>
 			<p class="text-lg text-slate-600">
-				Les menus de la semaine préparés avec soin par notre chef cuisinier
+				Les menus de la semaine préparés avec soin
 			</p>
 		</div>
 
@@ -29,7 +29,7 @@
 								{% endif %}
 								{% if menu.auteur %}
 									<p class="text-sm text-gray-500 mb-6">
-										Préparé par le Chef Serge
+										Préparé par le Chef
 																																								• Publié le
 										{{ menu.createdAt|date('d/m/Y') }}
 									</p>
@@ -70,7 +70,7 @@
 								<div class="text-center p-12 bg-gradient-to-b from-blue-50 to-white rounded-lg border border-blue-100">
 									<div class="text-6xl mb-4">🍽️</div>
 									<h4 class="text-xl font-semibold text-slate-800 mb-2">Menu en préparation</h4>
-									<p class="text-gray-600">Le Chef Serge prépare le menu de la semaine.<br>Il sera disponible très prochainement.</p>
+									<p class="text-gray-600">Le Chef prépare le menu de la semaine.<br>Il sera disponible très prochainement.</p>
 								</div>
 							{% endif %}
 						</div>

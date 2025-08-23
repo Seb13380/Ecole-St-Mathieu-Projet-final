@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block main %}
-	<div class="min-h-screen bg-[#a7e3dd] py-12">
+	<div class="min-h-screen bg-gray-50 py-12">
 		<div
 			class="max-w-4xl mx-auto px-4">
 			<!-- En-tête -->
@@ -16,7 +16,7 @@
 				<div class="w-24 h-1 bg-[#a7e3dd] mx-auto rounded-full mt-4"></div>
 				<p class="mt-4 text-center bg-blue-50 p-3 rounded-lg border border-blue-200">
 					<span class="text-blue-800">ℹ️</span>
-					Cette demande sera examinée par la direction. Vous recevrez une réponse par email.
+					Cette demande sera examinée par notre équipe. Vous recevrez une réponse par email.
 				</p>
 			</div>
 
@@ -43,33 +43,33 @@
 				action="/auth/register" method="POST" class="space-y-8">
 				<!-- Section Parent -->
 				<div class="bg-white rounded-xl shadow-lg p-8">
-					<h2 class="text-3xl font-bold text-[#304a4d] mb-8 font-poppins flex items-center justify-center gap-3">
-						👨‍👩‍👧‍👦 Informations du parent responsable
+					<h2 class="text-2xl font-bold text-[#304a4d] mb-6 font-poppins flex items-center gap-3">
+						👨‍👩‍👧‍👦 Informations du parent
 					</h2>
 
 					<div class="grid md:grid-cols-2 gap-6">
 						<div>
-							<label for="parentFirstName" class="block text-lg font-medium text-[#304a4d] mb-2">Prénom *</label>
-							<input type="text" id="parentFirstName" name="parentFirstName" required class="input input-bordered w-full" style="background-color: #a7e3dd !important; color: #000000 !important;" placeholder="Votre prénom">
+							<label for="parentFirstName" class="block text-sm font-medium text-[#304a4d] mb-2">Prénom *</label>
+							<input type="text" id="parentFirstName" name="parentFirstName" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Votre prénom">
 						</div>
 
 						<div>
-							<label for="parentLastName" class="block text-lg font-medium text-[#304a4d] mb-2">Nom *</label>
+							<label for="parentLastName" class="block text-sm font-medium text-[#304a4d] mb-2">Nom *</label>
 							<input type="text" id="parentLastName" name="parentLastName" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Votre nom">
 						</div>
 
 						<div>
-							<label for="parentEmail" class="block text-lg font-medium text-[#304a4d] mb-2">Email *</label>
+							<label for="parentEmail" class="block text-sm font-medium text-[#304a4d] mb-2">Email *</label>
 							<input type="email" id="parentEmail" name="parentEmail" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="votre@email.com">
 						</div>
 
 						<div>
-							<label for="parentPhone" class="block text-lg font-medium text-[#304a4d] mb-2">Téléphone *</label>
+							<label for="parentPhone" class="block text-sm font-medium text-[#304a4d] mb-2">Téléphone *</label>
 							<input type="tel" id="parentPhone" name="parentPhone" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="06 12 34 56 78">
 						</div>
 
 						<div class="md:col-span-2">
-							<label for="parentAddress" class="block text-lg font-medium text-[#304a4d] mb-2">Adresse complète *</label>
+							<label for="parentAddress" class="block text-sm font-medium text-[#304a4d] mb-2">Adresse complète *</label>
 							<textarea id="parentAddress" name="parentAddress" rows="3" required class="textarea textarea-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Numéro, rue, code postal, ville"></textarea>
 						</div>
 					</div>
@@ -77,7 +77,7 @@
 
 				<!-- Section Enfants -->
 				<div class="bg-white rounded-xl shadow-lg p-8">
-					<h2 class="text-3xl font-bold text-[#304a4d] mb-8 font-poppins flex items-center justify-center gap-3">
+					<h2 class="text-2xl font-bold text-[#304a4d] mb-6 font-poppins flex items-center gap-3">
 						👶 Informations des enfants à inscrire
 					</h2>
 
@@ -123,7 +123,7 @@
 
 				<!-- Section Mot de passe -->
 				<div class="bg-white rounded-xl shadow-lg p-8">
-					<h2 class="text-3xl font-bold text-[#304a4d] mb-8 font-poppins flex items-center justify-center gap-3">
+					<h2 class="text-2xl font-bold text-[#304a4d] mb-6 font-poppins flex items-center gap-3">
 						🔒 Mot de passe pour votre compte
 					</h2>
 
@@ -204,11 +204,9 @@ childCount + 1
 container.appendChild(newChild);
 childCount++;
 
-// Afficher le bouton de suppression pour tous les enfants sauf le premier
 updateRemoveButtons();
 });
 
-// Gérer la suppression d'enfants
 document.addEventListener('click', function (e) {
 if (e.target.closest('.remove-child')) {
 e.target.closest('.child-item').remove();
@@ -225,7 +223,6 @@ title.textContent = `Enfant ${
 index + 1
 }`;
 
-// Mettre à jour les noms des inputs
 const inputs = child.querySelectorAll('input');
 inputs.forEach(input => {
 if (input.name.includes('children[')) {
@@ -249,7 +246,6 @@ removeButton.classList.remove('hidden');
 });
 }
 
-// Validation du mot de passe
 document.querySelector('form').addEventListener('submit', function (e) {
 const password = document.getElementById('password').value;
 const confirmPassword = document.getElementById('confirmPassword').value;

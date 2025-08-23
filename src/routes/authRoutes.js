@@ -1,11 +1,15 @@
 const express = require('express');
 const loginRoutes = require('./loginRoutes');
-// const registerRoutes = require('./registerRoutes'); // Fichier non existant
 const parentInvitationController = require('../controllers/parentInvitationController');
+const inscriptionController = require('../controllers/inscriptionController');
 
 const router = express.Router();
 
 router.use('/login', loginRoutes);
+
+// Routes pour l'inscription publique
+router.get('/register', inscriptionController.showRegistrationForm);
+router.post('/register', inscriptionController.processRegistration);
 
 // router.use('/register', registerRoutes); // Fichier non existant
 

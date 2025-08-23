@@ -264,7 +264,10 @@ const adminController = {
                 totalStudents: await prisma.student.count(),
                 totalClasses: await prisma.classe.count(),
                 totalMessages: await prisma.message.count(),
-                totalActualites: await prisma.actualite.count()
+                totalActualites: await prisma.actualite.count(),
+                pendingInscriptions: await prisma.inscriptionRequest.count({
+                    where: { status: 'PENDING' }
+                })
             };
 
             const recentUsers = await prisma.user.findMany({

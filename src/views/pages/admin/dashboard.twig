@@ -204,6 +204,33 @@ class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 	</div>
 </a>
 
+<!-- Gestion des demandes d'inscription -->
+<a href="/admin/inscriptions" class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border-l-4 border-purple-500">
+	<div class="flex items-center mb-4">
+		<div class="bg-gradient-to-br from-purple-400 to-indigo-500 p-4 rounded-full group-hover:scale-110 transition-transform duration-300">
+			<svg class="h-8 w-8 text-white" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+			</svg>
+		</div>
+	</div>
+	<h3 class="text-xl font-bold text-[#304a4d] mb-2 font-poppins-semibold">📝 Demandes d'inscription</h3>
+	<p class="text-gray-600 font-poppins-regular">Valider ou refuser les demandes d'inscription</p>
+	{% if stats.pendingInscriptions > 0 %}
+		<div class="mt-2">
+			<span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+				{{ stats.pendingInscriptions }}
+				en attente
+			</span>
+		</div>
+	{% endif %}
+	<div class="mt-4 flex items-center text-purple-600 font-medium">
+		<span>Accéder</span>
+		<svg class="ml-2 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+		</svg>
+	</div>
+</a>
+
 <!-- Gestion carrousel (petit) -->
 <a href="/carousel/manage" class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border-l-4 border-cyan-500">
 	<div class="flex items-center mb-4">
