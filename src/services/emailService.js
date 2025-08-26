@@ -377,6 +377,94 @@ class EmailService {
     }
 
     /**
+     * Envoyer une notification au directeur pour une nouvelle demande d'inscription
+     * @param {Object} inscriptionData - Données de la demande d'inscription
+     */
+    async sendNewRequestNotification(inscriptionData) {
+        const { parentFirstName, parentLastName, parentEmail, parentPhone, children } = inscriptionData;
+        const directorEmail = 'sgdigitalweb13@gmail.com'; // Votre email
+
+        const childrenList = children.map(child =>
+            `• ${child.firstName} ${child.lastName} (né(e) le ${new Date(child.birthDate).toLocaleDateString('fr-FR')})`
+        ).join('\n');
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: directorEmail,
+            subject: '🔔 Nouvelle demande d\'inscription à valider - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 30px;">
+                            <h2 style="color: #856404; margin-top: 0; text-align: center;">
+                                🔔 Nouvelle demande d'inscription en attente
+                            </h2>
+                        </div>
+                        
+                        <h3 style="color: #304a4d; border-bottom: 2px solid #a7e3dd; padding-bottom: 10px;">
+                            👨‍👩‍👧‍👦 Informations du parent
+                        </h3>
+                        
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Nom :</strong> ${parentFirstName} ${parentLastName}</p>
+                            <p style="margin: 5px 0;"><strong>Email :</strong> <a href="mailto:${parentEmail}">${parentEmail}</a></p>
+                            <p style="margin: 5px 0;"><strong>Téléphone :</strong> ${parentPhone || 'Non renseigné'}</p>
+                        </div>
+
+                        <h3 style="color: #304a4d; border-bottom: 2px solid #a7e3dd; padding-bottom: 10px;">
+                            👶 Enfant(s) à inscrire
+                        </h3>
+                        
+                        <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <pre style="color: #004085; font-family: Arial; white-space: pre-wrap; margin: 0;">${childrenList}</pre>
+                        </div>
+                        
+                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin: 20px 0;">
+                            <h3 style="color: #155724; margin-top: 0;">✅ Actions requises :</h3>
+                            <ol style="color: #155724; margin: 0; padding-left: 20px;">
+                                <li>Connectez-vous à votre espace directeur</li>
+                                <li>Accédez à la section "Demandes d'inscription"</li>
+                                <li>Examinez la demande et validez ou rejetez</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/admin/inscriptions" 
+                               style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                🚀 Voir les demandes en attente
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="color: #0c5460; margin: 0;">
+                                <strong>📅 Date de la demande :</strong> ${new Date().toLocaleString('fr-FR')}<br>
+                                <strong>📊 Action recommandée :</strong> Traiter sous 48-72h
+                            </p>
+                        </div>
+                        
+                        <p style="color: #666; font-size: 12px; text-align: center; margin-top: 30px;">
+                            Cet email est une notification automatique du système de gestion de l'École Saint-Mathieu.
+                        </p>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('Notification directeur envoyée:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi de la notification au directeur:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
      * Tester la configuration email
      */
     async testConnection() {

@@ -69,6 +69,7 @@ model User {
   TicketBooklet       TicketBooklet[]
   TicketPurchase      TicketPurchase[]
   inscriptionRequests InscriptionRequest[] @relation("InscriptionReviewer")
+  reviewedRequests    InscriptionRequest[]
 }
 
 model Student {
@@ -361,31 +362,23 @@ enum InscriptionStatus {
 }
 
 model InscriptionRequest {
-  id              Int    @id @default(autoincrement())
-  // Informations du parent
+  id              Int       @id @default(autoincrement())
   parentFirstName String
   parentLastName  String
-  parentEmail     String @unique
+  parentEmail     String    @unique
   parentPhone     String
   parentAddress   String
-  password        String // Mot de passe hashé
+  password        String
+  children        Json
+  status          String    @default("PENDING")
+  reviewedAt      DateTime?
+  reviewedBy      Int?
+  reviewComment   String?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  // Informations des enfants (JSON pour gérer plusieurs enfants)
-  children Json // [{firstName: "", lastName: "", birthDate: ""}]
-
-  // Statut de la demande
-  status        InscriptionStatus @default(PENDING)
-  reviewedAt    DateTime?
-  reviewedBy    Int? // ID de l'admin qui a traité la demande
-  reviewComment String? // Commentaire de l'admin
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relation avec l'admin qui a traité la demande
   reviewer User? @relation("InscriptionReviewer", fields: [reviewedBy], references: [id])
-
-  @@index([status])
-  @@index([parentEmail])
-  @@index([createdAt])
+  User     User? @relation(fields: [userId], references: [id])
+  userId   Int?
 }

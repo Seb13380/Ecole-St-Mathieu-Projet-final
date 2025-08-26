@@ -1,12 +1,12 @@
-{% extends "layouts/admin.twig" %}
+{% extends "layouts/base.twig" %}
 
 {% block title %}Demandes d'inscription - Administration
 {% endblock %}
 
-{% block content %}
+{% block main %}
 	<div class="container mx-auto px-4 py-8">
 		<div class="flex justify-between items-center mb-8">
-			<h1 class="text-3xl font-bold text-[#304a4d]">Demandes d'inscription</h1>
+			<h1 class="text-3xl font-bold text-[#304a4d]">Demandes d'inscription en attente</h1>
 			<div class="flex gap-2">
 				<span class="badge badge-warning">{{ requests | filter(r => r.status == 'PENDING') | length }}
 					en attente</span>
@@ -120,16 +120,19 @@
 						{% endif %}
 
 						<!-- Actions -->
-						{% if request.status == 'PENDING' %}
-							<div class="card-actions justify-end">
+						<div class="card-actions justify-end">
+							<button class="btn btn-info btn-outline" onclick="viewDetails({{ request.id }})">
+								Voir détails
+							</button>
+							{% if request.status == 'PENDING' %}
 								<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
 									Refuser
 								</button>
 								<button class="btn btn-success" onclick="showApproveModal({{ request.id }})">
 									Approuver
 								</button>
-							</div>
-						{% endif %}
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			{% else %}
@@ -193,6 +196,11 @@ document.getElementById('approve_modal').showModal();
 function showRejectModal(requestId) {
 currentRequestId = requestId;
 document.getElementById('reject_modal').showModal();
+}
+
+// Fonction pour voir les détails
+function viewDetails(requestId) {
+window.location.href = `/admin/inscriptions/${requestId}/details`;
 }
 
 // Traiter l'approbation

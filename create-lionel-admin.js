@@ -7,40 +7,62 @@ async function createNewAdmin() {
     try {
         console.log('🔐 Création du nouvel administrateur...');
 
-        // Vérifier si l'email existe déjà
-        const existingUser = await prisma.user.findUnique({
-            where: { email: 'l.camboulives@stmathieu.org' }
+        // Emails à vérifier (canonique + legacy)
+        const canonicalEmail = 'lionel.camboulives@ecole-saint-mathieu.fr';
+        const legacyEmail = 'l.camboulives@stmathieu.org';
+
+        // Vérifier si l'email canonique existe déjà
+        let existingUser = await prisma.user.findUnique({
+            where: { email: canonicalEmail }
         });
 
-        if (existingUser) {
-            console.log('⚠️  Un utilisateur avec cet email existe déjà.');
-            console.log('🔄 Mise à jour vers le rôle ADMIN...');
+        // Si pas trouvé, vérifier l'ancien email pour migration
+        let legacyUser = null;
+        if (!existingUser) {
+            legacyUser = await prisma.user.findUnique({
+                where: { email: legacyEmail }
+            });
+        }
 
-            // Mettre à jour le mot de passe et le rôle
-            const hashedPassword = await bcrypt.hash('Directeur2025!', 10);
+        const hashedPassword = await bcrypt.hash('Directeur2025!', 10);
+
+        if (existingUser) {
+            console.log('⚠️  Un utilisateur avec l\'email canonique existe déjà.');
+            console.log('🔄 Mise à jour vers le rôle DIRECTION...');
 
             const updatedUser = await prisma.user.update({
-                where: { email: 'l.camboulives@stmathieu.org' },
+                where: { email: canonicalEmail },
                 data: {
                     password: hashedPassword,
-                    role: 'ADMIN'
+                    role: 'DIRECTION'
                 }
             });
 
-            console.log('✅ Utilisateur mis à jour vers ADMIN !');
-        } else {
-            // Créer un nouveau compte admin
-            const hashedPassword = await bcrypt.hash('Directeur2025!', 10);
+            console.log('✅ Utilisateur mis à jour vers DIRECTION !');
+        } else if (legacyUser) {
+            console.log('♻️  Migration de l\'ancien email vers le nouveau...');
 
+            const updatedUser = await prisma.user.update({
+                where: { email: legacyEmail },
+                data: {
+                    email: canonicalEmail,
+                    password: hashedPassword,
+                    role: 'DIRECTION'
+                }
+            });
+
+            console.log('✅ Utilisateur migré vers DIRECTION !');
+        } else {
+            // Créer un nouveau compte admin avec les bonnes données
             const newAdmin = await prisma.user.create({
                 data: {
                     firstName: 'Lionel',
                     lastName: 'Camboulives',
-                    email: 'l.camboulives@stmathieu.org',
+                    email: canonicalEmail,  // Email canonique pour les tests
                     password: hashedPassword,
-                    phone: '06.12.34.56.78',
+                    phone: '06.63.78.69.68',
                     adress: 'École Saint-Mathieu',
-                    role: 'ADMIN'
+                    role: 'DIRECTION'  // Rôle attendu par les tests
                 }
             });
 
@@ -48,17 +70,17 @@ async function createNewAdmin() {
         }
 
         console.log('\n📋 Identifiants de connexion :');
-        console.log('📧 Email: l.camboulives@stmathieu.org');
+        console.log(`📧 Email: ${canonicalEmail}`);
         console.log('🔑 Mot de passe: Directeur2025!');
-        console.log('🔒 Rôle: ADMIN');
+        console.log('🔒 Rôle: DIRECTION');
         console.log('\n✅ Vous pouvez maintenant vous connecter !');
 
         // Vérifier que l'admin peut bien se connecter
         const testAdmin = await prisma.user.findUnique({
-            where: { email: 'l.camboulives@stmathieu.org' }
+            where: { email: canonicalEmail }
         });
 
-        if (testAdmin && testAdmin.role === 'ADMIN') {
+        if (testAdmin && testAdmin.role === 'DIRECTION') {
             console.log('✅ Vérification réussie - Admin prêt à se connecter !');
         } else {
             console.log('❌ Problème avec la création de l\'admin');

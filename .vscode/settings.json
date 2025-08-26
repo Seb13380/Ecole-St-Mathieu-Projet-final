@@ -6,5 +6,6 @@
         "**/node_modules/**": true,
         "**/prisma/**": true,
         "**/.git/**": true
-    }
+    },
+    "claudeCodeChat.permissions.yoloMode": true
 }
