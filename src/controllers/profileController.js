@@ -24,7 +24,7 @@ const ProfileController = {
                     minute: 'numeric'
                 }),
                 memberSince: '2023', // Exemple
-                profileImage: this.getProfileImage(user.role)
+                profileImage: ProfileController.getProfileImage(user.role)
             };
 
             // Ajouter des données spécifiques selon le rôle

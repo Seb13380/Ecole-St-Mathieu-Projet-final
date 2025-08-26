@@ -1,66 +1,85 @@
-# 📧 Système d'Invitations Parents - École Saint-Mathieu
+# 📧 Système de Demandes d'Inscription - École Saint-Mathieu
 
-## 🎯 Nouveau système de connexion des parents
+## 🎯 Nouveau système de validation des inscriptions
 
-Le système de codes d'invitation a été remplacé par un système plus moderne et sécurisé où le chef d'établissement envoie directement des liens d'inscription personnalisés par email aux parents.
+Le système permet maintenant aux parents de s'inscrire directement et au directeur de valider ou refuser ces demandes.
 
 ## 🚀 Fonctionnalités
 
-### Pour le Chef d'Établissement
-- **Interface de gestion des invitations** : `/parent-invitations/manage`
-- **Création d'invitations personnalisées** avec pré-remplissage des informations
-- **Envoi automatique d'emails** avec liens sécurisés
-- **Suivi des invitations** (envoyées, utilisées, expirées)
-- **Gestion des invitations** (supprimer, renvoyer)
-
 ### Pour les Parents
-- **Lien d'inscription unique** reçu par email
-- **Formulaire pré-rempli** avec les informations connues
-- **Inscription simplifiée** en une seule étape
-- **Création automatique** du compte parent et de l'enfant
+- **Inscription directe** sur `/auth/register`
+- **Formulaire complet** avec informations parent et enfants
+- **Confirmation automatique** par email
+- **Suivi de la demande** par statut
+
+### Pour le Directeur
+- **Interface de gestion** : `/admin/inscriptions`
+- **Validation des demandes** avec approbation/refus
+- **Création automatique des comptes** lors de l'approbation
+- **Envoi des identifiants** par email
+- **🆕 Notification email** pour chaque nouvelle demande à sgdigitalweb13@gmail.com
 
 ## 🔧 Utilisation
 
 ### 1. Connexion Directeur
 ```
 URL : http://localhost:3007/auth/login
-Email : directeur@ecole-saint-mathieu.fr
-Mot de passe : DirecteurSaintMathieu2024!
+Email : lionel.camboulives@ecole-saint-mathieu.fr
+Mot de passe : Directeur2025!
 ```
 
-### 2. Accès à la gestion des invitations
-- Aller sur le dashboard directeur
-- Cliquer sur "Invitations Parents"
-- Ou accéder directement : `/parent-invitations/manage`
+### 2. Notifications automatiques
+- **Email de notification** envoyé automatiquement à sgdigitalweb13@gmail.com
+- **Contenu** : Informations du parent et des enfants à inscrire
+- **Lien direct** vers l'interface de gestion des demandes
 
-### 3. Créer une invitation
-1. Remplir le formulaire avec :
-   - Informations du parent (email, prénom, nom)
-   - Informations de l'enfant (prénom, nom, date de naissance)
-   - Classe assignée (optionnel)
-2. Cliquer sur "Créer et envoyer l'invitation"
-3. L'email est envoyé automatiquement avec le lien personnalisé
+### 3. Accès à la gestion des demandes
+- Dashboard directeur → "Demandes d'inscription"
+- Ou directement : `/admin/inscriptions`
+- Ou via le lien dans l'email de notification
 
-### 4. Le parent reçoit l'email
-- Email avec lien unique et sécurisé
-- Valide pendant 7 jours
-- Formulaire pré-rempli à compléter
+### 4. Processus pour les parents
+1. Aller sur `/auth/register`
+2. Remplir le formulaire complet
+3. Recevoir email de confirmation
+4. Attendre validation du directeur
 
-## 🛠️ Configuration Email
+### 5. Processus pour le directeur
+1. Recevoir la notification email sur sgdigitalweb13@gmail.com
+2. Cliquer sur le lien dans l'email ou se connecter
+3. Consulter les demandes en attente
+4. Approuver → Comptes créés automatiquement
+5. Refuser → Email de refus envoyé
 
-Dans le fichier `.env`, configurez :
-```properties
-BASE_URL="http://localhost:3007"
-EMAIL_USER="votre_email@ecole.fr"
-EMAIL_PASS="votre_mot_de_passe"
-EMAIL_SERVICE="gmail"
-```
+## 🧪 Test du système
 
-**Note** : Pour la production, utilisez un service email professionnel (SendGrid, Mailgun, etc.)
+1. **Démarrer le serveur** : `npm start`
+2. **Créer une demande test** sur `/auth/register`
+3. **Vérifier la réception** de l'email sur sgdigitalweb13@gmail.com
+4. **Se connecter comme directeur** 
+5. **Valider la demande** sur `/admin/inscriptions`
+6. **Vérifier la création** des comptes automatiques
 
-## 📊 Base de Données
+## ✅ Avantages du nouveau système
 
-### Nouvelle table : `ParentInvitation`
+- **Automatisation complète** de la création des comptes
+- **Suivi centralisé** des demandes
+- **Communication email** automatique
+- **Sécurité renforcée** avec validation manuelle
+- **Interface intuitive** pour les directeurs
+- **🆕 Notifications instantanées** au directeur pour chaque demande
+
+## 📧 Configuration des notifications
+
+Le directeur reçoit automatiquement un email à l'adresse **sgdigitalweb13@gmail.com** contenant :
+- Les informations complètes du parent
+- La liste des enfants à inscrire avec leurs dates de naissance
+- Un lien direct vers l'interface de gestion
+- La date et l'heure de la demande
+
+## 🎉 Système opérationnel !
+
+Les parents peuvent maintenant s'inscrire directement et le directeur est notifié instantanément par email pour valider les demandes via une interface dédiée.
 ```sql
 - id (Int) : Identifiant unique
 - token (String) : Token unique pour le lien

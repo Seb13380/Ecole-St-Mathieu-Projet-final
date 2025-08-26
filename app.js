@@ -46,10 +46,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Routes
 const homeRoutes = require("./src/routes/homeRoutes");
-const authRoutes = require("./src/routes/authRoutes");
-const adminRoutes = require("./src/routes/adminRoutes");
-const directeurRoutes = require("./src/routes/directeurRoutes");
+const authRoutes = require('./src/routes/authRoutes');
+const adminRoutes = require('./src/routes/adminRoutes');
+const directeurRoutes = require('./src/routes/directeurRoutes');
 const parentRoutes = require("./src/routes/parentRoutes");
 const enseignantRoutes = require("./src/routes/enseignantRoutes");
 const actualiteRoutes = require("./src/routes/actualiteRoutes");
@@ -64,6 +65,7 @@ const profileRoutes = require("./src/routes/profileRoutes");
 const parentInvitationRoutes = require("./src/routes/parentInvitationRoutes");
 const carouselRoutes = require("./src/routes/carouselRoutes");
 const heroCarouselRoutes = require("./src/routes/heroCarouselRoutes");
+const inscriptionsRoutes = require('./src/routes/inscriptions');
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -83,6 +85,19 @@ app.use('/contact', contactRoutes);
 app.use('/parent-invitations', parentInvitationRoutes);
 app.use('/carousel', carouselRoutes);
 app.use('/hero-carousel', heroCarouselRoutes);
+app.use('/inscriptions', inscriptionsRoutes);
+
+// Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
+app.get('/inscriptions/manage', (req, res) => {
+  if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'ADMIN') {
+    res.redirect('/admin/inscriptions');
+  } else {
+    res.status(403).render('pages/error', {
+      message: 'Accès non autorisé',
+      user: req.session.user
+    });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

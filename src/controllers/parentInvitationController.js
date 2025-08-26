@@ -1,41 +1,398 @@
 const { PrismaClient } = require('@prisma/client');
-const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
 const parentInvitationController = {
-    // Afficher la page de gestion des invitations (pour le directeur)
+    // Afficher le formulaire d'inscription avec token
+    async showRegistrationForm(req, res) {
+        try {
+            const { token } = req.params;
+
+            // Vérifier si le token existe et est valide
+            const invitation = await prisma.parentInvitation.findUnique({
+                where: { token: token }
+            });
+
+            if (!invitation) {
+                return res.status(404).render('pages/error', {
+                    message: 'Lien d\'invitation invalide ou expiré',
+                    user: null
+                });
+            }
+
+            if (invitation.used) {
+                return res.status(400).render('pages/error', {
+                    message: 'Cette invitation a déjà été utilisée',
+                    user: null
+                });
+            }
+
+            // Vérifier si l'invitation n'est pas expirée
+            if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+                return res.status(400).render('pages/error', {
+                    message: 'Cette invitation a expiré',
+                    user: null
+                });
+            }
+
+            res.render('pages/auth/register-with-invitation', {
+                title: 'Inscription avec invitation - École Saint-Mathieu',
+                invitation: invitation,
+                token: token,
+                error: req.query.error,
+                success: req.query.success
+            });
+
+        } catch (error) {
+            console.error('Erreur affichage formulaire invitation:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors de l\'affichage du formulaire',
+                user: null
+            });
+        }
+    },
+
+    // Traiter l'inscription avec token d'invitation
+    async processInvitationRegistration(req, res) {
+        try {
+            const { token } = req.params;
+            const { password, confirmPassword, phone, address } = req.body;
+
+            // Validation des mots de passe
+            if (password !== confirmPassword) {
+                return res.redirect(`/auth/register/${token}?error=Les mots de passe ne correspondent pas`);
+            }
+
+            if (password.length < 6) {
+                return res.redirect(`/auth/register/${token}?error=Le mot de passe doit contenir au moins 6 caractères`);
+            }
+
+            // Vérifier le token d'invitation
+            const invitation = await prisma.parentInvitation.findUnique({
+                where: { token: token }
+            });
+
+            if (!invitation || invitation.used) {
+                return res.redirect(`/auth/register/${token}?error=Invitation invalide ou déjà utilisée`);
+            }
+
+            if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+                return res.redirect(`/auth/register/${token}?error=Invitation expirée`);
+            }
+
+            // Vérifier si l'email existe déjà
+            const existingUser = await prisma.user.findUnique({
+                where: { email: invitation.parentEmail }
+            });
+
+            if (existingUser) {
+                return res.redirect(`/auth/register/${token}?error=Un compte avec cet email existe déjà`);
+            }
+
+            // Hacher le mot de passe
+            const hashedPassword = await bcrypt.hash(password, 12);
+
+            // Transaction pour créer le compte et marquer l'invitation comme utilisée
+            await prisma.$transaction(async (tx) => {
+                // Créer le compte parent
+                const parent = await tx.user.create({
+                    data: {
+                        firstName: invitation.parentFirstName,
+                        lastName: invitation.parentLastName,
+                        email: invitation.parentEmail,
+                        password: hashedPassword,
+                        phone: phone || '',
+                        adress: address || '',
+                        role: 'PARENT'
+                    }
+                });
+
+                // Créer l'enfant si les informations sont disponibles
+                if (invitation.childFirstName && invitation.childLastName && invitation.childDateNaissance) {
+                    // Récupérer la classe ou créer une classe par défaut
+                    let classe;
+                    if (invitation.classeId) {
+                        classe = await tx.classe.findUnique({
+                            where: { id: invitation.classeId }
+                        });
+                    }
+
+                    if (!classe) {
+                        classe = await tx.classe.findFirst({
+                            where: { nom: 'Non assigné' }
+                        });
+
+                        if (!classe) {
+                            classe = await tx.classe.create({
+                                data: {
+                                    nom: 'Non assigné',
+                                    niveau: 'A définir',
+                                    anneeScolaire: new Date().getFullYear().toString()
+                                }
+                            });
+                        }
+                    }
+
+                    await tx.student.create({
+                        data: {
+                            firstName: invitation.childFirstName,
+                            lastName: invitation.childLastName,
+                            dateNaissance: invitation.childDateNaissance,
+                            parentId: parent.id,
+                            classeId: classe.id
+                        }
+                    });
+                }
+
+                // Marquer l'invitation comme utilisée
+                await tx.parentInvitation.update({
+                    where: { id: invitation.id },
+                    data: {
+                        used: true,
+                        usedAt: new Date()
+                    }
+                });
+            });
+
+            res.redirect('/auth/login?success=Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.');
+
+        } catch (error) {
+            console.error('Erreur traitement invitation:', error);
+            res.redirect(`/auth/register/${token}?error=Une erreur est survenue lors de la création de votre compte`);
+        }
+    },
+
+    // Afficher les demandes d'inscription pour le directeur
     async showInvitationManagement(req, res) {
         try {
             if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
                 return res.status(403).render('pages/error', {
-                    message: 'Accès refusé. Réservé aux directeurs.'
+                    message: 'Accès refusé. Réservé aux directeurs.',
+                    user: req.session.user
                 });
             }
 
-            // Récupérer toutes les invitations
-            const invitations = await prisma.parentInvitation.findMany({
-                orderBy: { createdAt: 'desc' },
-                take: 50 // Limiter à 50 résultats
+            // Récupérer les demandes d'inscription
+            const requests = await prisma.inscriptionRequest.findMany({
+                where: { status: 'PENDING' },
+                orderBy: { createdAt: 'desc' }
             });
 
-            // Récupérer les classes disponibles
-            const classes = await prisma.classe.findMany({
-                orderBy: { nom: 'asc' }
-            });
+            // Calculer les statistiques
+            const stats = {
+                pending: await prisma.inscriptionRequest.count({ where: { status: 'PENDING' } }),
+                approved: await prisma.inscriptionRequest.count({ where: { status: 'APPROVED' } }),
+                rejected: await prisma.inscriptionRequest.count({ where: { status: 'REJECTED' } }),
+                total: await prisma.inscriptionRequest.count()
+            };
 
             res.render('pages/direction/parent-invitations', {
-                title: 'Gestion des Invitations Parents',
-                invitations,
-                classes
+                title: 'Gestion des demandes d\'inscription',
+                requests,
+                stats,
+                user: req.session.user
             });
 
         } catch (error) {
-            console.error('Erreur affichage gestion invitations:', error);
+            console.error('Erreur affichage demandes:', error);
             res.status(500).render('pages/error', {
-                message: 'Erreur lors de l\'affichage de la gestion des invitations'
+                message: 'Erreur lors de l\'affichage des demandes',
+                user: req.session.user
             });
+        }
+    },
+
+    // Approuver une demande d'inscription
+    async approveInscription(req, res) {
+        try {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+                return res.status(403).json({ error: 'Accès refusé' });
+            }
+
+            const { id } = req.params;
+
+            // Récupérer la demande
+            const request = await prisma.inscriptionRequest.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!request) {
+                return res.status(404).json({ error: 'Demande non trouvée' });
+            }
+
+            if (request.status !== 'PENDING') {
+                return res.status(400).json({ error: 'Cette demande a déjà été traitée' });
+            }
+
+            // Générer un mot de passe temporaire
+            const tempPassword = 'Parent' + Math.random().toString(36).slice(-8) + '!';
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+            // Transaction pour créer le compte parent et l'enfant
+            const result = await prisma.$transaction(async (tx) => {
+                // Créer le compte parent
+                const parent = await tx.user.create({
+                    data: {
+                        firstName: request.parentFirstName,
+                        lastName: request.parentLastName,
+                        email: request.parentEmail,
+                        password: hashedPassword,
+                        phone: request.parentPhone || '',
+                        adress: request.parentAddress || '',
+                        role: 'PARENT'
+                    }
+                });
+
+                // Créer l'enfant
+                const student = await tx.student.create({
+                    data: {
+                        firstName: request.childFirstName,
+                        lastName: request.childLastName,
+                        dateNaissance: new Date(request.childBirthDate),
+                        parentId: parent.id,
+                        classeId: 1 // Classe par défaut, à ajuster
+                    }
+                });
+
+                // Mettre à jour le statut de la demande
+                await tx.inscriptionRequest.update({
+                    where: { id: request.id },
+                    data: {
+                        status: 'APPROVED',
+                        reviewedAt: new Date(),
+                        reviewedBy: req.session.user.id
+                    }
+                });
+
+                return { parent, student, tempPassword };
+            });
+
+            // Envoyer l'email de confirmation avec les identifiants
+            await this.sendApprovalEmail(request, result.tempPassword);
+
+            res.json({
+                success: true,
+                message: 'Demande approuvée et compte créé'
+            });
+
+        } catch (error) {
+            console.error('Erreur approbation:', error);
+            res.status(500).json({ error: 'Erreur lors de l\'approbation' });
+        }
+    },
+
+    // Refuser une demande d'inscription
+    async rejectInscription(req, res) {
+        try {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+                return res.status(403).json({ error: 'Accès refusé' });
+            }
+
+            const { id } = req.params;
+            const { reason } = req.body;
+
+            const request = await prisma.inscriptionRequest.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!request || request.status !== 'PENDING') {
+                return res.status(400).json({ error: 'Demande invalide' });
+            }
+
+            // Mettre à jour le statut
+            await prisma.inscriptionRequest.update({
+                where: { id: request.id },
+                data: {
+                    status: 'REJECTED',
+                    reviewedAt: new Date(),
+                    reviewedBy: req.session.user.id,
+                    rejectionReason: reason || ''
+                }
+            });
+
+            // Envoyer l'email de refus
+            await this.sendRejectionEmail(request, reason);
+
+            res.json({
+                success: true,
+                message: 'Demande refusée'
+            });
+
+        } catch (error) {
+            console.error('Erreur refus:', error);
+            res.status(500).json({ error: 'Erreur lors du refus' });
+        }
+    },
+
+    // Envoyer l'email d'approbation
+    async sendApprovalEmail(request, tempPassword) {
+        try {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+                    pass: process.env.EMAIL_PASS || 'password'
+                }
+            });
+
+            const mailOptions = {
+                from: 'ecole@saint-mathieu.fr',
+                to: request.parentEmail,
+                subject: 'Inscription approuvée - École Saint-Mathieu',
+                html: `
+                    <h2>Bienvenue à l'École Saint-Mathieu !</h2>
+                    <p>Bonjour ${request.parentFirstName} ${request.parentLastName},</p>
+                    <p>Votre demande d'inscription a été approuvée.</p>
+                    <p><strong>Vos identifiants de connexion :</strong></p>
+                    <ul>
+                        <li>Email : ${request.parentEmail}</li>
+                        <li>Mot de passe temporaire : ${tempPassword}</li>
+                    </ul>
+                    <p>Connectez-vous sur notre plateforme et changez votre mot de passe.</p>
+                    <p>Cordialement,<br>L'École Saint-Mathieu</p>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+            return true;
+        } catch (error) {
+            console.error('Erreur envoi email:', error);
+            return false;
+        }
+    },
+
+    // Envoyer l'email de refus
+    async sendRejectionEmail(request, reason) {
+        try {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+                    pass: process.env.EMAIL_PASS || 'password'
+                }
+            });
+
+            const mailOptions = {
+                from: 'ecole@saint-mathieu.fr',
+                to: request.parentEmail,
+                subject: 'Demande d\'inscription - École Saint-Mathieu',
+                html: `
+                    <p>Bonjour ${request.parentFirstName} ${request.parentLastName},</p>
+                    <p>Nous avons examiné votre demande d'inscription.</p>
+                    <p>Malheureusement, nous ne pouvons pas donner suite à votre demande pour le moment.</p>
+                    ${reason ? `<p>Motif : ${reason}</p>` : ''}
+                    <p>N'hésitez pas à nous contacter pour plus d'informations.</p>
+                    <p>Cordialement,<br>L'École Saint-Mathieu</p>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+            return true;
+        } catch (error) {
+            console.error('Erreur envoi email:', error);
+            return false;
         }
     },
 
@@ -56,37 +413,26 @@ const parentInvitationController = {
                 classeId
             } = req.body;
 
-            // Vérifier si le parent existe déjà
+            // Vérifier si l'email existe déjà
             const existingUser = await prisma.user.findUnique({
                 where: { email: parentEmail }
             });
 
             if (existingUser) {
-                return res.status(400).json({
-                    error: 'Un compte avec cet email existe déjà'
-                });
+                return res.status(400).json({ error: 'Un compte avec cet email existe déjà' });
             }
 
             // Vérifier si une invitation existe déjà pour cet email
-            const existingInvitation = await prisma.parentInvitation.findFirst({
-                where: {
-                    parentEmail: parentEmail,
-                    used: false
-                }
+            const existingInvitation = await prisma.parentInvitation.findUnique({
+                where: { parentEmail: parentEmail }
             });
 
-            if (existingInvitation) {
-                return res.status(400).json({
-                    error: 'Une invitation non utilisée existe déjà pour cet email'
-                });
+            if (existingInvitation && !existingInvitation.used) {
+                return res.status(400).json({ error: 'Une invitation pour cet email existe déjà' });
             }
 
             // Générer un token unique
-            const token = crypto.randomBytes(32).toString('hex');
-
-            // Calculer la date d'expiration (7 jours)
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + 7);
+            const token = require('crypto').randomBytes(32).toString('hex');
 
             // Créer l'invitation
             const invitation = await prisma.parentInvitation.create({
@@ -100,272 +446,21 @@ const parentInvitationController = {
                     childDateNaissance: childDateNaissance ? new Date(childDateNaissance) : null,
                     classeId: classeId ? parseInt(classeId) : null,
                     createdBy: req.session.user.id,
-                    expiresAt
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 jours
                 }
             });
 
-            // Envoyer l'email
-            const emailSent = await this.sendInvitationEmail(invitation);
-
-            if (emailSent) {
-                // Marquer l'email comme envoyé
-                await prisma.parentInvitation.update({
-                    where: { id: invitation.id },
-                    data: { emailSent: true }
-                });
-            }
+            // Envoyer l'email d'invitation
+            await this.sendInvitationEmail(invitation);
 
             res.json({
                 success: true,
-                message: emailSent ? 'Invitation créée et email envoyé avec succès' : 'Invitation créée mais erreur d\'envoi d\'email',
-                invitation: {
-                    id: invitation.id,
-                    token: invitation.token,
-                    parentEmail: invitation.parentEmail,
-                    emailSent
-                }
+                message: 'Invitation créée et envoyée avec succès'
             });
 
         } catch (error) {
             console.error('Erreur création invitation:', error);
-            res.status(500).json({
-                error: 'Erreur lors de la création de l\'invitation'
-            });
-        }
-    },
-
-    // Envoyer l'email d'invitation
-    async sendInvitationEmail(invitation) {
-        try {
-            // Configuration du transporteur email (à adapter selon votre service)
-            const transporter = nodemailer.createTransporter({
-                // Exemple avec Gmail - à adapter selon votre configuration
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
-                    pass: process.env.EMAIL_PASS || 'votre_mot_de_passe'
-                }
-            });
-
-            const invitationUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/auth/register/${invitation.token}`;
-
-            const mailOptions = {
-                from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
-                to: invitation.parentEmail,
-                subject: 'Invitation à créer votre compte - École Saint-Mathieu',
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #0d9488;">École Saint-Mathieu</h2>
-                        
-                        <p>Bonjour ${invitation.parentFirstName} ${invitation.parentLastName},</p>
-                        
-                        <p>Nous avons le plaisir de vous inviter à créer votre compte parent sur notre plateforme numérique pour suivre la scolarité de votre enfant <strong>${invitation.childFirstName} ${invitation.childLastName}</strong>.</p>
-                        
-                        <div style="background-color: #f0fdfa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <p style="margin: 0;"><strong>Pour créer votre compte, cliquez sur le lien ci-dessous :</strong></p>
-                            <p style="margin: 10px 0;">
-                                <a href="${invitationUrl}" style="background-color: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-                                    Créer mon compte
-                                </a>
-                            </p>
-                        </div>
-                        
-                        <p><strong>Important :</strong> Ce lien est valide pendant 7 jours à compter de sa réception.</p>
-                        
-                        <p>Une fois votre compte créé, vous pourrez :</p>
-                        <ul>
-                            <li>Consulter les notes et absences de votre enfant</li>
-                            <li>Acheter et gérer les tickets de cantine</li>
-                            <li>Communiquer avec l'équipe pédagogique</li>
-                            <li>Suivre les actualités de l'école</li>
-                        </ul>
-                        
-                        <p>Si vous rencontrez des difficultés, n'hésitez pas à nous contacter.</p>
-                        
-                        <p>Cordialement,<br>
-                        L'équipe de l'École Saint-Mathieu</p>
-                        
-                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-                        <p style="color: #6b7280; font-size: 12px;">
-                            Si le lien ne fonctionne pas, copiez et collez cette URL dans votre navigateur :<br>
-                            ${invitationUrl}
-                        </p>
-                    </div>
-                `
-            };
-
-            await transporter.sendMail(mailOptions);
-            console.log('Email d\'invitation envoyé à:', invitation.parentEmail);
-            return true;
-
-        } catch (error) {
-            console.error('Erreur envoi email:', error);
-            return false;
-        }
-    },
-
-    // Afficher le formulaire d'inscription avec token
-    async showRegistrationForm(req, res) {
-        try {
-            const { token } = req.params;
-
-            // Vérifier que le token est valide
-            const invitation = await prisma.parentInvitation.findUnique({
-                where: { token },
-                include: {
-                    classeId: {
-                        include: {
-                            classe: true
-                        }
-                    }
-                }
-            });
-
-            if (!invitation) {
-                return res.status(404).render('pages/error', {
-                    message: 'Lien d\'invitation invalide ou expiré'
-                });
-            }
-
-            if (invitation.used) {
-                return res.status(400).render('pages/error', {
-                    message: 'Cette invitation a déjà été utilisée'
-                });
-            }
-
-            if (invitation.expiresAt && new Date() > invitation.expiresAt) {
-                return res.status(400).render('pages/error', {
-                    message: 'Cette invitation a expiré. Veuillez contacter l\'école.'
-                });
-            }
-
-            // Pré-remplir les données du formulaire
-            const formData = {
-                parentFirstName: invitation.parentFirstName,
-                parentLastName: invitation.parentLastName,
-                email: invitation.parentEmail,
-                childFirstName: invitation.childFirstName,
-                childLastName: invitation.childLastName,
-                childDateNaissance: invitation.childDateNaissance ? invitation.childDateNaissance.toISOString().split('T')[0] : ''
-            };
-
-            res.render('pages/auth/register-with-invitation', {
-                title: 'Création de votre compte - École Saint-Mathieu',
-                invitation,
-                formData
-            });
-
-        } catch (error) {
-            console.error('Erreur affichage formulaire invitation:', error);
-            res.status(500).render('pages/error', {
-                message: 'Erreur lors de l\'affichage du formulaire'
-            });
-        }
-    },
-
-    // Traiter l'inscription avec invitation
-    async processInvitationRegistration(req, res) {
-        try {
-            const { token } = req.params;
-            const { password, confirmPassword, phone, adress } = req.body;
-
-            // Vérifier les mots de passe
-            if (password !== confirmPassword) {
-                return res.status(400).json({
-                    error: 'Les mots de passe ne correspondent pas'
-                });
-            }
-
-            // Validation de la complexité du mot de passe
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-            if (!passwordRegex.test(password)) {
-                return res.status(400).json({
-                    error: 'Le mot de passe doit contenir au moins 6 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial'
-                });
-            }
-
-            // Récupérer l'invitation
-            const invitation = await prisma.parentInvitation.findUnique({
-                where: { token }
-            });
-
-            if (!invitation || invitation.used || (invitation.expiresAt && new Date() > invitation.expiresAt)) {
-                return res.status(400).json({
-                    error: 'Invitation invalide ou expirée'
-                });
-            }
-
-            // Vérifier si l'email n'est pas déjà utilisé
-            const existingUser = await prisma.user.findUnique({
-                where: { email: invitation.parentEmail }
-            });
-
-            if (existingUser) {
-                return res.status(400).json({
-                    error: 'Un compte avec cet email existe déjà'
-                });
-            }
-
-            const bcrypt = require('bcrypt');
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            // Transaction pour créer l'utilisateur et l'enfant
-            const result = await prisma.$transaction(async (tx) => {
-                // Créer l'utilisateur parent
-                const user = await tx.user.create({
-                    data: {
-                        firstName: invitation.parentFirstName,
-                        lastName: invitation.parentLastName,
-                        email: invitation.parentEmail,
-                        password: hashedPassword,
-                        phone: phone || '',
-                        adress: adress || '',
-                        role: 'PARENT'
-                    }
-                });
-
-                // Créer l'enfant si les informations sont disponibles
-                let student = null;
-                if (invitation.childFirstName && invitation.childLastName) {
-                    student = await tx.student.create({
-                        data: {
-                            firstName: invitation.childFirstName,
-                            lastName: invitation.childLastName,
-                            dateNaissance: invitation.childDateNaissance || new Date(),
-                            parentId: user.id,
-                            classeId: invitation.classeId || 1 // Classe par défaut si non spécifiée
-                        }
-                    });
-                }
-
-                // Marquer l'invitation comme utilisée
-                await tx.parentInvitation.update({
-                    where: { id: invitation.id },
-                    data: {
-                        used: true,
-                        usedAt: new Date()
-                    }
-                });
-
-                return { user, student };
-            });
-
-            res.json({
-                success: true,
-                message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.',
-                user: {
-                    id: result.user.id,
-                    email: result.user.email,
-                    firstName: result.user.firstName,
-                    lastName: result.user.lastName
-                }
-            });
-
-        } catch (error) {
-            console.error('Erreur traitement inscription invitation:', error);
-            res.status(500).json({
-                error: 'Erreur lors de la création du compte'
-            });
+            res.status(500).json({ error: 'Erreur lors de la création de l\'invitation' });
         }
     },
 
@@ -384,18 +479,16 @@ const parentInvitationController = {
 
             res.json({
                 success: true,
-                message: 'Invitation supprimée avec succès'
+                message: 'Invitation supprimée'
             });
 
         } catch (error) {
             console.error('Erreur suppression invitation:', error);
-            res.status(500).json({
-                error: 'Erreur lors de la suppression'
-            });
+            res.status(500).json({ error: 'Erreur lors de la suppression' });
         }
     },
 
-    // Renvoyer un email d'invitation
+    // Renvoyer une invitation
     async resendInvitation(req, res) {
         try {
             if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
@@ -416,26 +509,72 @@ const parentInvitationController = {
                 return res.status(400).json({ error: 'Cette invitation a déjà été utilisée' });
             }
 
-            // Envoyer l'email
-            const emailSent = await this.sendInvitationEmail(invitation);
+            // Générer un nouveau token et prolonger l'expiration
+            const newToken = require('crypto').randomBytes(32).toString('hex');
 
-            if (emailSent) {
-                await prisma.parentInvitation.update({
-                    where: { id: invitation.id },
-                    data: { emailSent: true }
-                });
-            }
+            const updatedInvitation = await prisma.parentInvitation.update({
+                where: { id: invitation.id },
+                data: {
+                    token: newToken,
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
+                    emailSent: false
+                }
+            });
+
+            // Renvoyer l'email
+            await this.sendInvitationEmail(updatedInvitation);
 
             res.json({
                 success: true,
-                message: emailSent ? 'Email renvoyé avec succès' : 'Erreur lors de l\'envoi de l\'email'
+                message: 'Invitation renvoyée avec succès'
             });
 
         } catch (error) {
             console.error('Erreur renvoi invitation:', error);
-            res.status(500).json({
-                error: 'Erreur lors du renvoi'
+            res.status(500).json({ error: 'Erreur lors du renvoi' });
+        }
+    },
+
+    // Envoyer l'email d'invitation
+    async sendInvitationEmail(invitation) {
+        try {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+                    pass: process.env.EMAIL_PASS || 'password'
+                }
             });
+
+            const registrationUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/auth/register/${invitation.token}`;
+
+            const mailOptions = {
+                from: 'ecole@saint-mathieu.fr',
+                to: invitation.parentEmail,
+                subject: 'Invitation à rejoindre l\'École Saint-Mathieu',
+                html: `
+                    <h2>Invitation à rejoindre l'École Saint-Mathieu</h2>
+                    <p>Bonjour ${invitation.parentFirstName} ${invitation.parentLastName},</p>
+                    <p>Vous êtes invité(e) à créer votre compte parent sur notre plateforme.</p>
+                    ${invitation.childFirstName ? `<p>Pour votre enfant : ${invitation.childFirstName} ${invitation.childLastName}</p>` : ''}
+                    <p><a href="${registrationUrl}">Cliquez ici pour créer votre compte</a></p>
+                    <p>Ce lien expire dans 7 jours.</p>
+                    <p>Cordialement,<br>L'École Saint-Mathieu</p>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+
+            // Marquer l'email comme envoyé
+            await prisma.parentInvitation.update({
+                where: { id: invitation.id },
+                data: { emailSent: true }
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Erreur envoi email invitation:', error);
+            return false;
         }
     }
 };

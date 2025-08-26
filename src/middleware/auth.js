@@ -42,7 +42,8 @@ const requireAdmin = (req, res, next) => {
         console.log('❌ Accès refusé - rôle insuffisant');
         return res.status(403).render('pages/error', {
             message: 'Vous n\'avez pas les permissions nécessaires pour accéder à cette page',
-            title: 'Accès refusé'
+            title: 'Accès refusé',
+            user: req.session.user
         });
     }
 
@@ -54,7 +55,20 @@ const requireEnseignant = requireRole(['ENSEIGNANT', 'ADMIN', 'DIRECTION']);
 
 const requireParent = requireRole(['PARENT', 'ADMIN', 'DIRECTION']);
 
-const requireDirection = requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']);
+const requireDirection = (req, res, next) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+        return res.status(403).render('pages/error', {
+            message: 'Accès refusé. Réservé aux directeurs.',
+            user: req.session.user
+        });
+    }
+
+    next();
+};
 
 const requireAPEL = requireRole(['APEL', 'ADMIN', 'DIRECTION']);
 

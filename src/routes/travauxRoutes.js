@@ -1,19 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const travauxController = require('../controllers/travauxController');
-const { requireAuth, requireDirection } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 
-// Route publique pour voir les travaux
-router.get('/', travauxController.getTravaux);
+// Routes publiques
+router.get('/', travauxController.showTravaux);
+router.get('/list', travauxController.showTravaux);
 
-// Routes de gestion (nécessite les permissions de direction)
-router.get('/manage', requireDirection, travauxController.getTravauxManagement);
-router.post('/', requireDirection, travauxController.createTravaux);
-router.put('/:id', requireDirection, travauxController.updateTravaux);
-router.post('/:id', requireDirection, travauxController.updateTravaux); // Route POST pour modification
-router.delete('/:id', requireDirection, travauxController.deleteTravaux);
-router.post('/:id/delete', requireDirection, travauxController.deleteTravaux); // Route POST pour suppression
-router.patch('/:id/toggle-visibility', requireDirection, travauxController.toggleVisibility);
-router.post('/:id/toggle-visibility', requireDirection, travauxController.toggleVisibility);
+// Routes admin - gestion des travaux
+router.get('/manage', requireAdmin, travauxController.showManagement);
+router.get('/management', requireAdmin, travauxController.showManagement);
 
+// CRUD travaux
+router.post('/create', requireAdmin, travauxController.createTravaux);
+router.post('/:id/update', requireAdmin, travauxController.updateTravaux);
+router.post('/:id/delete', requireAdmin, travauxController.deleteTravaux);
+router.post('/:id/toggle-visibility', requireAdmin, travauxController.toggleVisibility);
+
+// Routes RESTful pour compatibilité API
+router.put('/:id', requireAdmin, travauxController.updateTravaux);
+router.delete('/:id', requireAdmin, travauxController.deleteTravaux);
+router.patch('/:id/toggle', requireAdmin, travauxController.toggleVisibility);
+
+module.exports = router;
 module.exports = router;

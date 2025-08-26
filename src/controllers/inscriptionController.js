@@ -160,7 +160,57 @@ const inscriptionController = {
         }
     },
 
-    // Traiter la demande d'inscription
+    // Afficher les détails d'une demande
+    showRequestDetails: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const request = await prisma.inscriptionRequest.findUnique({
+                where: { id: parseInt(id) },
+                include: {
+                    reviewer: {
+                        select: { firstName: true, lastName: true }
+                    }
+                }
+            });
+
+            if (!request) {
+                return res.status(404).render('pages/error', {
+                    message: 'Demande non trouvée',
+                    user: req.session.user
+                });
+            }
+
+            // Parser les enfants
+            let children = [];
+            try {
+                if (typeof request.children === 'string') {
+                    children = JSON.parse(request.children);
+                } else {
+                    children = request.children || [];
+                }
+            } catch (e) {
+                children = [];
+            }
+
+            res.render('pages/admin/inscription-request-details', {
+                title: 'Détails de la demande',
+                request: {
+                    ...request,
+                    children: children
+                },
+                user: req.session.user
+            });
+        } catch (error) {
+            console.error('Erreur lors de la récupération des détails:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors de la récupération des détails',
+                user: req.session.user
+            });
+        }
+    },
+
+    // Traiter la demande d'inscription (mise à jour)
     processRegistration: async (req, res) => {
         try {
             const {
@@ -237,7 +287,7 @@ const inscriptionController = {
                 }
             });
 
-            // Envoyer l'email de confirmation automatiquement
+            // Envoyer l'email de confirmation au parent
             try {
                 await emailService.sendConfirmationEmail({
                     parentFirstName,
@@ -248,7 +298,20 @@ const inscriptionController = {
                 console.log('✅ Email de confirmation envoyé à:', parentEmail);
             } catch (emailError) {
                 console.error('❌ Erreur lors de l\'envoi de l\'email de confirmation:', emailError);
-                // On ne fait pas échouer l'inscription si l'email ne part pas
+            }
+
+            // Envoyer la notification au directeur
+            try {
+                await emailService.sendNewRequestNotification({
+                    parentFirstName,
+                    parentLastName,
+                    parentEmail,
+                    parentPhone,
+                    children: childrenData
+                });
+                console.log('✅ Notification envoyée au directeur');
+            } catch (notificationError) {
+                console.error('❌ Erreur lors de l\'envoi de la notification au directeur:', notificationError);
             }
 
             res.redirect('/auth/register?success=Votre demande d\'inscription a été envoyée avec succès. Vous recevrez une réponse par email dans les plus brefs délais.');
@@ -271,14 +334,38 @@ const inscriptionController = {
                 orderBy: { createdAt: 'desc' }
             });
 
+            // Parser le JSON des enfants pour chaque demande
+            const requestsWithParsedChildren = requests.map(request => {
+                let children = [];
+                try {
+                    if (typeof request.children === 'string') {
+                        children = JSON.parse(request.children);
+                    } else {
+                        children = request.children || [];
+                    }
+                } catch (e) {
+                    console.error('Erreur parsing children:', e);
+                    children = [];
+                }
+
+                return {
+                    ...request,
+                    children: children
+                };
+            });
+
+            console.log(`📋 ${requestsWithParsedChildren.length} demandes d'inscription trouvées`);
+
             res.render('pages/admin/inscription-requests', {
                 title: 'Demandes d\'inscription',
-                requests
+                requests: requestsWithParsedChildren,
+                user: req.session.user
             });
         } catch (error) {
             console.error('Erreur lors de la récupération des demandes:', error);
             res.status(500).render('pages/error', {
-                message: 'Erreur lors de la récupération des demandes'
+                message: 'Erreur lors de la récupération des demandes',
+                user: req.session.user
             });
         }
     },
@@ -287,6 +374,18 @@ const inscriptionController = {
     approveRequest: async (req, res) => {
         try {
             const { id } = req.params;
+            console.log('📝 Données reçues - req.body:', req.body);
+            console.log('📝 Params reçus - req.params:', req.params);
+
+            // Vérification defensive pour req.body
+            if (!req.body) {
+                console.error('❌ req.body est undefined');
+                return res.status(400).json({
+                    success: false,
+                    message: 'Données de requête manquantes'
+                });
+            }
+
             const { comment } = req.body;
 
             // Récupérer la demande d'inscription
@@ -375,6 +474,18 @@ const inscriptionController = {
     rejectRequest: async (req, res) => {
         try {
             const { id } = req.params;
+            console.log('📝 Données reçues pour rejet - req.body:', req.body);
+            console.log('📝 Params reçus pour rejet - req.params:', req.params);
+
+            // Vérification defensive pour req.body
+            if (!req.body) {
+                console.error('❌ req.body est undefined pour rejet');
+                return res.status(400).json({
+                    success: false,
+                    message: 'Données de requête manquantes'
+                });
+            }
+
             const { comment } = req.body;
 
             const request = await prisma.inscriptionRequest.update({
@@ -405,10 +516,10 @@ const inscriptionController = {
                 message: 'Demande rejetée'
             });
         } catch (error) {
-            console.error('Erreur lors du rejet:', error);
+            console.error('❌ Erreur lors du rejet:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors du rejet'
+                message: 'Erreur lors du rejet: ' + error.message
             });
         }
     }

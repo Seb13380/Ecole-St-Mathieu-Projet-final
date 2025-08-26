@@ -1,37 +1,45 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const menuController = require('../controllers/menuController');
 const inscriptionController = require('../controllers/inscriptionController');
 const { requireAdmin } = require('../middleware/auth');
 
-router.use(requireAdmin);
+// Dashboard admin
+router.get('/dashboard', requireAdmin, adminController.getDashboard);
 
-router.get('/dashboard', adminController.getDashboard);
+// Gestion des utilisateurs
+router.get('/users', requireAdmin, adminController.getUsersManagement);
+router.post('/users', requireAdmin, adminController.createUser);
+router.post('/users/:id/update', requireAdmin, adminController.updateUser);
+router.post('/users/:id/delete', requireAdmin, adminController.deleteUser);
 
-router.get('/users', adminController.getUsersManagement);
-router.post('/users', adminController.createUser);
-router.put('/users/:id', adminController.updateUser);
-router.delete('/users/:id', adminController.deleteUser);
+// Gestion des classes
+router.get('/classes', requireAdmin, adminController.getClassesManagement);
+router.post('/classes', requireAdmin, adminController.createClasse);
+router.post('/classes/:id/update', requireAdmin, adminController.updateClasse);
+router.post('/classes/:id/delete', requireAdmin, adminController.deleteClasse);
 
-router.get('/classes', adminController.getClassesManagement);
-router.post('/classes', adminController.createClasse);
+// Gestion des élèves
+router.get('/students', requireAdmin, adminController.getStudentsManagement);
+router.post('/students', requireAdmin, adminController.createStudent);
+router.post('/students/:id/update', requireAdmin, adminController.updateStudent);
+router.post('/students/:id/delete', requireAdmin, adminController.deleteStudent);
 
-router.get('/students', adminController.getStudentsManagement);
-router.post('/students', adminController.createStudent);
+// Routes pour les demandes d'inscription
+router.get('/inscriptions', requireAdmin, inscriptionController.showAllRequests);
+router.post('/inscriptions/:id/approve', requireAdmin, inscriptionController.approveRequest);
+router.post('/inscriptions/:id/reject', requireAdmin, inscriptionController.rejectRequest);
+router.get('/inscriptions/:id/details', requireAdmin, inscriptionController.showRequestDetails);
 
-// Routes pour la gestion des menus
-router.get('/menus', menuController.getAdminMenus);
-router.get('/menus/create', menuController.getCreateMenu);
-router.post('/menus/create', menuController.postCreateMenu);
-router.get('/menus/:id/edit', menuController.getEditMenu);
-router.post('/menus/:id/edit', menuController.postEditMenu);
-router.delete('/menus/:id', menuController.deleteMenu);
-router.post('/menus/deactivate-all', menuController.deactivateAllMenus);
+// Messages de contact
+router.get('/contact-messages', requireAdmin, adminController.getContactMessages);
+router.post('/contact/:id/process', requireAdmin, adminController.markContactAsProcessed);
 
-// Routes pour la gestion des demandes d'inscription
-router.get('/inscriptions', inscriptionController.showAllRequests);
-router.post('/inscriptions/:id/approve', inscriptionController.approveRequest);
-router.post('/inscriptions/:id/reject', inscriptionController.rejectRequest);
+// Rapports et statistiques
+router.get('/reports', requireAdmin, adminController.getReports);
+
+// Paramètres système
+router.get('/settings', requireAdmin, adminController.getSettings);
+router.post('/settings', requireAdmin, adminController.updateSettings);
 
 module.exports = router;

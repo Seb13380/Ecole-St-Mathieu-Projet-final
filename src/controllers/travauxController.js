@@ -3,6 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const travauxController = {
+    // Liste publique des travaux (visible:true)
     async getTravaux(req, res) {
         try {
             const travaux = await prisma.travaux.findMany({
@@ -30,6 +31,7 @@ const travauxController = {
         }
     },
 
+    // Ancien nom éventuellement utilisé ailleurs (non référencé dans routes actuelles)
     async getTravauxManagement(req, res) {
         try {
             const travaux = await prisma.travaux.findMany({
@@ -57,127 +59,171 @@ const travauxController = {
         }
     },
 
-    async createTravaux(req, res) {
+    // Page de gestion (admin)
+    showManagement: async (req, res) => {
         try {
-            const { titre, description, dateDebut, dateFin, progression, statut, important, visible } = req.body;
-            const auteurId = req.session.user.id;
+            console.log('🏗️ Accès à la gestion des travaux par:', req.session.user?.email);
 
-            // Validation de la progression (0-100)
-            const progressionInt = Math.min(100, Math.max(0, parseInt(progression) || 0));
-
-            // Gestion des dates
-            let dateDebutFinal = dateDebut && dateDebut.trim() ? new Date(dateDebut) : null;
-            let dateFinFinal = dateFin && dateFin.trim() ? new Date(dateFin) : null;
-
-            const travaux = await prisma.travaux.create({
-                data: {
-                    titre,
-                    description,
-                    auteurId,
-                    dateDebut: dateDebutFinal,
-                    dateFin: dateFinFinal,
-                    progression: progressionInt,
-                    statut: statut || 'PLANIFIE',
-                    important: important === 'true',
-                    visible: visible === 'true'
-                }
+            const travaux = await prisma.travaux.findMany({
+                include: {
+                    auteur: {
+                        select: { firstName: true, lastName: true }
+                    }
+                },
+                orderBy: [
+                    { important: 'desc' },
+                    { dateDebut: 'desc' }
+                ]
             });
 
-            console.log('✅ Travaux créés:', travaux.titre);
-            res.redirect('/travaux/manage?success=' + encodeURIComponent('Travaux créés avec succès'));
+            // Formater les dates pour l'affichage HTML
+            const travauxFormatted = travaux.map(t => ({
+                ...t,
+                dateDebutFormatted: t.dateDebut ? t.dateDebut.toISOString().split('T')[0] : '',
+                dateFinFormatted: t.dateFin ? t.dateFin.toISOString().split('T')[0] : '',
+                progressionPercent: Math.min(100, Math.max(0, t.progression || 0))
+            }));
+
+            res.render('pages/admin/travaux-management', {
+                title: 'Gestion des Travaux',
+                travaux: travauxFormatted,
+                user: req.session.user,
+                success: req.query.success,
+                error: req.query.error
+            });
         } catch (error) {
-            console.error('Erreur lors de la création des travaux:', error);
-            res.redirect('/travaux/manage?error=' + encodeURIComponent('Erreur lors de la création des travaux'));
+            console.error('❌ Erreur lors de la récupération des travaux pour la gestion:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors du chargement de la gestion des travaux',
+                user: req.session.user
+            });
         }
     },
 
-    async updateTravaux(req, res) {
+    // Création d'un travail (admin)
+    createTravaux: async (req, res) => {
         try {
-            console.log('🔧 updateTravaux appelé:', {
-                method: req.method,
-                url: req.url,
-                params: req.params,
-                body: req.body
-            });
+            const {
+                titre,
+                description,
+                dateDebut,
+                dateFin,
+                progression,
+                statut,
+                important,
+                visible
+            } = req.body;
 
-            const { id } = req.params;
-            const { titre, description, dateDebut, dateFin, progression, statut, important, visible } = req.body;
-
-            // Validation de la progression (0-100)
-            const progressionInt = Math.min(100, Math.max(0, parseInt(progression) || 0));
-
-            // Gestion des dates
-            let dateDebutFinal = dateDebut && dateDebut.trim() ? new Date(dateDebut) : null;
-            let dateFinFinal = dateFin && dateFin.trim() ? new Date(dateFin) : null;
-
-            const travaux = await prisma.travaux.update({
-                where: { id: parseInt(id) },
-                data: {
-                    titre,
-                    description,
-                    dateDebut: dateDebutFinal,
-                    dateFin: dateFinFinal,
-                    progression: progressionInt,
-                    statut: statut || 'PLANIFIE',
-                    important: important === 'true',
-                    visible: visible === 'true'
-                }
-            });
-
-            console.log('✅ Travaux mis à jour:', travaux.titre);
-            res.redirect(`/travaux/manage?success=${encodeURIComponent('Travaux mis à jour avec succès')}#travail-${id}`);
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour des travaux:', error);
-            res.redirect(`/travaux/manage?error=${encodeURIComponent('Erreur lors de la mise à jour des travaux')}#travail-${id || ''}`);
-        }
-    },
-
-    async deleteTravaux(req, res) {
-        try {
-            console.log('🗑️ deleteTravaux appelé:', {
-                method: req.method,
-                params: req.params,
-                body: req.body
-            });
-
-            const { id } = req.params;
-
-            await prisma.travaux.delete({
-                where: { id: parseInt(id) }
-            });
-
-            console.log('✅ Travaux supprimés:', id);
-            res.redirect('/travaux/manage?success=' + encodeURIComponent('Travaux supprimés avec succès'));
-        } catch (error) {
-            console.error('Erreur lors de la suppression des travaux:', error);
-            res.redirect('/travaux/manage?error=' + encodeURIComponent('Erreur lors de la suppression des travaux'));
-        }
-    },
-
-    async toggleVisibility(req, res) {
-        try {
-            const { id } = req.params;
-
-            const travaux = await prisma.travaux.findUnique({
-                where: { id: parseInt(id) }
-            });
-
-            if (!travaux) {
-                return res.redirect('/travaux/manage?error=' + encodeURIComponent('Travaux non trouvés'));
+            if (!req.session?.user?.id) {
+                return res.redirect('/travaux/manage?error=' + encodeURIComponent('Utilisateur non authentifié'));
             }
 
-            const updatedTravaux = await prisma.travaux.update({
-                where: { id: parseInt(id) },
-                data: { visible: !travaux.visible }
+            const nouveauTravail = await prisma.travaux.create({
+                data: {
+                    titre,
+                    description,
+                    dateDebut: dateDebut ? new Date(dateDebut) : new Date(),
+                    dateFin: dateFin ? new Date(dateFin) : null,
+                    progression: parseInt(progression) || 0,
+                    statut: statut || 'EN_COURS',
+                    important: important === 'on' || important === 'true',
+                    visible: visible === 'on' || visible === 'true',
+                    auteurId: req.session.user.id
+                }
             });
 
-            const message = updatedTravaux.visible ? 'Travaux rendus visibles' : 'Travaux masqués';
-            console.log('✅ Visibilité modifiée:', message);
-            res.redirect(`/travaux/manage?success=${encodeURIComponent(message)}#travail-${id}`);
+            console.log('✅ Nouveau travail créé:', nouveauTravail.titre);
+            res.redirect('/travaux/manage?success=' + encodeURIComponent('Travail créé avec succès'));
         } catch (error) {
-            console.error('Erreur lors du changement de visibilité:', error);
-            res.redirect(`/travaux/manage?error=${encodeURIComponent('Erreur lors du changement de visibilité')}#travail-${id || ''}`);
+            console.error('❌ Erreur lors de la création du travail:', error);
+            res.redirect('/travaux/manage?error=' + encodeURIComponent('Erreur lors de la création du travail'));
         }
+    },
+
+    // Mise à jour d'un travail (admin)
+    updateTravaux: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const {
+                titre,
+                description,
+                dateDebut,
+                dateFin,
+                progression,
+                statut,
+                important,
+                visible
+            } = req.body;
+
+            const travauxMisAJour = await prisma.travaux.update({
+                where: { id: parseInt(id) },
+                data: {
+                    titre,
+                    description,
+                    dateDebut: dateDebut ? new Date(dateDebut) : undefined,
+                    dateFin: dateFin ? new Date(dateFin) : null,
+                    progression: parseInt(progression) || 0,
+                    statut: statut || 'EN_COURS',
+                    important: important === 'on' || important === 'true',
+                    visible: visible === 'on' || visible === 'true'
+                }
+            });
+
+            console.log('✅ Travail mis à jour:', travauxMisAJour.titre);
+            res.redirect('/travaux/manage?success=' + encodeURIComponent('Travail mis à jour avec succès'));
+        } catch (error) {
+            console.error('❌ Erreur lors de la mise à jour du travail:', error);
+            res.redirect('/travaux/manage?error=' + encodeURIComponent('Erreur lors de la mise à jour du travail'));
+        }
+    },
+
+    // Suppression d'un travail (admin)
+    deleteTravaux: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const travauxSupprime = await prisma.travaux.delete({
+                where: { id: parseInt(id) }
+            });
+
+            console.log('🗑️ Travail supprimé:', travauxSupprime.titre);
+            res.redirect('/travaux/manage?success=' + encodeURIComponent('Travail supprimé avec succès'));
+        } catch (error) {
+            console.error('❌ Erreur lors de la suppression du travail:', error);
+            res.redirect('/travaux/manage?error=' + encodeURIComponent('Erreur lors de la suppression du travail'));
+        }
+    },
+
+    // Bascule visibilité (admin)
+    toggleVisibility: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const travail = await prisma.travaux.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!travail) {
+                return res.redirect('/travaux/manage?error=' + encodeURIComponent('Travail non trouvé'));
+            }
+
+            const travauxMisAJour = await prisma.travaux.update({
+                where: { id: parseInt(id) },
+                data: { visible: !travail.visible }
+            });
+
+            const message = travauxMisAJour.visible ? 'Travail rendu visible' : 'Travail masqué';
+            console.log('🔄 Visibilité modifiée:', travauxMisAJour.titre, '->', travauxMisAJour.visible);
+            res.redirect('/travaux/manage?success=' + encodeURIComponent(message));
+        } catch (error) {
+            console.error('❌ Erreur lors du changement de visibilité:', error);
+            res.redirect('/travaux/manage?error=' + encodeURIComponent('Erreur lors du changement de visibilité'));
+        }
+    },
+
+    // Alias compatible avec les routes existantes (routes appellent showTravaux)
+    showTravaux(req, res) {
+        return this.getTravaux(req, res);
     }
 };
 
