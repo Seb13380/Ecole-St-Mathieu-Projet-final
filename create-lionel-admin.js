@@ -9,7 +9,7 @@ async function createNewAdmin() {
 
         // Vérifier si l'email existe déjà
         const existingUser = await prisma.user.findUnique({
-            where: { email: 'l.camboulives@orange.fr' }
+            where: { email: 'l.camboulives@stmathieu.org' }
         });
 
         if (existingUser) {
@@ -17,10 +17,10 @@ async function createNewAdmin() {
             console.log('🔄 Mise à jour vers le rôle ADMIN...');
 
             // Mettre à jour le mot de passe et le rôle
-            const hashedPassword = await bcrypt.hash('StMathieu2025!', 10);
+            const hashedPassword = await bcrypt.hash('Directeur2025!', 10);
 
             const updatedUser = await prisma.user.update({
-                where: { email: 'l.camboulives@orange.fr' },
+                where: { email: 'l.camboulives@stmathieu.org' },
                 data: {
                     password: hashedPassword,
                     role: 'ADMIN'
@@ -30,13 +30,13 @@ async function createNewAdmin() {
             console.log('✅ Utilisateur mis à jour vers ADMIN !');
         } else {
             // Créer un nouveau compte admin
-            const hashedPassword = await bcrypt.hash('StMathieu2025!', 10);
+            const hashedPassword = await bcrypt.hash('Directeur2025!', 10);
 
             const newAdmin = await prisma.user.create({
                 data: {
                     firstName: 'Lionel',
                     lastName: 'Camboulives',
-                    email: 'l.camboulives@orange.fr',
+                    email: 'l.camboulives@stmathieu.org',
                     password: hashedPassword,
                     phone: '06.12.34.56.78',
                     adress: 'École Saint-Mathieu',
@@ -48,14 +48,14 @@ async function createNewAdmin() {
         }
 
         console.log('\n📋 Identifiants de connexion :');
-        console.log('📧 Email: l.camboulives@orange.fr');
-        console.log('🔑 Mot de passe: StMathieu2025!');
+        console.log('📧 Email: l.camboulives@stmathieu.org');
+        console.log('🔑 Mot de passe: Directeur2025!');
         console.log('🔒 Rôle: ADMIN');
         console.log('\n✅ Vous pouvez maintenant vous connecter !');
 
         // Vérifier que l'admin peut bien se connecter
         const testAdmin = await prisma.user.findUnique({
-            where: { email: 'l.camboulives@orange.fr' }
+            where: { email: 'l.camboulives@stmathieu.org' }
         });
 
         if (testAdmin && testAdmin.role === 'ADMIN') {
