@@ -10,7 +10,7 @@ async function createFrank() {
 
         // Vérifier si Frank existe déjà
         const existingFrank = await prisma.user.findUnique({
-            where: { email: 'frank@st-mathieu.fr' }
+            where: { email: 'frank@stmathieu.org' }
         });
 
         if (existingFrank) {
@@ -18,11 +18,11 @@ async function createFrank() {
 
             // Mettre à jour ses droits si nécessaire
             const updatedFrank = await prisma.user.update({
-                where: { email: 'frank@st-mathieu.fr' },
+                where: { email: 'frank@stmathieu.org' },
                 data: {
-                    role: 'MAINTENANCE_SITE', // Nouveau rôle pour Frank
+                    role: 'GESTIONNAIRE_SITE', // Nouveau rôle pour Frank
                     firstName: 'Frank',
-                    lastName: 'Gestionnaire'
+                    lastName: 'Gestionnaire Site'
                 }
             });
 
@@ -36,18 +36,18 @@ async function createFrank() {
         const frank = await prisma.user.create({
             data: {
                 firstName: 'Frank',
-                lastName: 'Gestionnaire',
-                email: 'frank@st-mathieu.fr',
+                lastName: 'Gestionnaire Site',
+                email: 'frank@stmathieu.org',
                 password: hashedPassword,
                 phone: '06.12.34.56.79',
                 adress: 'École Saint-Mathieu',
-                role: 'MAINTENANCE_SITE' // Nouveau rôle pour la maintenance du site
+                role: 'GESTIONNAIRE_SITE' // Nouveau rôle pour la gestion du site
             }
         });
 
         console.log('✅ Frank créé avec succès:', frank.email);
         console.log('🔑 Mot de passe temporaire: Frank2025!');
-        console.log('🎯 Rôle: MAINTENANCE_SITE');
+        console.log('🎯 Rôle: GESTIONNAIRE_SITE');
 
         return frank;
 

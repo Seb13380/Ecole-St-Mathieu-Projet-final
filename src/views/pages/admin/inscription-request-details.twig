@@ -10,7 +10,7 @@
 			<!-- En-tête -->
 			<div class="flex justify-between items-center mb-8">
 				<h1 class="text-3xl font-bold text-[#304a4d]">Détails de la demande d'inscription</h1>
-				<a href="/admin/inscriptions" class="btn btn-ghost">
+				<a href="/directeur/inscriptions" class="btn btn-ghost">
 					← Retour aux demandes
 				</a>
 			</div>
@@ -185,7 +185,7 @@ async function processApproval() {
 const comment = document.getElementById('approve_comment').value;
 
 try {
-const response = await fetch (`/admin/inscriptions/${currentRequestId}/approve`, {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/approve`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -197,7 +197,7 @@ const result = await response.json();
 
 if (result.success) {
 alert('✅ Demande approuvée avec succès !');
-window.location.href = '/admin/inscriptions';
+window.location.href = '/directeur/inscriptions';
 } else {
 alert('❌ Erreur : ' + result.message);
 }
@@ -216,7 +216,7 @@ return;
 }
 
 try {
-const response = await fetch (`/admin/inscriptions/${currentRequestId}/reject`, {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/reject`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -228,7 +228,7 @@ const result = await response.json();
 
 if (result.success) {
 alert('✅ Demande refusée');
-window.location.href = '/admin/inscriptions';
+window.location.href = '/directeur/inscriptions';
 } else {
 alert('❌ Erreur : ' + result.message);
 }

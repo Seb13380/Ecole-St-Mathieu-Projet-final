@@ -1,45 +1,116 @@
 const express = require('express');
 const router = express.Router();
-const adminController = require('../controllers/adminController');
-const inscriptionController = require('../controllers/inscriptionController');
 const { requireAdmin } = require('../middleware/auth');
 
-// Dashboard admin
-router.get('/dashboard', requireAdmin, adminController.getDashboard);
+// === REDIRECTIONS VERS LES ROUTES DIRECTEUR ===
+// Toutes les fonctionnalités admin sont maintenant dans directeur
 
-// Gestion des utilisateurs
-router.get('/users', requireAdmin, adminController.getUsersManagement);
-router.post('/users', requireAdmin, adminController.createUser);
-router.post('/users/:id/update', requireAdmin, adminController.updateUser);
-router.post('/users/:id/delete', requireAdmin, adminController.deleteUser);
+// Dashboard admin -> directeur
+router.get('/dashboard', requireAdmin, (req, res) => {
+    res.redirect('/directeur/dashboard');
+});
 
-// Gestion des classes
-router.get('/classes', requireAdmin, adminController.getClassesManagement);
-router.post('/classes', requireAdmin, adminController.createClasse);
-router.post('/classes/:id/update', requireAdmin, adminController.updateClasse);
-router.post('/classes/:id/delete', requireAdmin, adminController.deleteClasse);
+// Gestion des utilisateurs -> directeur
+router.get('/users', requireAdmin, (req, res) => {
+    res.redirect('/directeur/users');
+});
 
-// Gestion des élèves
-router.get('/students', requireAdmin, adminController.getStudentsManagement);
-router.post('/students', requireAdmin, adminController.createStudent);
-router.post('/students/:id/update', requireAdmin, adminController.updateStudent);
-router.post('/students/:id/delete', requireAdmin, adminController.deleteStudent);
+router.post('/users', requireAdmin, (req, res) => {
+    req.url = '/directeur/users';
+    req.baseUrl = '/directeur';
+    res.redirect(307, '/directeur/users');
+});
 
-// Routes pour les demandes d'inscription
-router.get('/inscriptions', requireAdmin, inscriptionController.showAllRequests);
-router.post('/inscriptions/:id/approve', requireAdmin, inscriptionController.approveRequest);
-router.post('/inscriptions/:id/reject', requireAdmin, inscriptionController.rejectRequest);
-router.get('/inscriptions/:id/details', requireAdmin, inscriptionController.showRequestDetails);
+router.post('/users/:id/update', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/users/${id}/update`);
+});
 
-// Messages de contact
-router.get('/contact-messages', requireAdmin, adminController.getContactMessages);
-router.post('/contact/:id/process', requireAdmin, adminController.markContactAsProcessed);
+router.post('/users/:id/delete', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/users/${id}/delete`);
+});
 
-// Rapports et statistiques
-router.get('/reports', requireAdmin, adminController.getReports);
+// Gestion des classes -> directeur
+router.get('/classes', requireAdmin, (req, res) => {
+    res.redirect('/directeur/classes');
+});
 
-// Paramètres système
-router.get('/settings', requireAdmin, adminController.getSettings);
-router.post('/settings', requireAdmin, adminController.updateSettings);
+router.post('/classes', requireAdmin, (req, res) => {
+    res.redirect(307, '/directeur/classes');
+});
+
+router.post('/classes/:id/update', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/classes/${id}/update`);
+});
+
+router.post('/classes/:id/delete', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/classes/${id}/delete`);
+});
+
+// Gestion des élèves -> directeur
+router.get('/students', requireAdmin, (req, res) => {
+    res.redirect('/directeur/students');
+});
+
+router.post('/students', requireAdmin, (req, res) => {
+    res.redirect(307, '/directeur/students');
+});
+
+router.post('/students/:id/update', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/students/${id}/update`);
+});
+
+router.post('/students/:id/delete', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/students/${id}/delete`);
+});
+
+// Routes pour les demandes d'inscription -> directeur
+router.get('/inscriptions', requireAdmin, (req, res) => {
+    res.redirect('/directeur/inscriptions');
+});
+
+router.post('/inscriptions/:id/approve', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/inscriptions/${id}/approve`);
+});
+
+router.post('/inscriptions/:id/reject', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/inscriptions/${id}/reject`);
+});
+
+router.get('/inscriptions/:id/details', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(`/directeur/inscriptions/${id}/details`);
+});
+
+// Messages de contact -> directeur
+router.get('/contact-messages', requireAdmin, (req, res) => {
+    res.redirect('/directeur/contact-messages');
+});
+
+router.post('/contact/:id/process', requireAdmin, (req, res) => {
+    const { id } = req.params;
+    res.redirect(307, `/directeur/contact/${id}/process`);
+});
+
+// Rapports et statistiques -> directeur
+router.get('/reports', requireAdmin, (req, res) => {
+    res.redirect('/directeur/reports');
+});
+
+// Paramètres système -> directeur
+router.get('/settings', requireAdmin, (req, res) => {
+    res.redirect('/directeur/settings');
+});
+
+router.post('/settings', requireAdmin, (req, res) => {
+    res.redirect(307, '/directeur/settings');
+});
 
 module.exports = router;

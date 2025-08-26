@@ -5,14 +5,14 @@ const inscriptionController = require('../controllers/inscriptionController');
 
 // Route pour afficher les demandes d'inscription (direction et admin)
 router.get('/manage', requireDirection, (req, res) => {
-    // Rediriger vers la page admin des inscriptions
-    res.redirect('/admin/inscriptions');
+    // Rediriger vers la page directeur des inscriptions
+    res.redirect('/directeur/inscriptions');
 });
 
 // Redirections pour éviter les erreurs 404
 router.get('/:id/details', requireDirection, (req, res) => {
     const { id } = req.params;
-    res.redirect(`/admin/inscriptions/${id}/details`);
+    res.redirect(`/directeur/inscriptions/${id}/details`);
 });
 
 // Routes d'approbation et de rejet qui utilisent directement le contrôleur
