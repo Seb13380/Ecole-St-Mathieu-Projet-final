@@ -157,9 +157,9 @@ const loginController = {
                 console.log('➡️ Redirection vers tableau de bord admin');
                 res.redirect('/admin/dashboard');
                 break;
-            case 'MAINTENANCE_SITE':
-                console.log('➡️ Redirection vers tableau de bord Frank');
-                res.redirect('/frank/dashboard');
+            case 'GESTIONNAIRE_SITE':
+                console.log('➡️ Redirection vers tableau de bord gestionnaire site');
+                res.redirect('/directeur/dashboard');
                 break;
             case 'ENSEIGNANT':
                 console.log('➡️ Redirection vers tableau de bord enseignant');

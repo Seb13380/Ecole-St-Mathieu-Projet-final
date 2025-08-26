@@ -5,117 +5,341 @@
 
 {% block main %}
 	<style>
-		.ogec-fullwidth {
+		/* Reset margins et padding pour pleine largeur */
+		.ogec-container {
+			margin: 0 -50vw;
+			padding: 0;
+			width: 100vw;
 			position: relative;
 			left: 50%;
 			right: 50%;
-			margin: -1rem -50vw -2rem;
-			width: 100vw;
+		}
+
+		/* Section en pleine largeur avec 2 moitiés */
+		.section-split {
+			display: flex;
+			min-height: 60vh;
+		}
+
+		.section-half {
+			width: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 60px 40px;
+		}
+
+		.section-content {
+			max-width: 500px;
+			width: 100%;
+		}
+
+		.ogec-header {
+			background: #6fc7b7;
+			color: white;
+			padding: 40px 0;
+			text-align: center;
+		}
+
+		/* Section Présentation - Rose avec image enfant */
+		.presentation-text {
+			background: #f7b5a8;
+			color: #333;
+		}
+
+		.presentation-image {
+			background: #f7b5a8;
+			background-image: url('/assets/images/enfant-presentation.jpg');
+			background-size: cover;
+			background-position: center;
+			position: relative;
+		}
+
+		/* Si pas d'image spécifique, utiliser une couleur de fond avec motif */
+		.presentation-image::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: url('data:image/svg+xml, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ff9999" opacity="0.3"/><circle cx="80" cy="30" r="1.5" fill="%23ff9999" opacity="0.3"/><circle cx="40" cy="70" r="2.5" fill="%23ff9999" opacity="0.3"/><circle cx="70" cy="80" r="1" fill="%23ff9999" opacity="0.3"/></svg>');
+			background-size: 50px 50px;
+		}
+
+		/* Section Membres - Vert avec image équipe */
+		.membres-text {
+			background: #6fc7b7;
+			color: white;
+		}
+
+		.membres-image {
+			background: #6fc7b7;
+			background-image: url('/assets/images/equipe-membres.jpg');
+			background-size: cover;
+			background-position: center;
+		}
+
+		/* Section Missions - Rose */
+		.missions-text {
+			background: #f7b5a8;
+			color: #333;
+		}
+
+		.missions-image {
+			background: #f7b5a8;
+			background-image: url('/assets/images/missions-ecole.jpg');
+			background-size: cover;
+			background-position: center;
+		}
+
+		/* Section Réalisations - Vert */
+		.realisations-text {
+			background: #6fc7b7;
+			color: white;
+		}
+
+		.realisations-image {
+			background: #6fc7b7;
+			background-image: url('/assets/images/travaux-ecole.jpg');
+			background-size: cover;
+			background-position: center;
+		}
+
+		/* Section Contact - Bleu foncé */
+		.contact-section {
+			background: #4a90a4;
+			color: white;
+			padding: 60px 40px;
+			text-align: center;
+		}
+
+		.section-title {
+			font-size: 2.5rem;
+			font-weight: bold;
+			margin-bottom: 1.5rem;
+			letter-spacing: 2px;
+			text-transform: uppercase;
+		}
+
+		.section-subtitle {
+			font-size: 1.3rem;
+			font-style: italic;
+			margin-bottom: 2rem;
+			font-weight: 300;
+		}
+
+		.section-text {
+			font-size: 1.1rem;
+			line-height: 1.7;
+			margin-bottom: 1.5rem;
+		}
+
+		.membres-list {
+			margin: 2rem 0;
+		}
+
+		.membres-category {
+			margin-bottom: 2rem;
+		}
+
+		.membres-category h4 {
+			font-size: 1.2rem;
+			font-weight: 600;
+			margin-bottom: 0.8rem;
+			color: #fff;
+		}
+
+		.membres-category p {
+			font-size: 1rem;
+			line-height: 1.5;
+			margin-bottom: 0.3rem;
+		}
+
+		@media(max-width: 768px) {
+			.section-split {
+				flex-direction: column;
+			}
+
+			.section-half {
+				width: 100%;
+				min-height: 40vh;
+				padding: 40px 20px;
+			}
+
+			.section-title {
+				font-size: 2rem;
+			}
+
+			.ogec-header h1 {
+				font-size: 2.2rem !important;
+			}
 		}
 	</style>
 
 	<div
-		class="ogec-fullwidth">
+		class="ogec-container">
 
-		<!-- Section Héro -->
-		<section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
-			<div style="max-width: 1200px; margin: 0 auto;">
-				<h1 style="font-size: 3.5rem; font-weight: bold; margin-bottom: 1rem;">OGEC</h1>
-				<p style="font-size: 1.5rem; margin-bottom: 2rem;">Organisme de Gestion de l'Enseignement Catholique</p>
-				<p style="font-size: 1.2rem;">École Saint-Mathieu</p>
-			</div>
+		<!-- Header -->
+		<section class="ogec-header">
+			<h1 style="font-size: 4rem; font-weight: bold; margin-bottom: 1rem;">L'OGEC</h1>
+			<p style="font-size: 1.4rem;">Organisme de Gestion de l'Enseignement Catholique - École Saint-Mathieu</p>
 		</section>
 
 		<!-- Section Présentation -->
-		<section style="background: white; padding: 80px 20px;">
-			<div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
-				<div>
-					<h2 style="font-size: 2.5rem; color: #333; margin-bottom: 1.5rem;">Qu'est-ce que l'OGEC ?</h2>
-					<p style="font-size: 1.2rem; line-height: 1.8; color: #666; margin-bottom: 1.5rem;">
-						L'OGEC (Organisme de Gestion de l'Enseignement Catholique) est une association loi 1901 
-												qui assure la gestion matérielle et financière de notre établissement.
-					</p>
-					<p style="font-size: 1.2rem; line-height: 1.8; color: #666;">
-						Composé de parents bénévoles et de membres de l'équipe éducative, l'OGEC veille 
-												au bon fonctionnement administratif et financier de l'école Saint-Mathieu.
-					</p>
-				</div>
-				<div style="text-align: center;">
-					<img src="/assets/images/fondationStMatthieu.jpg" alt="École Saint-Mathieu" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+		<section class="section-split">
+			<div
+				class="section-half presentation-image"><!-- Image ou motif de fond -->
+			</div>
+			<div class="section-half presentation-text">
+				<div class="section-content">
+					<h2 class="section-title">Présentation</h2>
+					<h3 class="section-subtitle">Organisme de gestion de l'Enseignement Catholique</h3>
+
+					<p class="section-text">Chaque école de l'enseignement catholique est gérée conjointement par un OGEC.</p>
+
+					<p class="section-text">C'est une association loi 1901, initiée par l'enseignement catholique, au service de l'école. Elle lui donne une existence juridique, c'est-à-dire une personnalité morale, regroupant des personnes bénévoles, choisies en fonction de leurs compétences et de leur attachement aux valeurs de l'enseignement catholique, pour assurer la bonne gestion de l'école, en lien avec le Chef d'établissement.</p>
+
+					<p class="section-text">L'OGEC doit déposer des statuts, élire un Conseil d'Administration et un bureau, réunir une Assemblée Générale.</p>
 				</div>
 			</div>
 		</section>
 
 		<!-- Section Membres -->
-		<section style="background: #f8f9fa; padding: 80px 20px;">
-			<div style="max-width: 1200px; margin: 0 auto;">
-				<h2 style="text-align: center; font-size: 2.5rem; color: #333; margin-bottom: 3rem;">Les Membres de l'OGEC</h2>
-				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+		<section class="section-split">
+			<div class="section-half membres-text">
+				<div class="section-content">
+					<h2 class="section-title">Ses Membres</h2>
+					<p class="section-text">Pour l'école Saint-Mathieu, l'OGEC est constitué des membres suivants :</p>
 
-					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
-						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Président</h3>
-						<p style="color: #666; line-height: 1.6;">
-							Responsable de l'animation et de la coordination des activités de l'OGEC.
-														Représente l'association auprès des instances officielles.
-						</p>
+					<div class="membres-list">
+						<div class="membres-category">
+							<h4>Les membres de Droit :</h4>
+							<p>• M. Camboulives (DDEC)</p>
+							<p>• M./Mme Représentant(e) (UPOGEC)</p>
+							<p>• M./Mme Président(e) (APEL)</p>
+						</div>
+
+						<div class="membres-category">
+							<h4>Les membres du Bureau :</h4>
+							<p>
+								<strong>Mme/M. [Nom] :</strong>
+								Président(e)</p>
+							<p>
+								<strong>Mme/M. [Nom] :</strong>
+								Vice-Président(e)</p>
+							<p>
+								<strong>M./Mme [Nom] :</strong>
+								Trésorier</p>
+							<p>
+								<strong>Mme [Nom] :</strong>
+								Secrétaire</p>
+						</div>
+
+						<div class="membres-category">
+							<h4>Administrateurs :</h4>
+							<p>• Parent bénévole</p>
+							<p>• Parent bénévole</p>
+						</div>
+
+						<div class="membres-category">
+							<h4>Membre invité permanent :</h4>
+							<p>
+								<strong>Le Chef d'Établissement</strong>
+							</p>
+						</div>
 					</div>
 
-					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
-						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Trésorier</h3>
-						<p style="color: #666; line-height: 1.6;">
-							Gère les finances de l'établissement, établit les budgets 
-														et veille à l'équilibre financier de l'école.
-						</p>
-					</div>
+					<p class="section-text" style="font-style: italic; font-size: 1rem;">Notre CA regroupe des bénévoles en activité et une multi-compétences dans des domaines variés comme l'analyse financière, l'architecture et la conduite de travaux, la gestion du personnel, la communication, le juridique…</p>
+				</div>
+			</div>
+			<div
+				class="section-half membres-image"><!-- Image équipe -->
+			</div>
+		</section>
 
-					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
-						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Secrétaire</h3>
-						<p style="color: #666; line-height: 1.6;">
-							Assure le suivi administratif, la rédaction des comptes-rendus 
-														et la communication avec les familles.
-						</p>
-					</div>
+		<!-- Section Missions -->
+		<section class="section-split">
+			<div
+				class="section-half missions-image"><!-- Image missions -->
+			</div>
+			<div class="section-half missions-text">
+				<div class="section-content">
+					<h2 class="section-title">Ses Missions</h2>
+					<p class="section-text" style="font-style: italic;">en collaboration avec le chef d'établissement</p>
 
-					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
-						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Membres Actifs</h3>
-						<p style="color: #666; line-height: 1.6;">
-							Parents bénévoles qui participent aux décisions importantes 
-														concernant la vie de l'établissement.
-						</p>
-					</div>
+					<div style="margin-top: 2rem;">
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem;">La gestion financière de l'école</h4>
+						<p class="section-text" style="font-size: 1rem;">Calcul et suivi du budget, tenue des comptes, détermination de la contribution des familles, emploi et suivi des versements à la charge de l'État et des collectivités locales.</p>
 
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.8rem;">La gestion de la cantine</h4>
+						<p class="section-text" style="font-size: 1rem;">Négociation avec le prestataire, gestion des infrastructures, du personnel, de l'hygiène et la sécurité.</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.8rem;">La gestion du personnel</h4>
+						<p class="section-text" style="font-size: 1rem;">Contrats de travail, rémunérations, formations du personnel non enseignant et du Chef d'Établissement.</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.8rem;">La gestion des locaux</h4>
+						<p class="section-text" style="font-size: 1rem;">Entretien, rénovation, aménagement, mobilier, hygiène, sécurité et mise aux normes.</p>
+					</div>
 				</div>
 			</div>
 		</section>
 
+		<!-- Section Réalisations -->
+		<section class="section-split">
+			<div class="section-half realisations-text">
+				<div class="section-content">
+					<h2 class="section-title">Ses Réalisations</h2>
+
+					<div style="margin-top: 2rem;">
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem; color: white;">Les travaux 2024/2025 :</h4>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Rénovation de la cour de récréation</p>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Mise aux normes de sécurité</p>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Réfection des peintures des classes</p>
+						<p style="font-size: 1rem; margin-bottom: 1.5rem;">• Amélioration de l'isolation thermique</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem; color: white;">Le renouvellement de matériel :</h4>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Vidéoprojecteurs interactifs</p>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Matériel informatique et mise en réseau</p>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Renouvellement du mobilier scolaire</p>
+						<p style="font-size: 1rem; margin-bottom: 1.5rem;">• Équipement de la bibliothèque</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem; color: white;">Le co-financement avec l'APEL :</h4>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Aménagement d'espaces verts</p>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Organisation d'événements familiaux</p>
+						<p style="font-size: 1rem; margin-bottom: 0.3rem;">• Sorties pédagogiques</p>
+					</div>
+				</div>
+			</div>
+			<div
+				class="section-half realisations-image"><!-- Image réalisations -->
+			</div>
+		</section>
+
 		<!-- Section Contact -->
-		<section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
-			<div style="max-width: 800px; margin: 0 auto;">
-				<h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Nous Contacter</h2>
-				<div style="font-size: 1.2rem; line-height: 1.8;">
-					<p>Pour toute question concernant l'OGEC :</p>
-					<p style="margin: 1rem 0;">
+		<section class="contact-section">
+			<h2 style="font-size: 2.2rem; margin-bottom: 2rem;">NOUS CONTACTER</h2>
+
+			<div style="display: flex; justify-content: center; gap: 80px; flex-wrap: wrap;">
+				<div style="text-align: left;">
+					<h3 style="font-size: 1.3rem; margin-bottom: 1rem;">ADRESSE</h3>
+					<p>École Saint-Mathieu</p>
+					<p>Adresse à compléter</p>
+					<p>Code postal Ville</p>
+				</div>
+
+				<div style="text-align: left;">
+					<h3 style="font-size: 1.3rem; margin-bottom: 1rem;">CONTACT</h3>
+					<p>
 						<strong>Email :</strong>
 						ogec@ecole-saint-mathieu.fr</p>
-					<p style="margin: 1rem 0;">
+					<p>
 						<strong>Téléphone :</strong>
-						04 91 XX XX XX</p>
-					<p>Nous sommes à votre disposition pour échanger sur la gestion de notre école.</p>
+						XX.XX.XX.XX.XX</p>
 				</div>
 			</div>
 		</section>
 
 	</div>
-
-	<style>
-		@media(max-width: 768px) {
-			div[style*="grid-template-columns: 1fr 1fr"] {
-				grid-template-columns: 1fr !important;
-			}
-			h1[style*="font-size: 3.5rem"] {
-				font-size: 2.5rem !important;
-			}
-		}
-	</style>
 
 {% endblock %}

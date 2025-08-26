@@ -200,7 +200,7 @@ document.getElementById('reject_modal').showModal();
 
 // Fonction pour voir les détails
 function viewDetails(requestId) {
-window.location.href = `/admin/inscriptions/${requestId}/details`;
+window.location.href = `/directeur/inscriptions/${requestId}/details`;
 }
 
 // Traiter l'approbation
@@ -208,7 +208,7 @@ async function processApproval() {
 const comment = document.getElementById('approve_comment').value;
 
 try {
-const response = await fetch (`/admin/inscriptions/${currentRequestId}/approve`, {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/approve`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -238,7 +238,7 @@ return;
 }
 
 try {
-const response = await fetch (`/admin/inscriptions/${currentRequestId}/reject`, {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/reject`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'

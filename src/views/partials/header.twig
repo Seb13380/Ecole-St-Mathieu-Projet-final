@@ -49,7 +49,7 @@
 									<path d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.24 4.24a.75.75 0 010 1.06l-4.24 4.24a.75.75 0 01-1.08-.02z"/>
 								</svg>
 							</div>
-							<div id="chartes-submenu" class="absolute left-full top-0 hidden z-50 w-80 bg-[#a7e3dd] rounded-box shadow-lg p-2" onmouseover="showChartesMenu()" onmouseout="hideChartesMenu()">
+							<div id="chartes-submenu" class="absolute left-full top-0 hidden z-[60] w-80 bg-[#a7e3dd] rounded-box shadow-lg p-2" onmouseover="showChartesMenu()" onmouseout="hideChartesMenu()" style="margin-left: 8px; min-width: 300px;">
 								{% if isAuthenticated %}
 									<ul class="menu font-poppins-regular text-sm">
 										<li>
@@ -74,7 +74,7 @@
 										</li>
 									</ul>
 								{% else %}
-									<div class="text-gray-700 italic px-4 py-2">
+									<div class="text-gray-700 italic px-4 py-3 text-center bg-opacity-90 rounded-md">
 										🔒 Connexion requise pour accéder aux chartes
 									</div>
 								{% endif %}
@@ -190,6 +190,84 @@
 	</nav>
 </header>
 
+<style>
+	/* Amélioration du positionnement du sous-menu des chartes */
+	#chartes-submenu {
+		/* S'assurer que le sous-menu est bien positionné à droite */
+		left: 100% !important;
+		top: 0 !important;
+		margin-left: 12px !important;
+		/* Largeur adaptative selon le contenu */
+		min-width: 300px !important;
+		width: auto !important;
+		/* Garder le background visible */
+		background-color: #a7e3dd !important;
+		/* Assurer une bonne visibilité */
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+		border: 1px solid rgba(141, 211, 204, 0.3) !important;
+		/* Permettre le retour à la ligne pour le texte long */
+		white-space: normal !important;
+	}
+
+	/* S'assurer que le parent a une position relative */
+	.chartes-menu {
+		position: relative !important;
+	}
+
+	/* Styles spécifiques pour le message non connecté */
+	#chartes-submenu .text-gray-700 {
+		background-color: transparent !important;
+		color: #374151 !important;
+		padding: 12px 16px !important;
+		border-radius: 6px !important;
+		text-align: center !important;
+		white-space: normal !important;
+		line-height: 1.5 !important;
+	}
+
+	/* Styles pour les liens des chartes (utilisateur connecté) */
+	#chartes-submenu .menu li a {
+		padding: 8px 12px !important;
+		display: block !important;
+		border-radius: 6px !important;
+		transition: all 0.2s ease-in-out !important;
+		white-space: normal !important;
+		line-height: 1.4 !important;
+	}
+
+	#chartes-submenu .menu li a:hover {
+		background-color: #8dd3cc !important;
+		transform: translateX(2px) !important;
+	}
+
+	/* Améliorer la transition d'affichage */
+	#chartes-submenu.hidden {
+		opacity: 0;
+		pointer-events: none;
+		transform: translateX(-10px);
+		transition: all 0.2s ease-in-out;
+	}
+
+	#chartes-submenu:not(.hidden) {
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateX(0);
+		transition: all 0.2s ease-in-out;
+	}
+
+	/* Responsive - sur mobile, affichage vertical */
+	@media(max-width: 768px) {
+		#chartes-submenu {
+			left: 0 !important;
+			top: 100% !important;
+			margin-left: 0 !important;
+			margin-top: 4px !important;
+			width: 100% !important;
+			min-width: unset !important;
+		}
+	}
+</style>
+
 <script>
 	let chartesMenuTimeout;
 
@@ -198,6 +276,19 @@ clearTimeout(chartesMenuTimeout);
 const submenu = document.getElementById('chartes-submenu');
 if (submenu) {
 submenu.classList.remove('hidden');
+// S'assurer que le sous-menu est bien positionné
+setTimeout(() => {
+const rect = submenu.getBoundingClientRect();
+const windowWidth = window.innerWidth;
+
+// Si le sous-menu dépasse la fenêtre, l'ajuster
+if (rect.right > windowWidth) {
+submenu.style.left = 'auto';
+submenu.style.right = '100%';
+submenu.style.marginLeft = '0';
+submenu.style.marginRight = '12px';
+}
+}, 10);
 }
 }
 
@@ -206,6 +297,10 @@ chartesMenuTimeout = setTimeout(() => {
 const submenu = document.getElementById('chartes-submenu');
 if (submenu) {
 submenu.classList.add('hidden');
+// Réinitialiser la position
+submenu.style.left = '';
+submenu.style.right = '';
+submenu.style.marginRight = '';
 }
 }, 300); // Délai de 300ms pour permettre le passage de la souris
 }
@@ -213,7 +308,11 @@ submenu.classList.add('hidden');
 function toggleChartesMenu() {
 const submenu = document.getElementById('chartes-submenu');
 if (submenu) {
-submenu.classList.toggle('hidden');
+if (submenu.classList.contains('hidden')) {
+showChartesMenu();
+} else {
+hideChartesMenu();
+}
 }
 }
 </script>
