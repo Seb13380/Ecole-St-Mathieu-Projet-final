@@ -1,154 +1,270 @@
 {% extends "layouts/base.twig" %}
 
-{% block title %}
-	<title>Inscription - École Saint-Mathieu</title>
+{% block title %}Inscription - École Saint-Mathieu
 {% endblock %}
 
 {% block main %}
-	<div class="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
-		<div class="max-w-2xl w-full space-y-8">
-			<div>
-				<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-700">
-					Pré-inscription élève
-				</h2>
-				<p class="mt-3 text-center text-sm text-gray-600">
-					École Saint-Mathieu
-				</p>
-				<p class="mt-3 text-center text-sm text-green-500">
-					Veuillez noter que cette pré-inscription est soumise à validation par l'administration de l'école.
+	<div class="min-h-screen bg-[#a7e3dd] py-12">
+		<div
+			class="max-w-4xl mx-auto px-4">
+			<!-- En-tête -->
+			<div class="text-center mb-8">
+				<h1 class="text-4xl font-bold text-[#304a4d] mb-4 font-poppins">
+					Demande d'inscription
+				</h1>
+				<p class="text-lg text-gray-600">École Saint-Mathieu</p>
+				<div class="w-24 h-1 bg-[#a7e3dd] mx-auto rounded-full mt-4"></div>
+				<p class="mt-4 text-center bg-blue-50 p-3 rounded-lg border border-blue-200">
+					<span class="text-blue-800">ℹ️</span>
+					Cette demande sera examinée par la direction. Vous recevrez une réponse par email.
 				</p>
 			</div>
 
-			<form class="mt-8 space-y-6" action="/auth/register" method="POST">
-				{% if error %}
-					<div class="alert alert-error">
-						<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-						</svg>
-						<span>{{ error }}</span>
-					</div>
-				{% endif %}
+			<!-- Messages d'erreur/succès -->
+			{% if error %}
+				<div class="alert alert-error mb-6">
+					<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+					<span>{{ error }}</span>
+				</div>
+			{% endif %}
 
-				{% if success %}
-					<div class="alert alert-success">
-						<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-						</svg>
-						<span>{{ success }}</span>
-					</div>
-				{% endif %}
+			{% if success %}
+				<div class="alert alert-success mb-6">
+					<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+					<span>{{ success }}</span>
+				</div>
+			{% endif %}
 
-				<!-- Section Informations de l'enfant -->
-				<div class="bg-gray-50 rounded-lg p-6 border-l-4 border-teal-500">
-					<h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">👶 Informations de l'enfant</h3>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Prénom de l'enfant</span>
-							</label>
-							<input type="text" name="childFirstName" value="{{ formData.childFirstName }}" placeholder="Prénom de l'enfant" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
+			<form
+				action="/auth/register" method="POST" class="space-y-8">
+				<!-- Section Parent -->
+				<div class="bg-white rounded-xl shadow-lg p-8">
+					<h2 class="text-3xl font-bold text-[#304a4d] mb-8 font-poppins flex items-center justify-center gap-3">
+						👨‍👩‍👧‍👦 Informations du parent responsable
+					</h2>
+
+					<div class="grid md:grid-cols-2 gap-6">
+						<div>
+							<label for="parentFirstName" class="block text-lg font-medium text-[#304a4d] mb-2">Prénom *</label>
+							<input type="text" id="parentFirstName" name="parentFirstName" required class="input input-bordered w-full" style="background-color: #a7e3dd !important;" placeholder="Votre prénom">
 						</div>
 
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Nom de l'enfant</span>
-							</label>
-							<input type="text" name="childLastName" value="{{ formData.childLastName }}" placeholder="Nom de l'enfant" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
+						<div>
+							<label for="parentLastName" class="block text-lg font-medium text-[#304a4d] mb-2">Nom *</label>
+							<input type="text" id="parentLastName" name="parentLastName" required class="input input-bordered w-full" style="background-color: #a7e3dd !important;" placeholder="Votre nom">
+						</div>
+
+						<div>
+							<label for="parentEmail" class="block text-lg font-medium text-[#304a4d] mb-2">Email *</label>
+							<input type="email" id="parentEmail" name="parentEmail" required class="input input-bordered w-full" style="background-color: #a7e3dd !important;" placeholder="votre@email.com">
+						</div>
+
+						<div>
+							<label for="parentPhone" class="block text-lg font-medium text-[#304a4d] mb-2">Téléphone *</label>
+							<input type="tel" id="parentPhone" name="parentPhone" required class="input input-bordered w-full" style="background-color: #a7e3dd !important;" placeholder="06 12 34 56 78">
+						</div>
+
+						<div class="md:col-span-2">
+							<label for="parentAddress" class="block text-lg font-medium text-[#304a4d] mb-2">Adresse complète *</label>
+							<textarea id="parentAddress" name="parentAddress" rows="3" required class="textarea textarea-bordered w-full" style="background-color: #a7e3dd !important;" placeholder="Numéro, rue, code postal, ville"></textarea>
 						</div>
 					</div>
 				</div>
 
-				<!-- Section Informations du parent -->
-				<div class="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-500">
-					<h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">👨‍👩‍👧‍👦 Informations du parent</h3>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Prénom du parent</span>
-							</label>
-							<input type="text" name="firstName" value="{{ formData.firstName }}" placeholder="Votre prénom" class="input border-2 border-blue-300 focus:border-blue-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-						</div>
+				<!-- Section Enfants -->
+				<div class="bg-white rounded-xl shadow-lg p-8">
+					<h2 class="text-3xl font-bold text-[#304a4d] mb-8 font-poppins flex items-center justify-center gap-3">
+						👶 Informations des enfants à inscrire
+					</h2>
 
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Nom du parent</span>
-							</label>
-							<input type="text" name="lastName" value="{{ formData.lastName }}" placeholder="Votre nom" class="input border-2 border-blue-300 focus:border-blue-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-						</div>
+					<div
+						id="children-container">
+						<!-- Premier enfant par défaut -->
+						<div class="child-item border border-[#a7e3dd] rounded-lg p-6 mb-4">
+							<div class="flex justify-between items-center mb-4">
+								<h3 class="text-lg font-semibold text-[#304a4d]">Enfant 1</h3>
+								<button type="button" class="remove-child text-red-500 hover:text-red-700 hidden">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+									</svg>
+								</button>
+							</div>
 
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Email</span>
-							</label>
-							<input type="email" name="email" value="{{ formData.email }}" placeholder="votre@email.com" class="input border-2 border-blue-300 focus:border-blue-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-						</div>
+							<div class="grid md:grid-cols-3 gap-4">
+								<div>
+									<label class="block text-sm font-medium text-[#304a4d] mb-2">Prénom *</label>
+									<input type="text" name="children[0][firstName]" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Prénom de l'enfant">
+								</div>
 
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Téléphone</span>
-							</label>
-							<input type="tel" name="phone" value="{{ formData.phone }}" placeholder="06 12 34 56 78" class="input border-2 border-blue-300 focus:border-blue-600 focus:outline-none w-full rounded-lg px-3 py-2" required>
-						</div>
+								<div>
+									<label class="block text-sm font-medium text-[#304a4d] mb-2">Nom *</label>
+									<input type="text" name="children[0][lastName]" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Nom de l'enfant">
+								</div>
 
-						<div class="form-control md:col-span-2">
-							<label class="label">
-								<span class="label-text font-medium">Adresse complète</span>
-							</label>
-							<textarea name="adress" placeholder="Votre adresse complète (rue, code postal, ville)" class="textarea border-2 border-blue-300 focus:border-blue-600 focus:outline-none w-full rounded-lg px-3 py-2 h-20" required>{{ formData.adress }}</textarea>
+								<div>
+									<label class="block text-sm font-medium text-[#304a4d] mb-2">Date de naissance *</label>
+									<input type="date" name="children[0][birthDate]" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;">
+								</div>
+							</div>
 						</div>
 					</div>
+
+					<button type="button" id="add-child" class="bg-[#a7e3dd] text-[#304a4d] px-4 py-2 rounded-lg hover:bg-[#8dd3cc] transition-all duration-300 font-poppins-medium flex items-center gap-2">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+						</svg>
+						Ajouter un autre enfant
+					</button>
 				</div>
 
 				<!-- Section Mot de passe -->
-				<div class="bg-green-50 rounded-lg p-6 border-l-4 border-green-500">
-					<h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">🔒 Sécurité</h3>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Mot de passe</span>
-							</label>
-							<input type="password" name="password" placeholder="Votre mot de passe" class="input border-2 border-red-300 focus:border-red-600 focus:outline-none w-full rounded-lg px-3 py-2" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$" title="Le mot de passe doit contenir au moins 6 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)">
-							<div class="label">
-								<span class="label-text-alt text-xs text-gray-500">
-									Min. 6 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
-								</span>
-							</div>
+				<div class="bg-white rounded-xl shadow-lg p-8">
+					<h2 class="text-3xl font-bold text-[#304a4d] mb-8 font-poppins flex items-center justify-center gap-3">
+						🔒 Mot de passe pour votre compte
+					</h2>
+
+					<div class="grid md:grid-cols-2 gap-6">
+						<div>
+							<label for="password" class="block text-sm font-medium text-[#304a4d] mb-2">Mot de passe *</label>
+							<input type="password" id="password" name="password" required minlength="6" class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Minimum 6 caractères">
+							<p class="text-xs text-gray-500 mt-1">Au moins 6 caractères avec majuscule, minuscule et chiffre</p>
 						</div>
 
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text font-medium">Confirmation mot de passe</span>
-							</label>
-							<input type="password" name="confirmPassword" placeholder="Confirmez votre mot de passe" class="input border-2 border-green-300 focus:border-red-600 focus:outline-none w-full rounded-lg px-3 py-2" required minlength="6">
-							<div class="label">
-								<span class="label-text-alt text-xs text-gray-500">
-									Ressaisissez le même mot de passe
-								</span>
-							</div>
+						<div>
+							<label for="confirmPassword" class="block text-sm font-medium text-[#304a4d] mb-2">Confirmer le mot de passe *</label>
+							<input type="password" id="confirmPassword" name="confirmPassword" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Ressaisissez le mot de passe">
 						</div>
 					</div>
 				</div>
 
-				<!-- Section Validation -->
-				<div class="pt-6">
-					<div class="form-control">
-						<button type="submit" class="Btn full-width">
-							 Créer mon compte
-						</button>
-					</div>
+				<!-- Bouton de soumission -->
+				<div class="text-center">
+					<button type="submit" class="bg-[#304a4d] text-white px-8 py-4 rounded-lg hover:bg-[#456d72] transition-all duration-300 font-poppins-semibold text-lg">
+						Envoyer ma demande d'inscription
+					</button>
 
-					<div class="text-center mt-6">
-						<p class="text-sm text-gray-600">
-							Déjà un compte ?
-							<a href="/auth/login" class="text-teal-600 hover:text-teal-800 font-medium underline transition-colors">
-								Se connecter
-							</a>
-						</p>
-					</div>
+					<p class="mt-4 text-lg text-gray-600">
+						Déjà un compte ?
+						<a href="/auth/login" class="text-[#304a4d] hover:underline font-medium">Se connecter</a>
+					</p>
 				</div>
 			</form>
 		</div>
 	</div>
 
-	<script src="/assets/js/register.js"></script>
+	<script>
+		let childCount = 1;
+
+document.getElementById('add-child').addEventListener('click', function () {
+const container = document.getElementById('children-container');
+const newChild = document.createElement('div');
+newChild.className = 'child-item border border-[#a7e3dd] rounded-lg p-6 mb-4';
+newChild.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-[#304a4d]">Enfant ${
+childCount + 1
+}</h3>
+            <button type="button" class="remove-child text-red-500 hover:text-red-700">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-[#304a4d] mb-2">Prénom *</label>
+                <input type="text" name="children[${childCount}][firstName]" required 
+                       class="input input-bordered w-full" 
+                       style="background-color: #f8fdfc !important;"
+                       placeholder="Prénom de l'enfant">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-[#304a4d] mb-2">Nom *</label>
+                <input type="text" name="children[${childCount}][lastName]" required 
+                       class="input input-bordered w-full" 
+                       style="background-color: #f8fdfc !important;"
+                       placeholder="Nom de l'enfant">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-[#304a4d] mb-2">Date de naissance *</label>
+                <input type="date" name="children[${childCount}][birthDate]" required 
+                       class="input input-bordered w-full" 
+                       style="background-color: #f8fdfc !important;">
+            </div>
+        </div>
+    `;
+
+container.appendChild(newChild);
+childCount++;
+
+// Afficher le bouton de suppression pour tous les enfants sauf le premier
+updateRemoveButtons();
+});
+
+// Gérer la suppression d'enfants
+document.addEventListener('click', function (e) {
+if (e.target.closest('.remove-child')) {
+e.target.closest('.child-item').remove();
+updateChildNumbers();
+updateRemoveButtons();
+}
+});
+
+function updateChildNumbers() {
+const children = document.querySelectorAll('.child-item');
+children.forEach((child, index) => {
+const title = child.querySelector('h3');
+title.textContent = `Enfant ${
+index + 1
+}`;
+
+// Mettre à jour les noms des inputs
+const inputs = child.querySelectorAll('input');
+inputs.forEach(input => {
+if (input.name.includes('children[')) {
+const fieldName = input.name.split('][')[1].replace(']', '');
+input.name = `children[${index}][${fieldName}]`;
+}
+});
+});
+childCount = children.length;
+}
+
+function updateRemoveButtons() {
+const children = document.querySelectorAll('.child-item');
+children.forEach((child, index) => {
+const removeButton = child.querySelector('.remove-child');
+if (index === 0 && children.length === 1) {
+removeButton.classList.add('hidden');
+} else {
+removeButton.classList.remove('hidden');
+}
+});
+}
+
+// Validation du mot de passe
+document.querySelector('form').addEventListener('submit', function (e) {
+const password = document.getElementById('password').value;
+const confirmPassword = document.getElementById('confirmPassword').value;
+
+if (password !== confirmPassword) {
+e.preventDefault();
+alert('Les mots de passe ne correspondent pas !');
+return false;
+}
+
+if (password.length < 6) {
+e.preventDefault();
+alert('Le mot de passe doit contenir au moins 6 caractères !');
+return false;
+}
+});
+	</script>
 {% endblock %}

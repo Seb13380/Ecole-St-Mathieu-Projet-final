@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const pdf = require('pdf-poppler');
+const { fromPath } = require('pdf2pic');
 
 const prisma = new PrismaClient();
 
@@ -19,7 +19,6 @@ const storage = multer.diskStorage({
     }
 });
 
-// Filtre pour n'accepter que les PDF
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {
         cb(null, true);
@@ -45,7 +44,6 @@ const menuPdfController = {
             console.log('👤 Utilisateur:', req.session.user?.email, 'Rôle:', req.session.user?.role);
             console.log('📍 Tentative de rendu du template...');
 
-            // Récupérer tous les menus
             const menus = await prisma.menu.findMany({
                 include: {
                     auteur: {
@@ -110,7 +108,7 @@ const menuPdfController = {
             friday.setDate(monday.getDate() + 4); // Vendredi de cette semaine
 
             // Générer un nom automatique basé sur le nom du fichier
-            const nomMenu = req.file.originalname.replace('.pdf', '');
+            const nomMenu = "Menu";
 
             // Convertir le PDF en images
             console.log('🖼️ Conversion du PDF en images...');
@@ -122,23 +120,31 @@ const menuPdfController = {
                 fs.mkdirSync(imageDir, { recursive: true });
             }
 
-            const options = {
-                format: 'jpeg',
-                out_dir: imageDir,
-                out_prefix: path.parse(req.file.filename).name,
-                page: null // toutes les pages
-            };
+            const baseFilename = path.parse(req.file.filename).name;
 
             let imageUrls = [];
             try {
-                const pages = await pdf.convert(pdfPath, options);
-                console.log('📸 Pages converties:', pages);
+                // Configuration pour pdf2pic
+                const options = {
+                    density: 100,           // Résolution de l'image
+                    saveFilename: baseFilename,
+                    savePath: imageDir,
+                    format: "jpeg",         // Format de sortie
+                    width: "100%",            // Largeur de l'image
+                    height: "100%"            // Hauteur de l'image
+                };
+
+                // Convertir le PDF en images
+                const convertedPages = await fromPath(pdfPath, options).bulk(-1, true);
+                console.log('📸 Pages converties:', convertedPages.length);
 
                 // Générer les URLs des images
-                pages.forEach((page, index) => {
-                    const imageName = `${path.parse(req.file.filename).name}-${index + 1}.jpg`;
+                convertedPages.forEach((page, index) => {
+                    const imageName = `${baseFilename}.${index + 1}.jpeg`;
                     imageUrls.push(`/assets/images/menus/${imageName}`);
                 });
+
+                console.log('🖼️ URLs des images générées:', imageUrls);
             } catch (conversionError) {
                 console.warn('⚠️ Échec de la conversion PDF en images:', conversionError);
                 // On continue sans les images si la conversion échoue

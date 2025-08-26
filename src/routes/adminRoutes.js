@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const menuController = require('../controllers/menuController');
+const inscriptionController = require('../controllers/inscriptionController');
 const { requireAdmin } = require('../middleware/auth');
 
 router.use(requireAdmin);
@@ -27,5 +28,10 @@ router.get('/menus/:id/edit', menuController.getEditMenu);
 router.post('/menus/:id/edit', menuController.postEditMenu);
 router.delete('/menus/:id', menuController.deleteMenu);
 router.post('/menus/deactivate-all', menuController.deactivateAllMenus);
+
+// Routes pour la gestion des demandes d'inscription
+router.get('/inscriptions', inscriptionController.showAllRequests);
+router.post('/inscriptions/:id/approve', inscriptionController.approveRequest);
+router.post('/inscriptions/:id/reject', inscriptionController.rejectRequest);
 
 module.exports = router;

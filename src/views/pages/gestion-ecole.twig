@@ -1,0 +1,121 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}École Saint-Mathieu - OGEC
+{% endblock %}
+
+{% block main %}
+	<style>
+		.ogec-fullwidth {
+			position: relative;
+			left: 50%;
+			right: 50%;
+			margin: -1rem -50vw -2rem;
+			width: 100vw;
+		}
+	</style>
+
+	<div
+		class="ogec-fullwidth">
+
+		<!-- Section Héro -->
+		<section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
+			<div style="max-width: 1200px; margin: 0 auto;">
+				<h1 style="font-size: 3.5rem; font-weight: bold; margin-bottom: 1rem;">OGEC</h1>
+				<p style="font-size: 1.5rem; margin-bottom: 2rem;">Organisme de Gestion de l'Enseignement Catholique</p>
+				<p style="font-size: 1.2rem;">École Saint-Mathieu</p>
+			</div>
+		</section>
+
+		<!-- Section Présentation -->
+		<section style="background: white; padding: 80px 20px;">
+			<div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+				<div>
+					<h2 style="font-size: 2.5rem; color: #333; margin-bottom: 1.5rem;">Qu'est-ce que l'OGEC ?</h2>
+					<p style="font-size: 1.2rem; line-height: 1.8; color: #666; margin-bottom: 1.5rem;">
+						L'OGEC (Organisme de Gestion de l'Enseignement Catholique) est une association loi 1901 
+												qui assure la gestion matérielle et financière de notre établissement.
+					</p>
+					<p style="font-size: 1.2rem; line-height: 1.8; color: #666;">
+						Composé de parents bénévoles et de membres de l'équipe éducative, l'OGEC veille 
+												au bon fonctionnement administratif et financier de l'école Saint-Mathieu.
+					</p>
+				</div>
+				<div style="text-align: center;">
+					<img src="/assets/images/fondationStMatthieu.jpg" alt="École Saint-Mathieu" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+				</div>
+			</div>
+		</section>
+
+		<!-- Section Membres -->
+		<section style="background: #f8f9fa; padding: 80px 20px;">
+			<div style="max-width: 1200px; margin: 0 auto;">
+				<h2 style="text-align: center; font-size: 2.5rem; color: #333; margin-bottom: 3rem;">Les Membres de l'OGEC</h2>
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+
+					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Président</h3>
+						<p style="color: #666; line-height: 1.6;">
+							Responsable de l'animation et de la coordination des activités de l'OGEC.
+														Représente l'association auprès des instances officielles.
+						</p>
+					</div>
+
+					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Trésorier</h3>
+						<p style="color: #666; line-height: 1.6;">
+							Gère les finances de l'établissement, établit les budgets 
+														et veille à l'équilibre financier de l'école.
+						</p>
+					</div>
+
+					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Secrétaire</h3>
+						<p style="color: #666; line-height: 1.6;">
+							Assure le suivi administratif, la rédaction des comptes-rendus 
+														et la communication avec les familles.
+						</p>
+					</div>
+
+					<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+						<h3 style="font-size: 1.5rem; color: #333; margin-bottom: 1rem;">Membres Actifs</h3>
+						<p style="color: #666; line-height: 1.6;">
+							Parents bénévoles qui participent aux décisions importantes 
+														concernant la vie de l'établissement.
+						</p>
+					</div>
+
+				</div>
+			</div>
+		</section>
+
+		<!-- Section Contact -->
+		<section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
+			<div style="max-width: 800px; margin: 0 auto;">
+				<h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Nous Contacter</h2>
+				<div style="font-size: 1.2rem; line-height: 1.8;">
+					<p>Pour toute question concernant l'OGEC :</p>
+					<p style="margin: 1rem 0;">
+						<strong>Email :</strong>
+						ogec@ecole-saint-mathieu.fr</p>
+					<p style="margin: 1rem 0;">
+						<strong>Téléphone :</strong>
+						04 91 XX XX XX</p>
+					<p>Nous sommes à votre disposition pour échanger sur la gestion de notre école.</p>
+				</div>
+			</div>
+		</section>
+
+	</div>
+
+	<style>
+		@media(max-width: 768px) {
+			div[style*="grid-template-columns: 1fr 1fr"] {
+				grid-template-columns: 1fr !important;
+			}
+			h1[style*="font-size: 3.5rem"] {
+				font-size: 2.5rem !important;
+			}
+		}
+	</style>
+
+{% endblock %}

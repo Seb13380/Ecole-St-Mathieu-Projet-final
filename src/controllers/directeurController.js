@@ -21,7 +21,8 @@ const directeurController = {
                 prisma.student.count(),
                 prisma.classe.count(),
                 prisma.message.count(),
-                prisma.actualite.count()
+                prisma.actualite.count(),
+                prisma.travaux.count()
             ]);
 
             // Récupérer les utilisateurs récents
@@ -58,7 +59,8 @@ const directeurController = {
                     totalStudents: stats[1],
                     totalClasses: stats[2],
                     totalMessages: stats[3],
-                    totalActualites: stats[4]
+                    totalActualites: stats[4],
+                    totalTravaux: stats[5]
                 },
                 recentUsers,
                 recentMessages

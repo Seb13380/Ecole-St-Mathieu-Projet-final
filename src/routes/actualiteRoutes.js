@@ -9,7 +9,10 @@ router.get('/', actualiteController.getActualites);
 router.get('/manage', requireDirection, actualiteController.getActualitesManagement);
 router.post('/', requireDirection, actualiteController.createActualite);
 router.put('/:id', requireDirection, actualiteController.updateActualite);
+router.post('/:id', requireDirection, actualiteController.updateActualite); // Route POST pour modification
 router.delete('/:id', requireDirection, actualiteController.deleteActualite);
+router.post('/:id/delete', requireDirection, actualiteController.deleteActualite); // Route POST pour suppression
 router.patch('/:id/toggle-visibility', requireDirection, actualiteController.toggleVisibility);
+router.post('/:id/toggle-visibility', requireDirection, actualiteController.toggleVisibility);
 
 module.exports = router;

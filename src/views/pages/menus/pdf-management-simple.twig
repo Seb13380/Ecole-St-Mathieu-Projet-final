@@ -3,323 +3,301 @@
 {% block title %}Gestion des Menus PDF - École Saint-Mathieu
 {% endblock %}
 
-{% block styles %}
-	<style>
-		.menu-card {
-			transition: all 0.3s ease;
-			border-left: 4px solid transparent;
-		}
-		.menu-card.active {
-			border-left-color: #10b981;
-			background-color: #f0fdf4;
-		}
-		.menu-card.planned {
-			border-left-color: #f59e0b;
-			background-color: #fffbeb;
-		}
-		.menu-card.draft {
-			border-left-color: #6b7280;
-			background-color: #f9fafb;
-		}
-		.menu-card.archived {
-			border-left-color: #ef4444;
-			background-color: #fef2f2;
-		}
-		.status-badge {
-			font-size: 0.75rem;
-			font-weight: 600;
-			padding: 0.25rem 0.75rem;
-			border-radius: 9999px;
-			text-transform: uppercase;
-		}
-		.status-actif {
-			background-color: #dcfce7;
-			color: #166534;
-		}
-		.status-planifie {
-			background-color: #fef3c7;
-			color: #92400e;
-		}
-		.status-brouillon {
-			background-color: #f3f4f6;
-			color: #374151;
-		}
-		.status-archive {
-			background-color: #fecaca;
-			color: #991b1b;
-		}
-		.upload-zone {
-			border: 2px dashed #cbd5e0;
-			transition: all 0.3s ease;
-		}
-		.upload-zone:hover {
-			border-color: #3182ce;
-			background-color: #ebf8ff;
-		}
-		.upload-zone.dragover {
-			border-color: #3182ce;
-			background-color: #ebf8ff;
-		}
-	</style>
-{% endblock %}
-
 {% block main %}
-	<div class="min-h-screen bg-gray-50 py-8">
+	<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-8">
 		<div
-			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<!-- Header -->
-			<div class="mb-8">
-				<div class="flex justify-between items-center">
-					<div>
-						<h1 class="text-3xl font-bold text-gray-900">🍽️ Gestion des Menus PDF</h1>
-						<p class="mt-2 text-gray-600">Gérez les menus hebdomadaires de la cantine</p>
-					</div>
-					<button id="newMenuBtn" class="Btn bg-[#006B6D] text-white px-6 py-3 rounded-lg hover:bg-[#005659] transition-colors">
-						📄 Nouveau Menu PDF
-					</button>
-				</div>
+			class="max-w-7xl mx-auto">
+			<!-- Header Section -->
+			<div class="text-center mb-8">
+				<h1 class="text-4xl font-bold text-slate-800 mb-4">
+					<span class="mr-3">🍽️</span>
+					Gestion des Menus PDF
+				</h1>
+				<p class="text-slate-600">Gérez les menus hebdomadaires envoyés par la société Dupond</p>
 			</div>
 
-			<!-- Notification alerts -->
+			<!-- Messages -->
 			{% if success %}
-				<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6" role="alert">
-					<span class="block sm:inline">✅
-						{{ success }}</span>
+				<div class="max-w-4xl mx-auto mb-6">
+					<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+						<div class="flex items-center">
+							<svg class="w-5 h-5 mr-2" fill="currentColor" viewbox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+							</svg>
+							{{ success }}
+						</div>
+					</div>
 				</div>
 			{% endif %}
 
 			{% if error %}
-				<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
-					<span class="block sm:inline">❌
-						{{ error }}</span>
+				<div class="max-w-4xl mx-auto mb-6">
+					<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+						<div class="flex items-center">
+							<svg class="w-5 h-5 mr-2" fill="currentColor" viewbox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+							</svg>
+							{{ error }}
+						</div>
+					</div>
 				</div>
 			{% endif %}
 
-			<!-- Upload Modal -->
-			<div id="uploadModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
-				<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-					<div class="mt-3">
-						<h3 class="text-lg font-medium text-gray-900 mb-4">📄 Nouveau Menu PDF</h3>
-						<form id="uploadForm" action="/admin/menus-pdf/create" method="POST" enctype="multipart/form-data">
-							<div class="mb-4">
-								<label class="block text-sm font-medium text-gray-700 mb-2">Fichier PDF du menu</label>
-								<div class="upload-zone p-6 text-center rounded-lg">
-									<input type="file" id="menuPdf" name="menuPdf" accept=".pdf" required class="hidden">
-									<div id="dropZone" class="cursor-pointer">
-										<svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewbox="0 0 48 48">
-											<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-										</svg>
-										<p class="mt-2 text-sm text-gray-600">
-											<span class="text-blue-600">Cliquez pour choisir</span>
-											ou glissez votre fichier PDF ici
-										</p>
-										<p class="text-xs text-gray-500 mt-1">PDF uniquement, max 10MB</p>
-									</div>
-									<div id="fileInfo" class="hidden mt-2 text-sm text-green-600"></div>
-								</div>
+			<!-- Upload Section -->
+			<div class="mb-8">
+				<div class="bg-white shadow-lg border-l-4 border-orange-500 p-8 max-w-4xl mx-auto">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
+						<span class="mr-2">📤</span>
+						Ajouter un Nouveau Menu
+					</h2>
+
+					<form action="/admin/menus-pdf/create" method="POST" enctype="multipart/form-data" class="space-y-6">
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<label for="titre" class="block text-sm font-medium text-slate-700 mb-2">
+									Titre du menu
+								</label>
+								<input type="text" id="titre" name="titre" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="Menu du 18 au 22 août 2025" required>
 							</div>
 
-							<div class="mb-4">
-								<label class="flex items-center">
-									<input type="checkbox" name="actif" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-									<span class="ml-2 text-sm text-gray-700">Activer ce menu immédiatement</span>
+							<div>
+								<label for="description" class="block text-sm font-medium text-slate-700 mb-2">
+									Description (optionnel)
+								</label>
+								<input type="text" id="description" name="description" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="Menu spécial rentrée">
+							</div>
+						</div>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<label for="dateDebut" class="block text-sm font-medium text-slate-700 mb-2">
+									Date de début
+								</label>
+								<input type="date" id="dateDebut" name="dateDebut" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors" required>
+							</div>
+
+							<div>
+								<label for="dateFin" class="block text-sm font-medium text-slate-700 mb-2">
+									Date de fin
+								</label>
+								<input type="date" id="dateFin" name="dateFin" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors" required>
+							</div>
+						</div>
+
+						<div>
+							<label for="menuPdf" class="block text-sm font-medium text-slate-700 mb-2">
+								Fichier PDF du menu
+								<span class="text-red-500">*</span>
+							</label>
+							<div class="border-2 border-dashed border-slate-300 hover:border-orange-500 transition-colors p-8 text-center">
+								<input type="file" id="menuPdf" name="menuPdf" accept=".pdf" required class="hidden" onchange="updateFileName(this)">
+								<label for="menuPdf" class="cursor-pointer">
+									<div class="text-6xl mb-4">📄</div>
+									<div class="text-lg font-medium text-slate-700 mb-2">Cliquez pour sélectionner le PDF</div>
+									<div class="text-sm text-slate-500">Fichier PDF maximum 10MB</div>
+									<div id="fileName" class="text-sm font-medium text-orange-600 mt-2 hidden"></div>
 								</label>
 							</div>
+						</div>
 
-							<div class="flex justify-end space-x-3">
-								<button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
-									Annuler
-								</button>
-								<button type="submit" class="Btn bg-[#006B6D] text-white px-4 py-2 rounded-lg hover:bg-[#005659] transition-colors">
-									Enregistrer
-								</button>
-							</div>
-						</form>
-					</div>
+						<div class="text-center">
+							<button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 transition-colors inline-flex items-center text-lg">
+								<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+								</svg>
+								Ajouter le Menu
+							</button>
+						</div>
+					</form>
 				</div>
 			</div>
 
-			<!-- Menus List -->
-			<div class="space-y-6">
-				{% if menus|length > 0 %}
-					{% for menu in menus %}
-						<div class="menu-card bg-white rounded-lg shadow-md p-6 {{ menu.statut|lower }}">
-							<div class="flex justify-between items-start">
-								<div class="flex-1">
-									<div class="flex items-center space-x-3 mb-2">
-										<h3 class="text-lg font-semibold text-gray-900">{{ menu.semaine }}</h3>
-										<span class="status-badge status-{{ menu.statut|lower }}">
-											{{ menu.statut }}
-										</span>
-									</div>
+			<!-- Menus existants -->
+			<div class="mb-8">
+				<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
+					<span class="mr-2">📋</span>
+					Menus Existants ({{ menus|length }})
+				</h2>
 
-									<div class="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
-										{% if menu.dateDebut and menu.dateFin %}
-											<div>
-												<span class="font-medium">📅 Période:</span>
+				{% if menus and menus|length > 0 %}
+					<div class="grid gap-6 max-w-6xl mx-auto">
+						{% for menu in menus %}
+							<div class="bg-white shadow-md border-l-4 {{ menu.actif ? 'border-green-500' : 'border-slate-300' }} p-6 hover:shadow-lg transition-all duration-300">
+								<div class="flex flex-col md:flex-row md:items-center justify-between">
+									<div class="flex-1">
+										<div class="flex items-center mb-3">
+											<h3 class="text-xl font-bold text-slate-800 mr-4">{{ menu.titre }}</h3>
+											{% if menu.actif %}
+												<span class="bg-green-100 text-green-800 px-3 py-1 text-xs font-medium border border-green-200">
+													🟢 MENU ACTIF
+												</span>
+											{% else %}
+												<span class="bg-slate-100 text-slate-600 px-3 py-1 text-xs font-medium border border-slate-200">
+													📋 Planifié
+												</span>
+											{% endif %}
+										</div>
+
+										{% if menu.description %}
+											<p class="text-slate-600 mb-2">{{ menu.description }}</p>
+										{% endif %}
+
+										<div class="text-sm text-slate-500 space-y-1">
+											<div class="flex items-center">
+												<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+												</svg>
+												Du
 												{{ menu.dateDebut|date('d/m/Y') }}
-												-
+												au
 												{{ menu.dateFin|date('d/m/Y') }}
 											</div>
-										{% endif %}
-										<div>
-											<span class="font-medium">👤 Créé par:</span>
-											{{ menu.auteur.firstName }}
-											{{ menu.auteur.lastName }}
-										</div>
-										<div>
-											<span class="font-medium">📝 Créé le:</span>
-											{{ menu.createdAt|date('d/m/Y à H:i') }}
-										</div>
-										{% if menu.pdfFilename %}
-											<div>
-												<span class="font-medium">📄 Fichier:</span>
-												{{ menu.pdfFilename }}
+											<div class="flex items-center">
+												<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+												</svg>
+												Ajouté par
+												{{ menu.auteur.firstName }}
+												{{ menu.auteur.lastName }}
 											</div>
+											<div class="flex items-center">
+												<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+												</svg>
+												{{ menu.dateCreation|date('d/m/Y à H:i') }}
+											</div>
+										</div>
+									</div>
+
+									<div
+										class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0 md:ml-6">
+										<!-- Bouton Voir PDF -->
+										<a href="{{ menu.pdfUrl }}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm font-medium transition-colors inline-flex items-center justify-center">
+											<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+											</svg>
+											Voir PDF
+										</a>
+
+										<!-- Bouton Activer/Désactiver -->
+										{% if not menu.actif %}
+											<form action="/admin/menus-pdf/{{ menu.id }}/activate" method="POST" class="inline">
+												<button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 text-sm font-medium transition-colors inline-flex items-center justify-center w-full sm:w-auto">
+													<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+													</svg>
+													Activer
+												</button>
+											</form>
+										{% else %}
+											<span class="bg-gray-100 text-gray-500 px-4 py-2 text-sm font-medium inline-flex items-center justify-center cursor-not-allowed">
+												<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+												</svg>
+												Menu Actif
+											</span>
 										{% endif %}
+
+										<!-- Bouton Supprimer -->
+										<button onclick="confirmDelete({{ menu.id }}, '{{ menu.titre }}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-medium transition-colors inline-flex items-center justify-center">
+											<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+											</svg>
+											Supprimer
+										</button>
 									</div>
 								</div>
-
-								<div class="flex space-x-2">
-									{% if menu.pdfUrl %}
-										<a href="{{ menu.pdfUrl }}" target="_blank" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-											👁️ Voir PDF
-										</a>
-									{% endif %}
-
-									<button onclick="toggleMenu({{ menu.id }})" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white {{ menu.actif ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }} transition-colors">
-										{{ menu.actif ? '⏸️ Désactiver' : '▶️ Activer' }}
-									</button>
-
-									<button onclick="deleteMenu({{ menu.id }})" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">
-										🗑️ Supprimer
-									</button>
-								</div>
 							</div>
-						</div>
-					{% endfor %}
+						{% endfor %}
+					</div>
 				{% else %}
-					<div class="text-center py-12 bg-white rounded-lg shadow-md">
-						<svg class="mx-auto h-24 w-24 text-gray-400" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-						</svg>
-						<h3 class="mt-4 text-lg font-medium text-gray-900">Aucun menu pour le moment</h3>
-						<p class="mt-2 text-gray-500">Commencez par créer votre premier menu PDF.</p>
-						<button onclick="document.getElementById('newMenuBtn').click()" class="mt-4 Btn bg-[#006B6D] text-white px-6 py-3 rounded-lg hover:bg-[#005659] transition-colors">
-							📄 Créer le premier menu
-						</button>
+					<div class="text-center py-12">
+						<div class="bg-white shadow-md p-8 max-w-2xl mx-auto">
+							<div class="text-6xl mb-4">📄</div>
+							<h3 class="text-xl font-bold text-slate-800 mb-2">Aucun menu disponible</h3>
+							<p class="text-slate-600">Ajoutez votre premier menu PDF pour commencer.</p>
+						</div>
 					</div>
 				{% endif %}
+			</div>
+
+			<!-- Information Section -->
+			<div class="bg-blue-50 border border-blue-200 p-6 max-w-4xl mx-auto">
+				<h3 class="text-lg font-bold text-blue-900 mb-3">
+					<span class="mr-2">ℹ️</span>
+					Information importante
+				</h3>
+				<div class="text-blue-800 text-sm space-y-2">
+					<p>• Vous pouvez ajouter jusqu'à 3 menus pour vous avancer dans la planification.</p>
+					<p>• Seul le menu marqué comme "ACTIF" sera visible sur la page d'accueil dans la section "Le chef Serge vous propose".</p>
+					<p>• Les fichiers PDF doivent faire maximum 10MB et être au format PDF uniquement.</p>
+					<p>• Une fois qu'un menu est activé, les autres sont automatiquement désactivés.</p>
+				</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- Scripts -->
+	<!-- Modal de confirmation de suppression -->
+	<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+		<div class="bg-white p-6 max-w-md mx-4 shadow-xl">
+			<h3 class="text-lg font-bold text-slate-800 mb-4">Confirmer la suppression</h3>
+			<p class="text-slate-600 mb-6">Êtes-vous sûr de vouloir supprimer le menu "<span id="menuTitle"></span>" ? Cette action est irréversible.</p>
+			<div class="flex justify-end space-x-4">
+				<button onclick="closeDeleteModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 transition-colors">
+					Annuler
+				</button>
+				<form id="deleteForm" method="POST" class="inline">
+					<button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 transition-colors">
+						Supprimer
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	{{ parent() }}
 	<script>
-		// Modal management
-const modal = document.getElementById('uploadModal');
-const newMenuBtn = document.getElementById('newMenuBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-const uploadForm = document.getElementById('uploadForm');
-const fileInput = document.getElementById('menuPdf');
-const dropZone = document.getElementById('dropZone');
-const fileInfo = document.getElementById('fileInfo');
-
-newMenuBtn.addEventListener('click', () => {
-modal.style.display = 'block';
-});
-
-cancelBtn.addEventListener('click', () => {
-modal.style.display = 'none';
-uploadForm.reset();
-fileInfo.classList.add('hidden');
-});
-
-window.addEventListener('click', (e) => {
-if (e.target === modal) {
-modal.style.display = 'none';
-}
-});
-
-// File upload handling
-dropZone.addEventListener('click', () => fileInput.click());
-
-fileInput.addEventListener('change', (e) => {
-handleFile(e.target.files[0]);
-});
-
-// Drag and drop
-dropZone.addEventListener('dragover', (e) => {
-e.preventDefault();
-dropZone.classList.add('dragover');
-});
-
-dropZone.addEventListener('dragleave', () => {
-dropZone.classList.remove('dragover');
-});
-
-dropZone.addEventListener('drop', (e) => {
-e.preventDefault();
-dropZone.classList.remove('dragover');
-const file = e.dataTransfer.files[0];
-if (file && file.type === 'application/pdf') {
-fileInput.files = e.dataTransfer.files;
-handleFile(file);
+		function updateFileName(input) {
+const fileName = document.getElementById('fileName');
+if (input.files && input.files[0]) {
+fileName.textContent = '📄 ' + input.files[0].name;
+fileName.classList.remove('hidden');
 } else {
-alert('Veuillez sélectionner un fichier PDF valide.');
-}
-});
-
-function handleFile(file) {
-if (file) {
-fileInfo.textContent = `✅ ${
-file.name
-} (${
-(file.size / 1024 / 1024).toFixed(2)
-} MB)`;
-fileInfo.classList.remove('hidden');
+fileName.classList.add('hidden');
 }
 }
 
-// Menu actions
-function toggleMenu(menuId) {
-if (confirm('Êtes-vous sûr de vouloir modifier l\'état de ce menu ?')) {
-fetch (`/admin/menus-pdf/${menuId}/toggle`, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-}
-}).then(response => response.json()).then(data => {
-if (data.success) {
-location.reload();
-} else {
-alert('Erreur lors de la modification du menu');
-}
-}).catch(error => {
-console.error('Error:', error);
-alert('Erreur lors de la modification du menu');
-});
-}
+function confirmDelete(menuId, menuTitle) {
+document.getElementById('menuTitle').textContent = menuTitle;
+document.getElementById('deleteForm').action = `/admin/menus-pdf/${menuId}?_method=DELETE`;
+document.getElementById('deleteModal').classList.remove('hidden');
 }
 
-function deleteMenu(menuId) {
-if (confirm('Êtes-vous sûr de vouloir supprimer ce menu ? Cette action est irréversible.')) {
-fetch (`/admin/menus-pdf/${menuId}`, {
-method: 'DELETE',
-headers: {
-'Content-Type': 'application/json'
+function closeDeleteModal() {
+document.getElementById('deleteModal').classList.add('hidden');
 }
-}).then(response => response.json()).then(data => {
-if (data.success) {
-location.reload();
-} else {
-alert('Erreur lors de la suppression du menu');
+
+// Fermer la modal en cliquant à l'extérieur
+document.getElementById('deleteModal').addEventListener('click', function (e) {
+if (e.target === this) {
+closeDeleteModal();
 }
-}).catch(error => {
-console.error('Error:', error);
-alert('Erreur lors de la suppression du menu');
 });
-}
-}
+
+// Auto-remplir les dates avec la semaine courante
+document.addEventListener('DOMContentLoaded', function () {
+const today = new Date();
+const monday = new Date(today);
+monday.setDate(today.getDate() - today.getDay() + 1);
+
+const friday = new Date(monday);
+friday.setDate(monday.getDate() + 4);
+
+document.getElementById('dateDebut').value = monday.toISOString().split('T')[0];
+document.getElementById('dateFin').value = friday.toISOString().split('T')[0];
+});
 	</script>
 {% endblock %}

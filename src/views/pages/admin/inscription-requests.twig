@@ -1,0 +1,273 @@
+{% extends "layouts/admin.twig" %}
+
+{% block title %}Demandes d'inscription - Administration
+{% endblock %}
+
+{% block content %}
+	<div class="container mx-auto px-4 py-8">
+		<div class="flex justify-between items-center mb-8">
+			<h1 class="text-3xl font-bold text-[#304a4d]">Demandes d'inscription</h1>
+			<div class="flex gap-2">
+				<span class="badge badge-warning">{{ requests | filter(r => r.status == 'PENDING') | length }}
+					en attente</span>
+				<span class="badge badge-success">{{ requests | filter(r => r.status == 'APPROVED') | length }}
+					approuvées</span>
+				<span class="badge badge-error">{{ requests | filter(r => r.status == 'REJECTED') | length }}
+					refusées</span>
+			</div>
+		</div>
+
+		<!-- Filtres -->
+		<div class="mb-6">
+			<div class="tabs tabs-boxed">
+				<a class="tab tab-active" data-filter="all">Toutes ({{ requests | length }})</a>
+				<a class="tab" data-filter="PENDING">En attente ({{ requests | filter(r => r.status == 'PENDING') | length }})</a>
+				<a class="tab" data-filter="APPROVED">Approuvées ({{ requests | filter(r => r.status == 'APPROVED') | length }})</a>
+				<a class="tab" data-filter="REJECTED">Refusées ({{ requests | filter(r => r.status == 'REJECTED') | length }})</a>
+			</div>
+		</div>
+
+		<!-- Liste des demandes -->
+		<div class="space-y-6">
+			{% for request in requests %}
+				<div class="card bg-base-100 shadow-xl request-item" data-status="{{ request.status }}">
+					<div class="card-body">
+						<div class="flex justify-between items-start mb-4">
+							<div>
+								<h2 class="card-title text-[#304a4d] text-xl">
+									{{ request.parentFirstName }}
+									{{ request.parentLastName }}
+								</h2>
+								<p class="text-gray-600">{{ request.parentEmail }}</p>
+								<p class="text-gray-600">{{ request.parentPhone }}</p>
+							</div>
+
+							<div class="text-right">
+								{% if request.status == 'PENDING' %}
+									<span class="badge badge-warning badge-lg">En attente</span>
+								{% elseif request.status == 'APPROVED' %}
+									<span class="badge badge-success badge-lg">Approuvée</span>
+								{% else %}
+									<span class="badge badge-error badge-lg">Refusée</span>
+								{% endif %}
+								<p class="text-sm text-gray-500 mt-1">
+									Demande du
+									{{ request.createdAt | date('d/m/Y à H:i') }}
+								</p>
+							</div>
+						</div>
+
+						<!-- Informations du parent -->
+						<div class="grid md:grid-cols-2 gap-6 mb-6">
+							<div class="bg-blue-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
+									👨‍👩‍👧‍👦 Informations parent
+								</h3>
+								<div class="space-y-2 text-sm">
+									<p>
+										<strong>Nom :</strong>
+										{{ request.parentFirstName }}
+										{{ request.parentLastName }}</p>
+									<p>
+										<strong>Email :</strong>
+										{{ request.parentEmail }}</p>
+									<p>
+										<strong>Téléphone :</strong>
+										{{ request.parentPhone }}</p>
+									<p>
+										<strong>Adresse :</strong>
+										{{ request.parentAddress }}</p>
+								</div>
+							</div>
+
+							<div class="bg-green-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
+									👶 Enfant(s) à inscrire
+								</h3>
+								<div class="space-y-3">
+									{% for child in request.children %}
+										<div class="border border-green-200 rounded p-3 text-sm">
+											<p>
+												<strong>{{ child.firstName }}
+													{{ child.lastName }}</strong>
+											</p>
+											<p class="text-gray-600">Né(e) le
+												{{ child.birthDate | date('d/m/Y') }}</p>
+											<p class="text-gray-600">Âge :
+												{{ 'now' | date('Y') - child.birthDate | date('Y') }}
+												ans</p>
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+
+						<!-- Commentaire de révision si existe -->
+						{% if request.reviewComment %}
+							<div class="bg-gray-50 p-4 rounded-lg mb-4">
+								<h3 class="font-semibold text-[#304a4d] mb-2">Commentaire de révision</h3>
+								<p class="text-gray-700">{{ request.reviewComment }}</p>
+								{% if request.reviewer %}
+									<p class="text-sm text-gray-500 mt-2">
+										Par
+										{{ request.reviewer.firstName }}
+										{{ request.reviewer.lastName }}
+										le
+										{{ request.reviewedAt | date('d/m/Y à H:i') }}
+									</p>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<!-- Actions -->
+						{% if request.status == 'PENDING' %}
+							<div class="card-actions justify-end">
+								<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
+									Refuser
+								</button>
+								<button class="btn btn-success" onclick="showApproveModal({{ request.id }})">
+									Approuver
+								</button>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			{% else %}
+				<div class="text-center py-12">
+					<p class="text-gray-500 text-lg">Aucune demande d'inscription trouvée.</p>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<!-- Modal d'approbation -->
+	<dialog id="approve_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-green-600">Approuver la demande</h3>
+			<p class="py-4">Êtes-vous sûr de vouloir approuver cette demande d'inscription ?</p>
+
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text">Commentaire (optionnel)</span>
+				</label>
+				<textarea id="approve_comment" class="textarea textarea-bordered" placeholder="Commentaire d'approbation..."></textarea>
+			</div>
+
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('approve_modal').close()">Annuler</button>
+				<button class="btn btn-success" onclick="processApproval()">Confirmer l'approbation</button>
+			</div>
+		</div>
+	</dialog>
+
+	<!-- Modal de refus -->
+	<dialog id="reject_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-red-600">Refuser la demande</h3>
+			<p class="py-4">Êtes-vous sûr de vouloir refuser cette demande d'inscription ?</p>
+
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text">Motif du refus *</span>
+				</label>
+				<textarea id="reject_comment" class="textarea textarea-bordered" placeholder="Veuillez indiquer le motif du refus..." required></textarea>
+			</div>
+
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('reject_modal').close()">Annuler</button>
+				<button class="btn btn-error" onclick="processRejection()">Confirmer le refus</button>
+			</div>
+		</div>
+	</dialog>
+
+	<script>
+		let currentRequestId = null;
+
+// Fonction pour afficher le modal d'approbation
+function showApproveModal(requestId) {
+currentRequestId = requestId;
+document.getElementById('approve_modal').showModal();
+}
+
+// Fonction pour afficher le modal de refus
+function showRejectModal(requestId) {
+currentRequestId = requestId;
+document.getElementById('reject_modal').showModal();
+}
+
+// Traiter l'approbation
+async function processApproval() {
+const comment = document.getElementById('approve_comment').value;
+
+try {
+const response = await fetch (`/admin/inscriptions/${currentRequestId}/approve`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({comment})
+});
+
+const result = await response.json();
+
+if (result.success) {
+location.reload();
+} else {
+alert('Erreur : ' + result.message);
+}
+} catch (error) {
+alert('Erreur lors de l\'approbation');
+}
+}
+
+// Traiter le refus
+async function processRejection() {
+const comment = document.getElementById('reject_comment').value;
+
+if (! comment.trim()) {
+alert('Veuillez indiquer un motif de refus');
+return;
+}
+
+try {
+const response = await fetch (`/admin/inscriptions/${currentRequestId}/reject`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({comment})
+});
+
+const result = await response.json();
+
+if (result.success) {
+location.reload();
+} else {
+alert('Erreur : ' + result.message);
+}
+} catch (error) {
+alert('Erreur lors du refus');
+}
+}
+
+// Filtrage des demandes
+document.querySelectorAll('.tab').forEach(tab => {
+tab.addEventListener('click', function () { // Retirer la classe active de tous les onglets
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+// Ajouter la classe active à l'onglet cliqué
+this.classList.add('tab-active');
+
+const filter = this.getAttribute('data-filter');
+const requests = document.querySelectorAll('.request-item');
+
+requests.forEach(request => {
+if (filter === 'all' || request.getAttribute('data-status') === filter) {
+request.style.display = 'block';
+} else {
+request.style.display = 'none';
+}
+});
+});
+});
+	</script>
+{% endblock %}

@@ -54,7 +54,7 @@ const requireEnseignant = requireRole(['ENSEIGNANT', 'ADMIN', 'DIRECTION']);
 
 const requireParent = requireRole(['PARENT', 'ADMIN', 'DIRECTION']);
 
-const requireDirection = requireRole(['DIRECTION', 'ADMIN']);
+const requireDirection = requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']);
 
 const requireAPEL = requireRole(['APEL', 'ADMIN', 'DIRECTION']);
 
