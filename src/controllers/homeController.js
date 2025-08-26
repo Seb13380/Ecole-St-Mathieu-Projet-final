@@ -74,6 +74,7 @@ const homeController = {
       res.render('pages/home', {
         title: 'École Saint-Mathieu - Accueil',
         message: req.query.message || req.query.success || req.query.error,
+        user: req.session.user || null,
         menuActif: menuActif,
         actualites: actualites,
         travaux: travaux,
@@ -85,6 +86,7 @@ const homeController = {
       res.render('pages/home', {
         title: 'École Saint-Mathieu - Accueil',
         message: req.query.message || req.query.success || req.query.error,
+        user: req.session.user || null,
         menuActif: null,
         actualites: [],
         travaux: [],

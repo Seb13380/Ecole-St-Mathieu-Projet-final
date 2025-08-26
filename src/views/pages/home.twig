@@ -75,7 +75,7 @@
 	</div>
 
 	<div class="full-width-section py-8">
-		<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-12 text-center py-8">Actualités & Travaux</h2>
+		<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-12 text-center py-8">Notre école dans le temps</h2>
 
 		<div class="w-full">
 			<div class="flex flex-row w-full h-auto min-h-[800px] gap-0">
@@ -156,248 +156,281 @@
 					</div>
 				</div>
 
-				<!-- Section Actualités et Travaux empilés verticalement - 1/3 -->
-				<div
-					class="w-1/3 flex flex-col min-h-[600px] gap-4 pr-0">
-					<!-- Section Actualités -->
-					<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
-						<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center p-6">📰 Actualités</h3>
-						<div class="space-y-6 mb-8 px-8 pb-8">
-							{% if actualites and actualites|length > 0 %}
-								{% for actualite in actualites|slice(0, 3) %}
-									<div class="border-l-4 border-[#a7e3dd] pl-6">
-										<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3 {{ actualite.important ? 'text-red-600' : '' }}">
-											{{ actualite.important ? '🚨 ' : '' }}{{ actualite.titre }}
-										</h4>
-										<p class="text-lg md:text-xl text-gray-700 mb-3">{{ actualite.contenu|length > 100 ? actualite.contenu|slice(0, 100) ~ '...' : actualite.contenu }}</p>
-										<span class="text-lg md:text-xl text-gray-500">📅
-											{{ actualite.datePublication|date('d/m/Y') }}</span>
+				<!-- Section Travaux -->
+				<div class="bg-gray-50 p-0 flex-1 rounded-l-lg">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center px-8 pt-8">🔨 Travaux</h3>
+					<div class="space-y-6 px-8 pb-8">
+						{% if travaux and travaux|length > 0 %}
+							{% for travail in travaux %}
+								<div class="border-l-4 border-{% if travail.important %}red-500{% else %}[#304a4d]{% endif %} pl-6">
+									<div class="flex items-center gap-3 mb-3">
+										<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d]">{{ travail.titre }}</h4>
+										{% if travail.important %}
+											<span class="text-lg bg-red-100 text-red-600 px-3 py-2 rounded">Important</span>
+										{% endif %}
 									</div>
-								{% endfor %}
-
-							{% endif %}
-						</div>
-					</div>
-
-					<!-- Section Travaux -->
-					<div class="bg-gray-50 p-0 flex-1 rounded-l-lg">
-						<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center px-8 pt-8">🔨 Travaux</h3>
-						<div class="space-y-6 px-8 pb-8">
-							{% if travaux and travaux|length > 0 %}
-								{% for travail in travaux %}
-									<div class="border-l-4 border-{% if travail.important %}red-500{% else %}[#304a4d]{% endif %} pl-6">
-										<div class="flex items-center gap-3 mb-3">
-											<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d]">{{ travail.titre }}</h4>
-											{% if travail.important %}
-												<span class="text-lg bg-red-100 text-red-600 px-3 py-2 rounded">Important</span>
+									<p class="text-lg md:text-xl text-gray-700 mb-4">{{ travail.description|length > 100 ? travail.description[:100] ~ '...' : travail.description }}</p>
+									<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+										<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: {{ travail.progression }}%"></div>
+									</div>
+									<div class="flex items-center justify-between">
+										<span class="text-lg md:text-xl text-gray-500">🔧
+											{{ travail.progression }}%</span>
+										<span class="text-lg md:text-xl text-gray-400">
+											{% if travail.statut == 'EN_COURS' %}🚧 En cours
 											{% endif %}
-										</div>
-										<p class="text-lg md:text-xl text-gray-700 mb-4">{{ travail.description|length > 100 ? travail.description[:100] ~ '...' : travail.description }}</p>
-										<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-											<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: {{ travail.progression }}%"></div>
-										</div>
-										<div class="flex items-center justify-between">
-											<span class="text-lg md:text-xl text-gray-500">🔧
-												{{ travail.progression }}%</span>
-											<span class="text-lg md:text-xl text-gray-400">
-												{% if travail.statut == 'EN_COURS' %}🚧 En cours
-												{% endif %}
-												{% if travail.statut == 'TERMINE' %}✅ Terminé
-												{% endif %}
-												{% if travail.statut == 'PLANIFIE' %}📋 Planifié
-												{% endif %}
-												{% if travail.statut == 'SUSPENDU' %}⏸️ Suspendu
-												{% endif %}
-											</span>
-										</div>
+											{% if travail.statut == 'TERMINE' %}✅ Terminé
+											{% endif %}
+											{% if travail.statut == 'PLANIFIE' %}📋 Planifié
+											{% endif %}
+											{% if travail.statut == 'SUSPENDU' %}⏸️ Suspendu
+											{% endif %}
+										</span>
 									</div>
-								{% endfor %}
-							{% else %}
-								<div class="border-l-4 border-[#304a4d] pl-6">
-									<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Rénovation cour</h4>
-									<p class="text-lg md:text-xl text-gray-700 mb-4">Nouveaux jeux et revêtement prévu pour septembre.</p>
-									<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-										<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 75%"></div>
-									</div>
-									<span class="text-lg md:text-xl text-gray-500">🔧 75%</span>
 								</div>
+							{% endfor %}
+						{% else %}
+							<div class="border-l-4 border-[#304a4d] pl-6">
+								<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Rénovation cour</h4>
+								<p class="text-lg md:text-xl text-gray-700 mb-4">Nouveaux jeux et revêtement prévu pour septembre.</p>
+								<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+									<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 75%"></div>
+								</div>
+								<span class="text-lg md:text-xl text-gray-500">🔧 75%</span>
+							</div>
 
-								<div class="border-l-4 border-[#304a4d] pl-6">
-									<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Tableaux numériques</h4>
-									<p class="text-lg md:text-xl text-gray-700 mb-4">Équipement de toutes les classes.</p>
-									<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-										<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 45%"></div>
-									</div>
-									<span class="text-lg md:text-xl text-gray-500">🔧 45%</span>
+							<div class="border-l-4 border-[#304a4d] pl-6">
+								<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Tableaux numériques</h4>
+								<p class="text-lg md:text-xl text-gray-700 mb-4">Équipement de toutes les classes.</p>
+								<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+									<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 45%"></div>
 								</div>
-							{% endif %}
+								<span class="text-lg md:text-xl text-gray-500">🔧 45%</span>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% if user %}
+		<!-- Section Actualités - Visible uniquement pour les utilisateurs connectés -->
+		<div class="w-full flex flex-col min-h-[600px] gap-4 pr-0">
+			<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
+				<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center p-6">📰 Actualités</h3>
+				<div class="space-y-6 mb-8 px-8 pb-8">
+					{% if actualites and actualites|length > 0 %}
+						{% for actualite in actualites|slice(0, 3) %}
+							<div class="border-l-4 border-[#a7e3dd] pl-6">
+								<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3 {{ actualite.important ? 'text-red-600' : '' }}">
+									{{ actualite.important ? '🚨 ' : '' }}{{ actualite.titre }}
+								</h4>
+								<p class="text-lg md:text-xl text-gray-700 mb-3">{{ actualite.contenu|length > 100 ? actualite.contenu|slice(0, 100) ~ '...' : actualite.contenu }}</p>
+								<span class="text-lg md:text-xl text-gray-500">📅
+									{{ actualite.datePublication|date('d/m/Y') }}</span>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="text-center py-8">
+							<p class="text-xl text-gray-500">Aucune actualité disponible pour le moment.</p>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	{% else %}
+		<!-- Message pour les visiteurs non connectés -->
+		<div class="w-full flex flex-col min-h-[600px] gap-4 pr-0">
+			<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
+				<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center p-6">📰 Actualités</h3>
+				<div class="space-y-6 mb-8 px-8 pb-8">
+					<div class="text-center py-12">
+						<div class="mb-6">
+							<i class="fas fa-lock text-6xl text-gray-400 mb-4"></i>
+						</div>
+						<h4 class="text-2xl font-bold text-[#304a4d] mb-4">Accès réservé aux membres</h4>
+						<p class="text-xl text-gray-600 mb-6">
+							Les actualités de l'école sont accessibles uniquement aux familles et au personnel connectés.
+						</p>
+						<div class="space-y-4">
+							<a href="/login" class="inline-block bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 mr-4">
+								<i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+							</a>
+							<a href="/pre-inscription" class="inline-block bg-[#a7e3dd] hover:bg-[#8dd3cc] text-[#304a4d] font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+								<i class="fas fa-user-plus mr-2"></i>Faire une demande d'inscription
+							</a>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+	{% endif %}
 
-		<!-- Section Google Maps -->
-		<div class="full-width-section mt-16">
-			<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-8 text-center py-8">📍 Nous trouver</h2>
-			<div class="w-full">
-				<div class="bg-white p-6">
-					<div class="text-center mb-8">
-						<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-4">École Saint-Mathieu</h3>
-						<p class="text-xl md:text-2xl text-gray-600">
-							<i class="fas fa-map-marker-alt text-[#a7e3dd] mr-2"></i>
-							22 Place des Héros, 13013 Marseille - Château-Gombert
-						</p>
-						<p class="text-xl md:text-2xl text-gray-500 mt-3">
-							<i class="fas fa-phone text-[#a7e3dd] mr-2"></i>
-							Téléphone : 04 91 05 05 89
-						</p>
+	<!-- Section Google Maps -->
+	<div class="full-width-section mt-16">
+		<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-8 text-center py-8">📍 Nous trouver</h2>
+		<div class="w-full">
+			<div class="bg-white p-6">
+				<div class="text-center mb-8">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-4">École Saint-Mathieu</h3>
+					<p class="text-xl md:text-2xl text-gray-600">
+						<i class="fas fa-map-marker-alt text-[#a7e3dd] mr-2"></i>
+						22 Place des Héros, 13013 Marseille - Château-Gombert
+					</p>
+					<p class="text-xl md:text-2xl text-gray-500 mt-3">
+						<i class="fas fa-phone text-[#a7e3dd] mr-2"></i>
+						Téléphone : 04 91 05 05 89
+					</p>
+				</div>
+
+				<!-- Carte Google Maps -->
+				<div class="w-full h-[600px] overflow-hidden shadow-md maps-container">
+					<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.5234567890123!2d5.4297756!3d43.3406789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f15.5!3m3!1m2!1s0x12c9c6c234567890%3A0x9876543210fedcba!2s22%20Pl.%20des%20H%C3%A9ros%2C%2013013%20Marseille!5e1!3m2!1sfr!2sfr!4v1692345678901!5m2!1sfr!2sfr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="École Saint-Mathieu - 22 Place des Héros, Marseille"></iframe>
+				</div>
+
+				<!-- Informations pratiques -->
+				<div class="grid md:grid-cols-3 gap-6 mt-6 px-6">
+					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
+						<i class="fas fa-car text-4xl text-[#304a4d] mb-4"></i>
+						<h4 class="font-bold text-xl text-[#304a4d] mb-3">En voiture</h4>
+						<p class="text-lg text-gray-600">Parkings disponibles:<br>
+							- Place des Héros
+							<br>
+							- Parking Louis Feuillée</p>
 					</div>
-
-					<!-- Carte Google Maps -->
-					<div class="w-full h-[600px] overflow-hidden shadow-md maps-container">
-						<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.5234567890123!2d5.4297756!3d43.3406789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f15.5!3m3!1m2!1s0x12c9c6c234567890%3A0x9876543210fedcba!2s22%20Pl.%20des%20H%C3%A9ros%2C%2013013%20Marseille!5e1!3m2!1sfr!2sfr!4v1692345678901!5m2!1sfr!2sfr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="École Saint-Mathieu - 22 Place des Héros, Marseille"></iframe>
+					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
+						<i class="fas fa-bus text-4xl text-[#304a4d] mb-4"></i>
+						<h4 class="font-bold text-xl text-[#304a4d] mb-3">Transport en commun</h4>
+						<p class="text-lg text-gray-600">Bus ligne 1 - Arrêt place des Héros</p>
 					</div>
-
-					<!-- Informations pratiques -->
-					<div class="grid md:grid-cols-3 gap-6 mt-6 px-6">
-						<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
-							<i class="fas fa-car text-4xl text-[#304a4d] mb-4"></i>
-							<h4 class="font-bold text-xl text-[#304a4d] mb-3">En voiture</h4>
-							<p class="text-lg text-gray-600">Parkings disponibles:<br> - Place des Héros <br> - Parking Louis Feuillée</p>
-						</div>
-						<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
-							<i class="fas fa-bus text-4xl text-[#304a4d] mb-4"></i>
-							<h4 class="font-bold text-xl text-[#304a4d] mb-3">Transport en commun</h4>
-							<p class="text-lg text-gray-600">Bus ligne 1 - Arrêt place des Héros</p>
-						</div>
-						<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
-							<i class="fas fa-clock text-4xl text-[#304a4d] mb-4"></i>
-							<h4 class="font-bold text-xl text-[#304a4d] mb-3">Horaires</h4>
-							<p class="text-lg text-gray-600">Lun-Ven : 07h30 - 18h00</p>
-						</div>
+					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
+						<i class="fas fa-clock text-4xl text-[#304a4d] mb-4"></i>
+						<h4 class="font-bold text-xl text-[#304a4d] mb-3">Horaires</h4>
+						<p class="text-lg text-gray-600">Lun-Ven : 07h30 - 18h00</p>
 					</div>
 				</div>
 			</div>
 		</div>
-	{% endblock %}
+	</div>
+{% endblock %}
 
-	{% block styles %}
-		<style>
-			.full-width-section {
-				width: 100vw !important;
-				position: relative;
-				left: 50%;
-				right: 50%;
-				margin-left: -50vw !important;
-				margin-right: -50vw !important;
-				background-color: #a7e3dd;
-				padding: 20px 0;
-				box-sizing: border-box;
-			}
+{% block styles %}
+	<style>
+		.full-width-section {
+			width: 100vw !important;
+			position: relative;
+			left: 50%;
+			right: 50%;
+			margin-left: -50vw !important;
+			margin-right: -50vw !important;
+			background-color: #a7e3dd;
+			padding: 20px 0;
+			box-sizing: border-box;
+		}
 
-			/* Colonnes 50/50 */
-			.w-2\/3 {
-				width: 50% !important;
-			}
+		/* Colonnes 50/50 */
+		.w-2\/3 {
+			width: 50% !important;
+		}
 
-			.w-1\/3 {
-				width: 50% !important;
-			}
+		.w-1\/3 {
+			width: 50% !important;
+		}
 
-			/* Styles pour les carousels */
-			.carousel {
-				scroll-behavior: smooth;
-				scroll-snap-type: x mandatory;
-			}
+		/* Styles pour les carousels */
+		.carousel {
+			scroll-behavior: smooth;
+			scroll-snap-type: x mandatory;
+		}
 
-			.carousel-item {
-				scroll-snap-align: start;
-			}
+		.carousel-item {
+			scroll-snap-align: start;
+		}
 
-			/* Amélioration des boutons de carousel */
+		/* Amélioration des boutons de carousel */
+		.carousel .btn-circle {
+			background-color: rgba(48, 74, 77, 0.9) !important;
+			border: 3px solid rgba(167, 227, 221, 0.8) !important;
+			color: white !important;
+			font-weight: bold !important;
+			font-size: 24px !important;
+			width: 4rem !important;
+			height: 4rem !important;
+			min-height: 4rem !important;
+			transition: all 0.3s ease !important;
+			z-index: 999 !important;
+			backdrop-filter: blur(8px) !important;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			position: relative !important;
+		}
+
+		.carousel .btn-circle:hover {
+			background-color: rgba(48, 74, 77, 1) !important;
+			border-color: rgba(167, 227, 221, 1) !important;
+			transform: scale(1.1) !important;
+			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
+		}
+
+		/* Positionnement spécifique des boutons */
+		.carousel .carousel-prev {
+			margin-right: auto !important;
+		}
+
+		.carousel .carousel-next {
+			margin-left: auto !important;
+		}
+
+		/* S'assurer que les conteneurs de boutons sont visibles et symétriques */
+		.carousel-item .absolute {
+			z-index: 998 !important;
+		}
+
+		.carousel-item .absolute .btn-circle {
+			pointer-events: auto !important;
+			flex-shrink: 0 !important;
+		}
+
+		/* Forcer la visibilité des boutons même sur petits écrans */
+		@media(max-width: 768px) {
 			.carousel .btn-circle {
-				background-color: rgba(48, 74, 77, 0.9) !important;
-				border: 3px solid rgba(167, 227, 221, 0.8) !important;
-				color: white !important;
-				font-weight: bold !important;
-				font-size: 24px !important;
-				width: 4rem !important;
-				height: 4rem !important;
-				min-height: 4rem !important;
-				transition: all 0.3s ease !important;
-				z-index: 999 !important;
-				backdrop-filter: blur(8px) !important;
-				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-				display: flex !important;
-				align-items: center !important;
-				justify-content: center !important;
-				position: relative !important;
+				width: 3rem !important;
+				height: 3rem !important;
+				font-size: 18px !important;
 			}
+		}
 
-			.carousel .btn-circle:hover {
-				background-color: rgba(48, 74, 77, 1) !important;
-				border-color: rgba(167, 227, 221, 1) !important;
-				transform: scale(1.1) !important;
-				box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
-			}
+		/* Google Maps styling */
+		.maps-container iframe {
+			border-radius: 12px;
+			transition: transform 0.3s ease;
+			height: 600px !important;
+			min-height: 600px !important;
+		}
 
-			/* Positionnement spécifique des boutons */
-			.carousel .carousel-prev {
-				margin-right: auto !important;
-			}
+		.maps-container:hover iframe {
+			transform: scale(1.02);
+		}
 
-			.carousel .carousel-next {
-				margin-left: auto !important;
-			}
+		/* Animation pour les icônes des informations pratiques */
+		.info-card {
+			transition: all 0.3s ease;
+		}
 
-			/* S'assurer que les conteneurs de boutons sont visibles et symétriques */
-			.carousel-item .absolute {
-				z-index: 998 !important;
-			}
+		.info-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(167, 227, 221, 0.3);
+		}
+	</style>
+{% endblock %}
 
-			.carousel-item .absolute .btn-circle {
-				pointer-events: auto !important;
-				flex-shrink: 0 !important;
-			}
-
-			/* Forcer la visibilité des boutons même sur petits écrans */
-			@media(max-width: 768px) {
-				.carousel .btn-circle {
-					width: 3rem !important;
-					height: 3rem !important;
-					font-size: 18px !important;
-				}
-			}
-
-			/* Google Maps styling */
-			.maps-container iframe {
-				border-radius: 12px;
-				transition: transform 0.3s ease;
-				height: 600px !important;
-				min-height: 600px !important;
-			}
-
-			.maps-container:hover iframe {
-				transform: scale(1.02);
-			}
-
-			/* Animation pour les icônes des informations pratiques */
-			.info-card {
-				transition: all 0.3s ease;
-			}
-
-			.info-card:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 4px 12px rgba(167, 227, 221, 0.3);
-			}
-		</style>
-	{% endblock %}
-
-	{% block scripts %}
-		{{ parent() }}
-		<script>
-			// Auto-défilement pour les carousels DaisyUI
+{% block scripts %}
+	{{ parent() }}
+	<script>
+		// Auto-défilement pour les carousels DaisyUI
 document.addEventListener('DOMContentLoaded', function () {
 console.log('✅ Initialisation des carousels DaisyUI avec auto-défilement');
 
@@ -469,5 +502,5 @@ setTimeout(autoScrollCarousels, 1000);
 
 console.log('🚀 Carousels avec auto-défilement démarrés');
 });
-		</script>
-	{% endblock %}
+	</script>
+{% endblock %}
