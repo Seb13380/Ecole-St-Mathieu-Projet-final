@@ -73,6 +73,7 @@ model User {
   inscriptionRequests InscriptionRequest[] @relation("InscriptionReviewer")
   reviewedRequests    InscriptionRequest[]
   galleryMedia        GalleryMedia[]       @relation("UserGalleryMedia")
+  documents           Document[]           @relation("UserDocuments")
 }
 
 model Student {
@@ -429,4 +430,40 @@ model GalleryMedia {
 enum GalleryMediaType {
   IMAGE
   VIDEO
+}
+
+model Document {
+  id          Int          @id @default(autoincrement())
+  type        DocumentType // Type de document (PROJET_EDUCATIF, REGLEMENT_INTERIEUR, etc.)
+  titre       String // Titre affiché 
+  description String? // Description optionnelle
+  contenu     String?      @db.LongText // Contenu HTML (optionnel si juste PDF)
+  pdfUrl      String? // URL du fichier PDF
+  pdfFilename String? // Nom original du fichier PDF
+  active      Boolean      @default(true) // Document actif ou archivé
+  ordre       Int          @default(0) // Ordre d'affichage
+  auteurId    Int // Qui a créé/modifié le document
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  auteur User @relation("UserDocuments", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+  @@index([active])
+  @@index([ordre])
+}
+
+enum DocumentType {
+  PROJET_EDUCATIF
+  PROJET_ETABLISSEMENT
+  REGLEMENT_INTERIEUR
+  ORGANIGRAMME
+  CHARTE_LAICITE
+  CHARTE_NUMERIQUE
+  CHARTE_VIE_SCOLAIRE
+  CHARTE_RESTAURATION
+  AGENDA
+  PASTORALE_AXE
+  PASTORALE_TEMPS_PRIANT
+  PASTORALE_ENSEMBLE
 }

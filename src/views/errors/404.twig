@@ -1,0 +1,29 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Erreur 404 - Page non trouvée
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto p-8 text-center">
+		<div class="max-w-md mx-auto">
+			<div class="text-6xl mb-4">🔍</div>
+			<h1 class="text-3xl font-bold text-slate-800 mb-4">Page non trouvée</h1>
+			<p class="text-slate-600 mb-6">La page que vous recherchez n'existe pas ou a été déplacée.</p>
+
+			<div class="space-y-3">
+				<a href="/" class="btn btn-primary">
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+					</svg>
+					Retour à l'accueil
+				</a>
+
+				{% if user and (user.role == 'DIRECTION' or user.role == 'ADMIN' or user.role == 'GESTIONNAIRE_SITE') %}
+					<a href="/documents/admin" class="btn btn-outline">
+						📄 Gestion des documents
+					</a>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

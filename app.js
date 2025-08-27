@@ -68,6 +68,7 @@ const carouselRoutes = require("./src/routes/carouselRoutes");
 const heroCarouselRoutes = require("./src/routes/heroCarouselRoutes");
 const inscriptionsRoutes = require('./src/routes/inscriptions');
 const galleryRoutes = require('./src/routes/galleryRoutes');
+const documentRoutes = require('./src/routes/documentRoutes');
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -89,6 +90,7 @@ app.use('/carousel', carouselRoutes);
 app.use('/hero-carousel', heroCarouselRoutes);
 app.use('/inscriptions', inscriptionsRoutes);
 app.use('/gallery', galleryRoutes);
+app.use('/documents', documentRoutes);
 
 // Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
 app.get('/inscriptions/manage', (req, res) => {
