@@ -1,11 +1,13 @@
 const express = require('express');
 const loginRoutes = require('./loginRoutes');
+const passwordResetRoutes = require('./passwordResetRoutes');
 const parentInvitationController = require('../controllers/parentInvitationController');
 const inscriptionController = require('../controllers/inscriptionController');
 
 const router = express.Router();
 
 router.use('/login', loginRoutes);
+router.use('/', passwordResetRoutes); // Routes pour forgot-password et reset-password
 
 // Routes pour l'inscription publique
 router.get('/register', inscriptionController.showRegistrationForm);

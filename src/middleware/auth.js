@@ -60,9 +60,10 @@ const requireDirection = (req, res, next) => {
         return res.redirect('/login');
     }
 
-    if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+    const allowedRoles = ['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];
+    if (!allowedRoles.includes(req.session.user.role)) {
         return res.status(403).render('pages/error', {
-            message: 'Accès refusé. Réservé aux directeurs.',
+            message: 'Accès refusé. Réservé aux directeurs et gestionnaires.',
             user: req.session.user
         });
     }

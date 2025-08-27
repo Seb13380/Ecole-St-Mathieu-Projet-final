@@ -148,12 +148,13 @@ class EmailService {
                         <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
                             <h3 style="color: #856404; margin-top: 0;">📋 Dans votre espace parent, vous pourrez :</h3>
                             <ul style="color: #856404; margin: 0; padding-left: 20px;">
-                                <li>Consulter les notes et bulletins de vos enfants</li>
                                 <li>Voir les actualités de l'école</li>
                                 <li>Consulter les menus de la cantine</li>
-                                <li>Contacter les enseignants</li>
-                                <li>Gérer les tickets de restauration</li>
+                                <li>Accéder aux informations importantes</li>
                             </ul>
+                            <p style="color: #856404; margin: 10px 0 0 0; font-style: italic; font-size: 14px;">
+                                📝 <strong>Prochainement :</strong> Gestion des tickets de restauration et autres fonctionnalités en cours de développement.
+                            </p>
                         </div>
                         
                         <div style="background-color: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545; margin: 20px 0;">
@@ -433,7 +434,7 @@ class EmailService {
                         </div>
                         
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/admin/inscriptions" 
+                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/directeur/inscriptions" 
                                style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                                 🚀 Voir les demandes en attente
                             </a>
@@ -460,6 +461,179 @@ class EmailService {
             return { success: true, messageId: info.messageId };
         } catch (error) {
             console.error('Erreur lors de l\'envoi de la notification au directeur:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Envoyer un email de reset de mot de passe
+     * @param {Object} user - Données de l'utilisateur
+     * @param {string} resetToken - Token de reset
+     */
+    async sendPasswordResetEmail(user, resetToken) {
+        const resetUrl = `${process.env.BASE_URL || 'http://localhost:3007'}/auth/reset-password/${resetToken}`;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : user.email,
+            subject: '🔐 Réinitialisation de votre mot de passe - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 30px;">
+                            <h2 style="color: #856404; margin-top: 0; text-align: center;">
+                                🔐 Réinitialisation de mot de passe
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour <strong>${user.firstName} ${user.lastName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Vous avez demandé la réinitialisation de votre mot de passe pour votre compte École Saint-Mathieu.
+                        </p>
+                        
+                        <div style="background-color: #e7f3ff; padding: 20px; border-radius: 8px; border-left: 4px solid #007bff; margin: 20px 0;">
+                            <h3 style="color: #004085; margin-top: 0;">🔑 Pour créer un nouveau mot de passe :</h3>
+                            <p style="color: #004085; margin: 0;">
+                                Cliquez sur le bouton ci-dessous dans les <strong>60 prochaines minutes</strong>.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${resetUrl}" 
+                               style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                🔄 Réinitialiser mon mot de passe
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545; margin: 20px 0;">
+                            <h3 style="color: #721c24; margin-top: 0;">⚠️ Important :</h3>
+                            <ul style="color: #721c24; margin: 0; padding-left: 20px;">
+                                <li>Ce lien expire dans <strong>1 heure</strong></li>
+                                <li>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email</li>
+                                <li>Votre mot de passe actuel reste inchangé tant que vous ne créez pas un nouveau</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background-color: #e2e3e5; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #383d41; margin-top: 0;">🔗 Problème avec le bouton ?</h3>
+                            <p style="color: #383d41; margin: 5px 0;">Copiez et collez cette adresse dans votre navigateur :</p>
+                            <p style="color: #007bff; margin: 0; word-break: break-all; font-size: 12px;">${resetUrl}</p>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #0c5460; margin-top: 0;">📞 Besoin d'aide ?</h3>
+                            <p style="color: #0c5460; margin: 0;">
+                                Support technique : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
+                                Téléphone : 01 23 45 67 89
+                            </p>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6; margin-top: 30px;">
+                            Cordialement,<br>
+                            <strong>L'équipe technique de l'École Saint-Mathieu</strong>
+                        </p>
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                            <p style="color: #666; font-size: 12px;">
+                                Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('Email de reset de mot de passe envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi de l\'email de reset:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Envoyer une confirmation de changement de mot de passe
+     * @param {Object} user - Données de l'utilisateur
+     */
+    async sendPasswordChangedConfirmation(user) {
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : user.email,
+            subject: '✅ Mot de passe modifié avec succès - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 30px;">
+                            <h2 style="color: #155724; margin-top: 0; text-align: center;">
+                                ✅ Mot de passe modifié avec succès
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour <strong>${user.firstName} ${user.lastName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Votre mot de passe a été modifié avec succès le <strong>${new Date().toLocaleString('fr-FR')}</strong>.
+                        </p>
+                        
+                        <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #004085; margin-top: 0;">🔐 Sécurité :</h3>
+                            <p style="color: #004085; margin: 0;">
+                                Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
+                            </p>
+                        </div>
+                        
+                        <div style="background-color: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545; margin: 20px 0;">
+                            <h3 style="color: #721c24; margin-top: 0;">⚠️ Vous n'avez pas fait cette modification ?</h3>
+                            <p style="color: #721c24; margin: 0;">
+                                Si vous n'êtes pas à l'origine de ce changement, contactez immédiatement notre support technique.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/auth/login" 
+                               style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                🚀 Se connecter
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #0c5460; margin-top: 0;">📞 Support :</h3>
+                            <p style="color: #0c5460; margin: 0;">
+                                Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
+                                Téléphone : 01 23 45 67 89
+                            </p>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6; margin-top: 30px;">
+                            Cordialement,<br>
+                            <strong>L'équipe de l'École Saint-Mathieu</strong>
+                        </p>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('Email de confirmation changement mot de passe envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi de la confirmation:', error);
             return { success: false, error: error.message };
         }
     }

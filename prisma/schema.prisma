@@ -46,16 +46,18 @@ enum PaymentStatus {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  adress    String
-  phone     String
-  email     String   @unique
-  password  String
-  role      UserRole @default(PARENT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               Int       @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  adress           String
+  phone            String
+  email            String    @unique
+  password         String
+  role             UserRole  @default(PARENT)
+  resetToken       String? // Token pour reset de mot de passe
+  resetTokenExpiry DateTime? // Expiration du token de reset
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   enfants             Student[]            @relation("ParentEnfants")
   messages            Message[]            @relation("UserMessages")
@@ -159,6 +161,8 @@ model Actualite {
   titre           String
   contenu         String
   auteurId        Int
+  mediaUrl        String? // URL de l'image ou vidéo attachée
+  mediaType       String? // "image" ou "video"
   datePublication DateTime @default(now())
   visible         Boolean  @default(true)
   important       Boolean  @default(false)

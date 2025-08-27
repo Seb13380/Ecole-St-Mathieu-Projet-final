@@ -107,6 +107,19 @@
 							<p class="text-xs text-orange-600">🔧 En cours</p>
 						</div>
 					</div>
+
+					<div class="bg-white shadow-md border-l-4 border-pink-500 p-6 hover:shadow-xl transition-all duration-300 text-center w-64 h-48">
+						<div class="flex flex-col items-center h-full justify-center">
+							<div class="bg-pink-100 p-3 mb-4">
+								<svg class="h-8 w-8 text-pink-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+								</svg>
+							</div>
+							<p class="text-sm font-medium text-slate-500">Demandes Inscription</p>
+							<p class="text-3xl font-bold text-slate-800">{{ stats.pendingInscriptions ?? 0 }}</p>
+							<p class="text-xs text-pink-600">📝 En attente</p>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -117,6 +130,19 @@
 					Actions de Direction
 				</h2>
 				<div class="flex flex-wrap justify-center gap-6">
+					<a href="/directeur/inscriptions" class="group bg-white shadow-md border-l-4 border-pink-500 p-6 hover:shadow-xl hover:border-pink-600 transition-all duration-300 text-center w-64 h-48">
+						<div class="flex flex-col items-center h-full justify-center">
+							<div class="bg-pink-100 p-3 group-hover:bg-pink-200 transition-colors mb-4">
+								<svg class="h-8 w-8 text-pink-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-slate-800 mb-2">Demandes Inscription</h3>
+							<p class="text-slate-600 text-sm">{{ stats.pendingInscriptions ?? 0 }}
+								en attente</p>
+						</div>
+					</a>
+
 					<a href="/parent-invitations/manage" class="group bg-white shadow-md border-l-4 border-teal-500 p-6 hover:shadow-xl hover:border-teal-600 transition-all duration-300 text-center w-64 h-48">
 						<div class="flex flex-col items-center h-full justify-center">
 							<div class="bg-teal-100 p-3 group-hover:bg-teal-200 transition-colors mb-4">
