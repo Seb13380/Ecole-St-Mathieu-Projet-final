@@ -2,3 +2,17 @@ node_modules
 package-lock.json
 generated/prisma
 .env
+
+# Fichiers uploadés par les utilisateurs
+public/uploads/
+public/images/actualites/
+public/images/carousel/
+public/images/hero/
+public/images/galerie/
+public/documents/
+uploads/
+
+# Logs et fichiers temporaires
+*.log
+.DS_Store
+Thumbs.db
