@@ -8,8 +8,8 @@ const frankController = {
         try {
             console.log('🏫 Accès au tableau de bord Frank');
 
-            // Vérifier que l'utilisateur est bien Frank (MAINTENANCE_SITE)
-            if (req.session.user.role !== 'MAINTENANCE_SITE') {
+            // Vérifier que l'utilisateur est bien Frank (GESTIONNAIRE_SITE)
+            if (req.session.user.role !== 'GESTIONNAIRE_SITE') {
                 return res.status(403).render('pages/error.twig', {
                     message: 'Accès refusé - Réservé au gestionnaire'
                 });
@@ -50,6 +50,17 @@ const frankController = {
                 }
             });
 
+            // Récupérer les actualités récentes
+            const recentActualites = await prisma.actualite.findMany({
+                take: 3,
+                orderBy: { datePublication: 'desc' },
+                include: {
+                    auteur: {
+                        select: { firstName: true, lastName: true }
+                    }
+                }
+            });
+
             res.render('pages/frank/dashboard.twig', {
                 title: 'Tableau de bord - Frank',
                 user: req.session.user,
@@ -61,7 +72,8 @@ const frankController = {
                     totalActualites: stats[4]
                 },
                 recentUsers,
-                recentMessages
+                recentMessages,
+                recentActualites
             });
 
         } catch (error) {

@@ -8,11 +8,23 @@
 		<div class="flex justify-between items-center mb-8">
 			<h1 class="text-3xl font-bold text-[#304a4d]">Demandes d'inscription en attente</h1>
 			<div class="flex gap-2">
-				<span class="badge badge-warning">{{ requests | filter(r => r.status == 'PENDING') | length }}
+				{% set pendingCount = 0 %}
+				{% set approvedCount = 0 %}
+				{% set rejectedCount = 0 %}
+				{% for request in requests %}
+					{% if request.status == 'PENDING' %}
+						{% set pendingCount = pendingCount + 1 %}
+					{% elseif request.status == 'APPROVED' %}
+						{% set approvedCount = approvedCount + 1 %}
+					{% elseif request.status == 'REJECTED' %}
+						{% set rejectedCount = rejectedCount + 1 %}
+					{% endif %}
+				{% endfor %}
+				<span class="badge badge-warning">{{ pendingCount }}
 					en attente</span>
-				<span class="badge badge-success">{{ requests | filter(r => r.status == 'APPROVED') | length }}
+				<span class="badge badge-success">{{ approvedCount }}
 					approuvées</span>
-				<span class="badge badge-error">{{ requests | filter(r => r.status == 'REJECTED') | length }}
+				<span class="badge badge-error">{{ rejectedCount }}
 					refusées</span>
 			</div>
 		</div>
@@ -21,9 +33,9 @@
 		<div class="mb-6">
 			<div class="tabs tabs-boxed">
 				<a class="tab tab-active" data-filter="all">Toutes ({{ requests | length }})</a>
-				<a class="tab" data-filter="PENDING">En attente ({{ requests | filter(r => r.status == 'PENDING') | length }})</a>
-				<a class="tab" data-filter="APPROVED">Approuvées ({{ requests | filter(r => r.status == 'APPROVED') | length }})</a>
-				<a class="tab" data-filter="REJECTED">Refusées ({{ requests | filter(r => r.status == 'REJECTED') | length }})</a>
+				<a class="tab" data-filter="PENDING">En attente ({{ pendingCount }})</a>
+				<a class="tab" data-filter="APPROVED">Approuvées ({{ approvedCount }})</a>
+				<a class="tab" data-filter="REJECTED">Refusées ({{ rejectedCount }})</a>
 			</div>
 		</div>
 
@@ -131,6 +143,10 @@
 								<button class="btn btn-success" onclick="showApproveModal({{ request.id }})">
 									Approuver
 								</button>
+							{% else %}
+								<button class="btn btn-outline btn-sm" onclick="showDeleteModal({{ request.id }})">
+									🗑️ Supprimer
+								</button>
 							{% endif %}
 						</div>
 					</div>
@@ -183,6 +199,20 @@
 		</div>
 	</dialog>
 
+	<!-- Modal de suppression -->
+	<dialog id="delete_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-orange-600">Supprimer la demande</h3>
+			<p class="py-4">⚠️ Êtes-vous sûr de vouloir supprimer définitivement cette demande traitée ?</p>
+			<p class="text-sm text-gray-600">Cette action est irréversible.</p>
+
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('delete_modal').close()">Annuler</button>
+				<button class="btn btn-error" onclick="processDelete()">Supprimer définitivement</button>
+			</div>
+		</div>
+	</dialog>
+
 	<script>
 		let currentRequestId = null;
 
@@ -196,6 +226,12 @@ document.getElementById('approve_modal').showModal();
 function showRejectModal(requestId) {
 currentRequestId = requestId;
 document.getElementById('reject_modal').showModal();
+}
+
+// Fonction pour afficher le modal de suppression
+function showDeleteModal(requestId) {
+currentRequestId = requestId;
+document.getElementById('delete_modal').showModal();
 }
 
 // Fonction pour voir les détails
@@ -213,9 +249,9 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
+credentials: 'include',
 body: JSON.stringify({comment})
 });
-
 const result = await response.json();
 
 if (result.success) {
@@ -243,9 +279,9 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
+credentials: 'include',
 body: JSON.stringify({comment})
 });
-
 const result = await response.json();
 
 if (result.success) {
@@ -258,7 +294,28 @@ alert('Erreur lors du refus');
 }
 }
 
-// Filtrage des demandes
+// Traiter la suppression
+async function processDelete() {
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/delete`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+credentials: 'include'
+});
+
+const result = await response.json();
+
+if (result.success) {
+location.reload();
+} else {
+alert('Erreur : ' + result.message);
+}
+} catch (error) {
+alert('Erreur lors de la suppression');
+}
+} // Filtrage des demandes
 document.querySelectorAll('.tab').forEach(tab => {
 tab.addEventListener('click', function () { // Retirer la classe active de tous les onglets
 document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));

@@ -190,9 +190,9 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
+credentials: 'include',
 body: JSON.stringify({comment})
 });
-
 const result = await response.json();
 
 if (result.success) {
@@ -221,9 +221,9 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
+credentials: 'include',
 body: JSON.stringify({comment})
 });
-
 const result = await response.json();
 
 if (result.success) {

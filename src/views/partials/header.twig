@@ -83,6 +83,9 @@
 						<li>
 							<a href="/agenda" class="hover:font-poppins-medium transition-all">Agenda</a>
 						</li>
+						<li>
+							<a href="/gallery" class="hover:font-poppins-medium transition-all">Images et Vidéos</a>
+						</li>
 					</ul>
 				</li>
 
@@ -154,9 +157,9 @@
 							<li>
 								<a href="/directeur/dashboard">Tableau de bord</a>
 							</li>
-						{% elseif user.role == 'MAINTENANCE_SITE' %}
+						{% elseif user.role == 'GESTIONNAIRE_SITE' %}
 							<li>
-								<a href="/frank/dashboard">Tableau de bord</a>
+								<a href="/directeur/dashboard">Tableau de bord</a>
 							</li>
 						{% elseif user.role == 'ENSEIGNANT' %}
 							<li>

@@ -56,6 +56,8 @@ const actualiteController = {
   async createActualite(req, res) {
     try {
       console.log('📝 Données reçues pour création:', req.body);
+      console.log('📁 Fichier reçu:', req.file);
+
       const { titre, contenu, important, visible, datePublication } = req.body;
       const auteurId = req.session.user.id;
 
@@ -65,11 +67,22 @@ const actualiteController = {
         datePublicationFinal = new Date(datePublication);
       }
 
+      // Gestion du fichier média
+      let mediaUrl = null;
+      let mediaType = null;
+      if (req.file) {
+        mediaUrl = `/uploads/actualites/${req.file.filename}`;
+        mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
+        console.log('📁 Média ajouté:', { mediaUrl, mediaType });
+      }
+
       const actualite = await prisma.actualite.create({
         data: {
           titre,
           contenu,
           auteurId,
+          mediaUrl,
+          mediaType,
           important: important === 'true',
           visible: visible === 'true',
           datePublication: datePublicationFinal
@@ -90,20 +103,31 @@ const actualiteController = {
         method: req.method,
         url: req.url,
         params: req.params,
-        body: req.body
+        body: req.body,
+        file: req.file
       });
 
       const { id } = req.params;
       const { titre, contenu, important, visible } = req.body;
 
+      // Préparer les données de mise à jour
+      const updateData = {
+        titre,
+        contenu,
+        important: important === 'true',
+        visible: visible === 'true'
+      };
+
+      // Gestion du nouveau fichier média
+      if (req.file) {
+        updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;
+        updateData.mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
+        console.log('📁 Nouveau média ajouté:', { mediaUrl: updateData.mediaUrl, mediaType: updateData.mediaType });
+      }
+
       const actualite = await prisma.actualite.update({
         where: { id: parseInt(id) },
-        data: {
-          titre,
-          contenu,
-          important: important === 'true',
-          visible: visible === 'true'
-        }
+        data: updateData
       });
 
       console.log('✅ Actualité mise à jour:', actualite.titre);

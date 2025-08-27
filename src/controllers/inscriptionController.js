@@ -54,7 +54,22 @@ async function createParentAccount(inscriptionRequest) {
 
         // Créer les comptes enfants
         const createdChildren = [];
-        for (const child of children) {
+
+        // Parser les enfants si c'est du JSON
+        let childrenData = children;
+        if (typeof children === 'string') {
+            try {
+                childrenData = JSON.parse(children);
+            } catch (e) {
+                console.error('❌ Erreur parsing children JSON:', e);
+                childrenData = [];
+            }
+        }
+
+        console.log('👶 Enfants à créer:', childrenData);
+
+        for (const child of childrenData) {
+            console.log('🔄 Création enfant:', child);
             const student = await prisma.student.create({
                 data: {
                     firstName: child.firstName,
@@ -325,6 +340,10 @@ const inscriptionController = {
     // Pour l'admin : afficher toutes les demandes
     showAllRequests: async (req, res) => {
         try {
+            console.log('🔍 showAllRequests appelé');
+            console.log('👤 User session:', req.session.user ? req.session.user.email : 'Non connecté');
+            console.log('🎭 Role:', req.session.user ? req.session.user.role : 'Aucun');
+
             const requests = await prisma.inscriptionRequest.findMany({
                 include: {
                     reviewer: {
@@ -520,6 +539,52 @@ const inscriptionController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors du rejet: ' + error.message
+            });
+        }
+    },
+
+    // Pour l'admin : supprimer une demande traitée
+    deleteRequest: async (req, res) => {
+        try {
+            const { id } = req.params;
+            console.log('🗑️ Suppression demande ID:', id);
+
+            // Vérifier que la demande existe et a été traitée (APPROVED ou REJECTED)
+            const request = await prisma.inscriptionRequest.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!request) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Demande d\'inscription non trouvée'
+                });
+            }
+
+            if (request.status === 'PENDING') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Impossible de supprimer une demande en attente. Approuvez ou rejetez-la d\'abord.'
+                });
+            }
+
+            // Supprimer la demande
+            await prisma.inscriptionRequest.delete({
+                where: { id: parseInt(id) }
+            });
+
+            console.log('✅ Demande supprimée:', id);
+
+            res.json({
+                success: true,
+                message: 'Demande supprimée avec succès'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la suppression:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la suppression: ' + error.message
             });
         }
     }
