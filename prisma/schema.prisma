@@ -70,6 +70,7 @@ model User {
   TicketPurchase      TicketPurchase[]
   inscriptionRequests InscriptionRequest[] @relation("InscriptionReviewer")
   reviewedRequests    InscriptionRequest[]
+  galleryMedia        GalleryMedia[]       @relation("UserGalleryMedia")
 }
 
 model Student {
@@ -381,4 +382,47 @@ model InscriptionRequest {
   reviewer User? @relation("InscriptionReviewer", fields: [reviewedBy], references: [id])
   User     User? @relation(fields: [userId], references: [id])
   userId   Int?
+}
+
+model GalleryTheme {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // "rentrée", "spectacle", "sortie", etc.
+  description String? // Description optionnelle du thème
+  active      Boolean  @default(true)
+  ordre       Int      @default(0) // Ordre d'affichage
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  medias GalleryMedia[]
+
+  @@index([active])
+  @@index([ordre])
+}
+
+model GalleryMedia {
+  id          Int              @id @default(autoincrement())
+  filename    String // Nom du fichier
+  originalUrl String // URL du fichier
+  type        GalleryMediaType // IMAGE ou VIDEO
+  titre       String? // Titre optionnel
+  description String? // Description optionnelle
+  themeId     Int // Thème associé
+  auteurId    Int // Qui a ajouté le média
+  active      Boolean          @default(true)
+  ordre       Int              @default(0) // Ordre dans le thème
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  theme  GalleryTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  auteur User         @relation("UserGalleryMedia", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([themeId])
+  @@index([auteurId])
+  @@index([active])
+  @@index([type])
+}
+
+enum GalleryMediaType {
+  IMAGE
+  VIDEO
 }

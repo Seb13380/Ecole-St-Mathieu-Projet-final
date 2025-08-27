@@ -11,13 +11,13 @@ async function createAllUsers() {
         // 1. Créer Lionel Camboulives - Directeur
         console.log('👑 Création du directeur Lionel Camboulives...');
         const existingDirector = await prisma.user.findUnique({
-            where: { email: 'lionel.camboulives@ecole-saint-mathieu.fr' }
+            where: { email: 'l.camboulives@stmathieu.org' }
         });
 
         if (existingDirector) {
             console.log('⚠️  Lionel existe déjà, mise à jour...');
             await prisma.user.update({
-                where: { email: 'lionel.camboulives@ecole-saint-mathieu.fr' },
+                where: { email: 'l.camboulives@stmathieu.org' },
                 data: {
                     firstName: 'Lionel',
                     lastName: 'Camboulives',
@@ -31,7 +31,7 @@ async function createAllUsers() {
                 data: {
                     firstName: 'Lionel',
                     lastName: 'Camboulives',
-                    email: 'lionel.camboulives@ecole-saint-mathieu.fr',
+                    email: 'l.camboulives@stmathieu.org',
                     password: hashedPassword,
                     phone: '04.91.12.34.56',
                     adress: 'École Saint-Mathieu',
@@ -44,17 +44,17 @@ async function createAllUsers() {
         // 2. Créer Frank - Maintenance du site
         console.log('\n🔧 Création de Frank pour la maintenance...');
         const existingFrank = await prisma.user.findUnique({
-            where: { email: 'frank@ecole-saint-mathieu.fr' }
+            where: { email: 'frank@stmathieu.org' }
         });
 
         if (existingFrank) {
             console.log('⚠️  Frank existe déjà, mise à jour...');
             await prisma.user.update({
-                where: { email: 'frank@ecole-saint-mathieu.fr' },
+                where: { email: 'frank@stmathieu.org' },
                 data: {
                     firstName: 'Frank',
-                    lastName: 'Maintenance',
-                    role: 'MAINTENANCE_SITE'
+                    lastName: 'Gestionnaire Site',
+                    role: 'GESTIONNAIRE_SITE'
                 }
             });
             console.log('✅ Frank mis à jour');
@@ -63,15 +63,15 @@ async function createAllUsers() {
             await prisma.user.create({
                 data: {
                     firstName: 'Frank',
-                    lastName: 'Maintenance',
-                    email: 'frank@ecole-saint-mathieu.fr',
+                    lastName: 'Gestionnaire Site',
+                    email: 'frank@stmathieu.org',
                     password: hashedPassword,
                     phone: '04.91.23.45.67',
                     adress: 'École Saint-Mathieu',
-                    role: 'MAINTENANCE_SITE'
+                    role: 'GESTIONNAIRE_SITE'
                 }
             });
-            console.log('✅ Frank créé (Maintenance site)');
+            console.log('✅ Frank créé (Gestionnaire site)');
         }
 
         // 3. Créer Yamina - Assistante de direction
@@ -174,15 +174,15 @@ async function createAllUsers() {
         }
 
         console.log('\n🎉 === Récapitulatif des comptes créés ===');
-        console.log('👑 Lionel Camboulives (Directeur): lionel.camboulives@ecole-saint-mathieu.fr / Directeur2025!');
-        console.log('🔧 Frank (Maintenance): frank@ecole-saint-mathieu.fr / Frank2025!');
+        console.log('👑 Lionel Camboulives (Directeur): l.camboulives@stmathieu.org / Directeur2025!');
+        console.log('🔧 Frank (Gestionnaire Site): frank@stmathieu.org / Frank2025!');
         console.log('👩‍💼 Yamina (Assistante): yamina@ecole-saint-mathieu.fr / Yamina2025!');
         console.log('👨‍💻 Sébastien Giordano (Admin): sebastien.giordano@ecole-saint-mathieu.fr / Admin2025!');
         console.log('🍽️ Cécile (Restauration): cecile@ecole-saint-mathieu.fr / Cecile2025!');
 
         console.log('\n📋 === Permissions et accès ===');
         console.log('• Lionel: Accès complet direction + gestion invitations parents');
-        console.log('• Frank: Maintenance technique du site');
+        console.log('• Frank: Gestionnaire technique du site + galerie');
         console.log('• Yamina: Assistance administrative');
         console.log('• Sébastien: Administration complète du système');
         console.log('• Cécile: Gestion élèves et tickets de restauration');

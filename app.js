@@ -17,6 +17,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(__dirname + '/public'));
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -66,6 +67,7 @@ const parentInvitationRoutes = require("./src/routes/parentInvitationRoutes");
 const carouselRoutes = require("./src/routes/carouselRoutes");
 const heroCarouselRoutes = require("./src/routes/heroCarouselRoutes");
 const inscriptionsRoutes = require('./src/routes/inscriptions');
+const galleryRoutes = require('./src/routes/galleryRoutes');
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -86,6 +88,7 @@ app.use('/parent-invitations', parentInvitationRoutes);
 app.use('/carousel', carouselRoutes);
 app.use('/hero-carousel', heroCarouselRoutes);
 app.use('/inscriptions', inscriptionsRoutes);
+app.use('/gallery', galleryRoutes);
 
 // Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
 app.get('/inscriptions/manage', (req, res) => {
