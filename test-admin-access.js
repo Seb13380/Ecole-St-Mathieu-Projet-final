@@ -1,6 +1,8 @@
 const axios = require('axios');
 const path = require('path');
 
+const axios = require('axios');
+
 async function testAdminAccess() {
     try {
         console.log('🧪 Test d\'accès admin pour Lionel...\n');

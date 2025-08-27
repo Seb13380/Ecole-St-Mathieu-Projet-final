@@ -1,0 +1,529 @@
+const { PrismaClient } = require('@prisma/client');
+const path = require('path');
+const fs = require('fs');
+
+const prisma = new PrismaClient();
+
+// Pages publiques pour les documents
+const getDocumentsByCategory = async (req, res) => {
+    try {
+        const { category } = req.params; // 'ecole' ou 'pastorale'
+
+        console.log(`[getDocumentsByCategory] Catégorie demandée: ${category}`);
+
+        let documentTypes = [];
+        let pageTitle = '';
+
+        if (category === 'ecole') {
+            documentTypes = [
+                'PROJET_EDUCATIF',
+                'PROJET_ETABLISSEMENT',
+                'REGLEMENT_INTERIEUR',
+                'ORGANIGRAMME',
+                'AGENDA',
+                'CHARTE_LAICITE',
+                'CHARTE_NUMERIQUE',
+                'CHARTE_VIE_SCOLAIRE',
+                'CHARTE_RESTAURATION'
+            ];
+            pageTitle = 'Documents de l\'École';
+        } else if (category === 'pastorale') {
+            documentTypes = [
+                'PASTORALE_AXE',
+                'PASTORALE_TEMPS_PRIANT',
+                'PASTORALE_ENSEMBLE'
+            ];
+            pageTitle = 'Documents Pastorale';
+        } else {
+            return res.status(404).render('errors/404.twig');
+        }
+
+        const documents = await prisma.document.findMany({
+            where: {
+                type: { in: documentTypes },
+                active: true
+            },
+            include: {
+                auteur: {
+                    select: {
+                        firstName: true,
+                        lastName: true
+                    }
+                }
+            },
+            orderBy: [
+                { type: 'asc' },
+                { updatedAt: 'desc' }
+            ]
+        });
+
+        console.log(`[getDocumentsByCategory] ${documents.length} documents trouvés pour ${category}`);
+
+        // Grouper par type
+        const documentsByType = {};
+        documents.forEach(doc => {
+            if (!documentsByType[doc.type]) {
+                documentsByType[doc.type] = [];
+            }
+            documentsByType[doc.type].push(doc);
+        });
+
+        res.render('pages/documents/category.twig', {
+            category,
+            pageTitle,
+            documentsByType,
+            documents
+        });
+
+    } catch (error) {
+        console.error('[getDocumentsByCategory] Erreur:', error);
+        res.status(500).render('errors/500.twig', { error: error.message });
+    }
+};
+
+const showDocument = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        console.log(`[showDocument] ID demandé: ${id}`);
+
+        const document = await prisma.document.findUnique({
+            where: {
+                id: parseInt(id),
+                active: true
+            },
+            include: {
+                auteur: {
+                    select: {
+                        firstName: true,
+                        lastName: true
+                    }
+                }
+            }
+        });
+
+        if (!document) {
+            console.log(`[showDocument] Document ${id} non trouvé ou inactif`);
+            return res.status(404).render('errors/404.twig');
+        }
+
+        console.log(`[showDocument] Document trouvé: ${document.titre}`);
+
+        res.render('pages/documents/show.twig', {
+            document
+        });
+
+    } catch (error) {
+        console.error('[showDocument] Erreur:', error);
+        res.status(500).render('errors/500.twig', { error: error.message });
+    }
+};
+
+const documentController = {
+    // Afficher la liste des documents d'un type donné
+    async showDocuments(req, res) {
+        try {
+            const { type } = req.params;
+
+            const documents = await prisma.document.findMany({
+                where: {
+                    type: type.toUpperCase(),
+                    active: true
+                },
+                include: {
+                    auteur: {
+                        select: { firstName: true, lastName: true, role: true }
+                    }
+                },
+                orderBy: { ordre: 'asc' }
+            });
+
+            // Définir les titres et descriptions selon le type
+            const typeInfo = {
+                'PROJET_EDUCATIF': {
+                    title: 'Projet Éducatif',
+                    description: 'Notre projet éducatif définit les orientations pédagogiques de l\'école'
+                },
+                'PROJET_ETABLISSEMENT': {
+                    title: 'Projet d\'Établissement',
+                    description: 'Le projet d\'établissement présente les objectifs et actions concrètes'
+                },
+                'REGLEMENT_INTERIEUR': {
+                    title: 'Règlement Intérieur',
+                    description: 'Le règlement intérieur définit les règles de vie de l\'école'
+                },
+                'ORGANIGRAMME': {
+                    title: 'Organigramme',
+                    description: 'L\'organisation et la structure de l\'équipe éducative'
+                },
+                'CHARTE_LAICITE': {
+                    title: 'Charte de la Laïcité',
+                    description: 'Les principes de laïcité appliqués dans notre établissement'
+                },
+                'CHARTE_NUMERIQUE': {
+                    title: 'Charte du Numérique',
+                    description: 'Règles d\'usage des outils numériques à l\'école'
+                },
+                'CHARTE_VIE_SCOLAIRE': {
+                    title: 'Charte de Vie Scolaire',
+                    description: 'Les règles de vie et de respect au sein de l\'école'
+                },
+                'CHARTE_RESTAURATION': {
+                    title: 'Charte de Restauration',
+                    description: 'Organisation et règles du service de restauration'
+                },
+                'AGENDA': {
+                    title: 'Agenda',
+                    description: 'Calendrier des événements et activités de l\'école'
+                },
+                'PASTORALE_AXE': {
+                    title: 'Axe Pastoral de l\'École',
+                    description: 'L\'orientation pastorale et spirituelle de notre établissement'
+                },
+                'PASTORALE_TEMPS_PRIANT': {
+                    title: 'Temps Priant de l\'École',
+                    description: 'Inscription et organisation des temps de prière'
+                },
+                'PASTORALE_ENSEMBLE': {
+                    title: 'Ensemble Pastoral de l\'Étoile',
+                    description: 'Notre participation à l\'ensemble pastoral local'
+                }
+            };
+
+            const info = typeInfo[type.toUpperCase()] || {
+                title: 'Documents',
+                description: 'Documents de l\'école'
+            };
+
+            res.render('pages/documents/show.twig', {
+                documents,
+                type: type.toUpperCase(),
+                title: info.title,
+                description: info.description,
+                user: req.session.user
+            });
+
+        } catch (error) {
+            console.error('Erreur lors de l\'affichage des documents:', error);
+            res.status(500).render('pages/error.twig', {
+                message: 'Erreur lors du chargement des documents'
+            });
+        }
+    },
+
+    // Interface de gestion des documents (pour Lionel et Frank)
+    async manageDocuments(req, res) {
+        try {
+            console.log('🔍 manageDocuments - Début de la méthode');
+            console.log('👤 Utilisateur:', req.session.user ? req.session.user.email : 'Non connecté');
+
+            // Récupérer tous les documents groupés par type
+            const documents = await prisma.document.findMany({
+                include: {
+                    auteur: {
+                        select: { firstName: true, lastName: true, role: true }
+                    }
+                },
+                orderBy: [
+                    { type: 'asc' },
+                    { ordre: 'asc' }
+                ]
+            });
+
+            console.log(`📄 Documents trouvés: ${documents.length}`);
+
+            // Grouper par type
+            const documentsByType = {};
+            documents.forEach(doc => {
+                if (!documentsByType[doc.type]) {
+                    documentsByType[doc.type] = [];
+                }
+                documentsByType[doc.type].push(doc);
+            });
+
+            console.log('📋 Groupes de documents:', Object.keys(documentsByType));
+            console.log('🎯 Rendu du template: pages/documents/manage.twig');
+
+            res.render('pages/documents/manage.twig', {
+                documentsByType,
+                title: 'Gestion des Documents',
+                user: req.session.user,
+                success: req.query.success,
+                error: req.query.error
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la gestion des documents:', error);
+            res.status(500).render('pages/error.twig', {
+                message: 'Erreur lors du chargement de la gestion des documents'
+            });
+        }
+    },
+
+    // Méthode de test pour diagnostiquer
+    async testManage(req, res) {
+        try {
+            console.log('🧪 testManage - Test de la gestion des documents');
+
+            const documents = await prisma.document.findMany({
+                include: {
+                    auteur: {
+                        select: { firstName: true, lastName: true, role: true }
+                    }
+                }
+            });
+
+            console.log(`📄 Documents trouvés pour le test: ${documents.length}`);
+
+            const documentsByType = {};
+            documents.forEach(doc => {
+                if (!documentsByType[doc.type]) {
+                    documentsByType[doc.type] = [];
+                }
+                documentsByType[doc.type].push(doc);
+            });
+
+            res.render('pages/documents/test.twig', {
+                documentsByType,
+                user: req.session.user,
+                success: req.query.success,
+                error: req.query.error
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur lors du test:', error);
+            res.status(500).send('Erreur de test: ' + error.message);
+        }
+    },
+
+    // Créer un nouveau document
+    async createDocument(req, res) {
+        try {
+            const { type, titre, description, contenu } = req.body;
+            const auteurId = req.session.user.id;
+
+            // Gestion du fichier PDF si présent
+            let pdfUrl = null;
+            let pdfFilename = null;
+            if (req.file) {
+                pdfUrl = `/uploads/documents/${req.file.filename}`;
+                pdfFilename = req.file.originalname;
+            }
+
+            const document = await prisma.document.create({
+                data: {
+                    type: type.toUpperCase(),
+                    titre,
+                    description,
+                    contenu,
+                    pdfUrl,
+                    pdfFilename,
+                    auteurId,
+                    active: true
+                }
+            });
+
+            console.log('✅ Document créé:', document.titre);
+            res.redirect('/documents/admin?success=' + encodeURIComponent('Document créé avec succès'));
+
+        } catch (error) {
+            console.error('Erreur lors de la création du document:', error);
+            res.redirect('/documents/admin?error=' + encodeURIComponent('Erreur lors de la création du document'));
+        }
+    },
+
+    // Mettre à jour un document
+    async updateDocument(req, res) {
+        try {
+            const { id } = req.params;
+            const { titre, description, contenu } = req.body;
+
+            const updateData = {
+                titre,
+                description,
+                contenu
+            };
+
+            // Gestion du nouveau fichier PDF si présent
+            if (req.file) {
+                updateData.pdfUrl = `/uploads/documents/${req.file.filename}`;
+                updateData.pdfFilename = req.file.originalname;
+            }
+
+            const document = await prisma.document.update({
+                where: { id: parseInt(id) },
+                data: updateData
+            });
+
+            console.log('✅ Document mis à jour:', document.titre);
+            res.redirect('/documents/admin?success=' + encodeURIComponent('Document mis à jour avec succès'));
+
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du document:', error);
+            res.redirect('/documents/admin?error=' + encodeURIComponent('Erreur lors de la mise à jour du document'));
+        }
+    },
+
+    // Supprimer un document
+    async deleteDocument(req, res) {
+        try {
+            const { id } = req.params;
+
+            await prisma.document.delete({
+                where: { id: parseInt(id) }
+            });
+
+            console.log('✅ Document supprimé:', id);
+            res.redirect('/documents/admin?success=' + encodeURIComponent('Document supprimé avec succès'));
+
+        } catch (error) {
+            console.error('Erreur lors de la suppression du document:', error);
+            res.redirect('/documents/admin?error=' + encodeURIComponent('Erreur lors de la suppression du document'));
+        }
+    },
+
+    // Activer/désactiver un document
+    async toggleDocument(req, res) {
+        try {
+            const { id } = req.params;
+
+            const document = await prisma.document.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!document) {
+                return res.redirect('/documents/admin?error=' + encodeURIComponent('Document non trouvé'));
+            }
+
+            const updatedDocument = await prisma.document.update({
+                where: { id: parseInt(id) },
+                data: { active: !document.active }
+            });
+
+            const message = updatedDocument.active ? 'Document activé' : 'Document désactivé';
+            console.log('✅ Statut modifié:', message);
+            res.redirect('/documents/admin?success=' + encodeURIComponent(message));
+
+        } catch (error) {
+            console.error('Erreur lors du changement de statut:', error);
+            res.redirect('/documents/admin?error=' + encodeURIComponent('Erreur lors du changement de statut'));
+        }
+    },
+
+    // Nouvelles méthodes publiques
+    async getDocumentsByCategory(req, res) {
+        try {
+            const { category } = req.params;
+
+            console.log(`[getDocumentsByCategory] Catégorie demandée: ${category}`);
+
+            let documentTypes = [];
+            let pageTitle = '';
+
+            if (category === 'ecole') {
+                documentTypes = [
+                    'PROJET_EDUCATIF',
+                    'PROJET_ETABLISSEMENT',
+                    'REGLEMENT_INTERIEUR',
+                    'ORGANIGRAMME',
+                    'AGENDA',
+                    'CHARTE_LAICITE',
+                    'CHARTE_NUMERIQUE',
+                    'CHARTE_VIE_SCOLAIRE',
+                    'CHARTE_RESTAURATION'
+                ];
+                pageTitle = 'Documents de l\'École';
+            } else if (category === 'pastorale') {
+                documentTypes = [
+                    'PASTORALE_AXE',
+                    'PASTORALE_TEMPS_PRIANT',
+                    'PASTORALE_ENSEMBLE'
+                ];
+                pageTitle = 'Documents Pastorale';
+            } else {
+                return res.status(404).render('errors/404.twig');
+            }
+
+            const documents = await prisma.document.findMany({
+                where: {
+                    type: { in: documentTypes },
+                    active: true
+                },
+                include: {
+                    auteur: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                },
+                orderBy: [
+                    { type: 'asc' },
+                    { updatedAt: 'desc' }
+                ]
+            });
+
+            console.log(`[getDocumentsByCategory] ${documents.length} documents trouvés pour ${category}`);
+
+            // Grouper par type
+            const documentsByType = {};
+            documents.forEach(doc => {
+                if (!documentsByType[doc.type]) {
+                    documentsByType[doc.type] = [];
+                }
+                documentsByType[doc.type].push(doc);
+            });
+
+            res.render('pages/documents/category.twig', {
+                category,
+                pageTitle,
+                documentsByType,
+                documents
+            });
+
+        } catch (error) {
+            console.error('[getDocumentsByCategory] Erreur:', error);
+            res.status(500).render('errors/500.twig', { error: error.message });
+        }
+    },
+
+    async showPublicDocument(req, res) {
+        try {
+            const { id } = req.params;
+
+            console.log(`[showPublicDocument] ID demandé: ${id}`);
+
+            const document = await prisma.document.findUnique({
+                where: {
+                    id: parseInt(id),
+                    active: true
+                },
+                include: {
+                    auteur: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            });
+
+            if (!document) {
+                console.log(`[showPublicDocument] Document ${id} non trouvé ou inactif`);
+                return res.status(404).render('errors/404.twig');
+            }
+
+            console.log(`[showPublicDocument] Document trouvé: ${document.titre}`);
+
+            res.render('pages/documents/show.twig', {
+                document
+            });
+
+        } catch (error) {
+            console.error('[showPublicDocument] Erreur:', error);
+            res.status(500).render('errors/500.twig', { error: error.message });
+        }
+    }
+};
+
+module.exports = documentController;

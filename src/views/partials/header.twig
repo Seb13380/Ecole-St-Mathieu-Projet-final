@@ -31,60 +31,13 @@
 					</div>
 					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-xl" style="margin-top:-0.1rem;">
 						<li>
-							<a href="/projet-educatif" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Projet éducatif</a>
+							<a href="/documents/ecole" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">📄 Documents officiels</a>
 						</li>
 						<li>
-							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Projet d'établissement</a>
+							<a href="/agenda" class="hover:font-poppins-medium transition-all">� Agenda</a>
 						</li>
 						<li>
-							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Règlement intérieur</a>
-						</li>
-						<li>
-							<a href="/organigramme" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Organigramme</a>
-						</li>
-						<li class="relative">
-							<div class="hover:font-poppins-medium transition-all flex items-center justify-between w-full cursor-pointer chartes-menu" onmouseover="showChartesMenu()" onmouseout="hideChartesMenu()" onclick="toggleChartesMenu()">
-								Chartes
-								<svg class="fill-current ml-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-									<path d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.24 4.24a.75.75 0 010 1.06l-4.24 4.24a.75.75 0 01-1.08-.02z"/>
-								</svg>
-							</div>
-							<div id="chartes-submenu" class="absolute left-full top-0 hidden z-[60] w-80 bg-[#a7e3dd] rounded-box shadow-lg p-2" onmouseover="showChartesMenu()" onmouseout="hideChartesMenu()" style="margin-left: 8px; min-width: 300px;">
-								{% if isAuthenticated %}
-									<ul class="menu font-poppins-regular text-sm">
-										<li>
-											<a href="/documents/charte-laicite.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
-												📄 Charte de la laïcité
-											</a>
-										</li>
-										<li>
-											<a href="/documents/charte-numerique.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
-												📄 Charte du numérique
-											</a>
-										</li>
-										<li>
-											<a href="/documents/charte-vie-scolaire.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
-												📄 Charte de vie scolaire
-											</a>
-										</li>
-										<li>
-											<a href="/documents/charte-restauration.docx" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">
-												📄 Charte de restauration
-											</a>
-										</li>
-									</ul>
-								{% else %}
-									<div class="text-gray-700 italic px-4 py-3 text-center bg-opacity-90 rounded-md">
-										🔒 Connexion requise pour accéder aux chartes
-									</div>
-								{% endif %}
-							</div>
-						</li>
-						<li>
-							<a href="/agenda" class="hover:font-poppins-medium transition-all">Agenda</a>
-						</li>
-						<li>
-							<a href="/gallery" class="hover:font-poppins-medium transition-all">Images et Vidéos</a>
+							<a href="/gallery" class="hover:font-poppins-medium transition-all">🖼️ Images et Vidéos</a>
 						</li>
 					</ul>
 				</li>
@@ -98,14 +51,7 @@
 					</div>
 					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-xl" style="margin-top:-0.1rem;">
 						<li>
-							<a href="/projet-etablissement" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Axe Pastoral de l'école</a>
-						</li>
-
-						<li>
-							<a href="/reglement-interieur" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Fiche d'inscription au temps priant de l'école</a>
-						</li>
-						<li>
-							<a href="/projet-educatif" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">Ensemble pastoral de l'étoile</a>
+							<a href="/documents/pastorale" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">📄 Documents Pastorale</a>
 						</li>
 					</ul>
 				</li>
@@ -136,7 +82,7 @@
 			</ul>
 			<div class="flex-none" style="margin-left: 3rem;">
 				<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="flex items-center gap-6">
-					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300" style="height: 120px; animation: pulse-glow 4s ease-in-out infinite;"/>
+					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300" style="height: 110px; animation: pulse-glow 4s ease-in-out infinite;"/>
 					<span class="text-xl font-bold text-[#304a4d]"></span>
 				</a>
 			</div>
@@ -192,130 +138,3 @@
 		</div>
 	</nav>
 </header>
-
-<style>
-	/* Amélioration du positionnement du sous-menu des chartes */
-	#chartes-submenu {
-		/* S'assurer que le sous-menu est bien positionné à droite */
-		left: 100% !important;
-		top: 0 !important;
-		margin-left: 12px !important;
-		/* Largeur adaptative selon le contenu */
-		min-width: 300px !important;
-		width: auto !important;
-		/* Garder le background visible */
-		background-color: #a7e3dd !important;
-		/* Assurer une bonne visibilité */
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-		border: 1px solid rgba(141, 211, 204, 0.3) !important;
-		/* Permettre le retour à la ligne pour le texte long */
-		white-space: normal !important;
-	}
-
-	/* S'assurer que le parent a une position relative */
-	.chartes-menu {
-		position: relative !important;
-	}
-
-	/* Styles spécifiques pour le message non connecté */
-	#chartes-submenu .text-gray-700 {
-		background-color: transparent !important;
-		color: #374151 !important;
-		padding: 12px 16px !important;
-		border-radius: 6px !important;
-		text-align: center !important;
-		white-space: normal !important;
-		line-height: 1.5 !important;
-	}
-
-	/* Styles pour les liens des chartes (utilisateur connecté) */
-	#chartes-submenu .menu li a {
-		padding: 8px 12px !important;
-		display: block !important;
-		border-radius: 6px !important;
-		transition: all 0.2s ease-in-out !important;
-		white-space: normal !important;
-		line-height: 1.4 !important;
-	}
-
-	#chartes-submenu .menu li a:hover {
-		background-color: #8dd3cc !important;
-		transform: translateX(2px) !important;
-	}
-
-	/* Améliorer la transition d'affichage */
-	#chartes-submenu.hidden {
-		opacity: 0;
-		pointer-events: none;
-		transform: translateX(-10px);
-		transition: all 0.2s ease-in-out;
-	}
-
-	#chartes-submenu:not(.hidden) {
-		opacity: 1;
-		pointer-events: auto;
-		transform: translateX(0);
-		transition: all 0.2s ease-in-out;
-	}
-
-	/* Responsive - sur mobile, affichage vertical */
-	@media(max-width: 768px) {
-		#chartes-submenu {
-			left: 0 !important;
-			top: 100% !important;
-			margin-left: 0 !important;
-			margin-top: 4px !important;
-			width: 100% !important;
-			min-width: unset !important;
-		}
-	}
-</style>
-
-<script>
-	let chartesMenuTimeout;
-
-function showChartesMenu() {
-clearTimeout(chartesMenuTimeout);
-const submenu = document.getElementById('chartes-submenu');
-if (submenu) {
-submenu.classList.remove('hidden');
-// S'assurer que le sous-menu est bien positionné
-setTimeout(() => {
-const rect = submenu.getBoundingClientRect();
-const windowWidth = window.innerWidth;
-
-// Si le sous-menu dépasse la fenêtre, l'ajuster
-if (rect.right > windowWidth) {
-submenu.style.left = 'auto';
-submenu.style.right = '100%';
-submenu.style.marginLeft = '0';
-submenu.style.marginRight = '12px';
-}
-}, 10);
-}
-}
-
-function hideChartesMenu() {
-chartesMenuTimeout = setTimeout(() => {
-const submenu = document.getElementById('chartes-submenu');
-if (submenu) {
-submenu.classList.add('hidden');
-// Réinitialiser la position
-submenu.style.left = '';
-submenu.style.right = '';
-submenu.style.marginRight = '';
-}
-}, 300); // Délai de 300ms pour permettre le passage de la souris
-}
-
-function toggleChartesMenu() {
-const submenu = document.getElementById('chartes-submenu');
-if (submenu) {
-if (submenu.classList.contains('hidden')) {
-showChartesMenu();
-} else {
-hideChartesMenu();
-}
-}
-}
-</script>
