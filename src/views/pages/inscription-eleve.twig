@@ -1,0 +1,213 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<div class="min-h-screen bg-gradient-to-br from-[#a7e3dd] to-[#8dd3cc] py-12">
+		<div class="container mx-auto px-4">
+			<div class="max-w-4xl mx-auto">
+				<!-- En-tête -->
+				<div class="text-center mb-8">
+					<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
+						🎓 Inscription Élève
+					</h1>
+					<p class="text-lg text-[#304a4d]/80">
+						Demande d'inscription pour l'année scolaire 2025-2026
+					</p>
+				</div>
+
+				<!-- Messages flash -->
+				{% if success %}
+					<div class="alert alert-success mb-6">
+						<span>✅ {{ success }}</span>
+					</div>
+				{% endif %}
+
+				{% if error %}
+					<div class="alert alert-error mb-6">
+						<span>❌ {{ error }}</span>
+					</div>
+				{% endif %}
+
+				<!-- Formulaire -->
+				<div class="bg-white rounded-xl shadow-lg p-8">
+					<form action="/inscription-eleve" method="POST" class="space-y-6">
+
+						<!-- Section Parent/Responsable -->
+						<div class="border-b border-gray-200 pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+								👤 Informations du Parent/Responsable
+							</h2>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Prénom *</span>
+									</label>
+									<input type="text" name="parentFirstName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Nom *</span>
+									</label>
+									<input type="text" name="parentLastName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Email *</span>
+									</label>
+									<input type="email" name="parentEmail" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Téléphone *</span>
+									</label>
+									<input type="tel" name="parentPhone" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control md:col-span-2">
+									<label class="label">
+										<span class="label-text font-medium">Adresse complète *</span>
+									</label>
+									<textarea name="parentAddress" class="textarea textarea-bordered w-full" rows="3" required placeholder="Adresse, code postal, ville"></textarea>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Élève -->
+						<div class="border-b border-gray-200 pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+								🧒 Informations de l'Enfant à Inscrire
+							</h2>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Prénom de l'enfant *</span>
+									</label>
+									<input type="text" name="studentFirstName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Nom de l'enfant *</span>
+									</label>
+									<input type="text" name="studentLastName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Date de naissance *</span>
+									</label>
+									<input type="date" name="studentBirthDate" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Classe actuelle</span>
+									</label>
+									<select name="currentClass" class="select select-bordered w-full">
+										<option value="">Sélectionner...</option>
+										<option value="TPS">TPS (Toute Petite Section)</option>
+										<option value="PS">PS (Petite Section)</option>
+										<option value="MS">MS (Moyenne Section)</option>
+										<option value="GS">GS (Grande Section)</option>
+										<option value="CP">CP</option>
+										<option value="CE1">CE1</option>
+										<option value="CE2">CE2</option>
+										<option value="CM1">CM1</option>
+										<option value="CM2">CM2</option>
+										<option value="Première_inscription">Première inscription</option>
+										<option value="Autre_école">Autre école</option>
+									</select>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Classe demandée *</span>
+									</label>
+									<select name="requestedClass" class="select select-bordered w-full" required>
+										<option value="">Sélectionner la classe souhaitée...</option>
+										<option value="PS">PS (Petite Section)</option>
+										<option value="MS">MS (Moyenne Section)</option>
+										<option value="GS">GS (Grande Section)</option>
+										<option value="CP">CP</option>
+										<option value="CE1">CE1</option>
+										<option value="CE2">CE2</option>
+										<option value="CM1">CM1</option>
+										<option value="CM2">CM2</option>
+									</select>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">École précédente</span>
+									</label>
+									<input type="text" name="previousSchool" class="input input-bordered w-full" placeholder="Nom de l'école précédente (si applicable)">
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Informations Complémentaires -->
+						<div class="pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+								📋 Informations Complémentaires
+							</h2>
+
+							<div class="space-y-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Besoins particuliers ou PAI</span>
+									</label>
+									<textarea name="specialNeeds" class="textarea textarea-bordered w-full" rows="3" placeholder="Allergie, handicap, troubles d'apprentissage, etc. (facultatif)"></textarea>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Message ou demande particulière</span>
+									</label>
+									<textarea name="message" class="textarea textarea-bordered w-full" rows="4" placeholder="Votre message pour l'équipe pédagogique (facultatif)"></textarea>
+								</div>
+							</div>
+						</div>
+
+						<!-- Informations importantes -->
+						<div class="bg-blue-50 p-6 rounded-lg">
+							<h3 class="text-lg font-semibold text-[#304a4d] mb-3">
+								ℹ️ Informations importantes
+							</h3>
+							<ul class="list-disc list-inside space-y-2 text-[#304a4d]/80">
+								<li>Cette demande sera examinée par l'équipe de direction</li>
+								<li>Vous recevrez une réponse par email sous 48h</li>
+								<li>En cas d'acceptation, les identifiants de connexion vous seront envoyés</li>
+								<li>Les places sont limitées et attribuées selon l'ordre d'arrivée et les critères de l'école</li>
+								<li>Un entretien peut être demandé avant l'inscription définitive</li>
+							</ul>
+						</div>
+
+						<!-- Bouton de soumission -->
+						<div class="text-center pt-6">
+							<button type="submit" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white text-lg px-8 py-3">
+								📤 Envoyer la demande d'inscription
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<!-- Informations de contact -->
+				<div class="mt-8 text-center">
+					<div class="bg-white/50 rounded-lg p-6">
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-2">
+							Besoin d'aide ?
+						</h3>
+						<p class="text-[#304a4d]/80">
+							Contactez le secrétariat au <strong>04 91 05 05 89</strong><br>
+							ou par email : <strong>secretariat@ecole-saint-mathieu.fr</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
