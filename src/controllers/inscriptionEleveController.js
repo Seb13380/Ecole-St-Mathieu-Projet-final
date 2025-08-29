@@ -151,7 +151,7 @@ const inscriptionEleveController = {
             if (action === 'APPROVE') {
                 newStatus = 'ACCEPTED';
                 emailTemplate = 'inscriptionApproved';
-                
+
                 // Créer automatiquement le compte parent et élève
                 try {
                     await inscriptionEleveController.createParentAndStudentAccount(request);
