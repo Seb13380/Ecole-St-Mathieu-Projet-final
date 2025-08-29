@@ -59,21 +59,22 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  enfants             Student[]            @relation("ParentEnfants")
-  messages            Message[]            @relation("UserMessages")
-  actualites          Actualite[]          @relation("UserActualites")
-  travaux             Travaux[]            @relation("UserTravaux")
-  horaires            Horaire[]            @relation("EnseignantHoraires")
-  notes               Note[]               @relation("EnseignantNotes")
-  menus               Menu[]               @relation("UserMenus")
-  carouselImages      CarouselImage[]      @relation("UserCarouselImages")
-  heroCarousel        HeroCarousel[]       @relation("UserHeroCarousel")
-  TicketBooklet       TicketBooklet[]
-  TicketPurchase      TicketPurchase[]
-  inscriptionRequests InscriptionRequest[] @relation("InscriptionReviewer")
-  reviewedRequests    InscriptionRequest[]
-  galleryMedia        GalleryMedia[]       @relation("UserGalleryMedia")
-  documents           Document[]           @relation("UserDocuments")
+  enfants                  Student[]               @relation("ParentEnfants")
+  messages                 Message[]               @relation("UserMessages")
+  actualites               Actualite[]             @relation("UserActualites")
+  travaux                  Travaux[]               @relation("UserTravaux")
+  horaires                 Horaire[]               @relation("EnseignantHoraires")
+  notes                    Note[]                  @relation("EnseignantNotes")
+  menus                    Menu[]                  @relation("UserMenus")
+  carouselImages           CarouselImage[]         @relation("UserCarouselImages")
+  heroCarousel             HeroCarousel[]          @relation("UserHeroCarousel")
+  TicketBooklet            TicketBooklet[]
+  TicketPurchase           TicketPurchase[]
+  inscriptionRequests      InscriptionRequest[]    @relation("InscriptionReviewer")
+  reviewedRequests         InscriptionRequest[]
+  galleryMedia             GalleryMedia[]          @relation("UserGalleryMedia")
+  documents                Document[]              @relation("UserDocuments")
+  processedPreInscriptions PreInscriptionRequest[] @relation("ProcessedPreInscriptions")
 }
 
 model Student {
@@ -466,4 +467,47 @@ enum DocumentType {
   PASTORALE_AXE
   PASTORALE_TEMPS_PRIANT
   PASTORALE_ENSEMBLE
+}
+
+model PreInscriptionRequest {
+  id Int @id @default(autoincrement())
+
+  // Informations parent
+  parentFirstName String
+  parentLastName  String
+  parentEmail     String
+  parentPhone     String
+  parentAddress   String?
+
+  // Informations élève
+  studentFirstName String
+  studentLastName  String
+  studentBirthDate DateTime
+  currentClass     String? // Classe actuelle (peut être vide si première inscription)
+  requestedClass   String // Classe demandée
+  previousSchool   String? // École précédente
+  specialNeeds     String? // Besoins particuliers
+  message          String? // Message libre des parents
+
+  // Statut et suivi
+  status      PreInscriptionStatus @default(PENDING)
+  submittedAt DateTime             @default(now())
+  processedAt DateTime?
+  processedBy Int? // ID de l'utilisateur qui a traité
+  adminNotes  String? // Notes administratives
+
+  // Relations
+  processor User? @relation("ProcessedPreInscriptions", fields: [processedBy], references: [id])
+
+  @@index([status])
+  @@index([submittedAt])
+  @@index([parentEmail])
+}
+
+enum PreInscriptionStatus {
+  PENDING // En attente
+  REVIEWING // En cours d'examen
+  ACCEPTED // Acceptée
+  REJECTED // Refusée
+  COMPLETED // Inscription finalisée
 }

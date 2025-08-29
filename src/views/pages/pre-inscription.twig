@@ -1,0 +1,217 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<div class="min-h-screen bg-gradient-to-br from-[#a7e3dd] to-[#8dd3cc] py-12">
+		<div class="container mx-auto px-4">
+			<div
+				class="max-w-4xl mx-auto">
+				<!-- En-tête -->
+				<div class="text-center mb-8">
+					<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
+						📝 Pré-inscription Élève
+					</h1>
+					<p class="text-lg text-[#304a4d]/80">
+						Demande d'inscription pour l'année scolaire 2025-2026
+					</p>
+				</div>
+
+				<!-- Messages flash -->
+				{% if success %}
+					<div class="alert alert-success mb-6">
+						<span>✅
+							{{ success }}</span>
+					</div>
+				{% endif %}
+
+				{% if error %}
+					<div class="alert alert-error mb-6">
+						<span>❌
+							{{ error }}</span>
+					</div>
+				{% endif %}
+
+				<!-- Formulaire -->
+				<div class="bg-white rounded-xl shadow-lg p-8">
+					<form
+						action="/pre-inscription" method="POST" class="space-y-6">
+
+						<!-- Section Parent/Responsable -->
+						<div class="border-b border-gray-200 pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+								👤 Informations du Parent/Responsable
+							</h2>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Prénom *</span>
+									</label>
+									<input type="text" name="parentFirstName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Nom *</span>
+									</label>
+									<input type="text" name="parentLastName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Email *</span>
+									</label>
+									<input type="email" name="parentEmail" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Téléphone *</span>
+									</label>
+									<input type="tel" name="parentPhone" class="input input-bordered w-full" required>
+								</div>
+							</div>
+
+							<div class="form-control mt-4">
+								<label class="label">
+									<span class="label-text font-medium">Adresse complète</span>
+								</label>
+								<textarea name="parentAddress" class="textarea textarea-bordered w-full" rows="3" placeholder="Adresse, code postal, ville"></textarea>
+							</div>
+						</div>
+
+						<!-- Section Élève -->
+						<div class="border-b border-gray-200 pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+								🎓 Informations de l'Élève
+							</h2>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Prénom de l'élève *</span>
+									</label>
+									<input type="text" name="studentFirstName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Nom de l'élève *</span>
+									</label>
+									<input type="text" name="studentLastName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Date de naissance *</span>
+									</label>
+									<input type="date" name="studentBirthDate" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Classe actuelle</span>
+									</label>
+									<select name="currentClass" class="select select-bordered w-full">
+										<option value="">Sélectionner...</option>
+										<option value="TPS">TPS (Toute Petite Section)</option>
+										<option value="PS">PS (Petite Section)</option>
+										<option value="MS">MS (Moyenne Section)</option>
+										<option value="GS">GS (Grande Section)</option>
+										<option value="CP">CP</option>
+										<option value="CE1">CE1</option>
+										<option value="CE2">CE2</option>
+										<option value="CM1">CM1</option>
+										<option value="CM2">CM2</option>
+										<option value="Autre">Autre école/niveau</option>
+									</select>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Classe demandée *</span>
+									</label>
+									<select name="requestedClass" class="select select-bordered w-full" required>
+										<option value="">Sélectionner...</option>
+										<option value="TPS">TPS (Toute Petite Section)</option>
+										<option value="PS">PS (Petite Section)</option>
+										<option value="MS">MS (Moyenne Section)</option>
+										<option value="GS">GS (Grande Section)</option>
+										<option value="CP">CP</option>
+										<option value="CE1">CE1</option>
+										<option value="CE2">CE2</option>
+										<option value="CM1">CM1</option>
+										<option value="CM2">CM2</option>
+									</select>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">École précédente</span>
+									</label>
+									<input type="text" name="previousSchool" class="input input-bordered w-full" placeholder="Nom de l'établissement précédent">
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Besoins spéciaux et message -->
+						<div class="space-y-4">
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Besoins particuliers ou aménagements</span>
+								</label>
+								<textarea name="specialNeeds" class="textarea textarea-bordered w-full" rows="3" placeholder="PAI, PPRE, troubles, allergies, etc."></textarea>
+							</div>
+
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Message libre</span>
+								</label>
+								<textarea name="message" class="textarea textarea-bordered w-full" rows="4" placeholder="Motivations, questions, informations complémentaires..."></textarea>
+							</div>
+						</div>
+
+						<!-- Information importante -->
+						<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+							<h3 class="font-semibold text-blue-800 mb-2">📋 À noter :</h3>
+							<ul class="text-blue-700 text-sm space-y-1">
+								<li>• Cette demande ne constitue pas une inscription définitive</li>
+								<li>• Nous vous recontacterons pour un entretien avec la direction</li>
+								<li>• L'inscription sera finalisée après acceptation et constitution du dossier</li>
+								<li>• Les places sont limitées selon les niveaux</li>
+							</ul>
+						</div>
+
+						<!-- Boutons -->
+						<div class="flex flex-col sm:flex-row gap-4 pt-6">
+							<button type="submit" class="btn btn-primary flex-1">
+								📤 Envoyer la demande
+							</button>
+							<a href="/" class="btn btn-ghost flex-1">
+								↩️ Retour à l'accueil
+							</a>
+						</div>
+					</form>
+				</div>
+
+				<!-- Informations de contact -->
+				<div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+					<h3 class="text-xl font-semibold text-[#304a4d] mb-4">
+						📞 Besoin d'aide ?
+					</h3>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+						<div>
+							<p class="font-medium">Secrétariat :</p>
+							<p>📧 secretariat@stmathieu.org</p>
+							<p>☎️ 04 XX XX XX XX</p>
+						</div>
+						<div>
+							<p class="font-medium">Horaires d'accueil :</p>
+							<p>Lundi - Vendredi : 8h00 - 17h00</p>
+							<p>Mercredi : 8h00 - 12h00</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
