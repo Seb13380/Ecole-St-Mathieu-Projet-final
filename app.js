@@ -17,6 +17,65 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(__dirname + '/public'));
+
+// Protection spéciale pour les PDF de documents avec accès restreint
+app.use('/uploads/documents', async (req, res, next) => {
+  try {
+    const documentPath = req.path;
+
+    // Si ce n'est pas un PDF, laisser passer
+    if (!documentPath.endsWith('.pdf')) {
+      return next();
+    }
+
+    // Chercher le document dans la base de données par pdfUrl
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const document = await prisma.document.findFirst({
+      where: {
+        OR: [
+          { pdfUrl: { contains: require('path').basename(documentPath) } },
+          { pdfUrl: { endsWith: documentPath } }
+        ]
+      }
+    });
+
+    if (!document) {
+      return next(); // Document non trouvé en base, laisser express.static gérer
+    }
+
+    // Types de documents publics (accès libre)
+    const publicDocumentTypes = [
+      'PROJET_EDUCATIF',
+      'PROJET_ETABLISSEMENT',
+      'REGLEMENT_INTERIEUR',
+      'DOSSIER_INSCRIPTION',
+      'PASTORALE_AXE',
+      'PASTORALE_TEMPS_PRIANT',
+      'PASTORALE_ENSEMBLE'
+    ];
+
+    // Si le document est public, laisser passer
+    if (publicDocumentTypes.includes(document.type)) {
+      return next();
+    }
+
+    // Sinon, vérifier l'authentification
+    if (!req.session.user) {
+      return res.status(401).json({
+        error: 'Connexion requise pour accéder à ce document'
+      });
+    }
+
+    next();
+
+  } catch (error) {
+    console.error('Erreur dans la protection PDF:', error);
+    next(); // En cas d'erreur, laisser passer pour éviter de casser le site
+  }
+});
+
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.use(session({

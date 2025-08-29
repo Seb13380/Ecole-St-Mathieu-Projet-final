@@ -73,7 +73,9 @@ const getDocumentsByCategory = async (req, res) => {
             category,
             pageTitle,
             documentsByType,
-            documents
+            documents,
+            isAuthenticated: !!req.session.user,
+            user: req.session.user || null
         });
 
     } catch (error) {
@@ -480,7 +482,9 @@ const documentController = {
                 category,
                 pageTitle,
                 documentsByType,
-                documents
+                documents,
+                isAuthenticated: !!req.session.user,
+                user: req.session.user || null
             });
 
         } catch (error) {

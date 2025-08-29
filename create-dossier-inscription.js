@@ -54,7 +54,7 @@ async function createDossierInscription() {
         console.log(`   - ID: ${dossierInscription.id}`);
         console.log(`   - Titre: ${dossierInscription.titre}`);
         console.log(`   - Type: ${dossierInscription.type}`);
-        
+
         console.log('\n🎯 Testez sur : http://localhost:3007/documents/ecole');
 
     } catch (error) {
