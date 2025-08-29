@@ -2,6 +2,7 @@ const express = require("express");
 const twig = require('twig');
 const dotenv = require('dotenv');
 const session = require("express-session");
+const flash = require('connect-flash');
 const methodOverride = require('method-override');
 
 dotenv.config();
@@ -88,6 +89,9 @@ app.use(session({
   }
 }));
 
+// Configuration du middleware flash pour les messages temporaires
+app.use(flash());
+
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
 
@@ -103,6 +107,9 @@ app.set('twig options', {
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.isAuthenticated = !!req.session.user;
+  // Rendre les messages flash disponibles dans toutes les vues
+  res.locals.successMessage = req.flash('success');
+  res.locals.errorMessage = req.flash('error');
   next();
 });
 
