@@ -16,7 +16,13 @@
 							<span class="font-semibold text-blue-600">{{ user.firstName }}
 								{{ user.lastName }}</span>
 						</p>
-						<p class="text-sm text-slate-500 mt-1">Directeur de l'École Saint-Mathieu</p>
+						{% if user.firstName == 'Lionel' %}
+							<p class="text-sm text-slate-500 mt-1">Directeur de l'École Saint-Mathieu</p>
+						{% elseif user.firstName == 'Frank' %}
+							<p class="text-sm text-slate-500 mt-1">Gestionnaire du Site Web</p>
+						{% else %}
+							<p class="text-sm text-slate-500 mt-1">Équipe de Direction</p>
+						{% endif %}
 						<div class="text-3xl mt-4">📊</div>
 						<p class="text-sm text-slate-500">Tableau de bord</p>
 					</div>

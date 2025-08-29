@@ -19,6 +19,7 @@ const getDocumentsByCategory = async (req, res) => {
                 'PROJET_EDUCATIF',
                 'PROJET_ETABLISSEMENT',
                 'REGLEMENT_INTERIEUR',
+                'DOSSIER_INSCRIPTION',
                 'ORGANIGRAMME',
                 'AGENDA',
                 'CHARTE_LAICITE',
@@ -72,7 +73,9 @@ const getDocumentsByCategory = async (req, res) => {
             category,
             pageTitle,
             documentsByType,
-            documents
+            documents,
+            isAuthenticated: !!req.session.user,
+            user: req.session.user || null
         });
 
     } catch (error) {
@@ -425,6 +428,7 @@ const documentController = {
                     'PROJET_EDUCATIF',
                     'PROJET_ETABLISSEMENT',
                     'REGLEMENT_INTERIEUR',
+                    'DOSSIER_INSCRIPTION',
                     'ORGANIGRAMME',
                     'AGENDA',
                     'CHARTE_LAICITE',
@@ -478,7 +482,9 @@ const documentController = {
                 category,
                 pageTitle,
                 documentsByType,
-                documents
+                documents,
+                isAuthenticated: !!req.session.user,
+                user: req.session.user || null
             });
 
         } catch (error) {

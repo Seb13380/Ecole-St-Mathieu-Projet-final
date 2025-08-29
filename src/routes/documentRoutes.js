@@ -16,8 +16,8 @@ router.post('/admin/:id/delete', requireDirection, documentController.deleteDocu
 router.patch('/admin/:id/toggle', requireDirection, documentController.toggleDocument);
 router.post('/admin/:id/toggle', requireDirection, documentController.toggleDocument);
 
-// Routes publiques AVEC AUTHENTIFICATION REQUISE
-router.get('/show/:id', requireAuth, documentController.showPublicDocument); // /documents/show/123
-router.get('/:category', requireAuth, documentController.getDocumentsByCategory); // /documents/ecole ou /documents/pastorale
+// Routes publiques SANS AUTHENTIFICATION (accès libre)
+router.get('/show/:id', documentController.showPublicDocument); // /documents/show/123
+router.get('/:category', documentController.getDocumentsByCategory); // /documents/ecole ou /documents/pastorale
 
 module.exports = router;
