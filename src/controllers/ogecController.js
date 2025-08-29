@@ -5,7 +5,7 @@ const ogecController = {
     // Page OGEC
     getOgec: async (req, res) => {
         try {
-            res.render('pages/ogec', {
+            res.render('pages/gestion-ecole', {
                 title: 'OGEC - École Saint Mathieu',
                 user: req.session.user || null,
                 currentUrl: req.originalUrl
