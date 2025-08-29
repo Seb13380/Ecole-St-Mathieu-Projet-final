@@ -11,7 +11,7 @@ async function createOrUpdateVPSUsers() {
 
         // 1. Vérifier/Créer/Mettre à jour Lionel
         let lionel = await prisma.user.findFirst({
-            where: { 
+            where: {
                 OR: [
                     { email: "l.camboulives@stmathieu.org" },
                     { firstName: { contains: "Lionel" } }
@@ -48,7 +48,7 @@ async function createOrUpdateVPSUsers() {
 
         // 2. Vérifier/Créer/Mettre à jour Frank
         let frank = await prisma.user.findFirst({
-            where: { 
+            where: {
                 OR: [
                     { email: "frank.quaracino@orange.fr" },
                     { firstName: { contains: "Frank" } }
@@ -85,11 +85,11 @@ async function createOrUpdateVPSUsers() {
 
         // 3. Vérification finale
         console.log("\n=== VERIFICATION FINALE ===");
-        
+
         const finalLionel = await prisma.user.findUnique({
             where: { email: "l.camboulives@stmathieu.org" }
         });
-        
+
         const finalFrank = await prisma.user.findUnique({
             where: { email: "frank.quaracino@orange.fr" }
         });
