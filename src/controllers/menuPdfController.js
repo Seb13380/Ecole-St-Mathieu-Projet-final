@@ -80,11 +80,15 @@ const menuPdfController = {
             console.log('📝 Données reçues:', req.body);
             console.log('📁 Fichier reçu:', req.file);
 
-            const { actif } = req.body;
+            const { actif, dateDebut, dateFin, semaine } = req.body;
 
             // Vérifications
             if (!req.file) {
                 return res.redirect('/admin/menus-pdf?error=Le fichier PDF est obligatoire');
+            }
+
+            if (!dateDebut || !dateFin) {
+                return res.redirect('/admin/menus-pdf?error=Les dates de début et fin sont obligatoires');
             }
 
             if (!req.session.user || !req.session.user.id) {
@@ -100,15 +104,12 @@ const menuPdfController = {
                 });
             }
 
-            // Générer des dates automatiques (semaine courante)
-            const today = new Date();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() - today.getDay() + 1); // Lundi de cette semaine
-            const friday = new Date(monday);
-            friday.setDate(monday.getDate() + 4); // Vendredi de cette semaine
+            // Utiliser les dates saisies par l'utilisateur, en s'assurant qu'elles sont correctement formatées
+            const monday = new Date(dateDebut + 'T12:00:00.000Z'); // Ajouter l'heure pour éviter les problèmes de fuseau horaire
+            const friday = new Date(dateFin + 'T12:00:00.000Z');
 
-            // Générer un nom automatique basé sur le nom du fichier
-            const nomMenu = "Menu";
+            // Utiliser le titre saisi ou générer un nom automatique
+            const nomMenu = semaine || `Menu du ${dateDebut} au ${dateFin}`;
 
             // Convertir le PDF en images
             console.log('🖼️ Conversion du PDF en images...');
