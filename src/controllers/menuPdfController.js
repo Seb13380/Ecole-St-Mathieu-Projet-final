@@ -255,11 +255,12 @@ const menuPdfController = {
                 }
             });
 
-            res.json({ success: true, menu: menuMisAJour });
+            const message = statut === 'ACTIF' ? 'Menu activé avec succès' : 'Menu désactivé avec succès';
+            res.redirect(`/admin/menus-pdf?success=${encodeURIComponent(message)}`);
 
         } catch (error) {
             console.error('❌ Erreur lors de la mise à jour du statut:', error);
-            res.status(500).json({ success: false, error: error.message });
+            res.redirect('/admin/menus-pdf?error=Erreur lors de la modification du menu');
         }
     },
 
@@ -274,7 +275,7 @@ const menuPdfController = {
             });
 
             if (!menu) {
-                return res.status(404).json({ success: false, error: 'Menu non trouvé' });
+                return res.redirect('/admin/menus-pdf?error=Menu non trouvé');
             }
 
             // Supprimer le fichier PDF
@@ -294,11 +295,11 @@ const menuPdfController = {
             });
 
             console.log('🗑️ Menu supprimé avec succès:', id);
-            res.json({ success: true });
+            res.redirect('/admin/menus-pdf?success=Menu supprimé avec succès');
 
         } catch (error) {
             console.error('❌ Erreur lors de la suppression du menu:', error);
-            res.status(500).json({ success: false, error: error.message });
+            res.redirect('/admin/menus-pdf?error=Erreur lors de la suppression du menu');
         }
     },
 
@@ -356,11 +357,11 @@ const menuPdfController = {
             });
 
             console.log('✅ Menu activé:', menuActive.semaine);
-            res.json({ success: true, menu: menuActive });
+            res.redirect('/admin/menus-pdf?success=Menu activé avec succès');
 
         } catch (error) {
             console.error('❌ Erreur lors de l\'activation du menu:', error);
-            res.status(500).json({ success: false, error: error.message });
+            res.redirect('/admin/menus-pdf?error=Erreur lors de l\'activation du menu');
         }
     }
 };

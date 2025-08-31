@@ -4,23 +4,21 @@ const prisma = new PrismaClient();
 async function testMenus() {
     try {
         const menus = await prisma.menu.findMany();
-        console.log('📊 Nombre de menus en base:', menus.length);
+        console.log('✅ Nombre de menus dans la base:', menus.length);
 
         if (menus.length > 0) {
-            console.log('📝 Premier menu:', {
+            console.log('📋 Premier menu:', {
                 id: menus[0].id,
                 semaine: menus[0].semaine,
                 dateDebut: menus[0].dateDebut,
                 dateFin: menus[0].dateFin,
-                actif: menus[0].actif,
-                statut: menus[0].statut
+                actif: menus[0].actif
             });
-        } else {
-            console.log('❌ Aucun menu trouvé en base de données');
         }
+
+        await prisma.$disconnect();
     } catch (error) {
         console.error('❌ Erreur:', error);
-    } finally {
         await prisma.$disconnect();
     }
 }
