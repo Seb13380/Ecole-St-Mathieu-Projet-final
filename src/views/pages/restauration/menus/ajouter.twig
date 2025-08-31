@@ -102,39 +102,32 @@ document.getElementById('dateDebut').addEventListener('change', updateSemaineTit
 document.getElementById('dateFin').addEventListener('change', updateSemaineTitre);
 
 function updateSemaineTitre() {
-const dateDebut = document.getElementById('dateDebut').value;
-const dateFin = document.getElementById('dateFin').value;
+	const dateDebut = document.getElementById('dateDebut').value;
+	const dateFin = document.getElementById('dateFin').value;
 
-if (dateDebut && dateFin) {
-const debut = new Date(dateDebut);
-const fin = new Date(dateFin);
+	if (dateDebut && dateFin) {
+		// Utiliser les dates directement sans créer d'objet Date pour éviter les problèmes de fuseau horaire
+		const [anneeDebut, moisDebut, jourDebut] = dateDebut.split('-').map(Number);
+		const [anneeFin, moisFin, jourFin] = dateFin.split('-').map(Number);
 
-const mois = [
-'Janvier',
-'Février',
-'Mars',
-'Avril',
-'Mai',
-'Juin',
-'Juillet',
-'Août',
-'Septembre',
-'Octobre',
-'Novembre',
-'Décembre'
-];
+		const mois = [
+			'Janvier',
+			'Février',
+			'Mars',
+			'Avril',
+			'Mai',
+			'Juin',
+			'Juillet',
+			'Août',
+			'Septembre',
+			'Octobre',
+			'Novembre',
+			'Décembre'
+		];
 
-const titre = `Semaine du ${
-debut.getDate()
-} au ${
-fin.getDate()
-} ${
-mois[fin.getMonth()]
-} ${
-fin.getFullYear()
-}`;
-document.getElementById('semaine').value = titre;
-}
+		const titre = `Menu du ${jourDebut.toString().padStart(2, '0')} au ${jourFin.toString().padStart(2, '0')} ${mois[moisFin - 1]} ${anneeFin}`;
+		document.getElementById('semaine').value = titre;
+	}
 }
 
 function showAlert(message, type = 'success') {

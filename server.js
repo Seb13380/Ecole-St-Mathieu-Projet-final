@@ -12,7 +12,7 @@ const compression = require('compression');
 // Import des routes
 const homeRoutes = require('./src/routes/homeRoutes');
 const authRoutes = require('./src/routes/authRoutes');
-const actualitesRoutes = require('./src/routes/actualitesRoutes');
+const actualitesRoutes = require('./src/routes/actualiteRoutes');
 const travauxRoutes = require('./src/routes/travauxRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const parentRoutes = require('./src/routes/parentRoutes');

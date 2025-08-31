@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const emailService = require('../services/emailService');
 
 const prisma = new PrismaClient();
 
@@ -86,10 +87,57 @@ const actualiteController = {
           important: important === 'true',
           visible: visible === 'true',
           datePublication: datePublicationFinal
+        },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
         }
       });
 
       console.log('✅ Actualité créée:', actualite.titre);
+
+      // Envoyer des notifications par email aux parents si l'actualité est visible
+      if (visible === 'true') {
+        try {
+          console.log('📧 Envoi des notifications aux parents...');
+
+          // Récupérer tous les emails des parents
+          const parents = await prisma.user.findMany({
+            where: {
+              role: 'PARENT'
+            },
+            select: { email: true }
+          });
+
+          const parentEmails = parents.map(parent => parent.email);
+
+          if (parentEmails.length > 0) {
+            const emailResult = await emailService.sendNewActualiteNotification({
+              titre: actualite.titre,
+              contenu: actualite.contenu,
+              auteur: actualite.auteur,
+              datePublication: actualite.datePublication,
+              important: actualite.important,
+              mediaUrl: actualite.mediaUrl
+            }, parentEmails);
+
+            if (emailResult.success) {
+              console.log(`✅ Notifications envoyées à ${emailResult.recipientCount} parents`);
+            } else {
+              console.error('❌ Erreur lors de l\'envoi des notifications:', emailResult.error);
+            }
+          } else {
+            console.log('ℹ️ Aucun parent trouvé pour les notifications');
+          }
+        } catch (emailError) {
+          console.error('❌ Erreur lors de l\'envoi des notifications par email:', emailError);
+          // On continue même si l'email échoue
+        }
+      } else {
+        console.log('ℹ️ Actualité non visible, aucune notification envoyée');
+      }
+
       res.redirect('/actualites/manage?success=' + encodeURIComponent('Actualité créée avec succès'));
     } catch (error) {
       console.error('Erreur lors de la création de l\'actualité:', error);
@@ -165,7 +213,12 @@ const actualiteController = {
       const { id } = req.params;
 
       const actualite = await prisma.actualite.findUnique({
-        where: { id: parseInt(id) }
+        where: { id: parseInt(id) },
+        include: {
+          auteur: {
+            select: { firstName: true, lastName: true }
+          }
+        }
       });
 
       if (!actualite) {
@@ -179,6 +232,46 @@ const actualiteController = {
 
       const message = updatedActualite.visible ? 'Actualité rendue visible' : 'Actualité masquée';
       console.log('✅ Visibilité modifiée:', message);
+
+      // Si l'actualité devient visible, envoyer des notifications aux parents
+      if (updatedActualite.visible && !actualite.visible) {
+        try {
+          console.log('📧 Envoi des notifications aux parents pour actualité rendue visible...');
+
+          // Récupérer tous les emails des parents
+          const parents = await prisma.user.findMany({
+            where: {
+              role: 'PARENT'
+            },
+            select: { email: true }
+          });
+
+          const parentEmails = parents.map(parent => parent.email);
+
+          if (parentEmails.length > 0) {
+            const emailResult = await emailService.sendNewActualiteNotification({
+              titre: actualite.titre,
+              contenu: actualite.contenu,
+              auteur: actualite.auteur,
+              datePublication: actualite.datePublication,
+              important: actualite.important,
+              mediaUrl: actualite.mediaUrl
+            }, parentEmails);
+
+            if (emailResult.success) {
+              console.log(`✅ Notifications envoyées à ${emailResult.recipientCount} parents`);
+            } else {
+              console.error('❌ Erreur lors de l\'envoi des notifications:', emailResult.error);
+            }
+          } else {
+            console.log('ℹ️ Aucun parent trouvé pour les notifications');
+          }
+        } catch (emailError) {
+          console.error('❌ Erreur lors de l\'envoi des notifications par email:', emailError);
+          // On continue même si l'email échoue
+        }
+      }
+
       res.redirect(`/actualites/manage?success=${encodeURIComponent(message)}#actualite-${id}`);
     } catch (error) {
       console.error('Erreur lors du changement de visibilité:', error);

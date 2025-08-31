@@ -639,6 +639,121 @@ class EmailService {
     }
 
     /**
+     * Envoyer une notification de nouvelle actualité aux parents
+     * @param {Object} actualiteData - Données de l'actualité
+     * @param {Array} parentEmails - Liste des emails des parents
+     */
+    async sendNewActualiteNotification(actualiteData, parentEmails) {
+        const { titre, contenu, auteur, datePublication, important, mediaUrl } = actualiteData;
+
+        // Créer un extrait du contenu (max 200 caractères)
+        const contenuExtrait = contenu.length > 200 ?
+            contenu.substring(0, 200) + '...' : contenu;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            bcc: process.env.TEST_MODE === 'true' ? [process.env.TEST_EMAIL] : parentEmails,
+            subject: `📰 ${important ? '🚨 IMPORTANT - ' : ''}Nouvelle actualité - École Saint-Mathieu`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fdfc;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        ${important ? `
+                        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                            <h2 style="color: #856404; margin: 0; text-align: center;">🚨 ACTUALITÉ IMPORTANTE</h2>
+                        </div>
+                        ` : ''}
+                        
+                        <h2 style="color: #304a4d; border-bottom: 2px solid #a7e3dd; padding-bottom: 10px;">
+                            📰 Nouvelle actualité publiée
+                        </h2>
+                        
+                        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #304a4d; margin-top: 0; font-size: 20px;">${titre}</h3>
+                            <p style="color: #333; line-height: 1.6; margin: 15px 0;">${contenuExtrait}</p>
+                            
+                            ${mediaUrl ? `
+                            <div style="margin: 15px 0;">
+                                <p style="color: #666; font-size: 14px;">📎 Cette actualité contient une image ou une vidéo.</p>
+                            </div>
+                            ` : ''}
+                            
+                            <div style="background-color: #e7f3ff; padding: 10px; border-radius: 5px; margin-top: 15px;">
+                                <p style="color: #004085; margin: 5px 0; font-size: 14px;">
+                                    <strong>📝 Publié par :</strong> ${auteur.firstName} ${auteur.lastName}
+                                </p>
+                                <p style="color: #004085; margin: 5px 0; font-size: 14px;">
+                                    <strong>📅 Date :</strong> ${new Date(datePublication).toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/actualites" 
+                               style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                📖 Lire l'actualité complète
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #0c5460; margin-top: 0;">💻 Votre espace parent :</h3>
+                            <p style="color: #0c5460; margin: 0;">
+                                Connectez-vous à votre espace parent pour consulter toutes les actualités, 
+                                suivre la scolarité de vos enfants et communiquer avec l'équipe pédagogique.
+                            </p>
+                            <div style="text-align: center; margin-top: 10px;">
+                                <a href="${process.env.BASE_URL || 'http://localhost:3007'}/auth/login" 
+                                   style="color: #0c5460; font-weight: bold; text-decoration: none;">
+                                    👉 Se connecter à l'espace parent
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #495057; margin-top: 0;">📧 Contact :</h3>
+                            <p style="color: #495057; margin: 0; font-size: 14px;">
+                                Pour toute question : <a href="mailto:ecole@saint-mathieu.fr" style="color: #304a4d;">ecole@saint-mathieu.fr</a><br>
+                                Téléphone : 01 23 45 67 89
+                            </p>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6; margin-top: 30px;">
+                            Cordialement,<br>
+                            <strong>L'équipe de l'École Saint-Mathieu</strong>
+                        </p>
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                            <p style="color: #666; font-size: 12px;">
+                                Vous recevez cet email car vous êtes parent d'élève à l'École Saint-Mathieu.<br>
+                                Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log(`📧 Notification d'actualité envoyée à ${parentEmails.length} parents:`, info.messageId);
+            return { success: true, messageId: info.messageId, recipientCount: parentEmails.length };
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'envoi de la notification d\'actualité:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
      * Tester la configuration email
      */
     async testConnection() {

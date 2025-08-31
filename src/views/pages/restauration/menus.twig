@@ -21,19 +21,7 @@
 						<div class="bg-white rounded-lg shadow-lg p-6">
 							<div class="text-center mb-6">
 								<h3 class="text-2xl font-bold text-slate-800 mb-2">{{ menu.semaine }}</h3>
-								{% if menu.dateDebut and menu.dateFin %}
-									<p class="text-lg text-gray-600 mb-4">Du
-										{{ menu.dateDebut|date('d/m/Y') }}
-										au
-										{{ menu.dateFin|date('d/m/Y') }}</p>
-								{% endif %}
-								{% if menu.auteur %}
-									<p class="text-sm text-gray-500 mb-6">
-										Préparé par le Chef
-																																								• Publié le
-										{{ menu.createdAt|date('d/m/Y') }}
-									</p>
-								{% endif %}
+								
 							</div>
 
 							{% if menu.imageUrls %}
