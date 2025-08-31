@@ -136,6 +136,7 @@ const inscriptionsRoutes = require('./src/routes/inscriptions');
 const galleryRoutes = require('./src/routes/galleryRoutes');
 const documentRoutes = require('./src/routes/documentRoutes');
 const preInscriptionRoutes = require('./src/routes/preInscriptionRoutes');
+const userManagementRoutes = require('./src/routes/userManagementRoutes');
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -159,6 +160,7 @@ app.use('/inscriptions', inscriptionsRoutes);
 app.use('/gallery', galleryRoutes);
 app.use('/documents', documentRoutes);
 app.use('/pre-inscription', preInscriptionRoutes);
+app.use('/user-management', userManagementRoutes);
 
 // Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
 app.get('/inscriptions/manage', (req, res) => {
