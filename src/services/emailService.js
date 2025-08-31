@@ -645,9 +645,9 @@ class EmailService {
      */
     async sendNewActualiteNotification(actualiteData, parentEmails) {
         const { titre, contenu, auteur, datePublication, important, mediaUrl } = actualiteData;
-        
+
         // Créer un extrait du contenu (max 200 caractères)
-        const contenuExtrait = contenu.length > 200 ? 
+        const contenuExtrait = contenu.length > 200 ?
             contenu.substring(0, 200) + '...' : contenu;
 
         const mailOptions = {
@@ -687,13 +687,13 @@ class EmailService {
                                 </p>
                                 <p style="color: #004085; margin: 5px 0; font-size: 14px;">
                                     <strong>📅 Date :</strong> ${new Date(datePublication).toLocaleDateString('fr-FR', {
-                                        weekday: 'long',
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}
                                 </p>
                             </div>
                         </div>

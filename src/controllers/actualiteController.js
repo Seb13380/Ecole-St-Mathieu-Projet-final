@@ -101,17 +101,17 @@ const actualiteController = {
       if (visible === 'true') {
         try {
           console.log('📧 Envoi des notifications aux parents...');
-          
+
           // Récupérer tous les emails des parents
           const parents = await prisma.user.findMany({
-            where: { 
+            where: {
               role: 'PARENT'
             },
             select: { email: true }
           });
 
           const parentEmails = parents.map(parent => parent.email);
-          
+
           if (parentEmails.length > 0) {
             const emailResult = await emailService.sendNewActualiteNotification({
               titre: actualite.titre,
@@ -237,17 +237,17 @@ const actualiteController = {
       if (updatedActualite.visible && !actualite.visible) {
         try {
           console.log('📧 Envoi des notifications aux parents pour actualité rendue visible...');
-          
+
           // Récupérer tous les emails des parents
           const parents = await prisma.user.findMany({
-            where: { 
+            where: {
               role: 'PARENT'
             },
             select: { email: true }
           });
 
           const parentEmails = parents.map(parent => parent.email);
-          
+
           if (parentEmails.length > 0) {
             const emailResult = await emailService.sendNewActualiteNotification({
               titre: actualite.titre,

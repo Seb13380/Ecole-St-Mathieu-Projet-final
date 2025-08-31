@@ -10,7 +10,7 @@ async function testActualiteNotifications() {
         // 1. Vérifier la configuration email
         console.log('1. Test de la configuration email...');
         const isEmailConfigured = await emailService.testConnection();
-        
+
         if (!isEmailConfigured) {
             console.log('❌ Configuration email invalide');
             return;
@@ -19,13 +19,13 @@ async function testActualiteNotifications() {
         // 2. Vérifier les parents dans la base de données
         console.log('\n2. Recherche des parents dans la base de données...');
         const parents = await prisma.user.findMany({
-            where: { 
+            where: {
                 role: 'PARENT'
             },
-            select: { 
-                email: true, 
-                firstName: true, 
-                lastName: true 
+            select: {
+                email: true,
+                firstName: true,
+                lastName: true
             }
         });
 
@@ -65,9 +65,9 @@ async function testActualiteNotifications() {
 
         // 4. Test d'envoi de notification
         console.log('\n4. Test d\'envoi de notification...');
-        
+
         const parentEmails = parents.map(parent => parent.email);
-        
+
         const emailResult = await emailService.sendNewActualiteNotification({
             titre: actualite.titre,
             contenu: actualite.contenu,
@@ -81,7 +81,7 @@ async function testActualiteNotifications() {
             console.log(`✅ Test réussi !`);
             console.log(`📧 Notification envoyée à ${emailResult.recipientCount} parent(s)`);
             console.log(`📨 Message ID: ${emailResult.messageId}`);
-            
+
             if (process.env.TEST_MODE === 'true') {
                 console.log(`🧪 Mode test activé - Email redirigé vers: ${process.env.TEST_EMAIL}`);
             }
