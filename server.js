@@ -20,6 +20,7 @@ const enseignantRoutes = require('./src/routes/enseignantRoutes');
 const directeurRoutes = require('./src/routes/directeurRoutes');
 const heroCarouselRoutes = require('./src/routes/heroCarouselRoutes');
 const carouselRoutes = require('./src/routes/carouselRoutes');
+const userManagementRoutes = require('./src/routes/userManagementRoutes');
 
 require('dotenv').config();
 
@@ -75,6 +76,7 @@ app.use('/enseignant', enseignantRoutes);
 app.use('/directeur', directeurRoutes);
 app.use('/hero-carousel', heroCarouselRoutes);
 app.use('/carousel', carouselRoutes);
+app.use('/user-management', userManagementRoutes);
 
 // Page 404
 app.use((req, res) => {
