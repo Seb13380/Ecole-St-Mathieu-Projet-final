@@ -108,8 +108,14 @@ const menuPdfController = {
             const monday = new Date(dateDebut + 'T12:00:00.000Z'); // Ajouter l'heure pour éviter les problèmes de fuseau horaire
             const friday = new Date(dateFin + 'T12:00:00.000Z');
 
-            // Utiliser le titre saisi ou générer un nom automatique
-            const nomMenu = semaine || `Menu du ${dateDebut} au ${dateFin}`;
+            // Fonction pour formater une date YYYY-MM-DD en DD/MM/YYYY
+            const formatDateToFrench = (dateStr) => {
+                const [year, month, day] = dateStr.split('-');
+                return `${day}/${month}/${year}`;
+            };
+
+            // Utiliser le titre saisi ou générer un nom automatique avec dates en format français
+            const nomMenu = semaine || `Menu du ${formatDateToFrench(dateDebut)} au ${formatDateToFrench(dateFin)}`;
 
             // Convertir le PDF en images
             console.log('🖼️ Conversion du PDF en images...');
