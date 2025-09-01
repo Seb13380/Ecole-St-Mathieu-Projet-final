@@ -18,7 +18,7 @@ router.put('/admin/config', inscriptionManagementController.updateInscriptionCon
 // Gestion des documents
 router.post('/admin/documents',
     inscriptionManagementController.uploadMiddleware,
-    inscriptionManagementController.uploadDocument
+    inscriptionManagementController.addDocument
 );
 
 router.delete('/admin/documents/:id', inscriptionManagementController.deleteDocument);

@@ -7,6 +7,7 @@ document.getElementById('configForm').addEventListener('submit', async (e) => {
 
     const formData = new FormData(e.target);
     const soustitre = formData.get('soustitre').trim();
+    const afficherAnnoncePS2026 = formData.get('afficherAnnoncePS2026') === '1';
 
     if (!soustitre) {
         showAlert('Le sous-titre ne peut pas être vide', 'error');
@@ -21,7 +22,10 @@ document.getElementById('configForm').addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ soustitre })
+            body: JSON.stringify({
+                soustitre,
+                afficherAnnoncePS2026
+            })
         });
 
         const result = await response.json();
@@ -48,11 +52,31 @@ document.getElementById('configForm').addEventListener('submit', async (e) => {
 function openUploadModal() {
     document.getElementById('uploadModal').style.display = 'flex';
     document.getElementById('documentName').focus();
+    // S'assurer que FILE est sélectionné par défaut
+    document.querySelector('input[name="type"][value="FILE"]').checked = true;
+    toggleDocumentType();
 }
 
 function closeUploadModal() {
     document.getElementById('uploadModal').style.display = 'none';
     document.getElementById('uploadForm').reset();
+    // Remettre FILE par défaut
+    document.querySelector('input[name="type"][value="FILE"]').checked = true;
+    toggleDocumentType();
+}
+
+function toggleDocumentType() {
+    const type = document.querySelector('input[name="type"]:checked').value;
+    const fileSection = document.getElementById('fileSection');
+    const linkSection = document.getElementById('linkSection');
+
+    if (type === 'FILE') {
+        fileSection.style.display = 'block';
+        linkSection.style.display = 'none';
+    } else {
+        fileSection.style.display = 'none';
+        linkSection.style.display = 'block';
+    }
 }
 
 // Fermer le modal en cliquant à l'extérieur
@@ -67,25 +91,50 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const file = formData.get('document');
+    const type = formData.get('type');
+    const nom = formData.get('nom');
 
-    if (!file || file.size === 0) {
-        showAlert('Veuillez sélectionner un fichier PDF', 'error');
+    if (!nom || nom.trim().length === 0) {
+        showAlert('Le nom du document est requis', 'error');
         return;
     }
 
-    if (file.type !== 'application/pdf') {
-        showAlert('Seuls les fichiers PDF sont acceptés', 'error');
-        return;
-    }
+    if (type === 'FILE') {
+        const file = formData.get('document');
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB
-        showAlert('Le fichier ne peut pas dépasser 10MB', 'error');
-        return;
+        if (!file || file.size === 0) {
+            showAlert('Veuillez sélectionner un fichier PDF', 'error');
+            return;
+        }
+
+        if (file.type !== 'application/pdf') {
+            showAlert('Seuls les fichiers PDF sont acceptés', 'error');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) { // 10MB
+            showAlert('Le fichier ne peut pas dépasser 10MB', 'error');
+            return;
+        }
+    } else if (type === 'LINK') {
+        const lienExterne = formData.get('lienExterne');
+
+        if (!lienExterne || lienExterne.trim().length === 0) {
+            showAlert('Le lien externe est requis', 'error');
+            return;
+        }
+
+        // Vérification basique de l'URL
+        try {
+            new URL(lienExterne);
+        } catch (e) {
+            showAlert('Veuillez saisir une URL valide (ex: https://exemple.com)', 'error');
+            return;
+        }
     }
 
     try {
-        showLoading('Upload en cours...');
+        showLoading('Ajout en cours...');
 
         const response = await fetch('/inscription-management/admin/documents', {
             method: 'POST',
@@ -269,6 +318,13 @@ document.getElementById('documentFile').addEventListener('change', (e) => {
         if (file.size > 10 * 1024 * 1024) {
             showAlert('Attention: le fichier dépasse 10MB', 'warning');
         }
+    }
+});
+
+// Gestion du changement de type de document
+document.addEventListener('change', (e) => {
+    if (e.target.name === 'type') {
+        toggleDocumentType();
     }
 });
 

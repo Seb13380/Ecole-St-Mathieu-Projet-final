@@ -166,6 +166,11 @@ app.use('/user-management', userManagementRoutes);
 app.use('/agenda', agendaRoutes);
 app.use('/inscription-management', inscriptionManagementRoutes);
 
+// Redirection de /inscription vers /inscription-eleve
+app.get('/inscription', (req, res) => {
+  res.redirect('/inscription-eleve');
+});
+
 // Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
 app.get('/inscriptions/manage', (req, res) => {
   if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'ADMIN') {

@@ -7,11 +7,57 @@
 				<!-- En-tête -->
 				<div class="text-center mb-8">
 					<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
-						🎓 Demande d'Inscription Élève
+						🎓 Demande d'inscription Élève(s)
 					</h1>
 					<p class="text-lg text-[#304a4d]/80" id="inscriptionSubtitle">
 						Demande d'inscription pour l'année scolaire 2025-2026
 					</p>
+				</div>
+
+				<!-- Annonce Petite Section 2026 -->
+				<div id="annoncePS2026" class="mb-8" style="display: none;">
+					<div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
+						<!-- Icône décorative -->
+						<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
+							🎓
+						</div>
+						
+						<div class="relative z-10">
+							<div class="flex items-center mb-4">
+								<span class="text-3xl mr-3">🌟</span>
+								<h2 class="text-2xl font-bold text-orange-700">
+									Inscription Petite Section - Rentrée 2026
+								</h2>
+							</div>
+							
+							<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
+								<p class="text-lg text-orange-800 mb-3 font-medium">
+									📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
+								</p>
+								<p class="text-orange-700 mb-4">
+									Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
+								</p>
+								
+								<div class="text-center">
+									<a href="https://forms.office.com/e/tm7H3nJbbH" 
+									   target="_blank" 
+									   rel="noopener"
+									   class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
+										<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+										</svg>
+										Accéder au formulaire d'inscription PS 2026
+									</a>
+								</div>
+							</div>
+							
+							<div class="text-center">
+								<p class="text-sm text-orange-600 italic">
+									⏰ Ce formulaire est spécialement conçu pour les futures petites sections
+								</p>
+							</div>
+						</div>
+					</div>
 				</div>
 
 				<!-- Documents à télécharger -->
@@ -48,7 +94,7 @@
 
 						<!-- Section Parent/Responsable -->
 						<div class="border-b border-gray-200 pb-6">
-							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+							<h2 class="text-2xl font-semibold text-[#304a4d] text-center mb-4">
 								👤 Informations du Parent/Responsable
 							</h2>
 
@@ -90,76 +136,95 @@
 							</div>
 						</div>
 
-						<!-- Section Élève -->
+						<!-- Section Enfants -->
 						<div class="border-b border-gray-200 pb-6">
-							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
-								🧒 Informations de l'Enfant à Inscrire
-							</h2>
+							<div class="text-center mb-6">
+								<h2 class="text-2xl font-semibold text-[#304a4d]">
+									👶 Enfant(s) à Inscrire
+								</h2>
+							</div>
+							<div class="flex justify-end mb-4">
+								<button type="button" id="addChildBtn" class="btn btn-outline btn-sm bg-[#304a4d] text-white hover:bg-[#2a3f42] shadow-lg font-semibold border border-white/20">
+									➕ Ajouter un autre enfant
+								</button>
+							</div>
 
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Prénom de l'enfant *</span>
-									</label>
-									<input type="text" name="studentFirstName" class="input input-bordered w-full" required>
-								</div>
+							<div id="childrenContainer" class="space-y-6">
+								<!-- Premier enfant (par défaut) -->
+								<div class="child-form bg-slate-50 p-4 rounded-lg border border-slate-200 relative" data-child-index="0">
+									<div class="flex justify-between items-center mb-4">
+										<h3 class="text-lg font-semibold text-[#304a4d]">Enfant 1</h3>
+										<button type="button" class="remove-child-btn btn btn-outline btn-xs text-red-600 hover:bg-red-50 shadow-md font-semibold bg-white border-2 border-red-200" style="display: none;">
+											🗑️ Supprimer
+										</button>
+									</div>
 
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Nom de l'enfant *</span>
-									</label>
-									<input type="text" name="studentLastName" class="input input-bordered w-full" required>
-								</div>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Prénom de l'enfant *</span>
+											</label>
+											<input type="text" name="children[0][firstName]" class="input input-bordered w-full" required>
+										</div>
 
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Date de naissance *</span>
-									</label>
-									<input type="date" name="studentBirthDate" class="input input-bordered w-full" required>
-								</div>
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Nom de l'enfant *</span>
+											</label>
+											<input type="text" name="children[0][lastName]" class="input input-bordered w-full" required>
+										</div>
 
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Classe actuelle</span>
-									</label>
-									<select name="currentClass" class="select select-bordered w-full">
-										<option value="">Sélectionner...</option>
-										<option value="TPS">TPS (Toute Petite Section)</option>
-										<option value="PS">PS (Petite Section)</option>
-										<option value="MS">MS (Moyenne Section)</option>
-										<option value="GS">GS (Grande Section)</option>
-										<option value="CP">CP</option>
-										<option value="CE1">CE1</option>
-										<option value="CE2">CE2</option>
-										<option value="CM1">CM1</option>
-										<option value="CM2">CM2</option>
-										<option value="Première_inscription">Première inscription</option>
-										<option value="Autre_école">Autre école</option>
-									</select>
-								</div>
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Date de naissance *</span>
+											</label>
+											<input type="date" name="children[0][birthDate]" class="input input-bordered w-full" required>
+										</div>
 
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Classe demandée *</span>
-									</label>
-									<select name="requestedClass" class="select select-bordered w-full" required>
-										<option value="">Sélectionner la classe souhaitée...</option>
-										<option value="PS">PS (Petite Section)</option>
-										<option value="MS">MS (Moyenne Section)</option>
-										<option value="GS">GS (Grande Section)</option>
-										<option value="CP">CP</option>
-										<option value="CE1">CE1</option>
-										<option value="CE2">CE2</option>
-										<option value="CM1">CM1</option>
-										<option value="CM2">CM2</option>
-									</select>
-								</div>
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Classe actuelle</span>
+											</label>
+											<select name="children[0][currentClass]" class="select select-bordered w-full">
+												<option value="">Sélectionner...</option>
+												<option value="TPS">TPS (Toute Petite Section)</option>
+												<option value="PS">PS (Petite Section)</option>
+												<option value="MS">MS (Moyenne Section)</option>
+												<option value="GS">GS (Grande Section)</option>
+												<option value="CP">CP</option>
+												<option value="CE1">CE1</option>
+												<option value="CE2">CE2</option>
+												<option value="CM1">CM1</option>
+												<option value="CM2">CM2</option>
+												<option value="Première_inscription">Première inscription</option>
+												<option value="Autre_école">Autre école</option>
+											</select>
+										</div>
 
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">École précédente</span>
-									</label>
-									<input type="text" name="previousSchool" class="input input-bordered w-full" placeholder="Nom de l'école précédente (si applicable)">
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Classe demandée *</span>
+											</label>
+											<select name="children[0][requestedClass]" class="select select-bordered w-full" required>
+												<option value="">Sélectionner la classe souhaitée...</option>
+												<option value="PS">PS (Petite Section)</option>
+												<option value="MS">MS (Moyenne Section)</option>
+												<option value="GS">GS (Grande Section)</option>
+												<option value="CP">CP</option>
+												<option value="CE1">CE1</option>
+												<option value="CE2">CE2</option>
+												<option value="CM1">CM1</option>
+												<option value="CM2">CM2</option>
+											</select>
+										</div>
+
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">École précédente</span>
+											</label>
+											<input type="text" name="children[0][previousSchool]" class="input input-bordered w-full" placeholder="Nom de l'école précédente (si applicable)">
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -203,7 +268,7 @@
 
 						<!-- Bouton de soumission -->
 						<div class="text-center pt-6">
-							<button type="submit" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white text-lg px-8 py-3">
+							<button type="submit" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white text-lg px-8 py-3 shadow-xl font-bold border border-white/30 transition-all duration-200 hover:shadow-2xl">
 								📤 Envoyer la demande d'inscription
 							</button>
 						</div>
@@ -227,6 +292,9 @@
 	</div>
 
 <script>
+// Variables globales
+let childIndex = 1; // Commence à 1 car nous avons déjà l'enfant 0
+
 // Charger les données d'inscription (sous-titre et documents)
 async function loadInscriptionData() {
     try {
@@ -237,6 +305,11 @@ async function loadInscriptionData() {
             // Mettre à jour le sous-titre
             if (data.config && data.config.soustitre) {
                 document.getElementById('inscriptionSubtitle').textContent = data.config.soustitre;
+            }
+            
+            // Afficher/masquer l'annonce PS 2026
+            if (data.config && data.config.afficherAnnoncePS2026) {
+                document.getElementById('annoncePS2026').style.display = 'block';
             }
             
             // Afficher les documents s'il y en a
@@ -285,7 +358,163 @@ function displayDocuments(documents) {
     documentsSection.style.display = 'block';
 }
 
+// Fonction pour ajouter un nouvel enfant
+function addChild() {
+    const container = document.getElementById('childrenContainer');
+    const newChildDiv = document.createElement('div');
+    newChildDiv.className = 'child-form bg-slate-50 p-4 rounded-lg border border-slate-200 relative';
+    newChildDiv.setAttribute('data-child-index', childIndex);
+
+    newChildDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-[#304a4d]">Enfant ${childIndex + 1}</h3>
+            <button type="button" class="remove-child-btn btn btn-outline btn-xs text-red-600 hover:bg-red-50 shadow-md font-semibold bg-white border-2 border-red-200">
+                🗑️ Supprimer
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Prénom de l'enfant *</span>
+                </label>
+                <input type="text" name="children[${childIndex}][firstName]" class="input input-bordered w-full" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Nom de l'enfant *</span>
+                </label>
+                <input type="text" name="children[${childIndex}][lastName]" class="input input-bordered w-full" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Date de naissance *</span>
+                </label>
+                <input type="date" name="children[${childIndex}][birthDate]" class="input input-bordered w-full" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Classe actuelle</span>
+                </label>
+                <select name="children[${childIndex}][currentClass]" class="select select-bordered w-full">
+                    <option value="">Sélectionner...</option>
+                    <option value="TPS">TPS (Toute Petite Section)</option>
+                    <option value="PS">PS (Petite Section)</option>
+                    <option value="MS">MS (Moyenne Section)</option>
+                    <option value="GS">GS (Grande Section)</option>
+                    <option value="CP">CP</option>
+                    <option value="CE1">CE1</option>
+                    <option value="CE2">CE2</option>
+                    <option value="CM1">CM1</option>
+                    <option value="CM2">CM2</option>
+                    <option value="Première_inscription">Première inscription</option>
+                    <option value="Autre_école">Autre école</option>
+                </select>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Classe demandée *</span>
+                </label>
+                <select name="children[${childIndex}][requestedClass]" class="select select-bordered w-full" required>
+                    <option value="">Sélectionner la classe souhaitée...</option>
+                    <option value="PS">PS (Petite Section)</option>
+                    <option value="MS">MS (Moyenne Section)</option>
+                    <option value="GS">GS (Grande Section)</option>
+                    <option value="CP">CP</option>
+                    <option value="CE1">CE1</option>
+                    <option value="CE2">CE2</option>
+                    <option value="CM1">CM1</option>
+                    <option value="CM2">CM2</option>
+                </select>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">École précédente</span>
+                </label>
+                <input type="text" name="children[${childIndex}][previousSchool]" class="input input-bordered w-full" placeholder="Nom de l'école précédente (si applicable)">
+            </div>
+        </div>
+    `;
+
+    container.appendChild(newChildDiv);
+    childIndex++;
+    
+    // Mettre à jour l'affichage des boutons supprimer
+    updateRemoveButtons();
+}
+
+// Fonction pour supprimer un enfant
+function removeChild(element) {
+    const childForm = element.closest('.child-form');
+    childForm.remove();
+    
+    // Renuméroter les enfants restants
+    renumberChildren();
+    updateRemoveButtons();
+}
+
+// Fonction pour renuméroter les enfants après suppression
+function renumberChildren() {
+    const childForms = document.querySelectorAll('.child-form');
+    childForms.forEach((form, index) => {
+        form.setAttribute('data-child-index', index);
+        
+        // Mettre à jour le titre
+        const title = form.querySelector('h3');
+        title.textContent = `Enfant ${index + 1}`;
+        
+        // Mettre à jour les noms des inputs
+        const inputs = form.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name && name.includes('children[')) {
+                const newName = name.replace(/children\[\d+\]/, `children[${index}]`);
+                input.setAttribute('name', newName);
+            }
+        });
+    });
+    
+    // Mettre à jour l'index pour les prochains ajouts
+    childIndex = childForms.length;
+}
+
+// Fonction pour mettre à jour l'affichage des boutons supprimer
+function updateRemoveButtons() {
+    const childForms = document.querySelectorAll('.child-form');
+    const removeButtons = document.querySelectorAll('.remove-child-btn');
+    
+    // Montrer/cacher les boutons supprimer selon le nombre d'enfants
+    removeButtons.forEach(btn => {
+        if (childForms.length > 1) {
+            btn.style.display = 'inline-block';
+        } else {
+            btn.style.display = 'none';
+        }
+    });
+}
+
 // Charger les données au chargement de la page
-document.addEventListener('DOMContentLoaded', loadInscriptionData);
+document.addEventListener('DOMContentLoaded', function() {
+    loadInscriptionData();
+    
+    // Gérer l'ajout d'enfants
+    document.getElementById('addChildBtn').addEventListener('click', addChild);
+    
+    // Gérer la suppression d'enfants (délégation d'événement)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-child-btn') || e.target.closest('.remove-child-btn')) {
+            const button = e.target.classList.contains('remove-child-btn') ? e.target : e.target.closest('.remove-child-btn');
+            removeChild(button);
+        }
+    });
+    
+    // Initialiser l'affichage des boutons
+    updateRemoveButtons();
+});
 </script>
 {% endblock %}

@@ -121,7 +121,7 @@ const inscriptionManagementController = {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
-            const { soustitre } = req.body;
+            const { soustitre, afficherAnnoncePS2026 } = req.body;
 
             if (!soustitre || soustitre.trim().length === 0) {
                 return res.status(400).json({
@@ -140,12 +140,13 @@ const inscriptionManagementController = {
             const newConfig = await prisma.inscriptionConfig.create({
                 data: {
                     soustitre: soustitre.trim(),
+                    afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026),
                     actif: true,
                     modifiePar: req.session.user.id
                 }
             });
 
-            console.log('✅ Configuration mise à jour:', soustitre);
+            console.log('✅ Configuration mise à jour:', { soustitre, afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026) });
 
             res.json({
                 success: true,
@@ -164,45 +165,76 @@ const inscriptionManagementController = {
 
     // ============ GESTION DES DOCUMENTS ============
 
-    async uploadDocument(req, res) {
+    async addDocument(req, res) {
         try {
-            console.log('📁 Upload document inscription par:', req.session.user?.email);
+            console.log('📁 Ajout document inscription par:', req.session.user?.email);
 
             // Vérifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
-            if (!req.file) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Aucun fichier sélectionné'
-                });
-            }
-
-            const { nom, description } = req.body;
+            const { nom, description, type, lienExterne } = req.body;
 
             if (!nom || nom.trim().length === 0) {
-                // Supprimer le fichier uploadé si erreur
-                await fs.unlink(req.file.path).catch(console.error);
+                if (req.file) {
+                    await fs.unlink(req.file.path).catch(console.error);
+                }
                 return res.status(400).json({
                     success: false,
                     message: 'Le nom du document est requis'
                 });
             }
 
+            if (!type || !['FILE', 'LINK'].includes(type)) {
+                if (req.file) {
+                    await fs.unlink(req.file.path).catch(console.error);
+                }
+                return res.status(400).json({
+                    success: false,
+                    message: 'Type de document invalide'
+                });
+            }
+
+            // Validation selon le type
+            if (type === 'FILE' && !req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Aucun fichier sélectionné pour un document de type fichier'
+                });
+            }
+
+            if (type === 'LINK' && (!lienExterne || lienExterne.trim().length === 0)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Le lien externe est requis pour un document de type lien'
+                });
+            }
+
             // Créer l'entrée en base de données
+            const documentData = {
+                nom: nom.trim(),
+                description: description?.trim() || null,
+                type: type,
+                ordre: await getNextOrderValue(),
+                actif: true,
+                ajoutePar: req.session.user.id
+            };
+
+            if (type === 'FILE') {
+                documentData.nomFichier = req.file.filename;
+                documentData.cheminFichier = req.file.path;
+                documentData.taille = req.file.size;
+            } else if (type === 'LINK') {
+                documentData.lienExterne = lienExterne.trim();
+                // Supprimer le fichier s'il a été uploadé par erreur
+                if (req.file) {
+                    await fs.unlink(req.file.path).catch(console.error);
+                }
+            }
+
             const document = await prisma.inscriptionDocument.create({
-                data: {
-                    nom: nom.trim(),
-                    description: description?.trim() || null,
-                    nomFichier: req.file.filename,
-                    cheminFichier: req.file.path,
-                    taille: req.file.size,
-                    ordre: await getNextOrderValue(),
-                    actif: true,
-                    ajoutePar: req.session.user.id
-                },
+                data: documentData,
                 include: {
                     auteur: {
                         select: { firstName: true, lastName: true }
@@ -210,7 +242,7 @@ const inscriptionManagementController = {
                 }
             });
 
-            console.log('✅ Document ajouté:', nom, '- Taille:', formatFileSize(req.file.size));
+            console.log('✅ Document ajouté:', nom, '- Type:', type);
 
             res.json({
                 success: true,
@@ -255,12 +287,14 @@ const inscriptionManagementController = {
                 });
             }
 
-            // Supprimer le fichier physique
-            try {
-                await fs.unlink(document.cheminFichier);
-                console.log('🗑️  Fichier physique supprimé:', document.nomFichier);
-            } catch (error) {
-                console.warn('⚠️  Impossible de supprimer le fichier physique:', error.message);
+            // Supprimer le fichier physique seulement s'il s'agit d'un fichier
+            if (document.type === 'FILE' && document.cheminFichier) {
+                try {
+                    await fs.unlink(document.cheminFichier);
+                    console.log('🗑️  Fichier physique supprimé:', document.nomFichier);
+                } catch (error) {
+                    console.warn('⚠️  Impossible de supprimer le fichier physique:', error.message);
+                }
             }
 
             // Supprimer l'entrée en base de données
@@ -268,7 +302,7 @@ const inscriptionManagementController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('✅ Document supprimé:', document.nom);
+            console.log('✅ Document supprimé:', document.nom, '- Type:', document.type);
 
             res.json({
                 success: true,
@@ -339,9 +373,12 @@ const inscriptionManagementController = {
                 where: { actif: true }
             });
 
-            // Récupérer les documents actifs
+            // Récupérer les documents actifs (seulement les fichiers PDF pour la page publique)
             const documents = await prisma.inscriptionDocument.findMany({
-                where: { actif: true },
+                where: {
+                    actif: true,
+                    type: 'FILE' // Seulement les fichiers PDF pour téléchargement
+                },
                 select: {
                     id: true,
                     nom: true,
@@ -354,7 +391,10 @@ const inscriptionManagementController = {
 
             res.json({
                 success: true,
-                config: config || { soustitre: "Demande d'inscription pour l'année scolaire 2025-2026" },
+                config: config || {
+                    soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
+                    afficherAnnoncePS2026: false
+                },
                 documents
             });
 
@@ -385,31 +425,43 @@ const inscriptionManagementController = {
                 });
             }
 
-            // Vérifier que le fichier existe
-            try {
-                await fs.access(document.cheminFichier);
-            } catch (error) {
-                console.error('❌ Fichier physique non trouvé:', document.cheminFichier);
-                return res.status(404).json({
-                    success: false,
-                    message: 'Fichier non disponible'
-                });
+            // Si c'est un lien externe, rediriger
+            if (document.type === 'LINK') {
+                return res.redirect(document.lienExterne);
             }
 
-            console.log('📥 Téléchargement document:', document.nom, 'par IP:', req.ip);
+            // Si c'est un fichier, vérifier qu'il existe
+            if (document.type === 'FILE') {
+                try {
+                    await fs.access(document.cheminFichier);
+                } catch (error) {
+                    console.error('❌ Fichier physique non trouvé:', document.cheminFichier);
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Fichier non disponible'
+                    });
+                }
 
-            // Configurer les headers pour le téléchargement
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename="${document.nom}.pdf"`);
+                console.log('📥 Téléchargement document:', document.nom, 'par IP:', req.ip);
 
-            // Envoyer le fichier
-            res.sendFile(path.resolve(document.cheminFichier));
+                // Configurer les headers pour le téléchargement
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename="${document.nom}.pdf"`);
+
+                // Envoyer le fichier
+                res.sendFile(path.resolve(document.cheminFichier));
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Type de document non supporté'
+                });
+            }
 
         } catch (error) {
             console.error('❌ Erreur lors du téléchargement:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors du téléchargement'
+                message: 'Erreur serveur'
             });
         }
     },
