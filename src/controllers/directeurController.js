@@ -518,7 +518,7 @@ const directeurController = {
             // Générer un CSV simple
             let csvContent = `Classe ${classe.nom} (${classe.niveau}) - ${classe.anneeScolaire}\n\n`;
             csvContent += 'Nom;Prénom;Date de naissance;Parent;Email parent;Téléphone parent\n';
-            
+
             classe.eleves.forEach(student => {
                 const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
                 csvContent += `${student.lastName};${student.firstName};${dateNaissance};${student.parent.firstName} ${student.parent.lastName};${student.parent.email};${student.parent.phone}\n`;

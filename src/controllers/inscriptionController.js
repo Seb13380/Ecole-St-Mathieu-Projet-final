@@ -17,12 +17,12 @@ const inscriptionController = {
     // Traiter l'inscription depuis le formulaire  
     processRegistration: async (req, res) => {
         try {
-            const { 
-                parentFirstName, 
-                parentLastName, 
-                parentEmail, 
-                parentPhone, 
-                parentAddress, 
+            const {
+                parentFirstName,
+                parentLastName,
+                parentEmail,
+                parentPhone,
+                parentAddress,
                 password,
                 confirmPassword
             } = req.body;
@@ -46,7 +46,7 @@ const inscriptionController = {
 
             // Récupérer les données des enfants du formulaire
             let childrenData = [];
-            
+
             // Gestion des enfants multiples
             if (req.body.children && Array.isArray(req.body.children)) {
                 childrenData = req.body.children.map(child => ({
@@ -66,7 +66,7 @@ const inscriptionController = {
                 const firstNames = Array.isArray(req.body.childFirstName) ? req.body.childFirstName : [req.body.childFirstName];
                 const lastNames = Array.isArray(req.body.childLastName) ? req.body.childLastName : [req.body.childLastName];
                 const birthDates = Array.isArray(req.body.childBirthDate) ? req.body.childBirthDate : [req.body.childBirthDate];
-                
+
                 childrenData = firstNames.map((firstName, index) => ({
                     firstName,
                     lastName: lastNames[index],
@@ -117,8 +117,8 @@ const inscriptionController = {
                 let children = [];
                 if (request.children) {
                     try {
-                        children = typeof request.children === 'string' 
-                            ? JSON.parse(request.children) 
+                        children = typeof request.children === 'string'
+                            ? JSON.parse(request.children)
                             : request.children;
                     } catch (e) {
                         console.error('Erreur parsing children pour request', request.id, ':', e);
@@ -287,8 +287,8 @@ const inscriptionController = {
             let children = [];
             if (request.children) {
                 try {
-                    children = typeof request.children === 'string' 
-                        ? JSON.parse(request.children) 
+                    children = typeof request.children === 'string'
+                        ? JSON.parse(request.children)
                         : request.children;
                 } catch (e) {
                     console.error('Erreur parsing children:', e);
@@ -444,8 +444,8 @@ const inscriptionController = {
                 let children = [];
                 if (request.children) {
                     try {
-                        children = typeof request.children === 'string' 
-                            ? JSON.parse(request.children) 
+                        children = typeof request.children === 'string'
+                            ? JSON.parse(request.children)
                             : request.children;
                     } catch (e) {
                         console.error('Erreur parsing children pour request', request.id, ':', e);

@@ -34,15 +34,15 @@ async function testClassesAccess() {
 
         if (lionel) {
             console.log(`✅ Lionel trouvé: ${lionel.firstName} ${lionel.lastName} (${lionel.role})`);
-            
+
             // Vérifier son mot de passe
             const passwordMatch = await bcrypt.compare('Lionel123!', lionel.password);
             console.log(`🔑 Mot de passe valide: ${passwordMatch ? '✅ Oui' : '❌ Non'}`);
-            
+
             if (passwordMatch) {
                 // 3. Simuler le contrôleur directement
                 console.log('\n🎯 Simulation du contrôleur getClassesManagement...');
-                
+
                 // Simuler une session utilisateur
                 const mockSession = {
                     user: {
@@ -63,7 +63,7 @@ async function testClassesAccess() {
                     console.log(`   - Nombre de classes: ${classesInDB.length}`);
                     console.log(`   - Titre: "Gestion des classes"`);
                     console.log(`   - Utilisateur: ${mockSession.user.firstName} ${mockSession.user.lastName}`);
-                    
+
                     // Simuler le rendu du template
                     if (classesInDB.length > 0) {
                         console.log('\n🎨 Le template devrait afficher:');

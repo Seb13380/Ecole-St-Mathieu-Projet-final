@@ -9,7 +9,7 @@ async function createBasicSchoolData() {
 
         // === CRÉATION DES CLASSES ===
         console.log('\n📚 Création des classes...');
-        
+
         const classesToCreate = [
             { nom: 'PS-A', niveau: 'PS', anneeScolaire: '2025-2026' },
             { nom: 'MS-A', niveau: 'MS', anneeScolaire: '2025-2026' },
@@ -41,7 +41,7 @@ async function createBasicSchoolData() {
 
         // === CRÉATION DE YAMINA (SECRÉTAIRE) ===
         console.log('\n👩‍💼 Création de Yamina (Secrétaire de Direction)...');
-        
+
         const yaminaEmail = 'yamina.secretaire@stmathieu.org';
         const yaminaPassword = await bcrypt.hash('Yamina123!', 10);
 
@@ -68,7 +68,7 @@ async function createBasicSchoolData() {
 
         // === CRÉATION D'ÉLÈVES D'EXEMPLE ===
         console.log('\n👶 Création d\'élèves d\'exemple...');
-        
+
         // Créer des parents d'exemple
         const parentsExemple = [
             {
@@ -112,7 +112,7 @@ async function createBasicSchoolData() {
 
             if (!existingParent) {
                 const hashedPassword = await bcrypt.hash('Parent123!', 10);
-                
+
                 const parent = await prisma.user.create({
                     data: {
                         firstName: parentData.firstName,
@@ -130,7 +130,7 @@ async function createBasicSchoolData() {
                 // Créer les enfants
                 for (const enfantData of parentData.enfants) {
                     const classeCorrespondante = createdClasses.find(c => c.niveau === enfantData.niveau);
-                    
+
                     if (classeCorrespondante) {
                         const student = await prisma.student.create({
                             data: {
@@ -151,9 +151,9 @@ async function createBasicSchoolData() {
 
         // === CONFIGURATION DES INSCRIPTIONS ===
         console.log('\n⚙️ Configuration des inscriptions...');
-        
+
         const existingConfig = await prisma.inscriptionConfig.findFirst();
-        
+
         if (!existingConfig) {
             // Récupérer Lionel pour l'ID
             const lionel = await prisma.user.findUnique({
@@ -178,7 +178,7 @@ async function createBasicSchoolData() {
         // === RÉCAPITULATIF ===
         console.log('\n🎉 RÉCAPITULATIF DE LA CRÉATION:');
         console.log('═══════════════════════════════════════');
-        
+
         const finalStats = await Promise.all([
             prisma.classe.count(),
             prisma.student.count(),
@@ -190,12 +190,12 @@ async function createBasicSchoolData() {
         console.log(`👶 Élèves inscrits: ${finalStats[1]}`);
         console.log(`👨‍👩‍👧‍👦 Parents: ${finalStats[2]}`);
         console.log(`👩‍💼 Secrétaires: ${finalStats[3]}`);
-        
+
         console.log('\n📋 COMPTES CRÉÉS:');
         console.log('👩‍💼 YAMINA (SECRÉTAIRE):');
         console.log(`   📧 Email: yamina.secretaire@stmathieu.org`);
         console.log(`   🔑 Mot de passe: Yamina123!`);
-        
+
         console.log('\n👨‍👩‍👧‍👦 PARENTS D\'EXEMPLE:');
         console.log(`   📧 marie.dupont@email.com / Parent123!`);
         console.log(`   📧 pierre.martin@email.com / Parent123!`);

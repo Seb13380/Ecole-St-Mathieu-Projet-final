@@ -24,7 +24,7 @@ async function createTestInscriptionRequest() {
                     },
                     {
                         firstName: 'Noah',
-                        lastName: 'Tester', 
+                        lastName: 'Tester',
                         birthDate: '2020-03-22',
                         requestedClass: 'MS-A'
                     }
