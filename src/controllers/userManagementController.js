@@ -203,16 +203,21 @@ const userManagementController = {
 
     async getStudentsManagement(req, res) {
         try {
+            console.log('🔍 Début getStudentsManagement');
+            console.log('👤 Utilisateur:', req.session.user?.email, 'Role:', req.session.user?.role);
+
             // Vérifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+                console.log('❌ Accès refusé pour le rôle:', req.session.user.role);
                 return res.status(403).render('pages/error', {
                     message: 'Accès refusé',
                     user: req.session.user
                 });
             }
 
+            console.log('✅ Autorisation OK, récupération des données...');
             const [eleves, parents, classes] = await Promise.all([
-                prisma.eleve.findMany({
+                prisma.student.findMany({
                     include: {
                         parent: {
                             select: { firstName: true, lastName: true, email: true }
@@ -232,6 +237,11 @@ const userManagementController = {
                 })
             ]);
 
+            console.log('📊 Données récupérées:');
+            console.log('   - Élèves:', eleves.length);
+            console.log('   - Parents:', parents.length);
+            console.log('   - Classes:', classes.length);
+
             res.render('pages/admin/students-management', {
                 eleves,
                 parents,
@@ -239,6 +249,8 @@ const userManagementController = {
                 title: 'Gestion des Élèves',
                 user: req.session.user
             });
+
+            console.log('✅ Vue rendue avec succès');
         } catch (error) {
             console.error('❌ Erreur lors de la récupération des élèves:', error);
             res.status(500).render('pages/error', {
@@ -257,7 +269,7 @@ const userManagementController = {
 
             const { firstName, lastName, birthDate, parentId, classeId } = req.body;
 
-            const eleve = await prisma.eleve.create({
+            const eleve = await prisma.student.create({
                 data: {
                     firstName,
                     lastName,
@@ -300,7 +312,7 @@ const userManagementController = {
             const { id } = req.params;
             const { firstName, lastName, birthDate, parentId, classeId } = req.body;
 
-            const eleve = await prisma.eleve.update({
+            const eleve = await prisma.student.update({
                 where: { id: parseInt(id) },
                 data: {
                     firstName,
@@ -343,7 +355,7 @@ const userManagementController = {
 
             const { id } = req.params;
 
-            const eleve = await prisma.eleve.findUnique({
+            const eleve = await prisma.student.findUnique({
                 where: { id: parseInt(id) }
             });
 
@@ -354,7 +366,7 @@ const userManagementController = {
                 });
             }
 
-            await prisma.eleve.delete({
+            await prisma.student.delete({
                 where: { id: parseInt(id) }
             });
 

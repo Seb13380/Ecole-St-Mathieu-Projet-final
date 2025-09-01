@@ -1,0 +1,214 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Gestion des Inscriptions - École Saint-Mathieu{% endblock %}
+
+{% block main %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-800 mb-4">
+                <span class="mr-3">📝</span>
+                Gestion des Inscriptions
+            </h1>
+            <p class="text-slate-600">Configuration du sous-titre et gestion des documents d'inscription</p>
+        </div>
+
+        <!-- Messages d'alerte -->
+        <div id="alertContainer" class="mb-6"></div>
+
+        <!-- Configuration du sous-titre -->
+        <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <h2 class="text-2xl font-semibold text-slate-800">
+                    <span class="mr-2">⚙️</span>
+                    Configuration du Sous-titre
+                </h2>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                <p class="text-sm text-blue-700">
+                    <strong>Sous-titre actuel :</strong> {{ config.soustitre }}
+                </p>
+                <p class="text-xs text-blue-600 mt-1">
+                    Modifié le {{ config.updatedAt|date('d/m/Y à H:i') }} par {{ config.modificateur.firstName }} {{ config.modificateur.lastName }}
+                </p>
+            </div>
+
+            <form id="configForm" class="space-y-4">
+                <div>
+                    <label for="soustitre" class="block text-sm font-medium text-slate-700 mb-2">
+                        Nouveau sous-titre
+                    </label>
+                    <input type="text" 
+                           id="soustitre" 
+                           name="soustitre" 
+                           value="{{ config.soustitre }}" 
+                           placeholder="Exemple: Demande d'inscription pour l'année scolaire 2026-2027"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           required>
+                </div>
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                    💾 Mettre à jour le sous-titre
+                </button>
+            </form>
+        </div>
+
+        <!-- Gestion des documents -->
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-semibold text-slate-800">
+                    <span class="mr-2">📁</span>
+                    Documents d'Inscription
+                </h2>
+                <button onclick="openUploadModal()" 
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors inline-flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Ajouter un document
+                </button>
+            </div>
+
+            {% if documents|length > 0 %}
+                <div class="space-y-4" id="documentsContainer">
+                    {% for document in documents %}
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4" data-document-id="{{ document.id }}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-red-500">📄</span>
+                                            <h3 class="font-semibold text-slate-800">{{ document.nom }}</h3>
+                                        </div>
+                                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                            {{ (document.taille / 1024 / 1024)|number_format(2) }} MB
+                                        </span>
+                                    </div>
+                                    {% if document.description %}
+                                        <p class="text-sm text-slate-600 mt-1">{{ document.description }}</p>
+                                    {% endif %}
+                                    <p class="text-xs text-slate-500 mt-2">
+                                        Ajouté le {{ document.createdAt|date('d/m/Y à H:i') }} par {{ document.auteur.firstName }} {{ document.auteur.lastName }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <!-- Boutons de réorganisation -->
+                                    <button onclick="moveDocument({{ document.id }}, 'up')" 
+                                            class="text-slate-500 hover:text-slate-700" title="Monter">
+                                        ⬆️
+                                    </button>
+                                    <button onclick="moveDocument({{ document.id }}, 'down')" 
+                                            class="text-slate-500 hover:text-slate-700" title="Descendre">
+                                        ⬇️
+                                    </button>
+                                    <!-- Test du téléchargement -->
+                                    <a href="/inscription-management/documents/{{ document.id }}/download" 
+                                       target="_blank" 
+                                       class="text-blue-500 hover:text-blue-700" title="Tester le téléchargement">
+                                        📥
+                                    </a>
+                                    <!-- Suppression -->
+                                    <button onclick="deleteDocument({{ document.id }}, '{{ document.nom }}')" 
+                                            class="text-red-500 hover:text-red-700" title="Supprimer">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <div class="text-slate-400 text-6xl mb-4">📄</div>
+                    <p class="text-slate-500">Aucun document d'inscription ajouté</p>
+                    <p class="text-sm text-slate-400">Cliquez sur "Ajouter un document" pour commencer</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Aperçu de la page publique -->
+        <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
+            <h2 class="text-2xl font-semibold text-slate-800 mb-4">
+                <span class="mr-2">👁️</span>
+                Aperçu de la page publique
+            </h2>
+            <div class="bg-slate-50 p-4 rounded-lg">
+                <p class="text-sm text-slate-600 mb-2">
+                    Les parents verront cette page à l'adresse : 
+                    <a href="/inscription-eleve" target="_blank" class="text-blue-600 underline">
+                        /inscription-eleve
+                    </a>
+                </p>
+                <a href="/inscription-eleve" 
+                   target="_blank" 
+                   class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                    🔗 Voir la page d'inscription publique
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout de document -->
+<div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-800">Ajouter un document</h3>
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data" class="p-6 space-y-4">
+            <div>
+                <label for="documentName" class="block text-sm font-medium text-slate-700 mb-2">
+                    Nom du document *
+                </label>
+                <input type="text" 
+                       id="documentName" 
+                       name="nom" 
+                       placeholder="Ex: Dossier d'inscription 2026"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                       required>
+            </div>
+
+            <div>
+                <label for="documentDescription" class="block text-sm font-medium text-slate-700 mb-2">
+                    Description (optionnel)
+                </label>
+                <textarea id="documentDescription" 
+                          name="description" 
+                          rows="3"
+                          placeholder="Description du document..."
+                          class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+            </div>
+
+            <div>
+                <label for="documentFile" class="block text-sm font-medium text-slate-700 mb-2">
+                    Fichier PDF *
+                </label>
+                <input type="file" 
+                       id="documentFile" 
+                       name="document" 
+                       accept=".pdf"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                       required>
+                <p class="text-xs text-slate-500 mt-1">Seuls les fichiers PDF sont acceptés (max 10MB)</p>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" 
+                        onclick="closeUploadModal()" 
+                        class="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors">
+                    Annuler
+                </button>
+                <button type="submit" 
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                    📤 Ajouter le document
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/assets/js/inscription-management.js"></script>
+{% endblock %}

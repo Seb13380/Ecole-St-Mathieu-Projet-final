@@ -7,11 +7,26 @@
 				<!-- En-tête -->
 				<div class="text-center mb-8">
 					<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
-						🎓 Inscription Élève
+						🎓 Demande d'Inscription Élève
 					</h1>
-					<p class="text-lg text-[#304a4d]/80">
+					<p class="text-lg text-[#304a4d]/80" id="inscriptionSubtitle">
 						Demande d'inscription pour l'année scolaire 2025-2026
 					</p>
+				</div>
+
+				<!-- Documents à télécharger -->
+				<div id="documentsSection" class="mb-8" style="display: none;">
+					<div class="bg-white rounded-xl shadow-lg p-6">
+						<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+							📁 Documents à télécharger
+						</h2>
+						<p class="text-[#304a4d]/80 mb-4">
+							Téléchargez et consultez les documents nécessaires pour l'inscription :
+						</p>
+						<div id="documentsList" class="space-y-3">
+							<!-- Les documents seront ajoutés ici par JavaScript -->
+						</div>
+					</div>
 				</div>
 
 				<!-- Messages flash -->
@@ -210,4 +225,67 @@
 			</div>
 		</div>
 	</div>
+
+<script>
+// Charger les données d'inscription (sous-titre et documents)
+async function loadInscriptionData() {
+    try {
+        const response = await fetch('/inscription-management/data');
+        const data = await response.json();
+        
+        if (data.success) {
+            // Mettre à jour le sous-titre
+            if (data.config && data.config.soustitre) {
+                document.getElementById('inscriptionSubtitle').textContent = data.config.soustitre;
+            }
+            
+            // Afficher les documents s'il y en a
+            if (data.documents && data.documents.length > 0) {
+                displayDocuments(data.documents);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des données d\'inscription:', error);
+    }
+}
+
+function displayDocuments(documents) {
+    const documentsSection = document.getElementById('documentsSection');
+    const documentsList = document.getElementById('documentsList');
+    
+    documentsList.innerHTML = '';
+    
+    documents.forEach(document => {
+        const documentDiv = document.createElement('div');
+        documentDiv.className = 'flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-200';
+        
+        const fileSize = (document.taille / 1024 / 1024).toFixed(2);
+        
+        documentDiv.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <span class="text-red-500 text-2xl">📄</span>
+                <div>
+                    <h3 class="font-semibold text-[#304a4d]">${document.nom}</h3>
+                    ${document.description ? `<p class="text-sm text-[#304a4d]/70">${document.description}</p>` : ''}
+                    <p class="text-xs text-[#304a4d]/60">${fileSize} MB</p>
+                </div>
+            </div>
+            <a href="/inscription-management/documents/${document.id}/download" 
+               class="bg-[#304a4d] hover:bg-[#2a3f42] text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Télécharger
+            </a>
+        `;
+        
+        documentsList.appendChild(documentDiv);
+    });
+    
+    documentsSection.style.display = 'block';
+}
+
+// Charger les données au chargement de la page
+document.addEventListener('DOMContentLoaded', loadInscriptionData);
+</script>
 {% endblock %}
