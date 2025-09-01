@@ -230,10 +230,10 @@ const directeurController = {
         try {
             const classes = await prisma.classe.findMany({
                 include: {
-                    students: true,
+                    eleves: true,
                     _count: {
                         select: {
-                            students: true
+                            eleves: true
                         }
                     }
                 },
@@ -480,6 +480,145 @@ const directeurController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors du marquage du message'
+            });
+        }
+    },
+
+    // === EXPORT ET EMAIL DES LISTES ===
+
+    async exportClassList(req, res) {
+        try {
+            const { id } = req.params;
+            const classe = await prisma.classe.findUnique({
+                where: { id: parseInt(id) },
+                include: {
+                    eleves: {
+                        include: {
+                            parent: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true,
+                                    phone: true
+                                }
+                            }
+                        },
+                        orderBy: { lastName: 'asc' }
+                    }
+                }
+            });
+
+            if (!classe) {
+                return res.status(404).render('pages/error', {
+                    message: 'Classe non trouvée',
+                    user: req.session.user
+                });
+            }
+
+            // Générer un CSV simple
+            let csvContent = `Classe ${classe.nom} (${classe.niveau}) - ${classe.anneeScolaire}\n\n`;
+            csvContent += 'Nom;Prénom;Date de naissance;Parent;Email parent;Téléphone parent\n';
+            
+            classe.eleves.forEach(student => {
+                const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
+                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${student.parent.firstName} ${student.parent.lastName};${student.parent.email};${student.parent.phone}\n`;
+            });
+
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="Liste_${classe.nom}_${new Date().toISOString().split('T')[0]}.csv"`);
+            res.send('\uFEFF' + csvContent); // BOM pour UTF-8
+
+        } catch (error) {
+            console.error('Erreur lors de l\'export de la liste:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors de l\'export de la liste',
+                user: req.session.user
+            });
+        }
+    },
+
+    async exportAllClassesAndEmail(req, res) {
+        try {
+            const classes = await prisma.classe.findMany({
+                include: {
+                    eleves: {
+                        include: {
+                            parent: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true,
+                                    phone: true
+                                }
+                            }
+                        },
+                        orderBy: { lastName: 'asc' }
+                    }
+                },
+                orderBy: { nom: 'asc' }
+            });
+
+            // Trouver Yamina (secrétaire)
+            const yamina = await prisma.user.findFirst({
+                where: { role: 'SECRETAIRE_DIRECTION' }
+            });
+
+            if (!yamina) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Secrétaire de direction non trouvée'
+                });
+            }
+
+            // Générer le rapport complet
+            let rapport = `RAPPORT COMPLET DES CLASSES - École Saint-Mathieu\n`;
+            rapport += `Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}\n`;
+            rapport += `Par: ${req.session.user.firstName} ${req.session.user.lastName}\n\n`;
+
+            let totalEleves = 0;
+
+            classes.forEach(classe => {
+                rapport += `\n=== CLASSE ${classe.nom} (${classe.niveau}) ===\n`;
+                rapport += `Année scolaire: ${classe.anneeScolaire}\n`;
+                rapport += `Nombre d'élèves: ${classe.eleves.length}\n\n`;
+
+                if (classe.eleves.length > 0) {
+                    classe.eleves.forEach((student, index) => {
+                        const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
+                        rapport += `${index + 1}. ${student.firstName} ${student.lastName}\n`;
+                        rapport += `   Né(e) le: ${dateNaissance}\n`;
+                        rapport += `   Parent: ${student.parent.firstName} ${student.parent.lastName}\n`;
+                        rapport += `   Email: ${student.parent.email}\n`;
+                        rapport += `   Téléphone: ${student.parent.phone}\n\n`;
+                    });
+                } else {
+                    rapport += '   Aucun élève inscrit\n\n';
+                }
+
+                totalEleves += classe.eleves.length;
+            });
+
+            rapport += `\n=== RÉSUMÉ GÉNÉRAL ===\n`;
+            rapport += `Total classes: ${classes.length}\n`;
+            rapport += `Total élèves: ${totalEleves}\n`;
+            rapport += `Moyenne élèves/classe: ${classes.length > 0 ? (totalEleves / classes.length).toFixed(1) : 0}\n`;
+
+            // TODO: Envoyer par email à Yamina
+            // const emailService = require('../services/emailService');
+            // await emailService.sendClassListToSecretary(yamina.email, rapport);
+
+            res.json({
+                success: true,
+                message: `Rapport généré et envoyé à ${yamina.firstName} ${yamina.lastName} (${yamina.email})`,
+                totalClasses: classes.length,
+                totalStudents: totalEleves
+            });
+
+        } catch (error) {
+            console.error('Erreur lors de l\'export complet:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de l\'export complet'
             });
         }
     },

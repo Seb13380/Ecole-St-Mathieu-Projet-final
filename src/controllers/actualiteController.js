@@ -147,7 +147,7 @@ const actualiteController = {
 
   async updateActualite(req, res) {
     const { id } = req.params; // Déplacer la déclaration ici pour être accessible dans catch
-    
+
     try {
       console.log('🔧 updateActualite appelé:', {
         method: req.method,

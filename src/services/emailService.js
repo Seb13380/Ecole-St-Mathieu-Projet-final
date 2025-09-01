@@ -754,6 +754,285 @@ class EmailService {
     }
 
     /**
+     * Envoyer un email d'approbation avec identifiants de connexion
+     * @param {Object} inscriptionData - Données de la demande d'inscription
+     * @param {String} tempPassword - Mot de passe temporaire généré
+     * @param {String} comment - Commentaire du directeur
+     */
+    async sendApprovalEmailWithCredentials(inscriptionData, comment = '') {
+        const { parentFirstName, parentLastName, parentEmail, children, tempPassword, createdStudents } = inscriptionData;
+
+        const childrenList = createdStudents ? createdStudents.map(student =>
+            `• ${student.firstName} ${student.lastName} - Classe: ${student.classe?.nom || 'Non assigné'}`
+        ).join('\n') : 'Enfants inscrits';
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
+            subject: '🎉 Inscription approuvée - Vos identifiants de connexion - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #16a34a; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #dcfce7; padding: 20px; border-radius: 8px; border-left: 4px solid #16a34a; margin-bottom: 30px;">
+                            <h2 style="color: #16a34a; margin: 0; font-size: 24px;">
+                                ✅ Félicitations ! Votre demande d'inscription a été approuvée
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6; font-size: 16px;">
+                            Bonjour <strong>${parentFirstName} ${parentLastName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Nous sommes ravis de vous informer que votre demande d'inscription a été acceptée. 
+                            Votre/vos enfant(s) sont désormais officiellement inscrits à l'École Saint-Mathieu !
+                        </p>
+
+                        ${comment ? `
+                        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                            <h3 style="color: #3b82f6; margin-top: 0;">💬 Message de la direction :</h3>
+                            <p style="color: #333; margin: 0; font-style: italic;">"${comment}"</p>
+                        </div>
+                        ` : ''}
+                        
+                        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #92400e; margin-top: 0;">👶 Enfant(s) inscrit(s) :</h3>
+                            <pre style="color: #333; font-family: Arial; white-space: pre-wrap; margin: 0;">${childrenList}</pre>
+                        </div>
+                        
+                        <div style="background-color: #e0f2fe; padding: 20px; border-radius: 8px; margin: 30px 0; border: 2px solid #0284c7;">
+                            <h3 style="color: #0284c7; margin-top: 0;">🔑 Vos identifiants de connexion</h3>
+                            <p style="color: #333; margin: 10px 0;"><strong>Email :</strong> ${parentEmail}</p>
+                            <p style="color: #333; margin: 10px 0;"><strong>Mot de passe temporaire :</strong> 
+                                <span style="background-color: #f1f5f9; padding: 5px 10px; border-radius: 4px; font-family: monospace; font-size: 16px; font-weight: bold;">${tempPassword}</span>
+                            </p>
+                            <p style="color: #dc2626; font-size: 14px; margin-top: 15px;">
+                                ⚠️ <strong>Important :</strong> Changez ce mot de passe dès votre première connexion pour votre sécurité.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="http://localhost:3007/auth/login" 
+                               style="background-color: #16a34a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                🚀 Se connecter à l'espace parent
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #495057; margin-top: 0;">📋 Prochaines étapes :</h3>
+                            <ul style="color: #333; line-height: 1.6;">
+                                <li>Connectez-vous à votre espace parent avec les identifiants ci-dessus</li>
+                                <li>Modifiez votre mot de passe temporaire</li>
+                                <li>Consultez les informations de votre/vos enfant(s)</li>
+                                <li>Vérifiez les coordonnées et mettez-les à jour si nécessaire</li>
+                                <li>Prenez connaissance du calendrier scolaire et des actualités</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 30px; text-align: center;">
+                            <p style="color: #666; font-size: 14px; margin: 5px 0;">
+                                📧 École Saint-Mathieu - ${process.env.EMAIL_USER || 'ecole@saint-mathieu.fr'}
+                            </p>
+                            <p style="color: #666; font-size: 14px; margin: 5px 0;">
+                                📍 Adresse de l'école - 📞 Téléphone de l'école
+                            </p>
+                            <p style="color: #16a34a; font-weight: bold; margin-top: 15px;">
+                                Bienvenue dans la famille Saint-Mathieu ! 🎓
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email d\'approbation avec identifiants envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'envoi de l\'email d\'approbation:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Notifier Yamina des nouveaux élèves inscrits
+     * @param {Object} notificationData - Données pour la notification
+     */
+    async sendNewStudentsNotificationToYamina(notificationData) {
+        const { yamimaEmail, yamimaFirstName, students } = notificationData;
+
+        const studentsList = students.map(student =>
+            `• ${student.nom} - Classe: ${student.classe} (${student.niveau})`
+        ).join('\n');
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : yamimaEmail,
+            subject: '👶 Nouveaux élèves inscrits - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #7c3aed; text-align: center; margin-bottom: 30px;">
+                            🏫 École Saint-Mathieu - Secrétariat
+                        </h1>
+                        
+                        <div style="background-color: #ede9fe; padding: 20px; border-radius: 8px; border-left: 4px solid #7c3aed; margin-bottom: 30px;">
+                            <h2 style="color: #7c3aed; margin: 0; font-size: 20px;">
+                                👶 Nouveaux élèves inscrits
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6; font-size: 16px;">
+                            Bonjour <strong>${yamimaFirstName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            De nouveaux élèves viennent d'être inscrits suite à l'approbation d'une demande d'inscription par la direction.
+                        </p>
+                        
+                        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #1e40af; margin-top: 0;">📋 Nouveaux élèves :</h3>
+                            <pre style="color: #333; font-family: Arial; white-space: pre-wrap; margin: 0;">${studentsList}</pre>
+                        </div>
+                        
+                        <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="color: #92400e; margin: 0;">
+                                💡 <strong>Action requise :</strong> Veuillez mettre à jour vos listes de classes et vérifier que tous les documents administratifs sont complets.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="http://localhost:3007/secretaire/dashboard" 
+                               style="background-color: #7c3aed; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                📊 Accéder au tableau de bord
+                            </a>
+                        </div>
+                        
+                        <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 30px; text-align: center;">
+                            <p style="color: #666; font-size: 14px;">
+                                Cette notification a été générée automatiquement par le système de gestion scolaire.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Notification Yamina envoyée:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'envoi de la notification Yamina:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Envoyer les listes de classes à Yamina
+     * @param {Object} classListData - Données des listes de classes
+     */
+    async sendClassListsToYamina(classListData) {
+        const { yamimaEmail, yamimaFirstName, classes } = classListData;
+
+        let classesHTML = '';
+        let totalStudents = 0;
+
+        classes.forEach(classe => {
+            totalStudents += classe.studentCount;
+            classesHTML += `
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #3b82f6;">
+                    <h3 style="color: #1e40af; margin: 0 0 10px 0;">${classe.nom} (${classe.niveau}) - ${classe.studentCount} élève(s)</h3>
+                    ${classe.students.length > 0 ? `
+                        <div style="margin-left: 15px;">
+                            ${classe.students.map(student => `
+                                <div style="margin: 5px 0; padding: 5px; background-color: white; border-radius: 4px;">
+                                    <strong>${student.nom}</strong><br>
+                                    <small style="color: #666;">
+                                        Parent: ${student.parent} | Email: ${student.email} | Tél: ${student.telephone}
+                                    </small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: #666; margin: 5px 0;">Aucun élève inscrit</p>'}
+                </div>
+            `;
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : yamimaEmail,
+            subject: '📋 Listes complètes des classes - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #7c3aed; text-align: center; margin-bottom: 30px;">
+                            🏫 École Saint-Mathieu - Listes de Classes
+                        </h1>
+                        
+                        <div style="background-color: #ede9fe; padding: 20px; border-radius: 8px; border-left: 4px solid #7c3aed; margin-bottom: 30px;">
+                            <h2 style="color: #7c3aed; margin: 0; font-size: 20px;">
+                                📊 Rapport complet des inscriptions
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6; font-size: 16px;">
+                            Bonjour <strong>${yamimaFirstName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Voici les listes complètes de toutes les classes avec les coordonnées des familles.
+                        </p>
+                        
+                        <div style="background-color: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                            <h3 style="color: #1e40af; margin: 0;">
+                                📈 Total: ${totalStudents} élève(s) inscrits dans ${classes.length} classe(s)
+                            </h3>
+                        </div>
+                        
+                        <div style="margin: 30px 0;">
+                            ${classesHTML}
+                        </div>
+                        
+                        <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="color: #92400e; margin: 0;">
+                                💡 <strong>Ces informations sont confidentielles</strong> et destinées uniquement à l'usage administratif de l'école.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="http://localhost:3007/secretaire/dashboard" 
+                               style="background-color: #7c3aed; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                📊 Tableau de bord secrétaire
+                            </a>
+                        </div>
+                        
+                        <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 30px; text-align: center;">
+                            <p style="color: #666; font-size: 14px;">
+                                Rapport généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Listes de classes envoyées à Yamina:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'envoi des listes à Yamina:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
      * Tester la configuration email
      */
     async testConnection() {

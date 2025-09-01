@@ -9,7 +9,7 @@ async function recreateLionelAndFrank() {
 
         // === CRÉATION DE LIONEL (DIRECTION) ===
         console.log('\n👨‍💼 Création de Lionel Camboulives...');
-        
+
         const lionelEmail = 'l.camboulives@stmathieu.org';
         const lionelPassword = await bcrypt.hash('Lionel123!', 10);
 
@@ -49,7 +49,7 @@ async function recreateLionelAndFrank() {
 
         // === CRÉATION DE FRANK (GESTIONNAIRE_SITE) ===
         console.log('\n🔧 Création de Frank...');
-        
+
         const frankEmail = 'frank.quaracino@orange.fr';
         const frankPassword = await bcrypt.hash('Frank123!', 10);
 
@@ -90,19 +90,19 @@ async function recreateLionelAndFrank() {
         // === RÉCAPITULATIF ===
         console.log('\n🎉 RÉCAPITULATIF DES COMPTES CRÉÉS:');
         console.log('═══════════════════════════════════════');
-        
+
         console.log('\n👨‍💼 LIONEL CAMBOULIVES (DIRECTION):');
         console.log(`📧 Email: ${lionelEmail}`);
         console.log('🔑 Mot de passe: Lionel123!');
         console.log('📱 Téléphone: 06.63.78.69.68');
         console.log('🔒 Rôle: DIRECTION');
-        
+
         console.log('\n🔧 FRANK QUARACINO (GESTIONNAIRE SITE):');
         console.log(`📧 Email: ${frankEmail}`);
         console.log('🔑 Mot de passe: Frank123!');
         console.log('📱 Téléphone: 06.12.34.56.79');
         console.log('🔒 Rôle: GESTIONNAIRE_SITE');
-        
+
         console.log('\n✅ Tous les comptes sont prêts à être utilisés !');
         console.log('⚠️  IMPORTANT: Changez ces mots de passe après la première connexion !');
 
@@ -110,7 +110,7 @@ async function recreateLionelAndFrank() {
         const finalLionel = await prisma.user.findUnique({
             where: { email: lionelEmail }
         });
-        
+
         const finalFrank = await prisma.user.findUnique({
             where: { email: frankEmail }
         });

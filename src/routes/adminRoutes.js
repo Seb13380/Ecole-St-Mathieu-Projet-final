@@ -74,6 +74,10 @@ router.get('/inscriptions', requireAdmin, (req, res) => {
     res.redirect('/directeur/inscriptions');
 });
 
+router.get('/inscriptions/manage', requireAdmin, (req, res) => {
+    res.redirect('/directeur/inscriptions/manage');
+});
+
 router.post('/inscriptions/:id/approve', requireAdmin, (req, res) => {
     const { id } = req.params;
     res.redirect(307, `/directeur/inscriptions/${id}/approve`);
@@ -87,6 +91,15 @@ router.post('/inscriptions/:id/reject', requireAdmin, (req, res) => {
 router.get('/inscriptions/:id/details', requireAdmin, (req, res) => {
     const { id } = req.params;
     res.redirect(`/directeur/inscriptions/${id}/details`);
+});
+
+// API routes
+router.get('/api/classes', requireAdmin, (req, res) => {
+    res.redirect('/directeur/api/classes');
+});
+
+router.post('/notify-yamina', requireAdmin, (req, res) => {
+    res.redirect(307, '/directeur/notify-yamina');
 });
 
 // Messages de contact -> directeur
