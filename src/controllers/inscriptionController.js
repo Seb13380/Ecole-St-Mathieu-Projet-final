@@ -80,7 +80,7 @@ const inscriptionController = {
             }
 
             // Création de la demande d'inscription
-            const inscriptionRequest = await prisma.inscriptionRequest.create({
+            const inscriptionRequest = await prisma.preInscriptionRequest.create({
                 data: {
                     parentFirstName,
                     parentLastName,
@@ -103,10 +103,10 @@ const inscriptionController = {
     // Pour l'admin : voir toutes les demandes
     showAllRequests: async (req, res) => {
         try {
-            const requests = await prisma.inscriptionRequest.findMany({
+            const requests = await prisma.preInscriptionRequest.findMany({
                 orderBy: { submittedAt: 'desc' },
                 include: {
-                    reviewer: {
+                    processor: {
                         select: { firstName: true, lastName: true }
                     }
                 }
@@ -152,7 +152,7 @@ const inscriptionController = {
             const { comment } = req.body;
 
             // Récupérer la demande d'inscription
-            const request = await prisma.inscriptionRequest.findUnique({
+            const request = await prisma.preInscriptionRequest.findUnique({
                 where: { id: parseInt(id) }
             });
 
@@ -164,13 +164,13 @@ const inscriptionController = {
             }
 
             // Mettre à jour le statut de la demande
-            await prisma.inscriptionRequest.update({
+            await prisma.preInscriptionRequest.update({
                 where: { id: parseInt(id) },
                 data: {
-                    status: 'APPROVED',
-                    reviewedAt: new Date(),
-                    reviewedBy: req.session.user.id,
-                    reviewComment: comment || 'Demande approuvée'
+                    status: 'ACCEPTED',
+                    processedAt: new Date(),
+                    processedBy: req.session.user.id,
+                    adminNotes: comment || 'Demande approuvée'
                 }
             });
 
@@ -202,7 +202,7 @@ const inscriptionController = {
             }
 
             // Récupérer la demande
-            const request = await prisma.inscriptionRequest.findUnique({
+            const request = await prisma.preInscriptionRequest.findUnique({
                 where: { id: parseInt(id) }
             });
 
@@ -214,13 +214,13 @@ const inscriptionController = {
             }
 
             // Mettre à jour le statut
-            await prisma.inscriptionRequest.update({
+            await prisma.preInscriptionRequest.update({
                 where: { id: parseInt(id) },
                 data: {
                     status: 'REJECTED',
-                    reviewedAt: new Date(),
-                    reviewedBy: req.session.user.id,
-                    reviewComment: reason
+                    processedAt: new Date(),
+                    processedBy: req.session.user.id,
+                    adminNotes: reason
                 }
             });
 
@@ -244,7 +244,7 @@ const inscriptionController = {
             const { id } = req.params;
 
             // Supprimer la demande
-            await prisma.inscriptionRequest.delete({
+            await prisma.preInscriptionRequest.delete({
                 where: { id: parseInt(id) }
             });
 
@@ -267,10 +267,10 @@ const inscriptionController = {
         try {
             const { id } = req.params;
 
-            const request = await prisma.inscriptionRequest.findUnique({
+            const request = await prisma.preInscriptionRequest.findUnique({
                 where: { id: parseInt(id) },
                 include: {
-                    reviewer: {
+                    processor: {
                         select: { firstName: true, lastName: true }
                     }
                 }
@@ -424,10 +424,10 @@ const inscriptionController = {
     showManageInscriptions: async (req, res) => {
         try {
             // Récupérer toutes les demandes avec statistiques
-            const requests = await prisma.inscriptionRequest.findMany({
+            const requests = await prisma.preInscriptionRequest.findMany({
                 orderBy: { submittedAt: 'desc' },
                 include: {
-                    reviewer: {
+                    processor: {
                         select: { firstName: true, lastName: true }
                     }
                 }

@@ -14,7 +14,7 @@
 				{% for request in requests %}
 					{% if request.status == 'PENDING' %}
 						{% set pendingCount = pendingCount + 1 %}
-					{% elseif request.status == 'APPROVED' %}
+					{% elseif request.status == 'ACCEPTED' %}
 						{% set approvedCount = approvedCount + 1 %}
 					{% elseif request.status == 'REJECTED' %}
 						{% set rejectedCount = rejectedCount + 1 %}
@@ -34,7 +34,7 @@
 			<div class="tabs tabs-boxed">
 				<a class="tab tab-active" data-filter="all">Toutes ({{ requests | length }})</a>
 				<a class="tab" data-filter="PENDING">En attente ({{ pendingCount }})</a>
-				<a class="tab" data-filter="APPROVED">Approuvées ({{ approvedCount }})</a>
+				<a class="tab" data-filter="ACCEPTED">Approuvées ({{ approvedCount }})</a>
 				<a class="tab" data-filter="REJECTED">Refusées ({{ rejectedCount }})</a>
 			</div>
 		</div>
@@ -57,14 +57,14 @@
 							<div class="text-right">
 								{% if request.status == 'PENDING' %}
 									<span class="badge badge-warning badge-lg">En attente</span>
-								{% elseif request.status == 'APPROVED' %}
+								{% elseif request.status == 'ACCEPTED' %}
 									<span class="badge badge-success badge-lg">Approuvée</span>
 								{% else %}
 									<span class="badge badge-error badge-lg">Refusée</span>
 								{% endif %}
 								<p class="text-sm text-gray-500 mt-1">
 									Demande du
-									{{ request.createdAt | date('d/m/Y à H:i') }}
+									{{ request.submittedAt | date('d/m/Y à H:i') }}
 								</p>
 							</div>
 						</div>
@@ -115,17 +115,17 @@
 						</div>
 
 						<!-- Commentaire de révision si existe -->
-						{% if request.reviewComment %}
+						{% if request.adminNotes %}
 							<div class="bg-gray-50 p-4 rounded-lg mb-4">
-								<h3 class="font-semibold text-[#304a4d] mb-2">Commentaire de révision</h3>
-								<p class="text-gray-700">{{ request.reviewComment }}</p>
-								{% if request.reviewer %}
+								<h3 class="font-semibold text-[#304a4d] mb-2">Notes administratives</h3>
+								<p class="text-gray-700">{{ request.adminNotes }}</p>
+								{% if request.processor %}
 									<p class="text-sm text-gray-500 mt-2">
 										Par
-										{{ request.reviewer.firstName }}
-										{{ request.reviewer.lastName }}
+										{{ request.processor.firstName }}
+										{{ request.processor.lastName }}
 										le
-										{{ request.reviewedAt | date('d/m/Y à H:i') }}
+										{{ request.processedAt | date('d/m/Y à H:i') }}
 									</p>
 								{% endif %}
 							</div>
@@ -280,7 +280,9 @@ headers: {
 'Content-Type': 'application/json'
 },
 credentials: 'include',
-body: JSON.stringify({comment})
+body: JSON.stringify(
+{reason: comment}
+)
 });
 const result = await response.json();
 
