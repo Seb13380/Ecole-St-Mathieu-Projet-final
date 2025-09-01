@@ -75,6 +75,9 @@ model User {
   galleryMedia             GalleryMedia[]          @relation("UserGalleryMedia")
   documents                Document[]              @relation("UserDocuments")
   processedPreInscriptions PreInscriptionRequest[] @relation("ProcessedPreInscriptions")
+  agendaEvents             AgendaEvent[]           @relation("UserAgenda")
+  inscriptionConfigs       InscriptionConfig[]     @relation("InscriptionConfigModifier")
+  inscriptionDocuments     InscriptionDocument[]   @relation("InscriptionDocumentAuteur")
 }
 
 model Student {
@@ -511,4 +514,59 @@ enum PreInscriptionStatus {
   ACCEPTED // Acceptée
   REJECTED // Refusée
   COMPLETED // Inscription finalisée
+}
+
+model AgendaEvent {
+  id          Int       @id @default(autoincrement())
+  titre       String
+  description String?   @db.LongText
+  dateDebut   DateTime
+  dateFin     DateTime?
+  heureDebut  String? // Format "09:00"
+  heureFin    String? // Format "17:00"
+  lieu        String?
+  couleur     String    @default("#3b82f6") // Couleur hex pour l'affichage
+  important   Boolean   @default(false)
+  visible     Boolean   @default(true)
+  auteurId    Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auteur User @relation("UserAgenda", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([dateDebut])
+  @@index([visible])
+  @@index([important])
+}
+
+// Configuration des inscriptions
+model InscriptionConfig {
+  id         Int      @id @default(autoincrement())
+  soustitre  String   @default("Demande d'inscription pour l'année scolaire 2025-2026")
+  actif      Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  modifiePar Int
+
+  modificateur User @relation("InscriptionConfigModifier", fields: [modifiePar], references: [id])
+}
+
+// Documents d'inscription (PDF)
+model InscriptionDocument {
+  id            Int      @id @default(autoincrement())
+  nom           String // Nom affiché du document
+  description   String? // Description du document
+  nomFichier    String // Nom du fichier sur le serveur
+  cheminFichier String // Chemin complet vers le fichier
+  taille        Int // Taille en bytes
+  ordre         Int      @default(0) // Ordre d'affichage
+  actif         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ajoutePar     Int // Qui a ajouté le document
+
+  auteur User @relation("InscriptionDocumentAuteur", fields: [ajoutePar], references: [id])
+
+  @@index([actif])
+  @@index([ordre])
 }

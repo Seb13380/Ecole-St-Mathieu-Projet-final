@@ -1,0 +1,226 @@
+{% extends "layouts/base.twig" %}
+
+{% block main %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- En-tête -->
+        <div class="text-center mb-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                <h1 class="text-4xl font-bold text-slate-800 mb-2">
+                    📅 Agenda Scolaire
+                </h1>
+                <p class="text-xl text-slate-600">
+                    Tous les événements importants de l'école
+                </p>
+                <div class="text-3xl mt-4">🗓️</div>
+            </div>
+        </div>
+
+        <!-- Bouton de gestion pour les admins -->
+        {% if user.role == 'DIRECTION' or user.role == 'GESTIONNAIRE_SITE' %}
+            <div class="text-center mb-6">
+                <a href="/agenda/manage" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    ⚙️ Gérer l'agenda
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- Calendrier interactif -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-8">
+            <div id="calendar"></div>
+        </div>
+
+        <!-- Événements à venir -->
+        {% if upcomingEvents|length > 0 %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+                    <span class="mr-3">📋</span>
+                    Événements à venir
+                </h2>
+                <div class="grid gap-4 max-w-4xl mx-auto">
+                    {% for event in upcomingEvents %}
+                        <div class="bg-white shadow-md border-l-4 {{ event.important ? 'border-red-500' : 'border-blue-500' }} p-6 hover:shadow-lg transition-all duration-300 rounded-r-lg">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-2">
+                                        <h3 class="text-xl font-bold text-slate-800" style="color: {{ event.couleur }}">
+                                            {{ event.titre }}
+                                        </h3>
+                                        {% if event.important %}
+                                            <span class="ml-2 bg-red-100 text-red-800 px-2 py-1 text-xs font-medium rounded">
+                                                ⚠️ IMPORTANT
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if event.description %}
+                                        <p class="text-slate-600 mb-3">{{ event.description }}</p>
+                                    {% endif %}
+                                    
+                                    <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                                        <div class="flex items-center">
+                                            <span class="mr-1">📅</span>
+                                            {{ event.dateDebut|date('d/m/Y') }}
+                                            {% if event.dateFin and event.dateFin != event.dateDebut %}
+                                                - {{ event.dateFin|date('d/m/Y') }}
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if event.heureDebut %}
+                                            <div class="flex items-center">
+                                                <span class="mr-1">🕒</span>
+                                                {{ event.heureDebut }}
+                                                {% if event.heureFin %}
+                                                    - {{ event.heureFin }}
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if event.lieu %}
+                                            <div class="flex items-center">
+                                                <span class="mr-1">📍</span>
+                                                {{ event.lieu }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="text-xs text-slate-400 mt-2">
+                                        Publié par {{ event.auteur.firstName }} {{ event.auteur.lastName }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Événements passés -->
+        {% if pastEvents|length > 0 %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+                    <span class="mr-3">📚</span>
+                    Événements passés
+                </h2>
+                <div class="grid gap-3 max-w-4xl mx-auto">
+                    {% for event in pastEvents|slice(0, 5) %}
+                        <div class="bg-gray-50 shadow-sm border-l-4 border-gray-400 p-4 hover:shadow-md transition-all duration-300 rounded-r-lg opacity-75">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-slate-700 mb-1">
+                                        {{ event.titre }}
+                                    </h3>
+                                    
+                                    <div class="flex flex-wrap gap-3 text-sm text-slate-500">
+                                        <div class="flex items-center">
+                                            <span class="mr-1">📅</span>
+                                            {{ event.dateDebut|date('d/m/Y') }}
+                                        </div>
+                                        
+                                        {% if event.lieu %}
+                                            <div class="flex items-center">
+                                                <span class="mr-1">📍</span>
+                                                {{ event.lieu }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% if pastEvents|length > 5 %}
+                        <div class="text-center text-slate-500 text-sm">
+                            ... et {{ pastEvents|length - 5 }} autres événements passés
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Aucun événement -->
+        {% if upcomingEvents|length == 0 and pastEvents|length == 0 %}
+            <div class="text-center py-12">
+                <div class="bg-white shadow-md border-l-4 border-gray-300 p-8 max-w-md mx-auto rounded-r-lg">
+                    <div class="text-gray-400 text-6xl mb-4">📅</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Aucun événement</h3>
+                    <p class="text-slate-600">L'agenda est actuellement vide</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- FullCalendar CSS et JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/fr.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        buttonText: {
+            today: 'Aujourd\'hui',
+            month: 'Mois',
+            week: 'Semaine',
+            list: 'Liste'
+        },
+        height: 'auto',
+        events: '/agenda/api/events',
+        eventClick: function(info) {
+            // Afficher les détails de l'événement
+            const event = info.event;
+            let details = `<strong>${event.title}</strong><br>`;
+            
+            if (event.extendedProps.description) {
+                details += `<br>${event.extendedProps.description}<br>`;
+            }
+            
+            details += `<br><strong>📅 Date:</strong> ${event.start.toLocaleDateString('fr-FR')}`;
+            
+            if (event.end && event.end.toDateString() !== event.start.toDateString()) {
+                details += ` - ${event.end.toLocaleDateString('fr-FR')}`;
+            }
+            
+            if (event.extendedProps.lieu) {
+                details += `<br><strong>📍 Lieu:</strong> ${event.extendedProps.lieu}`;
+            }
+            
+            details += `<br><br><small>Publié par ${event.extendedProps.auteur}</small>`;
+            
+            // Créer une modal simple
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+                    <div class="mb-4">${details}</div>
+                    <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Fermer
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        },
+        eventDidMount: function(info) {
+            // Ajouter un indicateur pour les événements importants
+            if (info.event.extendedProps.important) {
+                info.el.style.border = '2px solid #ef4444';
+                info.el.style.fontWeight = 'bold';
+            }
+        }
+    });
+    
+    calendar.render();
+});
+</script>
+{% endblock %}
