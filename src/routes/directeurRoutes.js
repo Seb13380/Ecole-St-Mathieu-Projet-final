@@ -25,6 +25,8 @@ router.get('/classes', directeurController.getClassesManagement);
 router.post('/classes', directeurController.createClasse);
 router.post('/classes/:id/update', directeurController.updateClasse);
 router.post('/classes/:id/delete', directeurController.deleteClasse);
+router.get('/classes/:id/export', directeurController.exportClassList);
+router.post('/classes/export-all', directeurController.exportAllClassesAndEmail);
 
 // Gestion des élèves
 router.get('/students', directeurController.getStudentsManagement);
@@ -34,10 +36,15 @@ router.post('/students/:id/delete', directeurController.deleteStudent);
 
 // Routes pour les demandes d'inscription
 router.get('/inscriptions', inscriptionController.showAllRequests);
+router.get('/inscriptions/manage', inscriptionController.showManageInscriptions);
 router.post('/inscriptions/:id/approve', inscriptionController.approveRequest);
 router.post('/inscriptions/:id/reject', inscriptionController.rejectRequest);
 router.post('/inscriptions/:id/delete', inscriptionController.deleteRequest);
 router.get('/inscriptions/:id/details', inscriptionController.showRequestDetails);
+
+// API routes for inscriptions
+router.get('/api/classes', inscriptionController.getAvailableClasses);
+router.post('/notify-yamina', inscriptionController.notifyYamina);
 
 // Messages de contact
 router.get('/contact-messages', directeurController.getContactMessages);

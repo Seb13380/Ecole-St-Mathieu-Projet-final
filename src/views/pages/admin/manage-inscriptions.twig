@@ -1,0 +1,607 @@
+{% extends "layouts/admin.twig" %}
+
+{% block title %}Gestion des Inscriptions - École Saint-Mathieu
+{% endblock %}
+
+{% block extra_css %}
+	<style>
+		.status-pending {
+			@apply bg-yellow-100 text-yellow-800 border-yellow-200;
+		}
+		.status-approved {
+			@apply bg-green-100 text-green-800 border-green-200;
+		}
+		.status-rejected {
+			@apply bg-red-100 text-red-800 border-red-200;
+		}
+
+		.fade-in {
+			animation: fadeIn 0.3s ease-in;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.hover-grow {
+			transition: transform 0.2s ease;
+		}
+
+		.hover-grow:hover {
+			transform: scale(1.02);
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+	<div
+		class="max-w-7xl mx-auto">
+		<!-- En-tête -->
+		<div class="flex justify-between items-center mb-8">
+			<div>
+				<h1 class="text-3xl font-bold text-gray-900 mb-2">
+					📋 Gestion des Inscriptions
+				</h1>
+				<p class="text-gray-600">
+					Approuvez les demandes et assignez automatiquement les élèves aux classes
+				</p>
+			</div>
+
+			<div class="flex gap-3">
+				<button onclick="notifyYamina()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2">
+					<i class="fas fa-paper-plane"></i>
+					Notifier Yamina
+				</button>
+				<a href="/admin/classes" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2">
+					<i class="fas fa-chalkboard-teacher"></i>
+					Gérer Classes
+				</a>
+			</div>
+		</div>
+
+		<!-- Statistiques -->
+		<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+			<div class="bg-white rounded-xl shadow-lg p-6 hover-grow">
+				<div class="flex items-center">
+					<div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+						<i class="fas fa-clock text-xl"></i>
+					</div>
+					<div class="ml-4">
+						<p class="text-sm font-medium text-gray-600">En attente</p>
+						<p class="text-2xl font-bold text-gray-900" id="pending-count">{{ pendingCount }}</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-xl shadow-lg p-6 hover-grow">
+				<div class="flex items-center">
+					<div class="p-3 rounded-full bg-green-100 text-green-600">
+						<i class="fas fa-check-circle text-xl"></i>
+					</div>
+					<div class="ml-4">
+						<p class="text-sm font-medium text-gray-600">Approuvées</p>
+						<p class="text-2xl font-bold text-gray-900" id="approved-count">{{ approvedCount }}</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-xl shadow-lg p-6 hover-grow">
+				<div class="flex items-center">
+					<div class="p-3 rounded-full bg-red-100 text-red-600">
+						<i class="fas fa-times-circle text-xl"></i>
+					</div>
+					<div class="ml-4">
+						<p class="text-sm font-medium text-gray-600">Refusées</p>
+						<p class="text-2xl font-bold text-gray-900" id="rejected-count">{{ rejectedCount }}</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-xl shadow-lg p-6 hover-grow">
+				<div class="flex items-center">
+					<div class="p-3 rounded-full bg-blue-100 text-blue-600">
+						<i class="fas fa-users text-xl"></i>
+					</div>
+					<div class="ml-4">
+						<p class="text-sm font-medium text-gray-600">Total</p>
+						<p class="text-2xl font-bold text-gray-900" id="total-count">{{ totalCount }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Filtres -->
+		<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+			<div class="flex flex-wrap gap-4 items-center">
+				<div class="flex gap-2">
+					<button onclick="filterRequests('all')" class="filter-btn active px-4 py-2 rounded-lg bg-blue-100 text-blue-800 font-medium transition-all duration-200">
+						Toutes
+					</button>
+					<button onclick="filterRequests('PENDING')" class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium transition-all duration-200 hover:bg-yellow-100 hover:text-yellow-800">
+						En attente
+					</button>
+					<button onclick="filterRequests('APPROVED')" class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium transition-all duration-200 hover:bg-green-100 hover:text-green-800">
+						Approuvées
+					</button>
+					<button onclick="filterRequests('REJECTED')" class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium transition-all duration-200 hover:bg-red-100 hover:text-red-800">
+						Refusées
+					</button>
+				</div>
+
+				<div class="flex-1"></div>
+
+				<div class="flex gap-2">
+					<input type="text" id="search-input" placeholder="Rechercher..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+					<button onclick="refreshRequests()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-all duration-200">
+						<i class="fas fa-sync-alt"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Liste des demandes -->
+		<div class="space-y-6" id="requests-container">
+			{% for request in requests %}
+				<div class="bg-white rounded-xl shadow-lg p-6 request-card fade-in" data-status="{{ request.status }}" data-search="{{ request.parentFirstName }} {{ request.parentLastName }} {{ request.parentEmail }}">
+					<div
+						class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+						<!-- Informations demande -->
+						<div class="flex-1">
+							<div class="flex items-center gap-3 mb-3">
+								<span class="status-badge {{ request.status|lower }} px-3 py-1 rounded-full text-sm font-medium border">
+									{% if request.status == 'PENDING' %}
+										⏳ En attente
+									{% elseif request.status == 'APPROVED' %}
+										✅ Approuvée
+									{% elseif request.status == 'REJECTED' %}
+										❌ Refusée
+									{% endif %}
+								</span>
+								<span class="text-sm text-gray-500">
+									{{ request.submittedAt|date('d/m/Y H:i') }}
+								</span>
+							</div>
+
+							<h3 class="text-xl font-bold text-gray-900 mb-2">
+								👨‍👩‍👧‍👦
+								{{ request.parentFirstName }}
+								{{ request.parentLastName }}
+							</h3>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<p class="text-sm text-gray-600">
+										<strong>Email:</strong>
+										{{ request.parentEmail }}</p>
+									<p class="text-sm text-gray-600">
+										<strong>Téléphone:</strong>
+										{{ request.parentPhone }}</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-600">
+										<strong>Adresse:</strong>
+										{{ request.parentAddress }}</p>
+								</div>
+							</div>
+
+							<!-- Enfants -->
+							<div class="mb-4">
+								<h4 class="font-semibold text-gray-800 mb-2">👶 Enfants à inscrire:</h4>
+								<div class="space-y-2">
+									{% set children = request.children %}
+									{% if children is iterable %}
+										{% for child in children %}
+											<div class="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+												<div>
+													<span class="font-medium">{{ child.firstName }}
+														{{ child.lastName }}</span>
+													<span class="text-sm text-gray-600 ml-2">
+														({{ child.birthDate|date('d/m/Y') }})
+													</span>
+												</div>
+												<div>
+													<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+														{{ child.requestedClass }}
+													</span>
+												</div>
+											</div>
+										{% endfor %}
+									{% endif %}
+								</div>
+							</div>
+
+							{% if request.specialNeeds %}
+								<div class="mb-4">
+									<h4 class="font-semibold text-gray-800 mb-1">⚠️ Besoins spéciaux:</h4>
+									<p class="text-sm text-gray-600 bg-yellow-50 p-2 rounded">{{ request.specialNeeds }}</p>
+								</div>
+							{% endif %}
+
+							{% if request.message %}
+								<div class="mb-4">
+									<h4 class="font-semibold text-gray-800 mb-1">💬 Message:</h4>
+									<p class="text-sm text-gray-600 bg-gray-50 p-2 rounded">{{ request.message }}</p>
+								</div>
+							{% endif %}
+						</div>
+
+						<!-- Actions -->
+						{% if request.status == 'PENDING' %}
+							<div class="lg:ml-6 lg:flex-shrink-0 mt-4 lg:mt-0">
+								<div class="flex flex-col gap-3">
+									<button onclick="showApprovalModal({{ request.id }}, '{{ request.parentFirstName }}', '{{ request.parentLastName }}')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2">
+										<i class="fas fa-check"></i>
+										Approuver & Créer Comptes
+									</button>
+
+									<button onclick="showRejectionModal({{ request.id }}, '{{ request.parentFirstName }}', '{{ request.parentLastName }}')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2">
+										<i class="fas fa-times"></i>
+										Refuser
+									</button>
+								</div>
+							</div>
+						{% endif %}
+					</div>
+
+					{% if request.reviewComment %}
+						<div class="mt-4 pt-4 border-t border-gray-200">
+							<h4 class="font-semibold text-gray-800 mb-1">📝 Commentaire de révision:</h4>
+							<p class="text-sm text-gray-600">{{ request.reviewComment }}</p>
+							{% if request.reviewedAt %}
+								<p class="text-xs text-gray-500 mt-1">
+									Traité le
+									{{ request.reviewedAt|date('d/m/Y à H:i') }}
+								</p>
+							{% endif %}
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+
+		{% if requests|length == 0 %}
+			<div class="text-center py-12">
+				<div class="text-6xl mb-4">📋</div>
+				<h3 class="text-xl font-semibold text-gray-700 mb-2">Aucune demande d'inscription</h3>
+				<p class="text-gray-500">Les nouvelles demandes apparaîtront ici.</p>
+			</div>
+		{% endif %}
+	</div>
+</div>
+
+<!-- Modal d'approbation -->
+<div id="approvalModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+	<div class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+		<div class="flex justify-between items-center mb-6">
+			<h3 class="text-xl font-bold text-green-700">✅ Approuver l'inscription</h3>
+			<button onclick="closeModal('approvalModal')" class="text-gray-400 hover:text-gray-600">
+				<i class="fas fa-times text-xl"></i>
+			</button>
+		</div>
+
+		<div class="mb-6">
+			<p class="text-gray-700 mb-4">
+				<strong>Famille:</strong>
+				<span id="approval-family-name"></span>
+			</p>
+			<p class="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+				<i class="fas fa-info-circle text-blue-500 mr-2"></i>
+				L'approbation créera automatiquement les comptes parent et enfants avec attribution de classe selon vos choix.
+			</p>
+		</div>
+
+		<!-- Sélection des classes pour chaque enfant -->
+		<div
+			id="children-class-selection" class="mb-6"><!-- Sera rempli dynamiquement -->
+		</div>
+
+		<div class="mb-6">
+			<label for="approval-comment" class="block text-sm font-medium text-gray-700 mb-2">
+				Commentaire (optionnel)
+			</label>
+			<textarea id="approval-comment" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Message personnalisé pour la famille..."></textarea>
+		</div>
+
+		<div class="flex gap-3 justify-end">
+			<button onclick="closeModal('approvalModal')" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200">
+				Annuler
+			</button>
+			<button onclick="approveInscription()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200">
+				<i class="fas fa-check mr-2"></i>
+				Approuver & Créer Comptes
+			</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal de refus -->
+<div id="rejectionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+	<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
+		<div class="flex justify-between items-center mb-6">
+			<h3 class="text-xl font-bold text-red-700">❌ Refuser l'inscription</h3>
+			<button onclick="closeModal('rejectionModal')" class="text-gray-400 hover:text-gray-600">
+				<i class="fas fa-times text-xl"></i>
+			</button>
+		</div>
+
+		<div class="mb-6">
+			<p class="text-gray-700 mb-4">
+				<strong>Famille:</strong>
+				<span id="rejection-family-name"></span>
+			</p>
+		</div>
+
+		<div class="mb-6">
+			<label for="rejection-reason" class="block text-sm font-medium text-gray-700 mb-2">
+				Motif du refus
+				<span class="text-red-500">*</span>
+			</label>
+			<textarea id="rejection-reason" rows="3" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500" placeholder="Expliquez les raisons du refus..."></textarea>
+		</div>
+
+		<div class="flex gap-3 justify-end">
+			<button onclick="closeModal('rejectionModal')" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200">
+				Annuler
+			</button>
+			<button onclick="rejectInscription()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200">
+				<i class="fas fa-times mr-2"></i>
+				Confirmer le refus
+			</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	let currentRequestId = null;
+	
+	// Charger les classes disponibles
+	let availableClasses = [];
+	
+	async function loadClasses() {
+	    try {
+	        const response = await fetch('/api/admin/classes');
+	        const data = await response.json();
+	        if (data.success) {
+	            availableClasses = data.classes;
+	        }
+	    } catch (error) {
+	        console.error('Erreur chargement classes:', error);
+	    }
+	}
+	
+	// Initialisation
+	document.addEventListener('DOMContentLoaded', function() {
+	    loadClasses();
+	});
+	
+	// Modal d'approbation
+	function showApprovalModal(requestId, firstName, lastName) {
+	    currentRequestId = requestId;
+	    document.getElementById('approval-family-name').textContent = `${firstName} ${lastName}`;
+	    
+	    // Récupérer les enfants de cette demande
+	    const requestCard = document.querySelector(`.request-card[data-id="${requestId}"]`);
+	    if (requestCard) {
+	        generateChildrenClassSelection(requestCard);
+	    }
+	    
+	    document.getElementById('approvalModal').classList.remove('hidden');
+	}
+	
+	function generateChildrenClassSelection(requestCard) {
+	    const container = document.getElementById('children-class-selection');
+	    container.innerHTML = '';
+	    
+	    // Récupérer les enfants depuis les données de la demande
+	    // Pour cet exemple, nous utiliserons une structure simplifiée
+	    const children = [
+	        { firstName: 'Exemple', lastName: 'Enfant', requestedClass: 'CP-A' }
+	    ]; // À remplacer par les vraies données
+	
+	    children.forEach((child, index) => {
+	        const childDiv = document.createElement('div');
+	        childDiv.className = 'border border-gray-200 rounded-lg p-4 mb-4';
+	        childDiv.innerHTML = `
+	            <h4 class="font-semibold text-gray-800 mb-3">
+	                👶 ${child.firstName} ${child.lastName}
+	            </h4>
+	            <div>
+	                <label class="block text-sm font-medium text-gray-700 mb-2">
+	                    Choisir la classe:
+	                </label>
+	                <select name="classe_${index}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+	                    <option value="">Sélectionner une classe...</option>
+	                    ${availableClasses.map(classe => 
+	                        `<option value="${classe.id}" ${child.requestedClass === classe.nom ? 'selected' : ''}>
+	                            ${classe.nom} (${classe.niveau})
+	                        </option>`
+	                    ).join('')}
+	                </select>
+	            </div>
+	        `;
+	        container.appendChild(childDiv);
+	    });
+	}
+	
+	// Modal de refus
+	function showRejectionModal(requestId, firstName, lastName) {
+	    currentRequestId = requestId;
+	    document.getElementById('rejection-family-name').textContent = `${firstName} ${lastName}`;
+	    document.getElementById('rejectionModal').classList.remove('hidden');
+	}
+	
+	function closeModal(modalId) {
+	    document.getElementById(modalId).classList.add('hidden');
+	    currentRequestId = null;
+	}
+	
+	// Approbation
+	async function approveInscription() {
+	    if (!currentRequestId) return;
+	    
+	    const comment = document.getElementById('approval-comment').value;
+	    
+	    // Récupérer les choix de classes
+	    const classSelections = {};
+	    const selects = document.querySelectorAll('#children-class-selection select');
+	    selects.forEach(select => {
+	        const childIndex = select.name.split('_')[1];
+	        classSelections[childIndex] = select.value;
+	    });
+	    
+	    try {
+	        const response = await fetch(`/admin/inscriptions/${currentRequestId}/approve`, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            },
+	            body: JSON.stringify({
+	                comment: comment,
+	                classSelections: classSelections
+	            })
+	        });
+	        
+	        const result = await response.json();
+	        
+	        if (result.success) {
+	            showNotification('✅ Inscription approuvée avec succès ! Comptes créés et email envoyé.', 'success');
+	            closeModal('approvalModal');
+	            setTimeout(() => location.reload(), 1500);
+	        } else {
+	            showNotification('❌ Erreur: ' + result.message, 'error');
+	        }
+	    } catch (error) {
+	        console.error('Erreur:', error);
+	        showNotification('❌ Erreur lors de l\'approbation', 'error');
+	    }
+	}
+	
+	// Refus
+	async function rejectInscription() {
+	    if (!currentRequestId) return;
+	    
+	    const reason = document.getElementById('rejection-reason').value;
+	    if (!reason.trim()) {
+	        showNotification('⚠️ Veuillez indiquer le motif du refus', 'warning');
+	        return;
+	    }
+	    
+	    try {
+	        const response = await fetch(`/admin/inscriptions/${currentRequestId}/reject`, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            },
+	            body: JSON.stringify({
+	                reason: reason
+	            })
+	        });
+	        
+	        const result = await response.json();
+	        
+	        if (result.success) {
+	            showNotification('✅ Inscription refusée. Email de notification envoyé.', 'success');
+	            closeModal('rejectionModal');
+	            setTimeout(() => location.reload(), 1500);
+	        } else {
+	            showNotification('❌ Erreur: ' + result.message, 'error');
+	        }
+	    } catch (error) {
+	        console.error('Erreur:', error);
+	        showNotification('❌ Erreur lors du refus', 'error');
+	    }
+	}
+	
+	// Filtres
+	function filterRequests(status) {
+	    const cards = document.querySelectorAll('.request-card');
+	    const buttons = document.querySelectorAll('.filter-btn');
+	    
+	    // Mettre à jour les boutons
+	    buttons.forEach(btn => {
+	        btn.classList.remove('active', 'bg-blue-100', 'text-blue-800');
+	        btn.classList.add('bg-gray-100', 'text-gray-600');
+	    });
+	    
+	    event.target.classList.remove('bg-gray-100', 'text-gray-600');
+	    event.target.classList.add('active', 'bg-blue-100', 'text-blue-800');
+	    
+	    // Filtrer les cartes
+	    cards.forEach(card => {
+	        if (status === 'all' || card.dataset.status === status) {
+	            card.style.display = 'block';
+	        } else {
+	            card.style.display = 'none';
+	        }
+	    });
+	}
+	
+	// Recherche
+	document.getElementById('search-input').addEventListener('input', function(e) {
+	    const searchTerm = e.target.value.toLowerCase();
+	    const cards = document.querySelectorAll('.request-card');
+	    
+	    cards.forEach(card => {
+	        const searchData = card.dataset.search.toLowerCase();
+	        if (searchData.includes(searchTerm)) {
+	            card.style.display = 'block';
+	        } else {
+	            card.style.display = 'none';
+	        }
+	    });
+	});
+	
+	// Actualiser
+	function refreshRequests() {
+	    location.reload();
+	}
+	
+	// Notifier Yamina
+	async function notifyYamina() {
+	    try {
+	        const response = await fetch('/admin/notify-yamina', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            }
+	        });
+	        
+	        const result = await response.json();
+	        
+	        if (result.success) {
+	            showNotification('📧 Notification envoyée à Yamina avec succès !', 'success');
+	        } else {
+	            showNotification('❌ Erreur: ' + result.message, 'error');
+	        }
+	    } catch (error) {
+	        console.error('Erreur:', error);
+	        showNotification('❌ Erreur lors de l\'envoi de la notification', 'error');
+	    }
+	}
+	
+	// Notifications
+	function showNotification(message, type) {
+	    const notification = document.createElement('div');
+	    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white ${
+	        type === 'success' ? 'bg-green-500' :
+	        type === 'error' ? 'bg-red-500' :
+	        type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+	    }`;
+	    notification.textContent = message;
+	    
+	    document.body.appendChild(notification);
+	    
+	    setTimeout(() => {
+	        notification.remove();
+	    }, 5000);
+	}
+	</script>
+	{% endblock %}

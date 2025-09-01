@@ -161,6 +161,10 @@ const loginController = {
                 console.log('➡️ Redirection vers tableau de bord gestionnaire site');
                 res.redirect('/directeur/dashboard');
                 break;
+            case 'SECRETAIRE_DIRECTION':
+                console.log('➡️ Redirection vers tableau de bord secrétaire');
+                res.redirect('/secretaire/dashboard');
+                break;
             case 'ENSEIGNANT':
                 console.log('➡️ Redirection vers tableau de bord enseignant');
                 res.redirect('/enseignant/dashboard');
