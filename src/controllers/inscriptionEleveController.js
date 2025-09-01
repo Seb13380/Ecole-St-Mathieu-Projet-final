@@ -34,20 +34,37 @@ const inscriptionEleveController = {
                 parentEmail,
                 parentPhone,
                 parentAddress,
-                studentFirstName,
-                studentLastName,
-                studentBirthDate,
-                currentClass,
-                requestedClass,
-                previousSchool,
+                children,
                 specialNeeds,
                 message
             } = req.body;
 
-            // Validation des champs obligatoires
-            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone ||
-                !studentFirstName || !studentLastName || !studentBirthDate || !requestedClass) {
-                req.flash('error', 'Veuillez remplir tous les champs obligatoires.');
+            // Validation des champs obligatoires du parent
+            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone) {
+                req.flash('error', 'Veuillez remplir tous les champs obligatoires du parent.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Traitement des enfants - le nouveau format envoie children comme objet
+            let childrenData = [];
+            if (children) {
+                // Convertir l'objet children en tableau
+                childrenData = Object.keys(children).map(key => {
+                    const child = children[key];
+                    return {
+                        firstName: child.firstName,
+                        lastName: child.lastName,
+                        birthDate: child.birthDate,
+                        currentClass: child.currentClass || null,
+                        requestedClass: child.requestedClass,
+                        previousSchool: child.previousSchool || null
+                    };
+                }).filter(child => child.firstName && child.lastName && child.birthDate && child.requestedClass);
+            }
+
+            // Vérifier qu'au moins un enfant est présent et valide
+            if (childrenData.length === 0) {
+                req.flash('error', 'Veuillez ajouter au moins un enfant avec toutes les informations obligatoires.');
                 return res.redirect('/inscription-eleve');
             }
 
@@ -61,7 +78,17 @@ const inscriptionEleveController = {
                 return res.redirect('/inscription-eleve');
             }
 
-            // Création de la demande d'inscription élève
+            // Vérifier s'il existe déjà une demande avec cet email
+            const existingRequest = await prisma.preInscriptionRequest.findFirst({
+                where: { parentEmail: parentEmail }
+            });
+
+            if (existingRequest) {
+                req.flash('error', 'Une demande d\'inscription existe déjà pour cette adresse email.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Création de la demande d'inscription avec plusieurs enfants
             const inscriptionRequest = await prisma.preInscriptionRequest.create({
                 data: {
                     // Informations parent
@@ -71,13 +98,10 @@ const inscriptionEleveController = {
                     parentPhone,
                     parentAddress,
 
-                    // Informations élève
-                    studentFirstName,
-                    studentLastName,
-                    studentBirthDate: new Date(studentBirthDate),
-                    currentClass: currentClass || null,
-                    requestedClass,
-                    previousSchool: previousSchool || null,
+                    // Informations des enfants (stocker en JSON)
+                    children: JSON.stringify(childrenData),
+
+                    // Informations complémentaires
                     specialNeeds: specialNeeds || null,
                     message: message || null,
 
@@ -87,16 +111,14 @@ const inscriptionEleveController = {
                 }
             });
 
-            console.log('Nouvelle demande d\'inscription élève créée:', inscriptionRequest.id);
+            console.log(`Nouvelle demande d'inscription créée pour ${childrenData.length} enfant(s):`, inscriptionRequest.id);
 
             // Envoyer email de confirmation au parent
             try {
                 await emailService.sendInscriptionConfirmation({
                     parentEmail,
                     parentFirstName,
-                    studentFirstName,
-                    studentLastName,
-                    requestedClass
+                    children: childrenData
                 });
             } catch (emailError) {
                 console.error('Erreur envoi email de confirmation:', emailError);
@@ -108,16 +130,18 @@ const inscriptionEleveController = {
                     parentFirstName,
                     parentLastName,
                     parentEmail,
-                    studentFirstName,
-                    studentLastName,
-                    requestedClass,
+                    children: childrenData,
                     requestId: inscriptionRequest.id
                 });
             } catch (emailError) {
                 console.error('Erreur envoi notification directeur:', emailError);
             }
 
-            req.flash('success', 'Votre demande d\'inscription a été envoyée avec succès ! Vous recevrez une réponse par email sous 48h.');
+            const successMessage = childrenData.length === 1
+                ? 'Votre demande d\'inscription a été envoyée avec succès !'
+                : `Votre demande d'inscription pour ${childrenData.length} enfants a été envoyée avec succès !`;
+
+            req.flash('success', successMessage + ' Vous recevrez une réponse par email sous 48h.');
             res.redirect('/inscription-eleve');
 
         } catch (error) {
@@ -204,11 +228,7 @@ const inscriptionEleveController = {
                 parentLastName,
                 parentEmail,
                 parentPhone,
-                parentAddress,
-                studentFirstName,
-                studentLastName,
-                studentBirthDate,
-                requestedClass
+                parentAddress
             } = inscriptionRequest;
 
             // Générer un mot de passe temporaire
@@ -228,31 +248,53 @@ const inscriptionEleveController = {
                 }
             });
 
-            // Trouver ou créer la classe demandée
-            let classe = await prisma.classe.findFirst({
-                where: { nom: requestedClass }
-            });
-
-            if (!classe) {
-                classe = await prisma.classe.create({
-                    data: {
-                        nom: requestedClass,
-                        niveau: requestedClass,
-                        anneeScolaire: new Date().getFullYear().toString()
-                    }
-                });
+            // Parser les enfants depuis le JSON
+            let childrenData = [];
+            try {
+                if (typeof inscriptionRequest.children === 'string') {
+                    childrenData = JSON.parse(inscriptionRequest.children);
+                } else {
+                    childrenData = inscriptionRequest.children || [];
+                }
+            } catch (e) {
+                console.error('Erreur parsing children:', e);
+                childrenData = [];
             }
 
-            // Créer l'élève
-            const student = await prisma.student.create({
-                data: {
-                    firstName: studentFirstName,
-                    lastName: studentLastName,
-                    dateOfBirth: new Date(studentBirthDate),
-                    classeId: classe.id,
-                    parentId: parentUser.id
+            // Créer les comptes étudiants pour chaque enfant
+            const students = [];
+
+            for (const child of childrenData) {
+                // Trouver ou créer la classe demandée
+                let classe = await prisma.classe.findFirst({
+                    where: { nom: child.requestedClass }
+                });
+
+                if (!classe) {
+                    // Créer une classe par défaut si elle n'existe pas
+                    classe = await prisma.classe.create({
+                        data: {
+                            nom: child.requestedClass || 'Non assigné',
+                            niveau: child.requestedClass || 'A définir',
+                            anneeScolaire: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
+                        }
+                    });
                 }
-            });
+
+                // Créer l'élève
+                const student = await prisma.student.create({
+                    data: {
+                        firstName: child.firstName,
+                        lastName: child.lastName,
+                        dateNaissance: new Date(child.birthDate),
+                        classeId: classe.id,
+                        parentId: parentUser.id
+                    }
+                });
+
+                students.push(student);
+                console.log('✅ Élève créé:', `${student.firstName} ${student.lastName} - Classe: ${child.requestedClass}`);
+            }
 
             // Envoyer email avec identifiants
             try {
@@ -260,14 +302,14 @@ const inscriptionEleveController = {
                     parentEmail,
                     parentFirstName,
                     tempPassword,
-                    studentFirstName,
-                    className: requestedClass
+                    children: childrenData
                 });
             } catch (emailError) {
                 console.error('Erreur envoi identifiants:', emailError);
             }
 
-            return { parentUser, student };
+            console.log(`✅ Comptes créés pour ${parentFirstName} ${parentLastName} avec ${students.length} enfant(s)`);
+            return { parentUser, students };
 
         } catch (error) {
             console.error('Erreur création comptes:', error);
