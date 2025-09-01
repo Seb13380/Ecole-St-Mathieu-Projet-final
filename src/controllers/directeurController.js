@@ -230,10 +230,10 @@ const directeurController = {
         try {
             const classes = await prisma.classe.findMany({
                 include: {
-                    eleves: true,
+                    students: true,
                     _count: {
                         select: {
-                            eleves: true
+                            students: true
                         }
                     }
                 },
@@ -492,7 +492,7 @@ const directeurController = {
             const classe = await prisma.classe.findUnique({
                 where: { id: parseInt(id) },
                 include: {
-                    eleves: {
+                    students: {
                         include: {
                             parent: {
                                 select: {
@@ -519,7 +519,7 @@ const directeurController = {
             let csvContent = `Classe ${classe.nom} (${classe.niveau}) - ${classe.anneeScolaire}\n\n`;
             csvContent += 'Nom;Prénom;Date de naissance;Parent;Email parent;Téléphone parent\n';
 
-            classe.eleves.forEach(student => {
+            classe.students.forEach(student => {
                 const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
                 csvContent += `${student.lastName};${student.firstName};${dateNaissance};${student.parent.firstName} ${student.parent.lastName};${student.parent.email};${student.parent.phone}\n`;
             });
@@ -541,7 +541,7 @@ const directeurController = {
         try {
             const classes = await prisma.classe.findMany({
                 include: {
-                    eleves: {
+                    students: {
                         include: {
                             parent: {
                                 select: {
@@ -580,10 +580,10 @@ const directeurController = {
             classes.forEach(classe => {
                 rapport += `\n=== CLASSE ${classe.nom} (${classe.niveau}) ===\n`;
                 rapport += `Année scolaire: ${classe.anneeScolaire}\n`;
-                rapport += `Nombre d'élèves: ${classe.eleves.length}\n\n`;
+                rapport += `Nombre d'élèves: ${classe.students.length}\n\n`;
 
-                if (classe.eleves.length > 0) {
-                    classe.eleves.forEach((student, index) => {
+                if (classe.students.length > 0) {
+                    classe.students.forEach((student, index) => {
                         const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
                         rapport += `${index + 1}. ${student.firstName} ${student.lastName}\n`;
                         rapport += `   Né(e) le: ${dateNaissance}\n`;
@@ -595,7 +595,7 @@ const directeurController = {
                     rapport += '   Aucun élève inscrit\n\n';
                 }
 
-                totalEleves += classe.eleves.length;
+                totalEleves += classe.students.length;
             });
 
             rapport += `\n=== RÉSUMÉ GÉNÉRAL ===\n`;

@@ -22,7 +22,7 @@
 						<h2 class="card-title">Statut de la demande</h2>
 						{% if request.status == 'PENDING' %}
 							<span class="badge badge-warning badge-lg">En attente</span>
-						{% elseif request.status == 'APPROVED' %}
+						{% elseif request.status == 'ACCEPTED' %}
 							<span class="badge badge-success badge-lg">Approuvée</span>
 						{% else %}
 							<span class="badge badge-error badge-lg">Refusée</span>
@@ -30,16 +30,16 @@
 					</div>
 					<p class="text-sm text-gray-500">
 						Demande créée le
-						{{ request.createdAt | date('d/m/Y à H:i') }}
+						{{ request.submittedAt | date('d/m/Y à H:i') }}
 					</p>
-					{% if request.reviewedAt %}
+					{% if request.processedAt %}
 						<p class="text-sm text-gray-500">
 							Traitée le
-							{{ request.reviewedAt | date('d/m/Y à H:i') }}
-							{% if request.reviewer %}
+							{{ request.processedAt | date('d/m/Y à H:i') }}
+							{% if request.processor %}
 								par
-								{{ request.reviewer.firstName }}
-								{{ request.reviewer.lastName }}
+								{{ request.processor.firstName }}
+								{{ request.processor.lastName }}
 							{% endif %}
 						</p>
 					{% endif %}
@@ -103,13 +103,13 @@
 			</div>
 
 			<!-- Commentaire de révision -->
-			{% if request.reviewComment %}
+			{% if request.adminNotes %}
 				<div class="card bg-base-100 shadow-xl mb-6">
 					<div class="card-body">
 						<h2 class="card-title text-[#304a4d] mb-4">
-							💬 Commentaire de révision
+							💬 Notes administratives
 						</h2>
-						<p>{{ request.reviewComment }}</p>
+						<p>{{ request.adminNotes }}</p>
 					</div>
 				</div>
 			{% endif %}
@@ -222,7 +222,9 @@ headers: {
 'Content-Type': 'application/json'
 },
 credentials: 'include',
-body: JSON.stringify({comment})
+body: JSON.stringify(
+{reason: comment}
+)
 });
 const result = await response.json();
 
