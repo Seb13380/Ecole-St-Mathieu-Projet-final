@@ -185,6 +185,28 @@ app.get('/inscriptions/manage', (req, res) => {
   }
 });
 
+// Routes pour les pages légales
+app.get('/a-propos', (req, res) => {
+  res.render('pages/legal/a-propos', {
+    user: req.session.user,
+    title: 'À propos de nous - École Saint-Mathieu'
+  });
+});
+
+app.get('/mentions-legales', (req, res) => {
+  res.render('pages/legal/mentions-legales', {
+    user: req.session.user,
+    title: 'Mentions légales - École Saint-Mathieu'
+  });
+});
+
+app.get('/politique-confidentialite', (req, res) => {
+  res.render('pages/legal/politique-confidentialite', {
+    user: req.session.user,
+    title: 'Politique de confidentialité - École Saint-Mathieu'
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
