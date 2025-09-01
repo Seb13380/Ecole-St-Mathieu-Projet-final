@@ -1,0 +1,54 @@
+🔍 GUIDE DE SYNCHRONISATION LOCAL → VPS
+=========================================
+
+VOTRE SITUATION:
+- ✅ LOCAL: 10 documents affichés correctement sur /documents/ecole
+- ❌ VPS: Page différente (documents manquants)
+- 🚨 URGENT: Déploiement officiel demain
+
+ÉTAPES DE SYNCHRONISATION:
+
+1. � TRANSFÉRER LES FICHIERS:
+   ─────────────────────────────
+   Sur votre serveur VPS, transférez:
+   - restore-documents-vps.sql (base de données)
+   - verify-vps.js (vérification)
+   - Le dossier /uploads/documents/ (fichiers PDF)
+
+2. 🗄️ RESTAURER LA BASE DE DONNÉES:
+   ─────────────────────────────────
+   mysql -u username -p database_name < restore-documents-vps.sql
+
+3. 🔄 REDÉMARRER LE SERVEUR:
+   ──────────────────────────
+   pm2 restart app
+   # ou votre méthode de redémarrage
+
+4. ✅ VÉRIFIER:
+   ─────────────
+   node verify-vps.js
+   
+5. 🌐 TESTER:
+   ───────────
+   https://votre-domaine.com/documents/ecole
+
+FICHIERS PDF À TRANSFÉRER:
+──────────────────────────
+- /uploads/documents/document-1756445000426-261237197.docx
+- /uploads/documents/reglement-public.pdf
+- /uploads/documents/organigramme-prive.pdf
+
+VÉRIFICATIONS FINALES:
+═════════════════════
+□ Les 10 documents s'affichent
+□ Les boutons "Consulter" fonctionnent
+□ Les liens PDF sont accessibles
+□ Pas d'erreurs 404
+□ Design identique au local
+
+SI ÇA NE MARCHE PAS:
+═══════════════════
+1. Vérifiez les logs du serveur
+2. Testez la connexion à la base de données
+3. Vérifiez les permissions des fichiers (chmod 755)
+4. Purgez le cache du navigateur (Ctrl+F5)

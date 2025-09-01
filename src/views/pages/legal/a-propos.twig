@@ -1,0 +1,110 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<div class="container mx-auto px-4 py-8 max-w-4xl">
+		<div class="bg-white rounded-lg shadow-lg p-8">
+			<h1 class="text-4xl font-bold text-[#304a4d] mb-8 text-center">À propos de l'École Saint-Mathieu</h1>
+
+			<!-- Section Histoire -->
+			<section class="mb-8">
+				<h2 class="text-2xl font-semibold text-[#304a4d] mb-4 border-b-2 border-[#a7e3dd] pb-2">Notre Histoire</h2>
+				<p class="text-gray-700 leading-relaxed mb-4">
+					L'École Saint-Mathieu est un établissement d'enseignement privé catholique sous contrat d'association avec l'État, 
+					                fondé avec la mission d'offrir une éducation de qualité dans un environnement bienveillant et respectueux des valeurs chrétiennes.
+				</p>
+				<p class="text-gray-700 leading-relaxed">
+					Depuis sa création, notre école s'engage à accompagner chaque enfant dans son développement personnel, 
+					                intellectuel et spirituel, en respectant le rythme et les besoins de chacun.
+				</p>
+			</section>
+
+			<!-- Section Mission -->
+			<section class="mb-8">
+				<h2 class="text-2xl font-semibold text-[#304a4d] mb-4 border-b-2 border-[#a7e3dd] pb-2">Notre Mission</h2>
+				<div class="grid md:grid-cols-2 gap-6">
+					<div class="bg-[#f8fdfc] p-6 rounded-lg">
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-3">Excellence Académique</h3>
+						<p class="text-gray-700">
+							Offrir un enseignement de qualité conforme aux programmes de l'Éducation Nationale, 
+							                        avec un suivi personnalisé de chaque élève.
+						</p>
+					</div>
+					<div class="bg-[#f8fdfc] p-6 rounded-lg">
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-3">Valeurs Chrétiennes</h3>
+						<p class="text-gray-700">
+							Transmettre les valeurs de respect, solidarité, partage et ouverture aux autres 
+							                        dans l'esprit de l'Évangile.
+						</p>
+					</div>
+					<div class="bg-[#f8fdfc] p-6 rounded-lg">
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-3">Épanouissement Personnel</h3>
+						<p class="text-gray-700">
+							Favoriser le développement de la personnalité de chaque enfant dans un climat 
+							                        de confiance et de bienveillance.
+						</p>
+					</div>
+					<div class="bg-[#f8fdfc] p-6 rounded-lg">
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-3">Ouverture au Monde</h3>
+						<p class="text-gray-700">
+							Préparer nos élèves à devenir des citoyens responsables et ouverts sur le monde 
+							                        qui les entoure.
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Section Équipe -->
+			<section class="mb-8">
+				<h2 class="text-2xl font-semibold text-[#304a4d] mb-4 border-b-2 border-[#a7e3dd] pb-2">Notre Équipe</h2>
+				<p class="text-gray-700 leading-relaxed mb-4">
+					L'École Saint-Mathieu rassemble une équipe pédagogique expérimentée et dévouée, composée d'enseignants qualifiés, 
+					                d'un personnel d'encadrement attentif et d'intervenants spécialisés.
+				</p>
+				<p class="text-gray-700 leading-relaxed">
+					Tous travaillent ensemble pour créer un environnement d'apprentissage stimulant et sécurisant, 
+					                où chaque enfant peut s'épanouir et donner le meilleur de lui-même.
+				</p>
+			</section>
+
+			<!-- Section Projet Éducatif -->
+			<section class="mb-8">
+				<h2 class="text-2xl font-semibold text-[#304a4d] mb-4 border-b-2 border-[#a7e3dd] pb-2">Notre Projet Éducatif</h2>
+				<div class="bg-[#a7e3dd]/20 p-6 rounded-lg">
+					<p class="text-gray-700 leading-relaxed mb-4">
+						Notre projet éducatif s'articule autour de trois axes principaux :
+					</p>
+					<ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+						<li>
+							<strong>L'excellence pédagogique :</strong>
+							Un enseignement adapté et différencié</li>
+						<li>
+							<strong>L'éducation aux valeurs :</strong>
+							Le respect, la solidarité et l'ouverture</li>
+						<li>
+							<strong>L'accompagnement personnalisé :</strong>
+							Un suivi individualisé de chaque élève</li>
+					</ul>
+					<div class="mt-6">
+						<a href="/documents/ecole" class="bg-[#304a4d] text-white px-6 py-3 rounded-lg hover:bg-[#1a2e30] transition-colors inline-block">
+							Consulter nos documents officiels
+						</a>
+					</div>
+				</div>
+			</section>
+
+			<!-- Section Contact -->
+			<section>
+				<h2 class="text-2xl font-semibold text-[#304a4d] mb-4 border-b-2 border-[#a7e3dd] pb-2">Nous Contacter</h2>
+				<p class="text-gray-700 leading-relaxed mb-4">
+					Pour toute question concernant notre établissement, nos projets pédagogiques ou les modalités d'inscription, 
+					                n'hésitez pas à nous contacter.
+				</p>
+				<div class="text-center">
+					<a href="/contact" class="bg-[#a7e3dd] text-[#304a4d] px-8 py-3 rounded-lg hover:bg-[#8dd4cc] transition-colors inline-block font-semibold">
+						Contactez-nous
+					</a>
+				</div>
+			</section>
+		</div>
+	</div>
+{% endblock %}
