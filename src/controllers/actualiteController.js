@@ -146,6 +146,8 @@ const actualiteController = {
   },
 
   async updateActualite(req, res) {
+    const { id } = req.params; // Déplacer la déclaration ici pour être accessible dans catch
+    
     try {
       console.log('🔧 updateActualite appelé:', {
         method: req.method,
@@ -155,7 +157,6 @@ const actualiteController = {
         file: req.file
       });
 
-      const { id } = req.params;
       const { titre, contenu, important, visible } = req.body;
 
       // Préparer les données de mise à jour

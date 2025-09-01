@@ -164,7 +164,7 @@ model Horaire {
 model Actualite {
   id              Int      @id @default(autoincrement())
   titre           String
-  contenu         String
+  contenu         String   @db.LongText
   auteurId        Int
   mediaUrl        String? // URL de l'image ou vidéo attachée
   mediaType       String? // "image" ou "video"
