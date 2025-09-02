@@ -110,9 +110,7 @@ const inscriptionController = {
             const requests = await prisma.preInscriptionRequest.findMany({
                 orderBy: { submittedAt: 'desc' },
                 include: {
-                    processor: {
-                        select: { firstName: true, lastName: true }
-                    }
+                    processor: true
                 }
             });
 
