@@ -39,15 +39,15 @@ app.set('twig options', {
 });
 
 // Configuration Twig
-twig.extendFilter('dateFormat', function (value, format) {
+twig.extendFilter('dateFormat', function(value, format) {
     if (!value) return '';
     const date = new Date(value);
-
-    switch (format) {
+    
+    switch(format) {
         case 'dd/mm/yyyy':
             return date.toLocaleDateString('fr-FR');
         case 'dd/mm/yyyy HH:mm':
-            return date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            return date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
         default:
             return date.toLocaleDateString('fr-FR');
     }

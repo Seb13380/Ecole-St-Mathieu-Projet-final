@@ -482,6 +482,7 @@ model PreInscriptionRequest {
   parentEmail     String
   parentPhone     String
   parentAddress   String?
+  parentPassword  String // Mot de passe choisi par le parent
 
   // Informations des enfants (stockées en JSON)
   children     Json // Tableau des enfants avec firstName, lastName, birthDate, currentClass, requestedClass, previousSchool
