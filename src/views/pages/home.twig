@@ -7,6 +7,20 @@
 
 {% block main %}
 
+<!-- Bandeau de déploiement qui défile -->
+<div style="background: linear-gradient(45deg, #f97316, #ea580c); color: white; padding: 12px 0; font-weight: bold; font-size: 18px; text-align: center; position: relative; overflow: hidden;">
+    <div style="animation: marquee 15s linear infinite;">
+        🚀 Site en cours de déploiement - Nouvelles fonctionnalités disponibles ! 🎉
+    </div>
+</div>
+
+<style>
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+</style>
+
 	<div class="py-8 px-4 md:py-16 md:px-8 bg-gradient-to-b from-[#a7e3dd] to-[#8dd3cc]">
 		<div class="max-w-15xl mx-auto text-center">
 			<h1 class="text-6xl md:text-8xl lg:text-9xl font-bold text-[#304a4d] mb-8 leading-tight" style="font-size: 5rem !important;">
@@ -85,15 +99,28 @@
 				<div class="space-y-6 mb-8 px-8 pb-8">
 					{% if actualites and actualites|length > 0 %}
 						{% for actualite in actualites|slice(0, 3) %}
-							<div class="border-l-4 border-[#a7e3dd] pl-6">
-								<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3 {{ actualite.important ? 'text-red-600' : '' }}">
-									{{ actualite.important ? '🚨 ' : '' }}{{ actualite.titre }}
+							<div class="border-l-4 border-[#a7e3dd] pl-6 mb-8">
+								{% if actualite.important %}
+									<div style="display: inline-block; background: linear-gradient(45deg, #dc2626, #ef4444); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);">
+										🚨 INFORMATION IMPORTANTE
+									</div>
+								{% endif %}
+								<h4 class="text-2xl md:text-3xl font-semibold text-[#304a4d] mb-4">
+									{{ actualite.titre }}
 								</h4>
-								<p class="text-lg md:text-xl text-gray-700 mb-3">{{ actualite.contenu|length > 100 ? actualite.contenu|slice(0, 100) ~ '...' : actualite.contenu }}</p>
-								<span class="text-lg md:text-xl text-gray-500">📅
+								<p class="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">{{ actualite.contenu|length > 200 ? actualite.contenu|slice(0, 200) ~ '...' : actualite.contenu }}</p>
+								<span class="text-xl md:text-2xl text-gray-500">📅
 									{{ actualite.datePublication|date('d/m/Y') }}</span>
 							</div>
 						{% endfor %}
+						<!-- Lien vers toutes les actualités -->
+						<div class="text-center mt-8 pt-6 border-t border-gray-200">
+							<a href="/actualites" class="inline-flex items-center px-6 py-3 bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold rounded-lg transition-colors duration-300 text-xl">
+								<i class="fas fa-newspaper mr-2"></i>
+								Voir toutes les actualités
+								<i class="fas fa-arrow-right ml-2"></i>
+							</a>
+						</div>
 					{% else %}
 						<div class="text-center py-8">
 							<p class="text-xl text-gray-500">Aucune actualité disponible pour le moment.</p>
