@@ -6,7 +6,7 @@ class EmailService {
         this.transporter = nodemailer.createTransport({
             service: 'gmail', // Ou votre service email
             auth: {
-                user: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+                user: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
                 pass: process.env.EMAIL_PASS || 'votre_mot_de_passe_email'
             }
         });
@@ -24,7 +24,7 @@ class EmailService {
         ).join('\n');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
             subject: '✅ Confirmation de votre demande d\'inscription - École Saint-Mathieu',
             html: `
@@ -63,8 +63,8 @@ class EmailService {
                         <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
                             <h3 style="color: #0c5460; margin-top: 0;">📧 Contact :</h3>
                             <p style="color: #0c5460; margin: 0;">
-                                Pour toute question : <a href="mailto:ecole@saint-mathieu.fr" style="color: #304a4d;">ecole@saint-mathieu.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Pour toute question : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -107,7 +107,7 @@ class EmailService {
         ).join('\n');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
             subject: '🔑 Vos identifiants de connexion - École Saint-Mathieu',
             html: `
@@ -214,7 +214,7 @@ class EmailService {
         ).join('\n');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
             subject: '🎉 Demande d\'inscription approuvée - École Saint-Mathieu',
             html: `
@@ -264,7 +264,7 @@ class EmailService {
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Contact :</h3>
                             <p style="color: #0c5460; margin: 0;">
                                 Secrétariat : <strong>01 23 45 67 89</strong><br>
-                                Email : <a href="mailto:ecole@saint-mathieu.fr" style="color: #304a4d;">ecole@saint-mathieu.fr</a>
+                                Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a>
                             </p>
                         </div>
                         
@@ -301,7 +301,7 @@ class EmailService {
         ).join('\n');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
             subject: 'Réponse à votre demande d\'inscription - École Saint-Mathieu',
             html: `
@@ -352,8 +352,8 @@ class EmailService {
                         <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Contact :</h3>
                             <p style="color: #0c5460; margin: 0;">
-                                Pour toute question : <a href="mailto:ecole@saint-mathieu.fr" style="color: #304a4d;">ecole@saint-mathieu.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Pour toute question : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -390,7 +390,7 @@ class EmailService {
         ).join('\n');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: directorEmail,
             subject: '🔔 Nouvelle demande d\'inscription à valider - École Saint-Mathieu',
             html: `
@@ -474,7 +474,7 @@ class EmailService {
         const resetUrl = `${process.env.BASE_URL || 'http://localhost:3007'}/auth/reset-password/${resetToken}`;
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : user.email,
             subject: '🔐 Réinitialisation de votre mot de passe - École Saint-Mathieu',
             html: `
@@ -566,7 +566,7 @@ class EmailService {
      */
     async sendPasswordChangedConfirmation(user) {
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : user.email,
             subject: '✅ Mot de passe modifié avec succès - École Saint-Mathieu',
             html: `
@@ -651,7 +651,7 @@ class EmailService {
             contenu.substring(0, 200) + '...' : contenu;
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             bcc: process.env.TEST_MODE === 'true' ? [process.env.TEST_EMAIL] : parentEmails,
             subject: `📰 ${important ? '🚨 IMPORTANT - ' : ''}Nouvelle actualité - École Saint-Mathieu`,
             html: `
@@ -722,7 +722,7 @@ class EmailService {
                         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
                             <h3 style="color: #495057; margin-top: 0;">📧 Contact :</h3>
                             <p style="color: #495057; margin: 0; font-size: 14px;">
-                                Pour toute question : <a href="mailto:ecole@saint-mathieu.fr" style="color: #304a4d;">ecole@saint-mathieu.fr</a><br>
+                                Pour toute question : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
                                 Téléphone : 01 23 45 67 89
                             </p>
                         </div>
@@ -767,7 +767,7 @@ class EmailService {
         ).join('\n') : 'Enfants inscrits';
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
             subject: '🎉 Inscription approuvée - Vos identifiants de connexion - École Saint-Mathieu',
             html: `
@@ -835,7 +835,7 @@ class EmailService {
                         
                         <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 30px; text-align: center;">
                             <p style="color: #666; font-size: 14px; margin: 5px 0;">
-                                📧 École Saint-Mathieu - ${process.env.EMAIL_USER || 'ecole@saint-mathieu.fr'}
+                                📧 École Saint-Mathieu - ${process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr'}
                             </p>
                             <p style="color: #666; font-size: 14px; margin: 5px 0;">
                                 📍 Adresse de l'école - 📞 Téléphone de l'école
@@ -871,7 +871,7 @@ class EmailService {
         ).join('\n');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : yamimaEmail,
             subject: '👶 Nouveaux élèves inscrits - École Saint-Mathieu',
             html: `
@@ -965,7 +965,7 @@ class EmailService {
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : yamimaEmail,
             subject: '📋 Listes complètes des classes - École Saint-Mathieu',
             html: `
@@ -1039,7 +1039,7 @@ class EmailService {
         const { parentEmail, parentFirstName, children } = inscriptionData;
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: parentEmail,
             subject: '✅ Confirmation de votre demande d\'inscription - École Saint-Mathieu',
             html: `
@@ -1071,7 +1071,7 @@ class EmailService {
         const { parentFirstName, parentLastName, parentEmail, children, requestId } = inscriptionData;
 
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: 'sgdigitalweb13@gmail.com', // Email admin pour tests
             subject: '🎓 Nouvelle demande d\'inscription - École Saint-Mathieu',
             html: `
@@ -1116,6 +1116,175 @@ class EmailService {
         } catch (error) {
             console.error('❌ Erreur de configuration email:', error);
             return false;
+        }
+    }
+
+    /**
+     * Envoyer un email de confirmation d'activation du compte
+     * @param {Object} parentData - Données du parent
+     */
+    async sendAccountActivatedEmail(parentData) {
+        const { parentFirstName, parentLastName, parentEmail } = parentData;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
+            subject: '✅ Votre compte a été activé - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 30px;">
+                            <h2 style="color: #155724; margin-top: 0; text-align: center;">
+                                ✅ Votre compte a été activé !
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour ${parentFirstName} ${parentLastName},
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Excellente nouvelle ! Votre demande d'inscription a été approuvée et votre compte d'accès au portail parents de l'École Saint-Mathieu est maintenant <strong>actif</strong>.
+                        </p>
+                        
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #304a4d;">
+                            <h3 style="color: #004085; margin-top: 0;">🔐 Pour vous connecter :</h3>
+                            <p style="margin: 10px 0; color: #004085;">
+                                <strong>Email :</strong> ${parentEmail}<br>
+                                <strong>Mot de passe :</strong> Celui que vous avez choisi lors de votre inscription
+                            </p>
+                        </div>
+                        
+                        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                            <h3 style="color: #856404; margin-top: 0;">🔒 Mot de passe oublié ?</h3>
+                            <p style="color: #856404; margin: 0;">
+                                Si vous avez oublié votre mot de passe, utilisez le lien <strong>"Mot de passe oublié"</strong> sur la page de connexion.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/auth/login" 
+                               style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                🚀 Se connecter maintenant
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #0c5460; margin-top: 0;">📞 Besoin d'aide ?</h3>
+                            <p style="color: #0c5460; margin: 0;">
+                                En cas de problème de connexion :<br>
+                                Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
+                                Téléphone : 01 23 45 67 89
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <p style="color: #666; font-size: 12px;">
+                                © École Saint-Mathieu - Portail Parents<br>
+                                Cet email est automatique, merci de ne pas y répondre.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('Email d\'activation envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi de l\'email d\'activation:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Envoyer les identifiants de connexion au parent après création de compte
+     * @param {Object} parentData - Données du parent avec mot de passe temporaire
+     */
+    async sendCredentials(parentData) {
+        const { parentFirstName, parentLastName, parentEmail, tempPassword } = parentData;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
+            subject: '🔑 Vos identifiants de connexion - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 30px;">
+                            <h2 style="color: #155724; margin-top: 0; text-align: center;">
+                                🔑 Votre compte a été créé !
+                            </h2>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour ${parentFirstName} ${parentLastName},
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Votre demande d'inscription a été approuvée ! Nous avons créé votre compte d'accès au portail parents de l'École Saint-Mathieu.
+                        </p>
+                        
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #304a4d;">
+                            <h3 style="color: #004085; margin-top: 0;">🔐 Vos identifiants de connexion :</h3>
+                            <p style="margin: 10px 0; color: #004085; font-family: monospace; font-size: 16px; background: white; padding: 10px; border-radius: 4px;">
+                                <strong>Email :</strong> ${parentEmail}<br>
+                                <strong>Mot de passe temporaire :</strong> <span style="color: #e74c3c; font-weight: bold;">${tempPassword}</span>
+                            </p>
+                        </div>
+                        
+                        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                            <h3 style="color: #856404; margin-top: 0;">⚠️ Important :</h3>
+                            <p style="color: #856404; margin: 0;">
+                                <strong>Changez votre mot de passe</strong> lors de votre première connexion pour des raisons de sécurité.<br>
+                                Ce mot de passe temporaire ne doit être utilisé que pour votre première connexion.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${process.env.BASE_URL || 'http://localhost:3007'}/auth/login" 
+                               style="background-color: #304a4d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                🚀 Se connecter maintenant
+                            </a>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #0c5460; margin-top: 0;">📞 Besoin d'aide ?</h3>
+                            <p style="color: #0c5460; margin: 0;">
+                                En cas de problème de connexion :<br>
+                                Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
+                                Téléphone : 01 23 45 67 89
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <p style="color: #666; font-size: 12px;">
+                                © École Saint-Mathieu - Portail Parents<br>
+                                Cet email est automatique, merci de ne pas y répondre.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('Email des identifiants envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi des identifiants:', error);
+            throw error;
         }
     }
 }

@@ -18,7 +18,16 @@
 							<div class="text-white">
 								<h1 class="text-3xl font-bold">{{ user.firstName }}
 									{{ user.lastName }}</h1>
-								<p class="text-blue-100 text-lg">{{ user.role|trans }}</p>
+								<p class="text-blue-100 text-lg">
+									{% if user.role == 'PARENT' %}👨‍👩‍👧‍👦 Parent d'élève
+										{% elseif user.role == 'RESTAURANT' %}🍽️ Personnel restaurant
+										{% elseif user.role == 'ADMIN' %}👑 Administrateur
+										{% elseif user.role == 'DIRECTION' %}🎓 Direction
+										{% elseif user.role == 'ENSEIGNANT' %}👩‍🏫 Enseignant
+									{% else %}
+										{{ user.role }}
+									{% endif %}
+								</p>
 								<p class="text-blue-200 text-sm">{{ user.email }}</p>
 							</div>
 						</div>
@@ -92,11 +101,11 @@
 								<label class="block text-sm font-medium text-gray-700">Rôle</label>
 								<p class="mt-1">
 									<span class="px-2 py-1 text-xs font-semibold rounded-full
-											                                    {% if user.role == 'PARENT' %}bg-green-100 text-green-800
-											                                    {% elseif user.role == 'RESTAURANT' %}bg-orange-100 text-orange-800
-											                                    {% elseif user.role == 'ADMIN' %}bg-blue-100 text-blue-800
-											                                    {% else %}bg-gray-100 text-gray-800
-											                                    {% endif %}">
+																						                                    {% if user.role == 'PARENT' %}bg-green-100 text-green-800
+																						                                    {% elseif user.role == 'RESTAURANT' %}bg-orange-100 text-orange-800
+																						                                    {% elseif user.role == 'ADMIN' %}bg-blue-100 text-blue-800
+																						                                    {% else %}bg-gray-100 text-gray-800
+																						                                    {% endif %}">
 										{{ user.role }}
 									</span>
 								</p>

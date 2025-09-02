@@ -7,19 +7,24 @@
 
 {% block main %}
 
-<!-- Bandeau de déploiement qui défile -->
-<div style="background: linear-gradient(45deg, #f97316, #ea580c); color: white; padding: 12px 0; font-weight: bold; font-size: 18px; text-align: center; position: relative; overflow: hidden;">
-    <div style="animation: marquee 15s linear infinite;">
-        🚀 Site en cours de déploiement - Nouvelles fonctionnalités disponibles ! 🎉
-    </div>
-</div>
+	<!-- Bandeau de déploiement qui défile -->
+	<div style="background: linear-gradient(45deg, #1e40af, #3b82f6); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #1e3a8a;">
+		<div style="animation: marquee 20s linear infinite;">
+			✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
+		</div>
 
-<style>
-@keyframes marquee {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-</style>
+	</div>
+
+	<style>
+		@keyframes marquee {
+			0% {
+				transform: translateX(100%);
+			}
+			100% {
+				transform: translateX(-100%);
+			}
+		}
+	</style>
 
 	<div class="py-8 px-4 md:py-16 md:px-8 bg-gradient-to-b from-[#a7e3dd] to-[#8dd3cc]">
 		<div class="max-w-15xl mx-auto text-center">
@@ -91,71 +96,71 @@
 	<div class="full-width-section py-8">
 		<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-12 text-center py-8">Actualités et informations familles</h2>
 
-{% if user %}
-		<!-- Section Actualités - Visible uniquement pour les utilisateurs connectés -->
-		<div class="w-full flex flex-col min-h-[600px] gap-4 pr-0">
-			<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
-				<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center p-6">📰 Actualités</h3>
-				<div class="space-y-6 mb-8 px-8 pb-8">
-					{% if actualites and actualites|length > 0 %}
-						{% for actualite in actualites|slice(0, 3) %}
-							<div class="border-l-4 border-[#a7e3dd] pl-6 mb-8">
-								{% if actualite.important %}
-									<div style="display: inline-block; background: linear-gradient(45deg, #dc2626, #ef4444); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);">
-										🚨 INFORMATION IMPORTANTE
-									</div>
-								{% endif %}
-								<h4 class="text-2xl md:text-3xl font-semibold text-[#304a4d] mb-4">
-									{{ actualite.titre }}
-								</h4>
-								<p class="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">{{ actualite.contenu|length > 200 ? actualite.contenu|slice(0, 200) ~ '...' : actualite.contenu }}</p>
-								<span class="text-xl md:text-2xl text-gray-500">📅
-									{{ actualite.datePublication|date('d/m/Y') }}</span>
+		{% if user %}
+			<!-- Section Actualités - Visible uniquement pour les utilisateurs connectés -->
+			<div class="w-full flex flex-col min-h-[600px] gap-4 pr-0">
+				<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center p-6">📰 Actualités</h3>
+					<div class="space-y-6 mb-8 px-8 pb-8">
+						{% if actualites and actualites|length > 0 %}
+							{% for actualite in actualites|slice(0, 3) %}
+								<div class="border-l-4 border-[#a7e3dd] pl-6 mb-8">
+									{% if actualite.important %}
+										<div style="display: inline-block; background: linear-gradient(45deg, #dc2626, #ef4444); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);">
+											🚨 INFORMATION IMPORTANTE
+										</div>
+									{% endif %}
+									<h4 class="text-2xl md:text-3xl font-semibold text-[#304a4d] mb-4">
+										{{ actualite.titre }}
+									</h4>
+									<p class="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">{{ actualite.contenu|length > 200 ? actualite.contenu|slice(0, 200) ~ '...' : actualite.contenu }}</p>
+									<span class="text-xl md:text-2xl text-gray-500">📅
+										{{ actualite.datePublication|date('d/m/Y') }}</span>
+								</div>
+							{% endfor %}
+							<!-- Lien vers toutes les actualités -->
+							<div class="text-center mt-8 pt-6 border-t border-gray-200">
+								<a href="/actualites" class="inline-flex items-center px-6 py-3 bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold rounded-lg transition-colors duration-300 text-xl">
+									<i class="fas fa-newspaper mr-2"></i>
+									Voir toutes les actualités
+									<i class="fas fa-arrow-right ml-2"></i>
+								</a>
 							</div>
-						{% endfor %}
-						<!-- Lien vers toutes les actualités -->
-						<div class="text-center mt-8 pt-6 border-t border-gray-200">
-							<a href="/actualites" class="inline-flex items-center px-6 py-3 bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold rounded-lg transition-colors duration-300 text-xl">
-								<i class="fas fa-newspaper mr-2"></i>
-								Voir toutes les actualités
-								<i class="fas fa-arrow-right ml-2"></i>
-							</a>
-						</div>
-					{% else %}
-						<div class="text-center py-8">
-							<p class="text-xl text-gray-500">Aucune actualité disponible pour le moment.</p>
-						</div>
-					{% endif %}
+						{% else %}
+							<div class="text-center py-8">
+								<p class="text-xl text-gray-500">Aucune actualité disponible pour le moment.</p>
+							</div>
+						{% endif %}
+					</div>
 				</div>
 			</div>
-		</div>
-	{% else %}
-		<!-- Message pour les visiteurs non connectés -->
-		<div class="w-full flex flex-col min-h-[600px] gap-5 pr-0">
-			<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
-				<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-5 text-center p-6">📰 Actualités</h3>
-				<div class="space-y-6 mb-8 px-8 pb-8">
-					<div class="text-center py-12">
-						<div class="mb-6">
-							<i class="fas fa-lock text-6xl text-gray-400 mb-4"></i>
-						</div>
-						<h4 class="text-2xl font-bold text-[#304a4d] mb-4">Accès réservé aux membres</h4>
-						<p class="text-xl text-gray-600 mb-6">
-							Les actualités de l'école sont accessibles uniquement aux familles et au personnel connectés.
-						</p>
-						<div class="space-y-4">
-							<a href="/login" class="inline-block bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 mr-4">
-								<i class="fas fa-sign-in-alt mr-2"></i>Se connecter
-							</a>
-							<a href="/inscription" class="inline-block bg-[#a7e3dd] hover:bg-[#8dd3cc] text-[#304a4d] font-bold py-3 px-6 rounded-lg transition-colors duration-300">
-								<i class="fas fa-user-plus mr-2"></i>Faire une demande d'identifiants
-							</a>
+		{% else %}
+			<!-- Message pour les visiteurs non connectés -->
+			<div class="w-full flex flex-col min-h-[600px] gap-5 pr-0">
+				<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-5 text-center p-6">📰 Actualités</h3>
+					<div class="space-y-6 mb-8 px-8 pb-8">
+						<div class="text-center py-12">
+							<div class="mb-6">
+								<i class="fas fa-lock text-6xl text-gray-400 mb-4"></i>
+							</div>
+							<h4 class="text-2xl font-bold text-[#304a4d] mb-4">Accès réservé aux membres</h4>
+							<p class="text-xl text-gray-600 mb-6">
+								Les actualités de l'école sont accessibles uniquement aux familles et au personnel connectés.
+							</p>
+							<div class="space-y-4">
+								<a href="/login" class="inline-block bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 mr-4">
+									<i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+								</a>
+								<a href="/inscription" class="inline-block bg-[#a7e3dd] hover:bg-[#8dd3cc] text-[#304a4d] font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+									<i class="fas fa-user-plus mr-2"></i>Faire une demande d'identifiants
+								</a>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	{% endif %}
+		{% endif %}
 
 		<div class="w-full">
 			<div class="flex flex-row w-full h-auto min-h-[800px] gap-0">
@@ -294,7 +299,6 @@
 		</div>
 	</div>
 
-	
 
 	<!-- Section Google Maps -->
 	<div class="full-width-section mt-13">

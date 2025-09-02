@@ -32,6 +32,10 @@ const inscriptionController = {
                 return res.redirect('/auth/register?error=Les mots de passe ne correspondent pas');
             }
 
+            if (password.length < 6) {
+                return res.redirect('/auth/register?error=Le mot de passe doit contenir au moins 6 caractères');
+            }
+
             // Vérifier si l'email existe déjà
             const existingUser = await prisma.user.findUnique({
                 where: { email: parentEmail }
@@ -87,7 +91,7 @@ const inscriptionController = {
                     parentEmail,
                     parentPhone,
                     parentAddress,
-                    password: hashedPassword,
+                    parentPassword: hashedPassword, // Stocker le mot de passe hashé
                     children: childrenData
                 }
             });
@@ -163,6 +167,33 @@ const inscriptionController = {
                 });
             }
 
+            // Vérifier si un compte parent existe déjà
+            const existingUser = await prisma.user.findUnique({
+                where: { email: request.parentEmail }
+            });
+
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Un compte avec cet email existe déjà'
+                });
+            }
+
+            // Créer le compte parent avec le mot de passe qu'il a choisi
+            const parentUser = await prisma.user.create({
+                data: {
+                    firstName: request.parentFirstName,
+                    lastName: request.parentLastName,
+                    email: request.parentEmail,
+                    password: request.parentPassword, // Utiliser le mot de passe choisi par le parent
+                    role: 'PARENT',
+                    phone: request.parentPhone,
+                    adress: request.parentAddress
+                }
+            });
+
+            console.log('✅ Compte parent créé:', request.parentEmail);
+
             // Mettre à jour le statut de la demande
             await prisma.preInscriptionRequest.update({
                 where: { id: parseInt(id) },
@@ -170,13 +201,35 @@ const inscriptionController = {
                     status: 'ACCEPTED',
                     processedAt: new Date(),
                     processedBy: req.session.user.id,
-                    adminNotes: comment || 'Demande approuvée'
+                    adminNotes: comment || 'Demande approuvée - Compte parent créé'
                 }
             });
 
+            // Envoyer email de confirmation d'activation du compte
+            try {
+                await emailService.sendAccountActivatedEmail({
+                    parentFirstName: request.parentFirstName,
+                    parentLastName: request.parentLastName,
+                    parentEmail: request.parentEmail
+                });
+                console.log('✅ Email d\'activation envoyé à:', request.parentEmail);
+            } catch (emailError) {
+                console.error('❌ Erreur envoi email activation:', emailError);
+                // Ne pas faire échouer la création du compte pour une erreur d'email
+            }
+
+            // Envoyer email d'approbation
+            try {
+                await emailService.sendApprovalEmail(request, comment);
+                console.log('✅ Email d\'approbation envoyé');
+            } catch (emailError) {
+                console.error('❌ Erreur envoi approbation:', emailError);
+            }
+
             res.json({
                 success: true,
-                message: 'Demande approuvée avec succès'
+                message: 'Demande approuvée avec succès et compte parent créé',
+                parentEmail: request.parentEmail
             });
 
         } catch (error) {

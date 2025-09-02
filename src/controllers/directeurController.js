@@ -230,10 +230,10 @@ const directeurController = {
         try {
             const classes = await prisma.classe.findMany({
                 include: {
-                    students: true,
+                    eleves: true,
                     _count: {
                         select: {
-                            students: true
+                            eleves: true
                         }
                     }
                 },
