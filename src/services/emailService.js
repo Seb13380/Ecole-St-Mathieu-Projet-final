@@ -1033,6 +1033,79 @@ class EmailService {
     }
 
     /**
+     * Envoyer email de confirmation d'inscription au parent
+     */
+    async sendInscriptionConfirmation(inscriptionData) {
+        const { parentEmail, parentFirstName, children } = inscriptionData;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: parentEmail,
+            subject: '✅ Confirmation de votre demande d\'inscription - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h1 style="color: #304a4d;">🎓 École Saint-Mathieu</h1>
+                    <h2>Demande d'inscription reçue</h2>
+                    <p>Bonjour <strong>${parentFirstName}</strong>,</p>
+                    <p>Nous avons bien reçu votre demande d'inscription pour ${children.length} enfant(s).</p>
+                    <p>Vous recevrez une réponse sous 48h.</p>
+                    <p>Cordialement,<br>L'équipe de l'École Saint-Mathieu</p>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email de confirmation envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur envoi confirmation:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Envoyer notification d'inscription au directeur
+     */
+    async sendInscriptionNotificationToDirector(inscriptionData) {
+        const { parentFirstName, parentLastName, parentEmail, children, requestId } = inscriptionData;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole@saint-mathieu.fr',
+            to: 'sgdigitalweb13@gmail.com', // Email admin pour tests
+            subject: '🎓 Nouvelle demande d\'inscription - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h1 style="color: #304a4d;">📝 Nouvelle demande d'inscription</h1>
+                    <h3>👨‍👩‍👧‍👦 Parent:</h3>
+                    <p><strong>Nom:</strong> ${parentLastName}</p>
+                    <p><strong>Prénom:</strong> ${parentFirstName}</p>
+                    <p><strong>Email:</strong> ${parentEmail}</p>
+                    <h3>👶 Enfant(s):</h3>
+                    ${children.map(child => `
+                        <div style="background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                            <p><strong>${child.firstName} ${child.lastName}</strong></p>
+                            <p>Né(e) le: ${child.birthDate}</p>
+                            <p>Classe demandée: ${child.grade || 'Non spécifiée'}</p>
+                        </div>
+                    `).join('')}
+                    <p><strong>ID de la demande:</strong> ${requestId}</p>
+                    <p>Email envoyé automatiquement le ${new Date().toLocaleString('fr-FR')}</p>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Notification directeur envoyée:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur notification directeur:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
      * Tester la configuration email
      */
     async testConnection() {
