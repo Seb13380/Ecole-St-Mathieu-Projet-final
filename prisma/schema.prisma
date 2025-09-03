@@ -575,3 +575,11 @@ model InscriptionDocument {
   @@index([ordre])
   @@index([type])
 }
+
+model InscriptionConfiguration {
+  id                    Int      @id @default(autoincrement())
+  soustitre             String   @default("Demande d'identifiants pour accéder à l'espace familles")
+  afficherAnnoncePS2026 Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}

@@ -490,6 +490,17 @@ const inscriptionController = {
             const rejectedCount = requests.filter(r => r.status === 'REJECTED').length;
             const totalCount = requests.length;
 
+            // Récupérer la configuration des inscriptions
+            let config = await prisma.inscriptionConfiguration.findFirst();
+            if (!config) {
+                // Créer une configuration par défaut si elle n'existe pas
+                config = await prisma.inscriptionConfiguration.create({
+                    data: {
+                        afficherAnnoncePS2026: false
+                    }
+                });
+            }
+
             // Parser les enfants pour chaque demande
             const requestsWithParsedChildren = requests.map(request => {
                 let children = [];
@@ -516,6 +527,7 @@ const inscriptionController = {
                 approvedCount,
                 rejectedCount,
                 totalCount,
+                config, // Ajouter la configuration
                 user: req.session.user
             });
 
@@ -524,6 +536,48 @@ const inscriptionController = {
             res.status(500).render('pages/error', {
                 message: 'Erreur lors de la récupération des demandes',
                 user: req.session.user
+            });
+        }
+    },
+
+    // Mettre à jour la configuration des inscriptions
+    updateInscriptionConfig: async (req, res) => {
+        try {
+            const { afficherAnnoncePS2026 } = req.body;
+
+            // Récupérer ou créer la configuration
+            let config = await prisma.inscriptionConfiguration.findFirst();
+            
+            if (config) {
+                // Mettre à jour la configuration existante
+                config = await prisma.inscriptionConfiguration.update({
+                    where: { id: config.id },
+                    data: {
+                        afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026)
+                    }
+                });
+            } else {
+                // Créer une nouvelle configuration
+                config = await prisma.inscriptionConfiguration.create({
+                    data: {
+                        afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026)
+                    }
+                });
+            }
+
+            console.log(`Configuration PS2026 mise à jour: ${afficherAnnoncePS2026 ? 'activée' : 'désactivée'}`);
+
+            res.json({
+                success: true,
+                message: 'Configuration mise à jour avec succès',
+                config: config
+            });
+
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour de la configuration:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la mise à jour de la configuration'
             });
         }
     }

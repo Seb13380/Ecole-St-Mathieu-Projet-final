@@ -180,7 +180,7 @@
 
 				{# Documents privés (accès restreint) #}
 				{% for type, documents in documentsByType %}
-					{% if type == 'ORGANIGRAMME' or type == 'CHARTE_LAICITE' or type == 'CHARTE_NUMERIQUE' or type == 'CHARTE_VIE_SCOLAIRE' or type == 'CHARTE_RESTAURATION' or type == 'AGENDA' %}
+					{% if type == 'ORGANIGRAMME' or type == 'CHARTE_LAICITE' or type == 'CHARTE_NUMERIQUE' or type == 'CHARTE_VIE_SCOLAIRE' or type == 'CHARTE_RESTAURATION' %}
 						{% set document = documents[0] %}
 
 						{# Vérifier si l'utilisateur est connecté #}
@@ -190,12 +190,11 @@
 									<div class="flex items-start justify-between mb-3">
 										<h3 class="card-title text-[#304a4d] text-lg">
 											{% if type == 'ORGANIGRAMME' %}🏗️ Organigramme
-												{% elseif type == 'AGENDA' %}📅 Agenda
 												{% elseif type == 'CHARTE_LAICITE' %}⚖️ Charte de la laïcité
 												{% elseif type == 'CHARTE_NUMERIQUE' %}💻 Charte du numérique
 												{% elseif type == 'CHARTE_VIE_SCOLAIRE' %}🎓 Charte de vie scolaire
 												{% elseif type == 'CHARTE_RESTAURATION' %}🍽️ Charte de restauration
-												{% else %}�
+												{% else %}📄
 												{{ type|replace('_', ' ')|title }}
 											{% endif %}
 										</h3>
@@ -255,7 +254,6 @@
 									<div class="flex items-start justify-between mb-3">
 										<h3 class="card-title text-slate-500 text-lg">
 											{% if type == 'ORGANIGRAMME' %}🏗️ Organigramme
-												{% elseif type == 'AGENDA' %}📅 Agenda
 												{% elseif type == 'CHARTE_LAICITE' %}⚖️ Charte de la laïcité
 												{% elseif type == 'CHARTE_NUMERIQUE' %}💻 Charte du numérique
 												{% elseif type == 'CHARTE_VIE_SCOLAIRE' %}🎓 Charte de vie scolaire

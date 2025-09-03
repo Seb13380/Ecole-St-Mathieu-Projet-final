@@ -46,6 +46,9 @@ router.get('/inscriptions/:id/details', inscriptionController.showRequestDetails
 router.get('/api/classes', inscriptionController.getAvailableClasses);
 router.post('/notify-yamina', inscriptionController.notifyYamina);
 
+// Configuration des inscriptions
+router.post('/inscription-config', inscriptionController.updateInscriptionConfig);
+
 // Messages de contact
 router.get('/contact-messages', directeurController.getContactMessages);
 router.post('/contact/:id/process', directeurController.markContactAsProcessed);

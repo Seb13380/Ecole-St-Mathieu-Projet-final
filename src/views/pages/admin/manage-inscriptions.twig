@@ -67,6 +67,32 @@
 			</div>
 		</div>
 
+		<!-- Configuration des annonces -->
+		<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+			<h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+				<i class="fas fa-cog text-blue-600"></i>
+				Configuration des Annonces
+			</h2>
+			
+			<div class="flex items-center justify-between">
+				<div>
+					<h3 class="font-semibold text-gray-800">🌟 Annonce Petite Section 2026</h3>
+					<p class="text-sm text-gray-600">Afficher l'annonce d'ouverture des inscriptions pour la Petite Section 2026</p>
+				</div>
+				
+				<div class="flex items-center">
+					<label class="relative inline-flex items-center cursor-pointer">
+						<input type="checkbox" 
+							   id="ps2026-toggle" 
+							   class="sr-only peer" 
+							   {{ config and config.afficherAnnoncePS2026 ? 'checked' : '' }}
+							   onchange="togglePS2026Announcement()">
+						<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+					</label>
+				</div>
+			</div>
+		</div>
+
 		<!-- Statistiques -->
 		<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 			<div class="bg-white rounded-xl shadow-lg p-6 hover-grow">
@@ -584,6 +610,44 @@
 	    } catch (error) {
 	        console.error('Erreur:', error);
 	        showNotification('❌ Erreur lors de l\'envoi de la notification', 'error');
+	    }
+	}
+
+	// Toggle PS2026 Announcement
+	async function togglePS2026Announcement() {
+	    const checkbox = document.getElementById('ps2026-toggle');
+	    const isChecked = checkbox.checked;
+	    
+	    try {
+	        const response = await fetch('/directeur/inscription-config', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            },
+	            body: JSON.stringify({
+	                afficherAnnoncePS2026: isChecked
+	            })
+	        });
+	        
+	        const result = await response.json();
+	        
+	        if (result.success) {
+	            showNotification(
+	                isChecked ? 
+	                '🌟 Annonce PS2026 activée avec succès !' : 
+	                '✅ Annonce PS2026 désactivée avec succès !', 
+	                'success'
+	            );
+	        } else {
+	            // Revenir à l'état précédent en cas d'erreur
+	            checkbox.checked = !isChecked;
+	            showNotification('❌ Erreur: ' + result.message, 'error');
+	        }
+	    } catch (error) {
+	        console.error('Erreur:', error);
+	        // Revenir à l'état précédent en cas d'erreur
+	        checkbox.checked = !isChecked;
+	        showNotification('❌ Erreur lors de la mise à jour de la configuration', 'error');
 	    }
 	}
 	

@@ -21,7 +21,6 @@ const getDocumentsByCategory = async (req, res) => {
                 'REGLEMENT_INTERIEUR',
                 'DOSSIER_INSCRIPTION',
                 'ORGANIGRAMME',
-                'AGENDA',
                 'CHARTE_LAICITE',
                 'CHARTE_NUMERIQUE',
                 'CHARTE_VIE_SCOLAIRE',
