@@ -5,9 +5,9 @@ Write-Host "💾 === SYNCHRONISATION BASE DE DONNÉES SEULEMENT ===" -Foreground
 Write-Host ""
 
 # Paramètres
-$VpsUser = "seb13380"
-$VpsHost = "seb13380.lws-hosting.com"
-$VpsPath = "/home/seb13380/ecole-st-mathieu"
+$VpsUser = "root"
+$VpsHost = "82.165.44.88"
+$VpsPath = "/root/ecole-st-mathieu"
 $LocalDbName = "ecole_saint_mathieu"
 $VpsDbName = "seb13380_ecole_saint_mathieu"
 $DbUser = "seb13380_ecole"
@@ -30,7 +30,8 @@ $DbPasswordPlain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.I
 try {
     # Export base locale
     Write-Host "📤 Export de la base locale..." -ForegroundColor Cyan
-    $backupFile = "db_sync_$(Get-Date -Format 'yyyyMMdd_HHmmss').sql"
+    $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $backupFile = "db_sync_$timestamp.sql"
     
     mysqldump -u root --single-transaction --routines --triggers $LocalDbName > $backupFile
     
@@ -48,7 +49,8 @@ try {
 
     # Import sur VPS
     Write-Host "📥 Import sur VPS..." -ForegroundColor Cyan
-    ssh "$VpsUser@$VpsHost" "cd $VpsPath && mysql -u $DbUser -p'$DbPasswordPlain' $VpsDbName < $backupFile && rm $backupFile"
+    $importCommand = "cd $VpsPath; mysql -u $DbUser -p`"$DbPasswordPlain`" $VpsDbName `< $backupFile; rm $backupFile"
+    ssh "$VpsUser@$VpsHost" "$importCommand"
     Write-Host "✅ Base importée sur VPS" -ForegroundColor Green
 
     # Nettoyage local

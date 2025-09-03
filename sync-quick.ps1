@@ -5,9 +5,9 @@ Write-Host "🚀 === SYNCHRONISATION RAPIDE LOCAL → VPS ===" -ForegroundColor 
 Write-Host ""
 
 # Paramètres (modifiez selon vos besoins)
-$VpsUser = "seb13380"
-$VpsHost = "seb13380.lws-hosting.com"
-$VpsPath = "/home/seb13380/ecole-st-mathieu"
+$VpsUser = "root"
+$VpsHost = "82.165.44.88"
+$VpsPath = "/root/ecole-st-mathieu"
 $LocalDbName = "ecole_saint_mathieu"
 $VpsDbName = "seb13380_ecole_saint_mathieu"
 $DbUser = "seb13380_ecole"
