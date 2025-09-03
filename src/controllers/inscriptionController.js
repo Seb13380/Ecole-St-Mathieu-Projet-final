@@ -547,7 +547,7 @@ const inscriptionController = {
 
             // Récupérer ou créer la configuration
             let config = await prisma.inscriptionConfiguration.findFirst();
-            
+
             if (config) {
                 // Mettre à jour la configuration existante
                 config = await prisma.inscriptionConfiguration.update({

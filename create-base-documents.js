@@ -12,7 +12,7 @@ async function createDocuments() {
             console.log('❌ Aucun utilisateur trouvé ! Créez d\'abord un utilisateur.');
             return;
         }
-        
+
         console.log(`✅ Utilisation de l'utilisateur: ${user.firstName} ${user.lastName} (ID: ${user.id})`);
 
         // Documents publics (première carte - accès libre)
