@@ -104,33 +104,45 @@
 					<div class="space-y-6 mb-8 px-8 pb-8">
 						{% if actualites and actualites|length > 0 %}
 							{% for actualite in actualites|slice(0, 3) %}
-								<article class="actualite-card bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] border border-white/50 group">
+								<article style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%); backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; border: 2px solid #5eead4;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 20px 40px rgba(0, 0, 0, 0.15)'; this.style.background='linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 25%, #6ee7b7 50%, #34d399 100%)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(0, 0, 0, 0.1)'; this.style.background='linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%)'">
 									{% if actualite.important %}
-										<div class="bg-gradient-to-r from-red-500 to-red-600 p-3">
-											<div class="flex items-center justify-center text-red-100">
-												<svg class="w-4 h-4 mr-2 animate-pulse text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-												</svg>
-												<span class="font-bold text-sm uppercase tracking-wide drop-shadow-lg text-yellow-100">🚨 INFORMATION IMPORTANTE</span>
+										<div style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #134e4a 100%); padding: 16px; position: relative; overflow: hidden;">
+											<!-- Effet de brillance animé -->
+											<div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 2s infinite;"></div>
+											<div class="flex items-center justify-center" style="position: relative; z-index: 1;">
+												<div style="background: rgba(255,255,255,0.2); border-radius: 50%; padding: 6px; margin-right: 12px; backdrop-filter: blur(4px);">
+													<svg style="width: 20px; height: 20px; color: #ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+													</svg>
+												</div>
+												<span style="color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-size: 16px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">
+													💎 Information Importante
+												</span>
 											</div>
 										</div>
+										<style>
+											@keyframes shine {
+												0% { left: -100%; }
+												100% { left: 100%; }
+											}
+										</style>
 									{% endif %}
 									
-									<div class="p-6">
+									<div style="padding: 24px;">
 										<div class="flex items-start gap-4">
 											<!-- Contenu principal -->
 											<div class="flex-1 min-w-0">
-												<h4 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 group-hover:text-teal-600 transition-colors duration-300">
+												<h4 style="font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 12px; transition: color 0.3s ease;">
 													{{ actualite.titre }}
 												</h4>
-												<div class="text-gray-700 mb-4 leading-relaxed whitespace-pre-line">
-													{% if actualite.contenu|length > 400 %}
-														{{ actualite.contenu|slice(0, 400)|trim }}...
-														<button class="bg-teal-500 hover:bg-teal-600 text-white font-medium ml-2 px-3 py-1 rounded-lg transition-colors duration-300 text-sm" onclick="toggleFullText(this)">
+												<div style="color: #374151; margin-bottom: 16px; line-height: 1.6; white-space: pre-line; font-size: 18px;">
+													{% if actualite.contenu|length > 300 %}
+														{{ actualite.contenu|slice(0, 300)|trim }}...
+														<button style="background-color: #0d9488; color: white; font-weight: 600; margin-left: 8px; padding: 8px 16px; border-radius: 8px; transition: background-color 0.3s ease; font-size: 16px; border: none; cursor: pointer;" onclick="toggleFullText(this)" onmouseover="this.style.backgroundColor='#0f766e'" onmouseout="this.style.backgroundColor='#0d9488'">
 															Lire la suite
 														</button>
 														<div class="hidden-content" style="display: none;">
-															{{ actualite.contenu|slice(400) }}
+															{{ actualite.contenu|slice(300) }}
 														</div>
 													{% else %}
 														{{ actualite.contenu }}
@@ -158,8 +170,8 @@
 											
 											<!-- Image optionnelle -->
 											{% if actualite.mediaUrl and actualite.mediaType == 'image' %}
-												<div class="flex-shrink-0 w-32 h-32 md:w-40 md:h-32">
-													<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" class="w-full h-full object-cover rounded-xl shadow-md group-hover:shadow-lg transition-shadow duration-300">
+												<div style="flex-shrink: 0; width: 256px; height: 192px;">
+													<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: box-shadow 0.3s ease;">
 												</div>
 											{% endif %}
 										</div>
@@ -168,8 +180,8 @@
 							{% endfor %}
 							
 							<!-- Lien vers toutes les actualités -->
-							<div class="text-center mt-8 pt-6 border-t border-white/30">
-								<a href="/actualites" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-lg border border-teal-400">
+							<div class="text-center mt-8 pt-6" style="border-top: 1px solid rgba(255, 255, 255, 0.3);">
+								<a href="/actualites" style="display: inline-flex; align-items: center; padding: 16px 32px; background: linear-gradient(to right, #0d9488, #0891b2); color: white; font-weight: bold; border-radius: 12px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); font-size: 18px; border: 2px solid #0d9488; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='linear-gradient(to right, #0f766e, #0e7490)'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 25px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.background='linear-gradient(to right, #0d9488, #0891b2)'; this.style.transform='scale(1)'; this.style.boxShadow='0 10px 15px rgba(0, 0, 0, 0.1)'">
 									<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
 									</svg>
