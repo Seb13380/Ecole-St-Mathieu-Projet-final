@@ -193,7 +193,11 @@
 										<div class="mb-4 flex justify-start">
 											<div class="w-48 h-32 overflow-hidden rounded-lg border border-slate-200 shadow-sm bg-gray-100 flex-shrink-0">
 												{% if actualite.mediaType == 'image' %}
-													<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" class="w-full h-full object-cover">
+													<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" class="w-full h-full object-cover" onload="console.log('Image loaded:', '{{ actualite.mediaUrl }}')" onerror="console.error('Image failed to load:', '{{ actualite.mediaUrl }}'); this.style.display='none'; this.nextElementSibling.style.display='block';">
+													<div style="display: none; padding: 20px; text-align: center; color: #666; font-size: 12px;">
+														❌ Image non trouvée<br>
+														<small>{{ actualite.mediaUrl }}</small>
+													</div>
 												{% elseif actualite.mediaType == 'video' %}
 													<video controls class="w-full h-full object-cover">
 														<source src="{{ actualite.mediaUrl }}" type="video/mp4">
@@ -201,6 +205,10 @@
 													</video>
 												{% endif %}
 											</div>
+										</div>
+										<!-- Debug info -->
+										<div class="text-xs text-gray-500 mb-2">
+											📋 Debug: URL={{ actualite.mediaUrl }} | Type={{ actualite.mediaType }}
 										</div>
 									{% endif %}
 
