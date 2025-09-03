@@ -115,6 +115,8 @@ model Actualite {
   auteurId        Int
   mediaUrl        String? // URL de l'image ou vidéo attachée
   mediaType       String? // "image" ou "video"
+  lienExterne     String? // URL vers un site externe
+  lienTexte       String? // Texte affiché pour le lien externe
   datePublication DateTime @default(now())
   visible         Boolean  @default(true)
   important       Boolean  @default(false)

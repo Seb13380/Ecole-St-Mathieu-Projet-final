@@ -290,22 +290,14 @@ const directeurController = {
 
     async createClasse(req, res) {
         try {
-            const { nom, niveau, anneeScolaire, enseignantId } = req.body;
-
-            // Données pour la création de la classe
-            const classeData = {
-                nom,
-                niveau,
-                anneeScolaire: anneeScolaire || new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
-            };
-
-            // Ajouter enseignantId seulement s'il est fourni et valide
-            if (enseignantId && !isNaN(parseInt(enseignantId))) {
-                classeData.enseignantId = parseInt(enseignantId);
-            }
+            const { nom, niveau, anneeScolaire } = req.body;
 
             const classe = await prisma.classe.create({
-                data: classeData
+                data: {
+                    nom,
+                    niveau,
+                    anneeScolaire: anneeScolaire || new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
+                }
             });
 
             // Redirection au lieu de JSON pour éviter l'affichage du JSON brut

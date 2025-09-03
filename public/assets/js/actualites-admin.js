@@ -45,13 +45,15 @@ window.closeSuccessModal = function () {
 };
 
 // Fonction de modification d'actualité
-window.editActualite = function (id, titre, contenu, important, visible) {
+window.editActualite = function (id, titre, contenu, important, visible, lienExterne, lienTexte) {
     console.log('🔧 Fonction editActualite appelée:', {
         id: id,
         titre: titre,
         contenu: contenu,
         important: important,
-        visible: visible
+        visible: visible,
+        lienExterne: lienExterne,
+        lienTexte: lienTexte
     });
 
     // Vérification des paramètres
@@ -68,9 +70,11 @@ window.editActualite = function (id, titre, contenu, important, visible) {
         const safeContenu = String(contenu || '');
         const safeImportant = (important === true || important === 'true' || important === 1);
         const safeVisible = (visible === true || visible === 'true' || visible === 1);
+        const safeLienExterne = String(lienExterne || '');
+        const safeLienTexte = String(lienTexte || '');
 
         console.log('🔄 Valeurs sécurisées:', {
-            safeId, safeTitre, safeContenu, safeImportant, safeVisible
+            safeId, safeTitre, safeContenu, safeImportant, safeVisible, safeLienExterne, safeLienTexte
         });
 
         // Remplir le formulaire
@@ -78,6 +82,13 @@ window.editActualite = function (id, titre, contenu, important, visible) {
         document.getElementById('editContenu').value = safeContenu;
         document.getElementById('editImportant').checked = safeImportant;
         document.getElementById('editVisible').checked = safeVisible;
+
+        // Champs de liens externes
+        const editLienExterne = document.getElementById('editLienExterne');
+        const editLienTexte = document.getElementById('editLienTexte');
+        if (editLienExterne) editLienExterne.value = safeLienExterne;
+        if (editLienTexte) editLienTexte.value = safeLienTexte;
+
         document.getElementById('editForm').action = `/actualites/${safeId}`;
 
         // Ouvrir le modal
