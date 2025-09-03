@@ -7,501 +7,465 @@
 
 {% block main %}
 
-<!-- Bandeau de déploiement qui défile -->
-<div style="background: linear-gradient(45deg, #1e40af, #3b82f6); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #1e3a8a;">
-	<div style="animation: marquee 20s linear infinite;">
-		✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
+	<!-- Bandeau de déploiement qui défile -->
+	<div style="background: linear-gradient(45deg, #1e40af, #3b82f6); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #1e3a8a;">
+		<div style="animation: marquee 20s linear infinite;">
+			✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
+		</div>
+
 	</div>
 
-</div>
+	<style>
+		@keyframes marquee {
+			0% {
+				transform: translateX(100%);
+			}
+			100% {
+				transform: translateX(-100%);
+			}
+		}
+	</style>
 
-<style>
-	@keyframes marquee {
-		0% {
-			transform: translateX(100%);
-		}
-		100% {
-			transform: translateX(-100%);
-		}
-	}
-
-	@keyframes pulse {
-		0,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0.8;
-		}
-	}
-</style>
-
-<div class="py-8 px-4 md:py-16 md:px-8 bg-gradient-to-b from-[#a7e3dd] to-[#8dd3cc]">
-	<div class="max-w-15xl mx-auto text-center">
-		<h1 class="text-6xl md:text-8xl lg:text-9xl font-bold text-[#304a4d] mb-8 leading-tight" style="font-size: 5rem !important;">
-			Bienvenue à l'École Saint-Mathieu
-		</h1>
-		<p class="text-2xl md:text-4xl lg:text-5xl text-[#304a4d] opacity-90 leading-relaxed max-w-7xl mx-auto px-2 md:px-4" style="font-size: 1.7rem !important; line-height: 1.5; margin: 1rem auto;">
-			L'école Saint Mathieu est ouverte à tous, conformément à la volonté de l'Eglise catholique de mettre à la disposition de tous ses orientations éducatives. Elle est associée à l'Etat par contrat dans le cadre de la loi Debré de 1959.
-			<br><br>
-			Ce projet, propre à l'école Saint Mathieu, puise sa source dans l'Evangile. Ses propositions éducatives se fondent sur la vision chrétienne de la personne humaine, partagée par tous les établissements catholiques.
-		</p>
+	<div class="py-8 px-4 md:py-16 md:px-8 bg-gradient-to-b from-[#a7e3dd] to-[#8dd3cc]">
+		<div class="max-w-15xl mx-auto text-center">
+			<h1 class="text-6xl md:text-8xl lg:text-9xl font-bold text-[#304a4d] mb-8 leading-tight" style="font-size: 5rem !important;">
+				Bienvenue à l'École Saint-Mathieu
+			</h1>
+			<p class="text-2xl md:text-4xl lg:text-5xl text-[#304a4d] opacity-90 leading-relaxed max-w-7xl mx-auto px-2 md:px-4" style="font-size: 1.7rem !important; line-height: 1.5; margin: 1rem auto;">
+				L'école Saint Mathieu est ouverte à tous, conformément à la volonté de l'Eglise catholique de mettre à la disposition de tous ses orientations éducatives. Elle est associée à l'Etat par contrat dans le cadre de la loi Debré de 1959.
+				<br><br>
+				Ce projet, propre à l'école Saint Mathieu, puise sa source dans l'Evangile. Ses propositions éducatives se fondent sur la vision chrétienne de la personne humaine, partagée par tous les établissements catholiques.
+			</p>
+		</div>
 	</div>
-</div>
-<!-- Hero Carousel -->
-<div class="w-full">
-	{% if heroCarouselImages and heroCarouselImages|length > 0 %}
-		<!-- Hero Carousel DaisyUI avec images uploadées -->
-		<div class="carousel w-full h-[1200px] hero-carousel">
-			{% for image in heroCarouselImages %}
-				<div id="hero-slide{{ loop.index }}" class="carousel-item relative w-full">
-					<img src="/uploads/hero-carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'École Saint-Mathieu' }}">
-					{% if image.titre or image.description %}
-						<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-							{% if image.titre %}
-								<h3 class="text-white text-4xl font-bold mb-2 drop-shadow-lg">{{ image.titre }}</h3>
-							{% endif %}
-							{% if image.description %}
-								<p class="text-white text-2xl drop-shadow-lg">{{ image.description }}</p>
-							{% endif %}
-						</div>
-					{% endif %}
-					{% if heroCarouselImages|length > 1 %}
-						<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-							<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-slide{{ loop.index == 1 ? heroCarouselImages|length : loop.index - 1 }}">❮</button>
-							<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-slide{{ loop.index == heroCarouselImages|length ? 1 : loop.index + 1 }}">❯</button>
-						</div>
-					{% endif %}
-				</div>
-			{% endfor %}
-		</div>
-	{% else %}
-		<!-- Fallback: Hero Carousel DaisyUI avec images par défaut -->
-		<div class="carousel w-full h-[1200px] hero-carousel">
-			<div id="hero-fallback-slide1" class="carousel-item relative w-full">
-				<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="École Saint-Mathieu">
-				<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-					<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide3">❮</button>
-					<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide2">❯</button>
-				</div>
-			</div>
-			<div id="hero-fallback-slide2" class="carousel-item relative w-full">
-				<img src="/assets/images/20250326_114954.jpg" class="w-full h-full object-cover" alt="Activités scolaires">
-				<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-					<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide1">❮</button>
-					<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide3">❯</button>
-				</div>
-			</div>
-			<div id="hero-fallback-slide3" class="carousel-item relative w-full">
-				<img src="/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg" class="w-full h-full object-cover" alt="Cour de récréation">
-				<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-					<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide2">❮</button>
-					<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide1">❯</button>
-				</div>
-			</div>
-		</div>
-	{% endif %}
-</div>
-
-<div class="full-width-section py-8">
-	<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-12 text-center py-8">Actualités et informations familles</h2>
-
-	{% if user %}
-		<!-- Section Actualités - Visible uniquement pour les utilisateurs connectés -->
-		<div class="w-full flex flex-col min-h-[700px] gap-4 pr-0">
-			<div class="bg-gradient-to-br from-teal-50 to-cyan-100 p-0 flex-1 border-b-2 border-teal-300 rounded-xl shadow-lg">
-				<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-8 text-center p-6 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-t-xl shadow-md">📰 Actualités</h3>
-				<div class="space-y-8 mb-8 px-8 pb-8">
-					{% if actualites and actualites|length > 0 %}
-						{% for actualite in actualites|slice(0, 3) %}
-							<div class="bg-gradient-to-br from-white via-teal-50 to-cyan-100 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-teal-400 overflow-hidden transform hover:scale-[1.02]">
-								{% if actualite.mediaUrl and actualite.mediaType == 'image' %}
-									<div class="relative p-4 bg-gradient-to-br from-teal-100 to-cyan-200">
-										<div class="flex justify-center">
-											<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" class="max-w-xs max-h-48 object-contain rounded-lg shadow-md">
-										</div>
-									</div>
+	<!-- Hero Carousel -->
+	<div class="w-full">
+		{% if heroCarouselImages and heroCarouselImages|length > 0 %}
+			<!-- Hero Carousel DaisyUI avec images uploadées -->
+			<div class="carousel w-full h-[1200px] hero-carousel">
+				{% for image in heroCarouselImages %}
+					<div id="hero-slide{{ loop.index }}" class="carousel-item relative w-full">
+						<img src="/uploads/hero-carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'École Saint-Mathieu' }}">
+						{% if image.titre or image.description %}
+							<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+								{% if image.titre %}
+									<h3 class="text-white text-4xl font-bold mb-2 drop-shadow-lg">{{ image.titre }}</h3>
 								{% endif %}
-
-								<div class="p-6">
-									{% if actualite.important %}
-										<div class="mb-4">
-											<div style="display: inline-block; background: linear-gradient(45deg, #dc2626, #ef4444); color: white; padding: 6px 16px; border-radius: 25px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4);">
-												🚨 INFORMATION IMPORTANTE
-											</div>
-										</div>
-									{% endif %}
-									<h4 class="text-2xl md:text-3xl font-bold text-[#304a4d] mb-4 bg-gradient-to-r from-teal-700 to-cyan-700 bg-clip-text text-transparent">
-										{{ actualite.titre }}
-									</h4>
-									<p class="text-lg md:text-xl text-gray-700 mb-6 leading-relaxed line-height-7">{{ actualite.contenu|length > 400 ? actualite.contenu|slice(0, 400) ~ '...' : actualite.contenu }}</p>
-
-									{% if actualite.lienExterne %}
-										<div class="mb-4">
-											<a href="{{ actualite.lienExterne }}" target="_blank" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
-												<i class="fas fa-external-link-alt mr-2"></i>
-												{{ actualite.lienTexte ? actualite.lienTexte : 'Lire la suite' }}
-											</a>
-										</div>
-									{% endif %}
-
-									<div class="flex items-center justify-between pt-4 border-t border-gray-200">
-										<span class="text-lg md:text-xl text-gray-600 flex items-center">
-											<i class="fas fa-calendar-alt mr-2 text-teal-600"></i>
-											{{ actualite.datePublication|date('d/m/Y') }}
-										</span>
-										{% if actualite.auteur %}
-											<span class="text-sm text-gray-500 flex items-center">
-												<i class="fas fa-user mr-1 text-cyan-600"></i>
-												{{ actualite.auteur.firstName }}
-												{{ actualite.auteur.lastName }}
-											</span>
-										{% endif %}
-									</div>
-								</div>
+								{% if image.description %}
+									<p class="text-white text-2xl drop-shadow-lg">{{ image.description }}</p>
+								{% endif %}
 							</div>
-						{% endfor %}
-						<!-- Lien vers toutes les actualités -->
-						<div class="text-center mt-10 pt-8">
-							<a href="/actualites" style="
-																	display: inline-flex;
-																	align-items: center;
-																	padding: 16px 40px;
-																	background: linear-gradient(45deg, #0d9488, #06b6d4, #0891b2);
-																	color: white;
-																	font-weight: bold;
-																	border-radius: 12px;
-																	transition: all 0.3s ease;
-																	font-size: 20px;
-																	box-shadow: 0 10px 25px rgba(8, 145, 178, 0.4);
-																	text-decoration: none;
-																	border: 2px solid rgba(34, 211, 238, 0.3);
-																	animation: pulse 2s infinite;
-																" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 15px 35px rgba(8, 145, 178, 0.6)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(8, 145, 178, 0.4)';">
-								<i class="fas fa-newspaper" style="margin-right: 12px; font-size: 24px; color: #a7f3d0;"></i>
-								Voir toutes les actualités
-								<i class="fas fa-arrow-right" style="margin-left: 12px; font-size: 20px; color: #a7f3d0;"></i>
-							</a>
-						</div>
-					{% else %}
-						<div class="text-center py-12">
-							<div class="bg-white rounded-xl shadow-lg p-8 mx-auto max-w-md">
-								<div class="text-6xl mb-4">📰</div>
-								<p class="text-xl text-gray-600">Aucune actualité disponible pour le moment.</p>
-							</div>
-						</div>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	{% else %}
-		<!-- Message pour les visiteurs non connectés -->
-
-		<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-5 text-center p-6">📰 Actualités</h3>
-		<div class="space-y-6 mb-8 px-8 pb-8">
-			<div class="text-center py-12">
-				<div class="mb-6">
-					<i class="fas fa-lock text-6xl text-gray-400 mb-4"></i>
-				</div>
-				<h4 class="text-2xl font-bold text-[#304a4d] mb-4">Accès réservé aux membres</h4>
-				<p class="text-xl text-gray-600 mb-6">
-					Les actualités de l'école sont accessibles uniquement aux familles et au personnel connectés.
-				</p>
-				<div class="flex justify-center items-center gap-4 flex-wrap">
-					<a href="/auth/login" class="headerbutton Btn">
-						<i class="fas fa-sign-in-alt mr-2"></i>
-						Se connecter
-					</a>
-					<a href="/inscription" class="headerbutton Btn">
-						<i class="fas fa-user-plus mr-2"></i>
-						Faire une demande d'identifiants
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>{% endif %}<div class="w-full">
-<div class="flex flex-row w-full h-auto min-h-[800px] gap-0">
-
-	<div class="w-2/3 flex flex-col pl-0">
-		<div class="bg-white p-8 h-full rounded-r-lg">
-			<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-8 text-center">"Les Echos liés de St Mathieu"</h3>
-
-			<div class="carousel w-full h-[700px] rounded-lg">
-				{% if carouselImages and carouselImages|length > 0 %}
-					{% for image in carouselImages %}
-						<div id="slide{{ loop.index }}" class="carousel-item relative w-full">
-							<img src="/uploads/carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'Image carrousel' }}">
-							{% if image.titre or image.description %}
-								<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-8">
-									{% if image.titre %}
-										<h4 class="font-bold text-2xl md:text-3xl text-white drop-shadow-lg mb-2">{{ image.titre }}</h4>
-									{% endif %}
-									{% if image.description %}
-										<p class="text-lg md:text-xl text-gray-200 drop-shadow-md">{{ image.description }}</p>
-									{% endif %}
-								</div>
-							{% endif %}
+						{% endif %}
+						{% if heroCarouselImages|length > 1 %}
 							<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-								<a href="#slide{{ loop.index == 1 ? carouselImages|length : loop.index - 1 }}" class="btn btn-circle pointer-events-auto">❮</a>
-								<a href="#slide{{ loop.index == carouselImages|length ? 1 : loop.index + 1 }}" class="btn btn-circle pointer-events-auto">❯</a>
+								<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-slide{{ loop.index == 1 ? heroCarouselImages|length : loop.index - 1 }}">❮</button>
+								<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-slide{{ loop.index == heroCarouselImages|length ? 1 : loop.index + 1 }}">❯</button>
 							</div>
-						</div>
-					{% endfor %}
-				{% else %}
-					<!-- Images par défaut si aucune image n'est uploadée -->
-					<div id="slide1" class="carousel-item relative w-full">
-						<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="Actualités école">
-						<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-							<h4 class="font-bold">Rentrée scolaire 2025</h4>
-							<p class="text-sm">Préparatifs en cours pour accueillir nos élèves</p>
-						</div>
-						<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-							<a href="#slide4" class="btn btn-circle pointer-events-auto">❮</a>
-							<a href="#slide2" class="btn btn-circle pointer-events-auto">❯</a>
-						</div>
-					</div>
-					<div id="slide2" class="carousel-item relative w-full">
-						<img src="/assets/images/20250710_123601.jpg" class="w-full h-full object-cover" alt="Travaux école">
-						<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-							<h4 class="font-bold">Rénovation en cours</h4>
-							<p class="text-sm">Amélioration des espaces de vie scolaire</p>
-						</div>
-						<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-							<a href="#slide1" class="btn btn-circle pointer-events-auto">❮</a>
-							<a href="#slide3" class="btn btn-circle pointer-events-auto">❯</a>
-						</div>
-					</div>
-					<div id="slide3" class="carousel-item relative w-full">
-						<img src="/assets/images/entreePrincipale.jpg" class="w-full h-full object-cover" alt="Vie scolaire">
-						<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-							<h4 class="font-bold">Vie de l'école</h4>
-							<p class="text-sm">Moments de partage et d'apprentissage</p>
-						</div>
-						<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-							<a href="#slide2" class="btn btn-circle pointer-events-auto">❮</a>
-							<a href="#slide4" class="btn btn-circle pointer-events-auto">❯</a>
-						</div>
-					</div>
-					<div id="slide4" class="carousel-item relative w-full">
-						<img src="/assets/images/20250710_123943.jpg" class="w-full h-full object-cover" alt="Projets école">
-						<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-							<h4 class="font-bold">Nouveaux projets</h4>
-							<p class="text-sm">Innovation et modernisation continue</p>
-						</div>
-						<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-							<a href="#slide3" class="btn btn-circle pointer-events-auto">❮</a>
-							<a href="#slide1" class="btn btn-circle pointer-events-auto">❯</a>
-						</div>
-					</div>
-				{% endif %}
-			</div>
-		</div>
-	</div>
-
-	<!-- Section Travaux -->
-	<div class="bg-gray-50 p-0 flex-1 rounded-l-lg">
-		<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center px-8 pt-8">🔨 Histoire et travaux de l'école</h3>
-		<div class="space-y-6 px-8 pb-8">
-			{% if travaux and travaux|length > 0 %}
-				{% for travail in travaux %}
-					<div class="border-l-4 border-{% if travail.important %}red-500{% else %}[#304a4d]{% endif %} pl-6">
-						<div class="flex items-center gap-3 mb-3">
-							<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d]">{{ travail.titre }}</h4>
-							{% if travail.important %}
-								<span class="text-lg bg-red-100 text-red-600 px-3 py-2 rounded">Important</span>
-							{% endif %}
-						</div>
-						<p class="text-lg md:text-xl text-gray-700 mb-4">{{ travail.description|length > 100 ? travail.description[:100] ~ '...' : travail.description }}</p>
-						<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-							<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: {{ travail.progression }}%"></div>
-						</div>
-						<div class="flex items-center justify-between">
-							<span class="text-lg md:text-xl text-gray-500">🔧
-								{{ travail.progression }}%</span>
-							<span class="text-lg md:text-xl text-gray-400">
-								{% if travail.statut == 'EN_COURS' %}🚧 En cours
-								{% endif %}
-								{% if travail.statut == 'TERMINE' %}✅ Terminé
-								{% endif %}
-								{% if travail.statut == 'PLANIFIE' %}📋 Planifié
-								{% endif %}
-								{% if travail.statut == 'SUSPENDU' %}⏸️ Suspendu
-								{% endif %}
-							</span>
-						</div>
+						{% endif %}
 					</div>
 				{% endfor %}
-			{% else %}
-				<div class="border-l-4 border-[#304a4d] pl-6">
-					<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Rénovation cour</h4>
-					<p class="text-lg md:text-xl text-gray-700 mb-4">Nouveaux jeux et revêtement prévu pour septembre.</p>
-					<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-						<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 75%"></div>
+			</div>
+		{% else %}
+			<!-- Fallback: Hero Carousel DaisyUI avec images par défaut -->
+			<div class="carousel w-full h-[1200px] hero-carousel">
+				<div id="hero-fallback-slide1" class="carousel-item relative w-full">
+					<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="École Saint-Mathieu">
+					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+						<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide3">❮</button>
+						<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide2">❯</button>
 					</div>
-					<span class="text-lg md:text-xl text-gray-500">🔧 75%</span>
+				</div>
+				<div id="hero-fallback-slide2" class="carousel-item relative w-full">
+					<img src="/assets/images/20250326_114954.jpg" class="w-full h-full object-cover" alt="Activités scolaires">
+					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+						<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide1">❮</button>
+						<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide3">❯</button>
+					</div>
+				</div>
+				<div id="hero-fallback-slide3" class="carousel-item relative w-full">
+					<img src="/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg" class="w-full h-full object-cover" alt="Cour de récréation">
+					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+						<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide2">❮</button>
+						<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide1">❯</button>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="full-width-section py-8">
+		<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-12 text-center py-8">Actualités et informations familles</h2>
+
+		{% if user %}
+			<!-- Section Actualités - Visible uniquement pour les utilisateurs connectés -->
+			<div class="w-full flex flex-col min-h-[600px] gap-4 pr-0">
+				<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center p-6">📰 Actualités</h3>
+					<div class="space-y-6 mb-8 px-8 pb-8">
+						{% if actualites and actualites|length > 0 %}
+							{% for actualite in actualites|slice(0, 3) %}
+								<div class="border-l-4 border-[#a7e3dd] pl-6 mb-8">
+									{% if actualite.important %}
+										<div style="display: inline-block; background: linear-gradient(45deg, #dc2626, #ef4444); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);">
+											🚨 INFORMATION IMPORTANTE
+										</div>
+									{% endif %}
+									<h4 class="text-2xl md:text-3xl font-semibold text-[#304a4d] mb-4">
+										{{ actualite.titre }}
+									</h4>
+									<p class="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">{{ actualite.contenu|length > 200 ? actualite.contenu|slice(0, 200) ~ '...' : actualite.contenu }}</p>
+									<span class="text-xl md:text-2xl text-gray-500">📅
+										{{ actualite.datePublication|date('d/m/Y') }}</span>
+								</div>
+							{% endfor %}
+							<!-- Lien vers toutes les actualités -->
+							<div class="text-center mt-8 pt-6 border-t border-gray-200">
+								<a href="/actualites" class="inline-flex items-center px-6 py-3 bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold rounded-lg transition-colors duration-300 text-xl">
+									<i class="fas fa-newspaper mr-2"></i>
+									Voir toutes les actualités
+									<i class="fas fa-arrow-right ml-2"></i>
+								</a>
+							</div>
+						{% else %}
+							<div class="text-center py-8">
+								<p class="text-xl text-gray-500">Aucune actualité disponible pour le moment.</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<!-- Message pour les visiteurs non connectés -->
+			<div class="w-full flex flex-col min-h-[600px] gap-5 pr-0">
+				<div class="bg-white p-0 flex-1 border-b-2 border-gray-300 rounded-l-lg">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-5 text-center p-6">📰 Actualités</h3>
+					<div class="space-y-6 mb-8 px-8 pb-8">
+						<div class="text-center py-12">
+							<div class="mb-6">
+								<i class="fas fa-lock text-6xl text-gray-400 mb-4"></i>
+							</div>
+							<h4 class="text-2xl font-bold text-[#304a4d] mb-4">Accès réservé aux membres</h4>
+							<p class="text-xl text-gray-600 mb-6">
+								Les actualités de l'école sont accessibles uniquement aux familles et au personnel connectés.
+							</p>
+							<div class="space-y-4">
+								<a href="/auth/login" class="inline-block bg-[#304a4d] hover:bg-[#2a3f42] text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 mr-4">
+									<i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+								</a>
+								<a href="/inscription" class="inline-block bg-[#a7e3dd] hover:bg-[#8dd3cc] text-[#304a4d] font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+									<i class="fas fa-user-plus mr-2"></i>Faire une demande d'identifiants
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+
+		<div class="w-full">
+			<div class="flex flex-row w-full h-auto min-h-[800px] gap-0">
+
+				<div class="w-2/3 flex flex-col pl-0">
+					<div class="bg-white p-8 h-full rounded-r-lg">
+						<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-8 text-center">"Les Echos liés de St Mathieu"</h3>
+
+						<div class="carousel w-full h-[700px] rounded-lg">
+							{% if carouselImages and carouselImages|length > 0 %}
+								{% for image in carouselImages %}
+									<div id="slide{{ loop.index }}" class="carousel-item relative w-full">
+										<img src="/uploads/carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'Image carrousel' }}">
+										{% if image.titre or image.description %}
+											<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-8">
+												{% if image.titre %}
+													<h4 class="font-bold text-2xl md:text-3xl text-white drop-shadow-lg mb-2">{{ image.titre }}</h4>
+												{% endif %}
+												{% if image.description %}
+													<p class="text-lg md:text-xl text-gray-200 drop-shadow-md">{{ image.description }}</p>
+												{% endif %}
+											</div>
+										{% endif %}
+										<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+											<a href="#slide{{ loop.index == 1 ? carouselImages|length : loop.index - 1 }}" class="btn btn-circle pointer-events-auto">❮</a>
+											<a href="#slide{{ loop.index == carouselImages|length ? 1 : loop.index + 1 }}" class="btn btn-circle pointer-events-auto">❯</a>
+										</div>
+									</div>
+								{% endfor %}
+							{% else %}
+								<!-- Images par défaut si aucune image n'est uploadée -->
+								<div id="slide1" class="carousel-item relative w-full">
+									<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="Actualités école">
+									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+										<h4 class="font-bold">Rentrée scolaire 2025</h4>
+										<p class="text-sm">Préparatifs en cours pour accueillir nos élèves</p>
+									</div>
+									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+										<a href="#slide4" class="btn btn-circle pointer-events-auto">❮</a>
+										<a href="#slide2" class="btn btn-circle pointer-events-auto">❯</a>
+									</div>
+								</div>
+								<div id="slide2" class="carousel-item relative w-full">
+									<img src="/assets/images/20250710_123601.jpg" class="w-full h-full object-cover" alt="Travaux école">
+									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+										<h4 class="font-bold">Rénovation en cours</h4>
+										<p class="text-sm">Amélioration des espaces de vie scolaire</p>
+									</div>
+									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+										<a href="#slide1" class="btn btn-circle pointer-events-auto">❮</a>
+										<a href="#slide3" class="btn btn-circle pointer-events-auto">❯</a>
+									</div>
+								</div>
+								<div id="slide3" class="carousel-item relative w-full">
+									<img src="/assets/images/entreePrincipale.jpg" class="w-full h-full object-cover" alt="Vie scolaire">
+									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+										<h4 class="font-bold">Vie de l'école</h4>
+										<p class="text-sm">Moments de partage et d'apprentissage</p>
+									</div>
+									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+										<a href="#slide2" class="btn btn-circle pointer-events-auto">❮</a>
+										<a href="#slide4" class="btn btn-circle pointer-events-auto">❯</a>
+									</div>
+								</div>
+								<div id="slide4" class="carousel-item relative w-full">
+									<img src="/assets/images/20250710_123943.jpg" class="w-full h-full object-cover" alt="Projets école">
+									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+										<h4 class="font-bold">Nouveaux projets</h4>
+										<p class="text-sm">Innovation et modernisation continue</p>
+									</div>
+									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+										<a href="#slide3" class="btn btn-circle pointer-events-auto">❮</a>
+										<a href="#slide1" class="btn btn-circle pointer-events-auto">❯</a>
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
 				</div>
 
-				<div class="border-l-4 border-[#304a4d] pl-6">
-					<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Tableaux numériques</h4>
-					<p class="text-lg md:text-xl text-gray-700 mb-4">Équipement de toutes les classes.</p>
-					<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-						<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 45%"></div>
+				<!-- Section Travaux -->
+				<div class="bg-gray-50 p-0 flex-1 rounded-l-lg">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-6 text-center px-8 pt-8">🔨 Histoire et travaux de l'école</h3>
+					<div class="space-y-6 px-8 pb-8">
+						{% if travaux and travaux|length > 0 %}
+							{% for travail in travaux %}
+								<div class="border-l-4 border-{% if travail.important %}red-500{% else %}[#304a4d]{% endif %} pl-6">
+									<div class="flex items-center gap-3 mb-3">
+										<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d]">{{ travail.titre }}</h4>
+										{% if travail.important %}
+											<span class="text-lg bg-red-100 text-red-600 px-3 py-2 rounded">Important</span>
+										{% endif %}
+									</div>
+									<p class="text-lg md:text-xl text-gray-700 mb-4">{{ travail.description|length > 100 ? travail.description[:100] ~ '...' : travail.description }}</p>
+									<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+										<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: {{ travail.progression }}%"></div>
+									</div>
+									<div class="flex items-center justify-between">
+										<span class="text-lg md:text-xl text-gray-500">🔧
+											{{ travail.progression }}%</span>
+										<span class="text-lg md:text-xl text-gray-400">
+											{% if travail.statut == 'EN_COURS' %}🚧 En cours
+											{% endif %}
+											{% if travail.statut == 'TERMINE' %}✅ Terminé
+											{% endif %}
+											{% if travail.statut == 'PLANIFIE' %}📋 Planifié
+											{% endif %}
+											{% if travail.statut == 'SUSPENDU' %}⏸️ Suspendu
+											{% endif %}
+										</span>
+									</div>
+								</div>
+							{% endfor %}
+						{% else %}
+							<div class="border-l-4 border-[#304a4d] pl-6">
+								<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Rénovation cour</h4>
+								<p class="text-lg md:text-xl text-gray-700 mb-4">Nouveaux jeux et revêtement prévu pour septembre.</p>
+								<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+									<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 75%"></div>
+								</div>
+								<span class="text-lg md:text-xl text-gray-500">🔧 75%</span>
+							</div>
+
+							<div class="border-l-4 border-[#304a4d] pl-6">
+								<h4 class="text-xl md:text-2xl font-semibold text-[#304a4d] mb-3">Tableaux numériques</h4>
+								<p class="text-lg md:text-xl text-gray-700 mb-4">Équipement de toutes les classes.</p>
+								<div class="w-full bg-gray-200 rounded-full h-3 mb-3">
+									<div class="bg-[#a7e3dd] h-3 rounded-full" style="width: 45%"></div>
+								</div>
+								<span class="text-lg md:text-xl text-gray-500">🔧 45%</span>
+							</div>
+						{% endif %}
 					</div>
-					<span class="text-lg md:text-xl text-gray-500">🔧 45%</span>
 				</div>
-			{% endif %}
+			</div>
 		</div>
 	</div>
-</div></div></div><!-- Section Google Maps --><div class="full-width-section mt-13"><h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-8 text-center py-8">📍 Nous trouver</h2><div class="w-full">
-<div class="bg-white p-6">
-	<div class="text-center mb-8">
-		<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-4">École Saint-Mathieu</h3>
-		<p class="text-xl md:text-2xl text-gray-600">
-			<i class="fas fa-map-marker-alt text-[#a7e3dd] mr-2"></i>
-			22 Place des Héros, 13013 Marseille - Château-Gombert
-		</p>
-		<p class="text-xl md:text-2xl text-gray-500 mt-3">
-			<i class="fas fa-phone text-[#a7e3dd] mr-2"></i>
-			Téléphone : 04 91 05 05 89
-		</p>
-	</div>
 
-	<!-- Carte Google Maps -->
-	<div class="w-full h-[600px] overflow-hidden shadow-md maps-container">
-		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.5234567890123!2d5.4297756!3d43.3406789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f15.5!3m3!1m2!1s0x12c9c6c234567890%3A0x9876543210fedcba!2s22%20Pl.%20des%20H%C3%A9ros%2C%2013013%20Marseille!5e1!3m2!1sfr!2sfr!4v1692345678901!5m2!1sfr!2sfr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="École Saint-Mathieu - 22 Place des Héros, Marseille"></iframe>
-	</div>
 
-	<!-- Informations pratiques -->
-	<div class="grid md:grid-cols-3 gap-6 mt-6 px-6">
-		<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
-			<i class="fas fa-car text-4xl text-[#304a4d] mb-4"></i>
-			<h4 class="font-bold text-xl text-[#304a4d] mb-3">En voiture</h4>
-			<p class="text-lg text-gray-600">Parkings disponibles:<br>
-				- Place des Héros
-				<br>
-				- Parking Louis Feuillée</p>
+	<!-- Section Google Maps -->
+	<div class="full-width-section mt-13">
+		<h2 class="text-5xl md:text-6xl font-bold text-[#304a4d] mb-8 text-center py-8">📍 Nous trouver</h2>
+		<div class="w-full">
+			<div class="bg-white p-6">
+				<div class="text-center mb-8">
+					<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-4">École Saint-Mathieu</h3>
+					<p class="text-xl md:text-2xl text-gray-600">
+						<i class="fas fa-map-marker-alt text-[#a7e3dd] mr-2"></i>
+						22 Place des Héros, 13013 Marseille - Château-Gombert
+					</p>
+					<p class="text-xl md:text-2xl text-gray-500 mt-3">
+						<i class="fas fa-phone text-[#a7e3dd] mr-2"></i>
+						Téléphone : 04 91 05 05 89
+					</p>
+				</div>
+
+				<!-- Carte Google Maps -->
+				<div class="w-full h-[600px] overflow-hidden shadow-md maps-container">
+					<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.5234567890123!2d5.4297756!3d43.3406789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f15.5!3m3!1m2!1s0x12c9c6c234567890%3A0x9876543210fedcba!2s22%20Pl.%20des%20H%C3%A9ros%2C%2013013%20Marseille!5e1!3m2!1sfr!2sfr!4v1692345678901!5m2!1sfr!2sfr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="École Saint-Mathieu - 22 Place des Héros, Marseille"></iframe>
+				</div>
+
+				<!-- Informations pratiques -->
+				<div class="grid md:grid-cols-3 gap-6 mt-6 px-6">
+					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
+						<i class="fas fa-car text-4xl text-[#304a4d] mb-4"></i>
+						<h4 class="font-bold text-xl text-[#304a4d] mb-3">En voiture</h4>
+						<p class="text-lg text-gray-600">Parkings disponibles:<br>
+							- Place des Héros
+							<br>
+							- Parking Louis Feuillée</p>
+					</div>
+					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
+						<i class="fas fa-bus text-4xl text-[#304a4d] mb-4"></i>
+						<h4 class="font-bold text-xl text-[#304a4d] mb-3">Transport en commun</h4>
+						<p class="text-lg text-gray-600">Bus ligne 1 - Arrêt place des Héros</p>
+					</div>
+					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
+						<i class="fas fa-clock text-4xl text-[#304a4d] mb-4"></i>
+						<h4 class="font-bold text-xl text-[#304a4d] mb-3">Horaires</h4>
+						<p class="text-lg text-gray-600">Lun-Ven : 07h30 - 18h00</p>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
-			<i class="fas fa-bus text-4xl text-[#304a4d] mb-4"></i>
-			<h4 class="font-bold text-xl text-[#304a4d] mb-3">Transport en commun</h4>
-			<p class="text-lg text-gray-600">Bus ligne 1 - Arrêt place des Héros</p>
-		</div>
-		<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
-			<i class="fas fa-clock text-4xl text-[#304a4d] mb-4"></i>
-			<h4 class="font-bold text-xl text-[#304a4d] mb-3">Horaires</h4>
-			<p class="text-lg text-gray-600">Lun-Ven : 07h30 - 18h00</p>
-		</div>
 	</div>
-</div></div></div>{% endblock %}{% block styles %}<style>.full-width-section {
-	width: 98vw !important;
-	position: relative;
-	left: 50%;
-	right: 50%;
-	margin-left: -49vw !important;
-	margin-right: -49vw !important;
-	background-color: #a7e3dd;
-	padding: 20px 0;
-	box-sizing: border-box;
-	max-width: 100%;
-	overflow-x: hidden;
-}
+{% endblock %}
 
-/* Colonnes 50/50 */
-.w-2\/3 {
-	width: 50% !important;
-}
+{% block styles %}
+	<style>
+		.full-width-section {
+			width: 98vw !important;
+			position: relative;
+			left: 50%;
+			right: 50%;
+			margin-left: -49vw !important;
+			margin-right: -49vw !important;
+			background-color: #a7e3dd;
+			padding: 20px 0;
+			box-sizing: border-box;
+			max-width: 100%;
+			overflow-x: hidden;
+		}
 
-.w-1\/3 {
-	width: 50% !important;
-}
+		/* Colonnes 50/50 */
+		.w-2\/3 {
+			width: 50% !important;
+		}
 
-/* Styles pour les carousels */
-.carousel {
-	scroll-behavior: smooth;
-	scroll-snap-type: x mandatory;
-}
+		.w-1\/3 {
+			width: 50% !important;
+		}
 
-.carousel-item {
-	scroll-snap-align: start;
-}
+		/* Styles pour les carousels */
+		.carousel {
+			scroll-behavior: smooth;
+			scroll-snap-type: x mandatory;
+		}
 
-/* Amélioration des boutons de carousel */
-.carousel .btn-circle {
-	background-color: rgba(48, 74, 77, 0.9) !important;
-	border: 3px solid rgba(167, 227, 221, 0.8) !important;
-	color: white !important;
-	font-weight: bold !important;
-	font-size: 24px !important;
-	width: 4rem !important;
-	height: 4rem !important;
-	min-height: 4rem !important;
-	transition: all 0.3s ease !important;
-	z-index: 999 !important;
-	backdrop-filter: blur(8px) !important;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-	display: flex !important;
-	align-items: center !important;
-	justify-content: center !important;
-	position: relative !important;
-}
+		.carousel-item {
+			scroll-snap-align: start;
+		}
 
-.carousel .btn-circle:hover {
-	background-color: rgba(48, 74, 77, 1) !important;
-	border-color: rgba(167, 227, 221, 1) !important;
-	transform: scale(1.1) !important;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
-}
+		/* Amélioration des boutons de carousel */
+		.carousel .btn-circle {
+			background-color: rgba(48, 74, 77, 0.9) !important;
+			border: 3px solid rgba(167, 227, 221, 0.8) !important;
+			color: white !important;
+			font-weight: bold !important;
+			font-size: 24px !important;
+			width: 4rem !important;
+			height: 4rem !important;
+			min-height: 4rem !important;
+			transition: all 0.3s ease !important;
+			z-index: 999 !important;
+			backdrop-filter: blur(8px) !important;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			position: relative !important;
+		}
 
-/* Positionnement spécifique des boutons */
-.carousel .carousel-prev {
-	margin-right: auto !important;
-}
+		.carousel .btn-circle:hover {
+			background-color: rgba(48, 74, 77, 1) !important;
+			border-color: rgba(167, 227, 221, 1) !important;
+			transform: scale(1.1) !important;
+			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
+		}
 
-.carousel .carousel-next {
-	margin-left: auto !important;
-}
+		/* Positionnement spécifique des boutons */
+		.carousel .carousel-prev {
+			margin-right: auto !important;
+		}
 
-/* S'assurer que les conteneurs de boutons sont visibles et symétriques */
-.carousel-item .absolute {
-	z-index: 998 !important;
-}
+		.carousel .carousel-next {
+			margin-left: auto !important;
+		}
 
-.carousel-item .absolute .btn-circle {
-	pointer-events: auto !important;
-	flex-shrink: 0 !important;
-}
+		/* S'assurer que les conteneurs de boutons sont visibles et symétriques */
+		.carousel-item .absolute {
+			z-index: 998 !important;
+		}
 
-/* Forcer la visibilité des boutons même sur petits écrans */
-@media(max-width: 768px) {
-	.carousel .btn-circle {
-		width: 3rem !important;
-		height: 3rem !important;
-		font-size: 18px !important;
-	}
-}
+		.carousel-item .absolute .btn-circle {
+			pointer-events: auto !important;
+			flex-shrink: 0 !important;
+		}
 
-/* Google Maps styling */
-.maps-container iframe {
-	border-radius: 12px;
-	transition: transform 0.3s ease;
-	height: 600px !important;
-	min-height: 600px !important;
-}
+		/* Forcer la visibilité des boutons même sur petits écrans */
+		@media(max-width: 768px) {
+			.carousel .btn-circle {
+				width: 3rem !important;
+				height: 3rem !important;
+				font-size: 18px !important;
+			}
+		}
 
-.maps-container:hover iframe {
-	transform: scale(1.02);
-}
+		/* Google Maps styling */
+		.maps-container iframe {
+			border-radius: 12px;
+			transition: transform 0.3s ease;
+			height: 600px !important;
+			min-height: 600px !important;
+		}
 
-/* Animation pour les icônes des informations pratiques */
-.info-card {
-	transition: all 0.3s ease;
-}
+		.maps-container:hover iframe {
+			transform: scale(1.02);
+		}
 
-.info-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(167, 227, 221, 0.3);
-}</style>{% endblock %}{% block scripts %}{{ parent() }}<script>// Auto-défilement pour les carousels DaisyUI
+		/* Animation pour les icônes des informations pratiques */
+		.info-card {
+			transition: all 0.3s ease;
+		}
+
+		.info-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(167, 227, 221, 0.3);
+		}
+	</style>
+{% endblock %}
+
+{% block scripts %}
+	{{ parent() }}
+	<script>
+		// Auto-défilement pour les carousels DaisyUI
 document.addEventListener('DOMContentLoaded', function () {
 console.log('✅ Initialisation des carousels DaisyUI avec auto-défilement');
 
@@ -572,4 +536,6 @@ setupCarouselNavigation();
 setTimeout(autoScrollCarousels, 1000);
 
 console.log('🚀 Carousels avec auto-défilement démarrés');
-});</script>{% endblock %}
+});
+	</script>
+{% endblock %}

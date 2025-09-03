@@ -208,7 +208,7 @@ const formData = new FormData(this);
 const data = Object.fromEntries(formData);
 
 if (isEditMode) { // Mise à jour
-fetch (`/admin/users/${currentUserId}/update`, {
+fetch (`/directeur/users/${currentUserId}/update`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -222,7 +222,7 @@ alert('Erreur: ' + data.message);
 }
 });
 } else { // Création
-fetch('/admin/users', {
+fetch('/directeur/users', {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -239,25 +239,45 @@ alert('Erreur: ' + data.message);
 });
 
 // Éditer un utilisateur
-function editUser(userId) { // Récupérer les données de l'utilisateur depuis le tableau
-const row = event.target.closest('tr');
-const cells = row.querySelectorAll('td');
-
-isEditMode = true;
-currentUserId = userId;
-document.getElementById('modalTitle').textContent = 'Modifier l\'utilisateur';
-
-// Remplir le formulaire (ici il faudrait une API pour récupérer les détails)
-document.getElementById('passwordField').style.display = 'none';
-document.getElementById('password').required = false;
-
-document.getElementById('userModal').classList.remove('hidden');
+async function editUser(userId) {
+    try {
+        // Récupérer les données de l'utilisateur depuis l'API
+        const response = await fetch(`/directeur/users/${userId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Erreur: ' + data.message);
+            return;
+        }
+        
+        const user = data.user;
+        
+        isEditMode = true;
+        currentUserId = userId;
+        document.getElementById('modalTitle').textContent = 'Modifier l\'utilisateur';
+        
+        // Remplir le formulaire avec les données de l'utilisateur
+        document.getElementById('firstName').value = user.firstName || '';
+        document.getElementById('lastName').value = user.lastName || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.phone || '';
+        document.getElementById('role').value = user.role || '';
+        
+        // Masquer le champ mot de passe pour la modification
+        document.getElementById('passwordField').style.display = 'none';
+        document.getElementById('password').required = false;
+        
+        document.getElementById('userModal').classList.remove('hidden');
+    } catch (error) {
+        console.error('Erreur lors de la récupération des données utilisateur:', error);
+        alert('Erreur lors de la récupération des données utilisateur');
+    }
 }
 
 // Supprimer un utilisateur
 function deleteUser(userId) {
 if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-fetch (`/admin/users/${userId}/delete`, {method: 'POST'}).then(response => response.json()).then(data => {
+fetch (`/directeur/users/${userId}/delete`, {method: 'POST'}).then(response => response.json()).then(data => {
 if (data.success) {
 location.reload();
 } else {

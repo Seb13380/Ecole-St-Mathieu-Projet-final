@@ -58,8 +58,8 @@
                                             <div>
                                                 <div class="text-sm font-medium text-slate-900">{{ eleve.firstName }} {{ eleve.lastName }}</div>
                                                 <div class="text-sm text-slate-500">
-                                                    🎂 {{ eleve.birthDate|date('d/m/Y') }}
-                                                    ({{ "now"|date('Y') - eleve.birthDate|date('Y') }} ans)
+                                                    🎂 {{ eleve.dateNaissance|date('d/m/Y') }}
+                                                    ({{ "now"|date('Y') - eleve.dateNaissance|date('Y') }} ans)
                                                 </div>
                                             </div>
                                         </div>
@@ -85,7 +85,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <div class="flex justify-center space-x-2">
                                             <!-- Bouton Modifier -->
-                                            <button onclick="editStudent({{ eleve.id }}, '{{ eleve.firstName }}', '{{ eleve.lastName }}', '{{ eleve.birthDate|date('Y-m-d') }}', {{ eleve.parentId }}, {{ eleve.classeId ?? 'null' }})"
+                                            <button onclick="editStudent({{ eleve.id }}, '{{ eleve.firstName }}', '{{ eleve.lastName }}', '{{ eleve.dateNaissance|date('Y-m-d') }}', {{ eleve.parentId }}, {{ eleve.classeId ?? 'null' }})"
                                                     class="text-blue-600 hover:text-blue-800 transition-colors" title="Modifier">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

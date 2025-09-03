@@ -16,6 +16,7 @@ router.get('/dashboard', directeurController.dashboard);
 
 // Gestion des utilisateurs
 router.get('/users', directeurController.getUsersManagement);
+router.get('/users/:id', directeurController.getUser);
 router.post('/users', directeurController.createUser);
 router.post('/users/:id/update', directeurController.updateUser);
 router.post('/users/:id/delete', directeurController.deleteUser);

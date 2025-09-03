@@ -15,7 +15,8 @@
 				</div>
 
 				<!-- Annonce Petite Section 2026 -->
-				<div id="annoncePS2026" class="mb-8" style="display: none;">
+				{% if config and config.afficherAnnoncePS2026 %}
+				<div id="annoncePS2026" class="mb-8">
 					<div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
 						<!-- Icône décorative -->
 						<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
@@ -59,6 +60,7 @@
 						</div>
 					</div>
 				</div>
+				{% endif %}
 
 				<!-- Documents à télécharger -->
 				<div id="documentsSection" class="mb-8" style="display: none;">

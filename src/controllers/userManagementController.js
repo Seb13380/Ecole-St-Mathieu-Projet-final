@@ -273,7 +273,7 @@ const userManagementController = {
                 data: {
                     firstName,
                     lastName,
-                    birthDate: new Date(birthDate),
+                    dateNaissance: new Date(birthDate),
                     parentId: parseInt(parentId),
                     classeId: classeId ? parseInt(classeId) : null
                 },
@@ -317,7 +317,7 @@ const userManagementController = {
                 data: {
                     firstName,
                     lastName,
-                    birthDate: new Date(birthDate),
+                    dateNaissance: new Date(birthDate),
                     parentId: parseInt(parentId),
                     classeId: classeId ? parseInt(classeId) : null
                 },

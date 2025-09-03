@@ -123,6 +123,27 @@ const directeurController = {
         }
     },
 
+    async getUser(req, res) {
+        try {
+            const userId = parseInt(req.params.id);
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                include: {
+                    enfants: true
+                }
+            });
+
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+            }
+
+            res.json({ success: true, user });
+        } catch (error) {
+            console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+            res.status(500).json({ success: false, message: 'Erreur serveur' });
+        }
+    },
+
     async createUser(req, res) {
         try {
             const { firstName, lastName, email, password, role, phone, adress } = req.body;

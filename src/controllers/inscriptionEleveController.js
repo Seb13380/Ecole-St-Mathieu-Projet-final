@@ -8,12 +8,22 @@ const inscriptionEleveController = {
     // Affichage du formulaire d'inscription élève
     getInscriptionEleve: async (req, res) => {
         try {
+            // Récupérer la configuration des inscriptions
+            let config = await prisma.inscriptionConfiguration.findFirst();
+            if (!config) {
+                config = {
+                    soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
+                    afficherAnnoncePS2026: true // Par défaut, on affiche l'annonce
+                };
+            }
+
             res.render('pages/inscription-eleve', {
                 title: 'Inscription Élève - École Saint Mathieu',
                 user: req.session.user || null,
                 currentUrl: req.originalUrl,
                 success: req.flash('success'),
-                error: req.flash('error')
+                error: req.flash('error'),
+                config: config
             });
         } catch (error) {
             console.error('Erreur lors du chargement de la page inscription élève:', error);
