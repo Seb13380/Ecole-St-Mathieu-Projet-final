@@ -42,29 +42,26 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-	<div
-		class="max-w-7xl mx-auto">
-		<!-- En-tête -->
-		<div class="flex justify-between items-center mb-8">
-			<div>
-				<h1 class="text-3xl font-bold text-gray-900 mb-2">
-					📋 Gestion des Inscriptions
-				</h1>
-				<p class="text-gray-600">
-					Approuvez les demandes et assignez automatiquement les élèves aux classes
-				</p>
-			</div>
+	<div class="max-w-7xl mx-auto">
+		<!-- Header moderne -->
+		{% include 'partials/page-header.twig' with {
+			title: "Gestion des Inscriptions",
+			subtitle: "Approuvez les demandes et assignez automatiquement les élèves aux classes",
+			emoji: "📋",
+			gradient: "indigo",
+			user: user
+		} %}
 
-			<div class="flex gap-3">
-				<button onclick="notifyYamina()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2">
-					<i class="fas fa-paper-plane"></i>
-					Notifier Yamina
-				</button>
-				<a href="/admin/classes" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2">
-					<i class="fas fa-chalkboard-teacher"></i>
-					Gérer Classes
-				</a>
-			</div>
+		<!-- Actions rapides -->
+		<div class="flex justify-center gap-4 mb-8">
+			<button onclick="notifyYamina()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2 hover:-translate-y-1">
+				<i class="fas fa-paper-plane"></i>
+				Notifier Yamina
+			</button>
+			<a href="/admin/classes" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2 hover:-translate-y-1">
+				<i class="fas fa-chalkboard-teacher"></i>
+				Gérer Classes
+			</a>
 		</div>
 
 		<!-- Configuration des annonces -->

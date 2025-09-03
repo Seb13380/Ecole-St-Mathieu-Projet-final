@@ -5,13 +5,15 @@
 {% endblock %}
 
 {% block content %}
-	<div
-		class="container mx-auto px-4 py-6">
-		<!-- En-tête -->
-		<div class="mb-6">
-			<h1 class="text-3xl font-bold text-gray-800 mb-2">{{ title }}</h1>
-			<p class="text-gray-600">Gérez les utilisateurs de l'école</p>
-		</div>
+	<div class="container mx-auto px-4 py-6">
+		<!-- Header moderne -->
+		{% include 'partials/page-header.twig' with {
+			title: title,
+			subtitle: "Gérez les utilisateurs de l'école",
+			icon: "fas fa-users",
+			gradient: "green",
+			user: user
+		} %}
 
 		<!-- Messages -->
 		{% if success %}
@@ -102,7 +104,7 @@
 								{{ user.createdAt|date('d/m/Y') }}
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-								<button onclick="editUser({{ user.id }})" class="text-indigo-600 hover:text-indigo-900 mr-3">
+								<button onclick="editParent({{ user.id }}, '{{ user.firstName }}', '{{ user.lastName }}', '{{ user.email }}', '{{ user.phone }}', '{{ user.adress }}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
 									<i class="fas fa-edit"></i>
 								</button>
 								{% if user.role != 'ADMIN' and user.role != 'DIRECTION' %}
@@ -247,24 +249,5 @@ isEditMode = true;
 currentUserId = userId;
 document.getElementById('modalTitle').textContent = 'Modifier l\'utilisateur';
 
-// Remplir le formulaire (ici il faudrait une API pour récupérer les détails)
-document.getElementById('passwordField').style.display = 'none';
-document.getElementById('password').required = false;
-
-document.getElementById('userModal').classList.remove('hidden');
-}
-
-// Supprimer un utilisateur
-function deleteUser(userId) {
-if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-fetch (`/admin/users/${userId}/delete`, {method: 'POST'}).then(response => response.json()).then(data => {
-if (data.success) {
-location.reload();
-} else {
-alert('Erreur: ' + data.message);
-}
-});
-}
-}
-	</script>
+	<script src="/assets/js/parents-management.js"></script>
 {% endblock %}

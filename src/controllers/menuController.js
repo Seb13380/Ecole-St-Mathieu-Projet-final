@@ -89,7 +89,7 @@ const menuController = {
 
             if (!req.session.user || !req.session.user.id) {
                 console.log('❌ Utilisateur non connecté');
-                return res.redirect('/login');
+                return res.redirect('/auth/login');
             }
 
             // Si l'option est cochée, désactiver les anciens menus

@@ -57,7 +57,7 @@ const requireParent = requireRole(['PARENT', 'ADMIN', 'DIRECTION']);
 
 const requireDirection = (req, res, next) => {
     if (!req.session.user) {
-        return res.redirect('/login');
+        return res.redirect('/auth/login');
     }
 
     const allowedRoles = ['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];

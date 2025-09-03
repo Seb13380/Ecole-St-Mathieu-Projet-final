@@ -240,10 +240,44 @@ const directeurController = {
                 orderBy: { nom: 'asc' }
             });
 
+            // Gestion des messages de feedback
+            let message = null;
+            let messageType = 'info';
+
+            if (req.query.success) {
+                messageType = 'success';
+                switch (req.query.success) {
+                    case 'classe-created':
+                        message = 'Classe créée avec succès';
+                        break;
+                    case 'classe-updated':
+                        message = 'Classe mise à jour avec succès';
+                        break;
+                    case 'classe-deleted':
+                        message = 'Classe supprimée avec succès';
+                        break;
+                }
+            } else if (req.query.error) {
+                messageType = 'error';
+                switch (req.query.error) {
+                    case 'creation-failed':
+                        message = 'Erreur lors de la création de la classe';
+                        break;
+                    case 'update-failed':
+                        message = 'Erreur lors de la mise à jour de la classe';
+                        break;
+                    case 'delete-failed':
+                        message = 'Erreur lors de la suppression de la classe';
+                        break;
+                }
+            }
+
             res.render('pages/admin/classes', {
                 classes,
                 title: 'Gestion des classes',
-                user: req.session.user
+                user: req.session.user,
+                message,
+                messageType
             });
         } catch (error) {
             console.error('Erreur lors de la récupération des classes:', error);
@@ -256,47 +290,49 @@ const directeurController = {
 
     async createClasse(req, res) {
         try {
-            const { nom, niveau } = req.body;
+            const { nom, niveau, anneeScolaire, enseignantId } = req.body;
+
+            // Données pour la création de la classe
+            const classeData = {
+                nom,
+                niveau,
+                anneeScolaire: anneeScolaire || new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
+            };
+
+            // Ajouter enseignantId seulement s'il est fourni et valide
+            if (enseignantId && !isNaN(parseInt(enseignantId))) {
+                classeData.enseignantId = parseInt(enseignantId);
+            }
 
             const classe = await prisma.classe.create({
-                data: { nom, niveau }
+                data: classeData
             });
 
-            res.json({
-                success: true,
-                message: 'Classe créée avec succès',
-                classe
-            });
+            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
+            res.redirect('/directeur/classes?success=classe-created');
         } catch (error) {
             console.error('Erreur lors de la création de la classe:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la création de la classe'
-            });
+            // Redirection avec erreur au lieu de JSON
+            res.redirect('/directeur/classes?error=creation-failed');
         }
     },
 
     async updateClasse(req, res) {
         try {
             const { id } = req.params;
-            const { nom, niveau } = req.body;
+            const { nom, niveau, anneeScolaire } = req.body;
 
             const classe = await prisma.classe.update({
                 where: { id: parseInt(id) },
-                data: { nom, niveau }
+                data: { nom, niveau, anneeScolaire }
             });
 
-            res.json({
-                success: true,
-                message: 'Classe mise à jour avec succès',
-                classe
-            });
+            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
+            res.redirect('/directeur/classes?success=classe-updated');
         } catch (error) {
             console.error('Erreur lors de la mise à jour de la classe:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la mise à jour de la classe'
-            });
+            // Redirection avec erreur au lieu de JSON
+            res.redirect('/directeur/classes?error=update-failed');
         }
     },
 
@@ -308,16 +344,12 @@ const directeurController = {
                 where: { id: parseInt(id) }
             });
 
-            res.json({
-                success: true,
-                message: 'Classe supprimée avec succès'
-            });
+            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
+            res.redirect('/directeur/classes?success=classe-deleted');
         } catch (error) {
             console.error('Erreur lors de la suppression de la classe:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la suppression de la classe'
-            });
+            // Redirection avec erreur au lieu de JSON
+            res.redirect('/directeur/classes?error=delete-failed');
         }
     },
 

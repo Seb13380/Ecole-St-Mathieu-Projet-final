@@ -63,8 +63,6 @@ model User {
   messages                 Message[]               @relation("UserMessages")
   actualites               Actualite[]             @relation("UserActualites")
   travaux                  Travaux[]               @relation("UserTravaux")
-  horaires                 Horaire[]               @relation("EnseignantHoraires")
-  notes                    Note[]                  @relation("EnseignantNotes")
   menus                    Menu[]                  @relation("UserMenus")
   carouselImages           CarouselImage[]         @relation("UserCarouselImages")
   heroCarousel             HeroCarousel[]          @relation("UserHeroCarousel")
@@ -93,8 +91,6 @@ model Student {
 
   parent          User              @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
   classe          Classe            @relation("ClasseEleves", fields: [classeId], references: [id])
-  notes           Note[]            @relation("EleveNotes")
-  absences        Absence[]         @relation("EleveAbsences")
   TicketBooklet   TicketBooklet[]
   MealReservation MealReservation[]
   TicketPurchase  TicketPurchase[]
@@ -109,56 +105,7 @@ model Classe {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  eleves   Student[] @relation("ClasseEleves")
-  horaires Horaire[] @relation("ClasseHoraires")
-  notes    Note[]    @relation("ClasseNotes")
-  absences Absence[] @relation("ClasseAbsences")
-}
-
-model Note {
-  id             Int      @id @default(autoincrement())
-  eleveId        Int
-  classeId       Int
-  enseignantId   Int
-  matiere        String
-  note           Float
-  coefficient    Float    @default(1)
-  commentaire    String?
-  dateEvaluation DateTime
-  createdAt      DateTime @default(now())
-
-  eleve      Student @relation("EleveNotes", fields: [eleveId], references: [id])
-  classe     Classe  @relation("ClasseNotes", fields: [classeId], references: [id])
-  enseignant User    @relation("EnseignantNotes", fields: [enseignantId], references: [id], onDelete: Cascade)
-}
-
-model Absence {
-  id          Int       @id @default(autoincrement())
-  eleveId     Int
-  classeId    Int
-  dateDebut   DateTime
-  dateFin     DateTime?
-  motif       String
-  justifiee   Boolean   @default(false)
-  commentaire String?
-  createdAt   DateTime  @default(now())
-
-  eleve  Student @relation("EleveAbsences", fields: [eleveId], references: [id])
-  classe Classe  @relation("ClasseAbsences", fields: [classeId], references: [id])
-}
-
-model Horaire {
-  id           Int      @id @default(autoincrement())
-  classeId     Int
-  enseignantId Int
-  jourSemaine  String
-  heureDebut   String
-  heureFin     String
-  matiere      String
-  createdAt    DateTime @default(now())
-
-  classe     Classe @relation("ClasseHoraires", fields: [classeId], references: [id])
-  enseignant User   @relation("EnseignantHoraires", fields: [enseignantId], references: [id], onDelete: Cascade)
+  eleves Student[] @relation("ClasseEleves")
 }
 
 model Actualite {

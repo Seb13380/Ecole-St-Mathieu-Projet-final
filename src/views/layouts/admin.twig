@@ -18,64 +18,153 @@
 		<link rel="stylesheet" href="/assets/css/style.css">
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> {% block styles %}{% endblock %}
 		</head>
-		<body
-			class="bg-gray-100 min-h-screen font-poppins">
-			<!-- Navigation Admin -->
-			<nav class="bg-white shadow-lg border-b border-gray-200">
+		<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen font-poppins">
+			<!-- Navigation Admin Moderne -->
+			<nav class="bg-white shadow-xl border-b-2 border-blue-100">
 				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div class="flex justify-between h-16">
-						<div class="flex items-center">
-							<a href="/directeur/dashboard" class="flex items-center space-x-2">
-								<img src="/assets/images/LogoStMathieuV.png" alt="Logo" class="h-8 w-8">
-								<span class="text-xl font-bold text-gray-800">Admin - École Saint-Mathieu</span>
+					<!-- Header principal plus grand -->
+					<div class="flex justify-between items-center h-20">
+						<div class="flex items-center space-x-4">
+							<a href="/directeur/dashboard" class="flex items-center space-x-3 hover:scale-105 transition-transform duration-200">
+								<div class="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-xl shadow-lg">
+									<img src="/assets/images/LogoStMathieuV.png" alt="Logo" class="h-10 w-10 filter brightness-0 invert">
+								</div>
+								<div>
+									<span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+										Admin - École Saint-Mathieu
+									</span>
+									<p class="text-sm text-gray-500 font-medium">Centre d'administration</p>
+								</div>
 							</a>
 						</div>
 
-						<div
-							class="flex items-center space-x-4">
-							<!-- Menu Admin -->
-							<div class="hidden md:flex items-center space-x-1">
-								<a href="/admin/dashboard" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-home mr-1"></i>Dashboard
-								</a>
-								<a href="/admin/users" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-users mr-1"></i>Utilisateurs
-								</a>
-								<a href="/admin/students" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-child mr-1"></i>Élèves
-								</a>
-								<a href="/admin/classes" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-school mr-1"></i>Classes
-								</a>
-								<a href="/admin/inscriptions" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-clipboard-list mr-1"></i>Inscriptions
-								</a>
-								<a href="/travaux/manage" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-hammer mr-1"></i>Travaux
-								</a>
-								<a href="/admin/reports" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-chart-bar mr-1"></i>Rapports
-								</a>
-								<a href="/admin/settings" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-cogs mr-1"></i>Paramètres
+						<!-- Utilisateur connecté avec badge moderne -->
+						{% if user %}
+							<div class="flex items-center space-x-4">
+								<div class="text-right">
+									<p class="text-sm font-semibold text-gray-800">{{ user.firstName }} {{ user.lastName }}</p>
+									<div class="flex items-center justify-end space-x-2">
+										<span class="px-3 py-1 text-xs font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg">
+											{% if user.role == 'DIRECTION' %}DIRECTION{% else %}{{ user.role }}{% endif %}
+										</span>
+										<span class="text-xs text-gray-500">•</span>
+										<span class="text-xs text-green-600 font-medium">En ligne</span>
+									</div>
+								</div>
+								<a href="/auth/logout" class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 border border-red-200 hover:border-red-300">
+									<i class="fas fa-sign-out-alt"></i>
+									<span class="font-medium">Déconnexion</span>
 								</a>
 							</div>
+						{% endif %}
+					</div>
 
-							<!-- Utilisateur connecté -->
-							{% if user %}
-								<div class="flex items-center space-x-3">
-									<span class="text-sm text-gray-700">{{ user.firstName }}
-										{{ user.lastName }}</span>
-									<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ user.role }}</span>
-									<a href="/auth/logout" class="text-sm text-red-600 hover:text-red-800">
-										<i class="fas fa-sign-out-alt mr-1"></i>Déconnexion
-									</a>
+					<!-- Barre de navigation modernisée -->
+					<div class="border-t border-gray-100">
+						<div class="flex items-center space-x-1 py-4 overflow-x-auto">
+							<a href="/admin/dashboard" class="nav-link" data-page="dashboard">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-blue-50 hover:text-blue-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-blue-100 p-2 rounded-lg">
+										<i class="fas fa-home text-blue-600"></i>
+									</div>
+									<span>Dashboard</span>
 								</div>
-							{% endif %}
+							</a>
+							
+							<a href="/admin/users" class="nav-link" data-page="users">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-green-50 hover:text-green-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-green-100 p-2 rounded-lg">
+										<i class="fas fa-users text-green-600"></i>
+									</div>
+									<span>Utilisateurs</span>
+								</div>
+							</a>
+							
+							<a href="/admin/students" class="nav-link" data-page="students">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-purple-50 hover:text-purple-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-purple-100 p-2 rounded-lg">
+										<i class="fas fa-child text-purple-600"></i>
+									</div>
+									<span>Élèves</span>
+								</div>
+							</a>
+							
+							<a href="/admin/classes" class="nav-link" data-page="classes">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-amber-50 hover:text-amber-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-amber-100 p-2 rounded-lg">
+										<i class="fas fa-school text-amber-600"></i>
+									</div>
+									<span>Classes</span>
+								</div>
+							</a>
+							
+							<a href="/admin/inscriptions" class="nav-link" data-page="inscriptions">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-cyan-50 hover:text-cyan-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-cyan-100 p-2 rounded-lg">
+										<i class="fas fa-clipboard-list text-cyan-600"></i>
+									</div>
+									<span>Inscriptions</span>
+								</div>
+							</a>
+							
+							<a href="/travaux/manage" class="nav-link" data-page="travaux">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-orange-50 hover:text-orange-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-orange-100 p-2 rounded-lg">
+										<i class="fas fa-hammer text-orange-600"></i>
+									</div>
+									<span>Travaux</span>
+								</div>
+							</a>
+							
+							<a href="/admin/reports" class="nav-link" data-page="reports">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-pink-50 hover:text-pink-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-pink-100 p-2 rounded-lg">
+										<i class="fas fa-chart-bar text-pink-600"></i>
+									</div>
+									<span>Rapports</span>
+								</div>
+							</a>
+							
+							<a href="/admin/settings" class="nav-link" data-page="settings">
+								<div class="flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-gray-50 hover:text-gray-700 hover:shadow-lg hover:-translate-y-1 text-gray-600">
+									<div class="bg-gray-100 p-2 rounded-lg">
+										<i class="fas fa-cogs text-gray-600"></i>
+									</div>
+									<span>Paramètres</span>
+								</div>
+							</a>
 						</div>
 					</div>
 				</div>
 			</nav>
+
+			<!-- Script pour l'état actif de la navigation -->
+			<script>
+				document.addEventListener('DOMContentLoaded', function() {
+					// Mettre en évidence l'onglet actuel
+					const currentPath = window.location.pathname;
+					const navLinks = document.querySelectorAll('.nav-link');
+					
+					navLinks.forEach(link => {
+						const href = link.getAttribute('href');
+						if (currentPath.includes(href)) {
+							const div = link.querySelector('div');
+							const icon = link.querySelector('i');
+							const span = link.querySelector('span');
+							
+							// Styles pour l'élément actif
+							div.classList.remove('hover:bg-blue-50', 'hover:text-blue-700', 'text-gray-600');
+							div.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white', 'shadow-xl', 'scale-105');
+							
+							// Modifier l'icône pour l'état actif
+							const iconDiv = div.querySelector('div');
+							iconDiv.classList.remove('bg-blue-100');
+							iconDiv.classList.add('bg-white', 'bg-opacity-20');
+							icon.classList.add('text-white');
+						}
+					});
+				});
+			</script>
 
 			<!-- Contenu principal -->
 			<main class="min-h-screen bg-gray-50"> {% block content %}{% endblock %}

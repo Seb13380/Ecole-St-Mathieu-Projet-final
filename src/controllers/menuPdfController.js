@@ -92,7 +92,7 @@ const menuPdfController = {
             }
 
             if (!req.session.user || !req.session.user.id) {
-                return res.redirect('/login');
+                return res.redirect('/auth/login');
             }
 
             // Si ce menu est actif, désactiver les autres

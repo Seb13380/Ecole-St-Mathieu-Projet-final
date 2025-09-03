@@ -1,6 +1,7 @@
 const express = require('express');
 const homeController = require('../controllers/homeController');
 const ogecController = require('../controllers/ogecController');
+const legalController = require('../controllers/legalController');
 const inscriptionEleveController = require('../controllers/inscriptionEleveController');
 const { requireAdmin } = require('../middleware/auth');
 const router = express.Router();
@@ -18,5 +19,10 @@ router.post('/contact', homeController.postContact);
 
 router.get('/admin/contact-messages', requireAdmin, homeController.getContactMessages);
 router.patch('/admin/contact-messages/:id/processed', requireAdmin, homeController.markContactAsProcessed);
+
+// Routes légales
+router.get('/a-propos', legalController.getAPropos);
+router.get('/mentions-legales', legalController.getMentionsLegales);
+router.get('/politique-confidentialite', legalController.getPolitiqueConfidentialite);
 
 module.exports = router;
