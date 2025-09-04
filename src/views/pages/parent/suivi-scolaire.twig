@@ -49,24 +49,24 @@
                                         </h2>
                                         {% if enfant.classe %}
                                             <div class="flex items-center space-x-2 mt-1">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-800 text-white border border-blue-900">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white border" style="background-color: #1e3a8a; border-color: #1e40af;">
                                                     📚 Classe {{ enfant.classe.nom }}
                                                 </span>
                                                 {% if enfant.classe.niveau %}
-                                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-900 text-white">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white" style="background-color: #1e40af;">
                                                         {{ enfant.classe.niveau }}
                                                     </span>
                                                 {% endif %}
                                             </div>
                                         {% else %}
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-500 text-white mt-1">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white mt-1" style="background-color: #f97316;">
                                                 ⚠️ Classe non assignée
                                             </span>
                                         {% endif %}
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="bg-blue-800 rounded-lg px-4 py-2 border border-blue-900">
+                                    <div class="rounded-lg px-4 py-2 border" style="background-color: #1e3a8a; border-color: #1e40af;">
                                         <p class="text-blue-100 text-sm font-medium">Année scolaire</p>
                                         <p class="text-white font-bold text-lg">2024-2025</p>
                                     </div>
@@ -108,7 +108,7 @@
 
                                 <div class="bg-green-50 rounded-lg p-4">
                                     <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
-                                        � Éducatable
+                                        📚 Éducartable
                                     </h3>
                                     <div class="space-y-3">
                                         <p class="text-sm text-gray-600">
