@@ -196,12 +196,7 @@
 
 		<!-- User menu (toujours visible à droite) -->
 		<div class="flex-none gap-4 user-menu">
-			<!-- Debug temporaire -->
-			{% if user %}
-				<small style="color: red; font-size: 10px;">DEBUG: user={{ user.firstName }} role={{ user.role }} auth={{ isAuthenticated ? 'true' : 'false' }}</small>
-			{% else %}
-				<small style="color: red; font-size: 10px;">DEBUG: NO USER</small>
-			{% endif %}
+
 			
 			{% if isAuthenticated %}
 				<div class="dropdown dropdown-end">

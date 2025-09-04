@@ -20,6 +20,8 @@ const showCredentialsForm = (req, res) => {
 
 // Traiter la demande d'identifiants
 const processCredentialsRequest = async (req, res) => {
+    let credentialsRequest = null; // Initialiser la variable pour être accessible dans le catch
+
     try {
         const { email, firstName, lastName, phone } = req.body;
 
@@ -29,7 +31,7 @@ const processCredentialsRequest = async (req, res) => {
         }
 
         // 🔄 NOUVEAU : Créer la demande en base pour traçabilité
-        const credentialsRequest = await prisma.credentialsRequest.create({
+        credentialsRequest = await prisma.credentialsRequest.create({
             data: {
                 requestedEmail: email.toLowerCase().trim(),
                 requestedFirstName: firstName.trim(),
@@ -46,14 +48,18 @@ const processCredentialsRequest = async (req, res) => {
             where: {
                 email: email.toLowerCase().trim(),
                 role: 'PARENT',
-                firstName: {
-                    contains: firstName.trim(),
-                    mode: 'insensitive'
-                },
-                lastName: {
-                    contains: lastName.trim(),
-                    mode: 'insensitive'
-                }
+                AND: [
+                    {
+                        firstName: {
+                            contains: firstName.trim()
+                        }
+                    },
+                    {
+                        lastName: {
+                            contains: lastName.trim()
+                        }
+                    }
+                ]
             }
         });
 

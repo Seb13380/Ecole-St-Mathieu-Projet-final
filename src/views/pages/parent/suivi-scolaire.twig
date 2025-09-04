@@ -1,0 +1,255 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-6xl mx-auto px-4">
+        <!-- En-tête -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">📚 Suivi Scolaire</h1>
+                    {% if enfants and enfants|length > 0 %}
+                        <p class="text-gray-600 mt-2">
+                            Suivi de 
+                            {% for enfant in enfants %}
+                                <span class="font-semibold text-blue-600">{{ enfant.firstName }} {{ enfant.lastName }}</span>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    {% else %}
+                        <p class="text-gray-600 mt-2">Consultez les détails scolaires de vos enfants</p>
+                    {% endif %}
+                </div>
+                <a href="/parent/dashboard" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    ← Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+
+        <!-- Liste des enfants -->
+        {% if enfants and enfants|length > 0 %}
+            <div class="space-y-6">
+                {% for enfant in enfants %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <!-- En-tête de l'enfant -->
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-12 w-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-semibold text-lg">
+                                                {{ enfant.firstName|first }}{{ enfant.lastName|first }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-white">
+                                            {{ enfant.firstName }} {{ enfant.lastName }}
+                                        </h2>
+                                        {% if enfant.classe %}
+                                            <div class="flex items-center space-x-2 mt-1">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-800 text-white border border-blue-900">
+                                                    📚 Classe {{ enfant.classe.nom }}
+                                                </span>
+                                                {% if enfant.classe.niveau %}
+                                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-900 text-white">
+                                                        {{ enfant.classe.niveau }}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-500 text-white mt-1">
+                                                ⚠️ Classe non assignée
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="bg-blue-800 rounded-lg px-4 py-2 border border-blue-900">
+                                        <p class="text-blue-100 text-sm font-medium">Année scolaire</p>
+                                        <p class="text-white font-bold text-lg">2024-2025</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contenu principal -->
+                        <div class="p-6">
+                            <!-- Informations générales -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                        👤 Informations personnelles
+                                    </h3>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Date de naissance:</span>
+                                            <span class="font-medium">
+                                                {% if enfant.dateNaissance %}
+                                                    {{ enfant.dateNaissance|date('d/m/Y') }}
+                                                {% else %}
+                                                    Non renseignée
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Numéro étudiant:</span>
+                                            <span class="font-medium">{{ enfant.id }}</span>
+                                        </div>
+                                        {% if enfant.classe %}
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">Niveau:</span>
+                                                <span class="font-medium">{{ enfant.classe.niveau|default('Non défini') }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="bg-green-50 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                        � Éducatable
+                                    </h3>
+                                    <div class="space-y-3">
+                                        <p class="text-sm text-gray-600">
+                                            Accédez au portail numérique de l'école pour consulter les notes, devoirs et communications.
+                                        </p>
+                                        <a href="https://app.educartable.com/accounts-portal/" target="_blank" 
+                                           class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                            </svg>
+                                            Accéder à Éducatable
+                                        </a>
+                                        <p class="text-xs text-gray-500">
+                                            🔗 Le lien s'ouvre dans un nouvel onglet
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-blue-50 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                        🏫 Scolarité
+                                    </h3>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Statut:</span>
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Actif
+                                            </span>
+                                        </div>
+                                        {% if enfant.classe %}
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">Effectif classe:</span>
+                                                <span class="font-medium">{{ enfant.classe.effectif|default('Non défini') }}</span>
+                                            </div>
+                                        {% endif %}
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Dernière mise à jour:</span>
+                                            <span class="font-medium">{{ 'now'|date('d/m/Y') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Moyennes par matière -->
+                            {% if enfant.moyennesParMatiere and enfant.moyennesParMatiere|length > 0 %}
+                                <div class="mt-6 border border-gray-200 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                        📊 Moyennes par Matière
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {% for matiere, moyenne in enfant.moyennesParMatiere %}
+                                            <div class="bg-gray-50 rounded-lg p-3">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm font-medium text-gray-700">{{ matiere }}</span>
+                                                    <span class="text-lg font-bold 
+                                                        {% if moyenne >= 16 %}text-green-600
+                                                        {% elseif moyenne >= 14 %}text-blue-600
+                                                        {% elseif moyenne >= 10 %}text-orange-600
+                                                        {% else %}text-red-600{% endif %}">
+                                                        {{ moyenne }}/20
+                                                    </span>
+                                                </div>
+                                                <div class="mt-2 bg-gray-200 rounded-full h-2">
+                                                    <div class="h-2 rounded-full 
+                                                        {% if moyenne >= 16 %}bg-green-500
+                                                        {% elseif moyenne >= 14 %}bg-blue-500
+                                                        {% elseif moyenne >= 10 %}bg-orange-500
+                                                        {% else %}bg-red-500{% endif %}" 
+                                                        style="width: {{ (moyenne / 20) * 100 }}%"></div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Aucun enfant -->
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
+                    <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-1a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun enfant trouvé</h3>
+                <p class="text-gray-500 mb-4">
+                    Aucun enfant n'est associé à votre compte parent.
+                </p>
+                <div class="text-sm text-gray-400">
+                    📞 Contactez l'administration pour associer vos enfants<br>
+                    📧 ou envoyez un message via la messagerie
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Actions rapides -->
+        <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Actions rapides</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="/parent/dashboard" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">Tableau de bord</p>
+                        <p class="text-sm text-gray-500">Retour à l'accueil</p>
+                    </div>
+                </a>
+                
+                <a href="/parent/messages" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">Messagerie</p>
+                        <p class="text-sm text-gray-500">Messages école</p>
+                    </div>
+                </a>
+                
+                <div class="flex items-center p-4 border border-gray-200 rounded-lg bg-gray-50 opacity-50">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 7V9.5a1.5 1.5 0 113 0V14" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-500">Rendez-vous</p>
+                        <p class="text-sm text-gray-400">Prochainement</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

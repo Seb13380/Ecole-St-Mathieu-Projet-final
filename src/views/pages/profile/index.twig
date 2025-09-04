@@ -55,9 +55,6 @@
 				</div>
 			</div>
 
-			<!-- Messages de succès/erreur -->
-			{% set success = app.request.query.get('success') %}
-			{% set error = app.request.query.get('error') %}
 
 			{% if success %}
 				<div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -249,7 +246,7 @@
 
 						<div class="space-y-2">
 							{% if user.role == 'PARENT' %}
-								<a href="/parent/tickets/purchase" class="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+								<a href="/parent/tickets/purchase" class=" block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
 									🛒 Acheter des tickets
 								</a>
 								<a href="/parent/dashboard" class="block w-full text-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">

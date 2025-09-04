@@ -5,9 +5,16 @@
 {% endblock %}
 
 {% block main %}
+	<div style="background: red; color: white; padding: 20px; margin: 20px;">
+		<h1 style="font-size: 32px; font-weight: bold;">TEST - Demande Identifiants</h1>
+		<p style="font-size: 18px;">Cette page devrait être visible maintenant !</p>
+		<div style="background: blue; color: white; padding: 10px; margin: 10px;">
+			<p>Si vous voyez ce contenu, la page fonctionne.</p>
+		</div>
+	</div>
+
 	<div class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50">
-		<div
-			class="container mx-auto px-4 py-12">
+		<div class="container mx-auto px-4 py-12">
 
 			{# En-tête #}
 			<div class="text-center mb-12">
@@ -16,7 +23,7 @@
 				</h1>
 				<p class="text-lg text-gray-600 max-w-2xl mx-auto">
 					Vous avez déjà un compte parent mais vous avez oublié vos identifiants ? 
-					                Remplissez ce formulaire pour recevoir vos nouveaux codes d'accès.
+					Remplissez ce formulaire pour recevoir vos nouveaux codes d'accès.
 				</p>
 			</div>
 
@@ -51,22 +58,7 @@
 			<div class="max-w-md mx-auto">
 				<div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
 
-					<div class="text-center mb-6">
-						<div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4">
-							<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9a2 2 0 012-2m0 0V7a2 2 0 012-2m0 0a2 2 0 012-2h2a2 2 0 012 2v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9a2 2 0 012-2"></path>
-							</svg>
-						</div>
-						<h2 class="text-xl font-semibold text-gray-800">
-							Récupération d'identifiants
-						</h2>
-						<p class="text-sm text-gray-600 mt-2">
-							Saisissez vos informations pour recevoir vos nouveaux identifiants
-						</p>
-					</div>
-
-					<form
-						method="POST" action="/demande-identifiants" class="space-y-6">
+					<form method="POST" action="/demande-identifiants" class="space-y-6">
 
 						{# Email #}
 						<div>
@@ -107,32 +99,6 @@
 
 					</form>
 
-					{# Informations importantes #}
-					<div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-						<h3 class="text-sm font-medium text-blue-800 mb-2">
-							ℹ️ Informations importantes
-						</h3>
-						<ul class="text-xs text-blue-700 space-y-1">
-							<li>• Vos identifiants seront envoyés par email</li>
-							<li>• Vous devrez changer le mot de passe temporaire</li>
-							<li>• Vérifiez vos spams si vous ne recevez rien</li>
-							<li>• En cas de problème, contactez l'école</li>
-						</ul>
-					</div>
-
-				</div>
-			</div>
-
-			{# Liens utiles #}
-			<div class="text-center mt-8">
-				<div class="space-y-2">
-					<a href="/auth/login" class="inline-block text-blue-600 hover:text-blue-800 transition duration-200">
-						← Retour à la connexion
-					</a>
-					<br>
-					<a href="/auth/register" class="inline-block text-gray-600 hover:text-gray-800 transition duration-200 text-sm">
-						Pas encore de compte ? Demander une inscription
-					</a>
 				</div>
 			</div>
 
