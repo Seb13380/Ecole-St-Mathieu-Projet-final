@@ -54,6 +54,12 @@ router.post('/inscription-config', inscriptionController.updateInscriptionConfig
 router.get('/contact-messages', directeurController.getContactMessages);
 router.post('/contact/:id/process', directeurController.markContactAsProcessed);
 
+// Demandes d'identifiants
+router.get('/credentials', directeurController.getCredentialsRequests);
+router.post('/credentials/:id/approve', directeurController.approveCredentialsRequest);
+router.post('/credentials/:id/reject', directeurController.rejectCredentialsRequest);
+router.post('/credentials/:id/delete', directeurController.deleteCredentialsRequest);
+
 // Rapports et statistiques
 router.get('/reports', directeurController.getReports);
 

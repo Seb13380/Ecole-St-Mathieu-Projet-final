@@ -44,6 +44,7 @@ const inscriptionEleveController = {
                 parentEmail,
                 parentPhone,
                 parentAddress,
+                anneeScolaire,
                 children,
                 specialNeeds,
                 message
@@ -52,6 +53,12 @@ const inscriptionEleveController = {
             // Validation des champs obligatoires du parent
             if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone) {
                 req.flash('error', 'Veuillez remplir tous les champs obligatoires du parent.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Validation de l'année scolaire
+            if (!anneeScolaire) {
+                req.flash('error', 'Veuillez sélectionner l\'année scolaire.');
                 return res.redirect('/inscription-eleve');
             }
 
@@ -107,6 +114,9 @@ const inscriptionEleveController = {
                     parentEmail,
                     parentPhone,
                     parentAddress,
+
+                    // Année scolaire
+                    anneeScolaire,
 
                     // Informations des enfants (stocker en JSON)
                     children: JSON.stringify(childrenData),

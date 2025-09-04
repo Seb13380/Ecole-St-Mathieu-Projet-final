@@ -73,6 +73,8 @@ model User {
   galleryMedia             GalleryMedia[]          @relation("UserGalleryMedia")
   documents                Document[]              @relation("UserDocuments")
   processedPreInscriptions PreInscriptionRequest[] @relation("ProcessedPreInscriptions")
+  credentialsForParent     CredentialsRequest[]    @relation("CredentialsForParent")
+  processedCredentials     CredentialsRequest[]    @relation("ProcessedCredentials")
   agendaEvents             AgendaEvent[]           @relation("UserAgenda")
   inscriptionConfigs       InscriptionConfig[]     @relation("InscriptionConfigModifier")
   inscriptionDocuments     InscriptionDocument[]   @relation("InscriptionDocumentAuteur")
@@ -327,6 +329,7 @@ model InscriptionRequest {
   parentAddress   String
   password        String
   children        Json
+  anneeScolaire   String    @default("2025/2026") // Année scolaire pour laquelle l'inscription est demandée
   status          String    @default("PENDING")
   reviewedAt      DateTime?
   reviewedBy      Int?
@@ -433,6 +436,9 @@ model PreInscriptionRequest {
   parentAddress   String?
   parentPassword  String // Mot de passe choisi par le parent
 
+  // Année scolaire pour laquelle l'inscription est demandée
+  anneeScolaire String @default("2025/2026")
+
   // Informations des enfants (stockées en JSON)
   children     Json // Tableau des enfants avec firstName, lastName, birthDate, currentClass, requestedClass, previousSchool
   specialNeeds String? // Besoins particuliers
@@ -453,12 +459,55 @@ model PreInscriptionRequest {
   @@index([parentEmail])
 }
 
+model CredentialsRequest {
+  id                 Int     @id @default(autoincrement())
+  requestedEmail     String // Email fourni par le demandeur
+  requestedFirstName String // Prénom fourni
+  requestedLastName  String // Nom fourni
+  requestedPhone     String? // Téléphone fourni (optionnel)
+
+  // Parent trouvé (s'il existe)
+  foundParentId    Int? // ID du parent trouvé en base
+  foundParentEmail String? // Email réel du parent trouvé
+
+  // Statut et traitement
+  status      CredentialsRequestStatus @default(PENDING)
+  processed   Boolean                  @default(false)
+  processedAt DateTime?
+  processedBy Int? // ID de l'admin qui a traité
+
+  // Résultat
+  identifiersSent Boolean @default(false) // Identifiants envoyés ou non
+  errorMessage    String? // Message d'erreur si échec
+  adminNotes      String? // Notes de l'admin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  foundParent User? @relation("CredentialsForParent", fields: [foundParentId], references: [id])
+  processor   User? @relation("ProcessedCredentials", fields: [processedBy], references: [id])
+
+  @@index([status])
+  @@index([processed])
+  @@index([createdAt])
+  @@index([requestedEmail])
+}
+
 enum PreInscriptionStatus {
   PENDING // En attente
   REVIEWING // En cours d'examen
   ACCEPTED // Acceptée
   REJECTED // Refusée
   COMPLETED // Inscription finalisée
+}
+
+enum CredentialsRequestStatus {
+  PENDING // En attente de traitement
+  PROCESSING // En cours de traitement
+  COMPLETED // Identifiants envoyés
+  FAILED // Échec (parent non trouvé, erreur email, etc.)
+  REJECTED // Rejetée par l'admin
 }
 
 model AgendaEvent {

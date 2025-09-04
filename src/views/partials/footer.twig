@@ -1,40 +1,112 @@
-<footer class="w-full flex items-center justify-between bg-[#a7e3dd] text-[#304a4d] p-6 font-poppins-regular">
-	<div class="flex gap-7">
-		<a href="/a-propos" class="link link-hover font-poppins-medium text-2xl text-[#304a4d] hover:text-[#1a2e30]">A propos de nous</a>
-	</div>
-	<div>
-		<a href="/contact" class="hover:font-poppins-semibold transition-all text-3xl">Contactez nous</a>
-	</div>
-	<div class="flex-none mt-3">
-		<a href="https://investir.fondation-st-matthieu.org//" target="_blank" rel="noopener" class="flex items-center gap-6">
-			<img src="/assets/images/fondationStMatthieu.jpg" alt="Logo Fondation Saint Matthieu" class="w-auto object-contain rounded-xl shadow-md" style="height: 100px;"/>
-			<span class="text-xl font-bold text-[#304a4d]"></span>
-		</a>
-	</div>
-	<div class="flex items-center gap-2">
-		<a href="/mentions-legales" class="link link-hover font-poppins-medium text-3xl text-[#304a4d] hover:text-[#1a2e30]">Mentions légales</a>
-		<span class="text-4xl text-[#304a4d] opacity-60">|</span>
-		<a href="/politique-confidentialite" class="link link-hover font-poppins-medium text-2xl text-[#304a4d] hover:text-[#1a2e30]">Politique de confidentialité</a>
+<footer class="bg-[#a7e3dd] text-[#304a4d] py-6 lg:py-8 font-poppins">
+	<div
+		class="container mx-auto px-4 sm:px-6">
+		<!-- Mobile: stacked layout -->
+		<div
+			class="flex flex-col lg:hidden space-y-6">
+			<!-- About section -->
+			<div class="text-center">
+				<h3 class="text-lg font-semibold mb-2">École Privée Saint-Mathieu</h3>
+				<p class="text-sm text-gray-600 leading-relaxed">
+					Enseignement catholique sous contrat d'association avec l'État.
+				</p>
+			</div>
 
+			<!-- Foundation logo -->
+			<div class="flex justify-center">
+				<a href="https://investir.fondation-st-matthieu.org/" target="_blank" rel="noopener">
+					<img src="/assets/images/fondationStMatthieu.jpg" alt="Fondation Saint Matthieu" class="h-16 w-auto opacity-80 hover:opacity-100 transition-opacity rounded-lg"/>
+				</a>
+			</div>
 
-		<div class="flex gap-5">
-			<a class="hover:opacity-70 transition-opacity">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" viewbox="0 0 24 24" class="fill-[#304a4d]">
-					<path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
-				</svg>
-			</a>
-			<a class="hover:opacity-70 transition-opacity">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" viewbox="0 0 24 24" class="fill-[#304a4d]">
-					<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
-				</svg>
-			</a>
-			<a class="hover:opacity-70 transition-opacity">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" viewbox="0 0 24 24" class="fill-[#304a4d]">
-					<path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
-				</svg>
-			</a>
+			<!-- Quick links -->
+			<div class="flex flex-wrap justify-center gap-4 text-sm">
+				<a href="/a-propos" class="hover:text-[#1a2e30] transition-colors">À propos</a>
+				<a href="/contact" class="hover:text-[#1a2e30] transition-colors">Contact</a>
+				<a href="/mentions-legales" class="hover:text-[#1a2e30] transition-colors">Mentions légales</a>
+				<a href="/politique-confidentialite" class="hover:text-[#1a2e30] transition-colors">Confidentialité</a>
+			</div>
+
+			<!-- Social media -->
+			<div class="flex justify-center space-x-6">
+				<a href="#" class="hover:opacity-70 transition-opacity" aria-label="Twitter">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" class="fill-[#304a4d]">
+						<path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
+					</svg>
+				</a>
+				<a href="#" class="hover:opacity-70 transition-opacity" aria-label="YouTube">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" class="fill-[#304a4d]">
+						<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
+					</svg>
+				</a>
+				<a href="#" class="hover:opacity-70 transition-opacity" aria-label="Facebook">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" class="fill-[#304a4d]">
+						<path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
+					</svg>
+				</a>
+			</div>
+
+			<!-- Copyright -->
+			<div class="text-center text-sm">
+				<p class="opacity-80">©
+					{{ "now"|date("Y") }}
+					École Saint-Mathieu - Tous droits réservés</p>
+			</div>
 		</div>
-		<aside>
-			<p class="text-xl text-[#304a4d] opacity-80">&copy; All rights reserved by SG Digital</p>
-		</aside>
-	</footer>
+
+		<!-- Desktop: horizontal layout -->
+		<div
+			class="hidden lg:flex lg:justify-between lg:items-center">
+			<!-- Left: About -->
+			<div class="flex-1">
+				<a href="/a-propos" class="text-xl font-medium hover:text-[#1a2e30] transition-colors">À propos de nous</a>
+			</div>
+
+			<!-- Center: Contact -->
+			<div class="flex-1 text-center">
+				<a href="/contact" class="text-2xl font-semibold hover:text-[#1a2e30] transition-colors">Contactez nous</a>
+			</div>
+
+			<!-- Foundation logo -->
+			<div class="flex-none mx-8">
+				<a href="https://investir.fondation-st-matthieu.org/" target="_blank" rel="noopener">
+					<img src="/assets/images/fondationStMatthieu.jpg" alt="Fondation Saint Matthieu" class="h-20 w-auto opacity-90 hover:opacity-100 transition-opacity rounded-lg shadow-md"/>
+				</a>
+			</div>
+
+			<!-- Right: Legal & Social -->
+			<div class="flex-1 flex items-center justify-end gap-6">
+				<div class="flex items-center gap-4">
+					<a href="/mentions-legales" class="text-lg font-medium hover:text-[#1a2e30] transition-colors">Mentions légales</a>
+					<span class="text-2xl opacity-60">|</span>
+					<a href="/politique-confidentialite" class="text-lg font-medium hover:text-[#1a2e30] transition-colors">Confidentialité</a>
+				</div>
+
+				<div class="flex gap-4 ml-6">
+					<a href="#" class="hover:opacity-70 transition-opacity" aria-label="Twitter">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" class="fill-[#304a4d]">
+							<path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
+						</svg>
+					</a>
+					<a href="#" class="hover:opacity-70 transition-opacity" aria-label="YouTube">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" class="fill-[#304a4d]">
+							<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
+						</svg>
+					</a>
+					<a href="#" class="hover:opacity-70 transition-opacity" aria-label="Facebook">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" class="fill-[#304a4d]">
+							<path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
+						</svg>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Desktop copyright -->
+		<div class="hidden lg:block border-t border-[#8dd3cc] mt-6 pt-4 text-center">
+			<p class="text-sm opacity-80">©
+				{{ "now"|date("Y") }}
+				École Privée Saint-Mathieu - Tous droits réservés</p>
+		</div>
+	</div>
+</footer>

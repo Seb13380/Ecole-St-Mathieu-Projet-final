@@ -24,7 +24,8 @@ const directeurController = {
                 prisma.message.count(),
                 prisma.actualite.count(),
                 prisma.travaux.count(),
-                prisma.inscriptionRequest.count({ where: { status: 'PENDING' } })
+                prisma.inscriptionRequest.count({ where: { status: 'PENDING' } }),
+                prisma.credentialsRequest.count({ where: { status: { in: ['PENDING', 'PROCESSING'] } } })
             ]);
 
             // Récupérer les utilisateurs récents
@@ -67,6 +68,24 @@ const directeurController = {
                 }
             });
 
+            // Récupérer les demandes d'identifiants en attente
+            const pendingCredentials = await prisma.credentialsRequest.findMany({
+                where: {
+                    status: { in: ['PENDING', 'PROCESSING'] }
+                },
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    foundParent: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            email: true
+                        }
+                    }
+                }
+            });
+
             res.render('pages/directeur/dashboard.twig', {
                 title: 'Tableau de bord - Administration',
                 user: req.session.user,
@@ -77,11 +96,13 @@ const directeurController = {
                     totalMessages: stats[3],
                     totalActualites: stats[4],
                     totalTravaux: stats[5],
-                    pendingInscriptions: stats[6]
+                    pendingInscriptions: stats[6],
+                    pendingCredentials: stats[7]
                 },
                 recentUsers,
                 recentMessages,
-                pendingRequests
+                pendingRequests,
+                pendingCredentials
             });
 
         } catch (error) {
@@ -735,6 +756,140 @@ const directeurController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de la mise à jour des paramètres'
+            });
+        }
+    },
+
+    // === GESTION DES DEMANDES D'IDENTIFIANTS ===
+
+    async getCredentialsRequests(req, res) {
+        try {
+            console.log('🔑 Accès aux demandes d\'identifiants');
+
+            // Récupérer toutes les demandes d'identifiants
+            const credentialsRequests = await prisma.credentialsRequest.findMany({
+                include: {
+                    foundParent: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            role: true
+                        }
+                    }
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            // Statistiques
+            const stats = {
+                total: credentialsRequests.length,
+                pending: credentialsRequests.filter(r => r.status === 'PENDING').length,
+                processing: credentialsRequests.filter(r => r.status === 'PROCESSING').length,
+                completed: credentialsRequests.filter(r => r.status === 'COMPLETED').length,
+                rejected: credentialsRequests.filter(r => r.status === 'REJECTED').length
+            };
+
+            res.render('pages/directeur/credentials.twig', {
+                title: 'Demandes d\'identifiants - Gestion',
+                user: req.session.user,
+                credentialsRequests,
+                stats
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur récupération demandes identifiants:', error);
+            res.status(500).render('pages/error.twig', {
+                message: 'Erreur lors du chargement des demandes d\'identifiants'
+            });
+        }
+    },
+
+    async approveCredentialsRequest(req, res) {
+        try {
+            const { id } = req.params;
+            const { notes } = req.body;
+
+            console.log(`✅ Approbation demande identifiants ID: ${id}`);
+
+            await prisma.credentialsRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    status: 'COMPLETED',
+                    processedAt: new Date(),
+                    processed: true,
+                    identifiersSent: true,
+                    adminNotes: notes || null
+                }
+            });
+
+            res.json({
+                success: true,
+                message: 'Demande d\'identifiants approuvée et identifiants envoyés avec succès'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur approbation demande identifiants:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de l\'approbation de la demande'
+            });
+        }
+    },
+
+    async rejectCredentialsRequest(req, res) {
+        try {
+            const { id } = req.params;
+            const { reason, notes } = req.body;
+
+            console.log(`❌ Rejet demande identifiants ID: ${id}`);
+
+            await prisma.credentialsRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    status: 'REJECTED',
+                    processedAt: new Date(),
+                    processed: true,
+                    errorMessage: reason || null,
+                    adminNotes: notes || null
+                }
+            });
+
+            res.json({
+                success: true,
+                message: 'Demande d\'identifiants rejetée'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur rejet demande identifiants:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors du rejet de la demande'
+            });
+        }
+    },
+
+    async deleteCredentialsRequest(req, res) {
+        try {
+            const { id } = req.params;
+
+            console.log(`🗑️ Suppression demande identifiants ID: ${id}`);
+
+            await prisma.credentialsRequest.delete({
+                where: { id: parseInt(id) }
+            });
+
+            res.json({
+                success: true,
+                message: 'Demande d\'identifiants supprimée'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur suppression demande identifiants:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la suppression de la demande'
             });
         }
     },

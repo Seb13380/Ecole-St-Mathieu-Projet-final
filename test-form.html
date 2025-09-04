@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test Demande Identifiants</title>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <h1>Test Demande d'Identifiants</h1>
+    <form action="http://localhost:3007/credentials-request" method="POST">
+        <div>
+            <label>Prénom: <input type="text" name="firstName" value="Jean" required></label>
+        </div>
+        <div>
+            <label>Nom: <input type="text" name="lastName" value="Dupont" required></label>
+        </div>
+        <div>
+            <label>Email: <input type="email" name="email" value="jean.dupont@test.com" required></label>
+        </div>
+        <div>
+            <label>Téléphone: <input type="text" name="phone" value="06.11.22.33.44"></label>
+        </div>
+        <div>
+            <button type="submit">Envoyer Demande</button>
+        </div>
+    </form>
+</body>
+
+</html>
