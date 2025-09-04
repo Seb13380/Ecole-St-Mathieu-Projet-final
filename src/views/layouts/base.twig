@@ -15,14 +15,72 @@
 
 		<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
 		<link href="/assets/css/tailwind.css?v=20250820" rel="stylesheet">
-		<link rel="stylesheet" href="/assets/css/style.css"> {% block styles %}{% endblock %}
+		<link rel="stylesheet" href="/assets/css/style.css">
+		
+		<!-- Style de diagnostic pour le menu mobile -->
+		<style>
+			#mobile-menu {
+				background: rgba(167, 227, 221, 0.95) !important;
+				backdrop-filter: blur(5px);
+			}
+			
+			#mobile-menu.translate-x-0 {
+				transform: translateX(0) !important;
+			}
+			
+			#mobile-menu.translate-x-full {
+				transform: translateX(100%) !important;
+			}
+			
+			.transition-transform {
+				transition: transform 0.3s ease-in-out !important;
+			}
+
+			/* Style pour les dropdowns mobiles */
+			.mobile-dropdown-content {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.3s ease-in-out;
+			}
+
+			.mobile-dropdown-content:not(.hidden) {
+				max-height: 500px;
+			}
+
+			.mobile-dropdown-content.hidden {
+				max-height: 0 !important;
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.mobile-dropdown-btn svg {
+				transition: transform 0.3s ease-in-out;
+			}
+
+			/* Améliorer la visibilité des sous-menus */
+			.mobile-dropdown-content li a {
+				background: rgba(141, 211, 204, 0.3);
+				margin: 2px 0;
+				border-radius: 8px;
+				border-left: 3px solid #8dd3cc;
+			}
+
+			.mobile-dropdown-content li a:hover {
+				background: rgba(141, 211, 204, 0.6) !important;
+			}
+		</style>
+		
+		{% block styles %}{% endblock %}
 		</head>
 		<body class="bg-[#a7e3dd] min-h-screen font-poppins">
 			{% include "partials/header.twig" %}
 			<main class="min-h-screen pt-4 pb-8"> {% block main %}{% endblock %}
 				</main>
-				{% include "partials/footer.twig" %}
+		{% include "partials/footer.twig" %}
 
-				{% block scripts %}{% endblock %}
-			</body>
-		</html>
+		<!-- Script pour le menu mobile responsive -->
+		<script src="/assets/js/mobile-menu.js"></script>
+		
+		{% block scripts %}{% endblock %}
+	</body>
+</html>

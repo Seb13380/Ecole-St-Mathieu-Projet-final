@@ -140,6 +140,39 @@
 							</div>
 						</div>
 
+						<!-- Section Mot de passe -->
+						<div class="border-b border-gray-200 pb-6">
+							<div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
+								<h2 class="text-2xl font-semibold text-orange-800 text-center mb-4">
+									🔒 Mot de passe pour votre compte
+								</h2>
+								<p class="text-center text-orange-700 mb-4">
+									Choisissez un mot de passe sécurisé pour accéder à votre espace parent
+								</p>
+								
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+									<div class="form-control">
+										<label class="label">
+											<span class="label-text font-medium">Mot de passe *</span>
+										</label>
+										<input type="password" name="parentPassword" class="input input-bordered w-full" 
+											   placeholder="Minimum 6 caractères" minlength="6" required>
+										<label class="label">
+											<span class="label-text-alt text-gray-500">Au moins 6 caractères avec majuscule, minuscule et chiffre</span>
+										</label>
+									</div>
+
+									<div class="form-control">
+										<label class="label">
+											<span class="label-text font-medium">Confirmer le mot de passe *</span>
+										</label>
+										<input type="password" name="confirmPassword" class="input input-bordered w-full" 
+											   placeholder="Ressaisissez le mot de passe" minlength="6" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<!-- Section Année Scolaire -->
 						<div class="border-b border-gray-200 pb-6">
 							<h2 class="text-2xl font-semibold text-[#304a4d] text-center mb-4">
@@ -557,6 +590,59 @@ removeChild(button);
 
 // Initialiser l'affichage des boutons
 updateRemoveButtons();
+
+// === VALIDATION DES MOTS DE PASSE ===
+const passwordInput = document.querySelector('input[name="parentPassword"]');
+const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
+const form = document.querySelector('form');
+
+function validatePassword() {
+	const password = passwordInput.value;
+	const confirmPassword = confirmPasswordInput.value;
+	
+	// Validation de la force du mot de passe
+	const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+	
+	if (password.length > 0) {
+		if (!passwordRegex.test(password)) {
+			passwordInput.classList.add('input-error');
+		} else {
+			passwordInput.classList.remove('input-error');
+		}
+	}
+
+	// Validation de la correspondance
+	if (confirmPassword.length > 0) {
+		if (password !== confirmPassword) {
+			confirmPasswordInput.classList.add('input-error');
+		} else {
+			confirmPasswordInput.classList.remove('input-error');
+		}
+	}
+}
+
+passwordInput.addEventListener('input', validatePassword);
+confirmPasswordInput.addEventListener('input', validatePassword);
+
+// Validation au moment de la soumission
+form.addEventListener('submit', function(e) {
+	const password = passwordInput.value;
+	const confirmPassword = confirmPasswordInput.value;
+	const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+	if (!passwordRegex.test(password)) {
+		e.preventDefault();
+		alert('Le mot de passe doit contenir au moins 6 caractères avec une majuscule, une minuscule et un chiffre.');
+		return;
+	}
+
+	if (password !== confirmPassword) {
+		e.preventDefault();
+		alert('Les mots de passe ne correspondent pas.');
+		return;
+	}
+});
+
 });
 	</script>
 {% endblock %}

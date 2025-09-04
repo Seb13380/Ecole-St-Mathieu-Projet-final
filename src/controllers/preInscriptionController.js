@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 
 const preInscriptionController = {
@@ -31,6 +32,8 @@ const preInscriptionController = {
                 parentEmail,
                 parentPhone,
                 parentAddress,
+                parentPassword,
+                confirmPassword,
                 studentFirstName,
                 studentLastName,
                 studentBirthDate,
@@ -43,10 +46,42 @@ const preInscriptionController = {
 
             // Validation des champs obligatoires
             if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone ||
-                !studentFirstName || !studentLastName || !studentBirthDate || !requestedClass) {
+                !studentFirstName || !studentLastName || !studentBirthDate || !requestedClass ||
+                !parentPassword || !confirmPassword) {
                 req.flash('error', 'Veuillez remplir tous les champs obligatoires.');
                 return res.redirect('/pre-inscription');
             }
+
+            // Validation du mot de passe
+            if (parentPassword !== confirmPassword) {
+                req.flash('error', 'Les mots de passe ne correspondent pas.');
+                return res.redirect('/pre-inscription');
+            }
+
+            if (parentPassword.length < 6) {
+                req.flash('error', 'Le mot de passe doit contenir au moins 6 caractères.');
+                return res.redirect('/pre-inscription');
+            }
+
+            // Validation format mot de passe (majuscule, minuscule, chiffre)
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+            if (!passwordRegex.test(parentPassword)) {
+                req.flash('error', 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.');
+                return res.redirect('/pre-inscription');
+            }
+
+            // Créer l'objet enfant au format JSON attendu par le modèle
+            const childrenData = [{
+                firstName: studentFirstName,
+                lastName: studentLastName,
+                birthDate: studentBirthDate,
+                currentClass: currentClass || null,
+                requestedClass,
+                previousSchool: previousSchool || null
+            }];
+
+            // Hasher le mot de passe fourni par l'utilisateur
+            const hashedPassword = await bcrypt.hash(parentPassword, 12);
 
             // Création de la demande de pré-inscription
             const preInscription = await prisma.preInscriptionRequest.create({
@@ -57,14 +92,10 @@ const preInscriptionController = {
                     parentEmail,
                     parentPhone,
                     parentAddress,
+                    parentPassword: hashedPassword,
 
-                    // Informations élève
-                    studentFirstName,
-                    studentLastName,
-                    studentBirthDate: new Date(studentBirthDate),
-                    currentClass: currentClass || null,
-                    requestedClass,
-                    previousSchool: previousSchool || null,
+                    // Informations élève (en JSON)
+                    children: childrenData,
                     specialNeeds: specialNeeds || null,
                     message: message || null,
 

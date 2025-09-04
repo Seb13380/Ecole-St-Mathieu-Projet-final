@@ -105,6 +105,15 @@ app.set('twig options', {
 
 // Middleware pour rendre les variables de session disponibles dans les vues
 app.use((req, res, next) => {
+  // Debug temporaire
+  console.log('🔍 DEBUG SESSION:', {
+    hasSession: !!req.session,
+    hasUser: !!req.session?.user,
+    user: req.session?.user,
+    sessionID: req.sessionID,
+    url: req.url
+  });
+
   res.locals.user = req.session.user || null;
   res.locals.isAuthenticated = !!req.session.user;
   // Rendre les messages flash disponibles dans toutes les vues
@@ -188,6 +197,11 @@ app.get('/inscriptions/manage', (req, res) => {
       user: req.session.user
     });
   }
+});
+
+// Route de test pour le header responsive
+app.get('/test-responsive', (req, res) => {
+  res.sendFile(__dirname + '/test-responsive.html');
 });
 
 const PORT = process.env.PORT || 3000;

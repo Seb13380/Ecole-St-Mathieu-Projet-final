@@ -258,8 +258,9 @@ const inscriptionController = {
                             data: {
                                 firstName: childData.firstName,
                                 lastName: childData.lastName,
-                                birthDate: new Date(childData.birthDate),
-                                parentId: parentUser.id
+                                dateNaissance: new Date(childData.birthDate),
+                                parentId: parentUser.id,
+                                classeId: 1 // Classe par défaut CP A
                             }
                         });
 

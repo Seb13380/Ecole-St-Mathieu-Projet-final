@@ -44,6 +44,8 @@ const inscriptionEleveController = {
                 parentEmail,
                 parentPhone,
                 parentAddress,
+                parentPassword,
+                confirmPassword,
                 anneeScolaire,
                 children,
                 specialNeeds,
@@ -51,8 +53,27 @@ const inscriptionEleveController = {
             } = req.body;
 
             // Validation des champs obligatoires du parent
-            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone) {
+            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone ||
+                !parentPassword || !confirmPassword) {
                 req.flash('error', 'Veuillez remplir tous les champs obligatoires du parent.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Validation du mot de passe
+            if (parentPassword !== confirmPassword) {
+                req.flash('error', 'Les mots de passe ne correspondent pas.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            if (parentPassword.length < 6) {
+                req.flash('error', 'Le mot de passe doit contenir au moins 6 caractères.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Validation format mot de passe (majuscule, minuscule, chiffre)
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+            if (!passwordRegex.test(parentPassword)) {
+                req.flash('error', 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.');
                 return res.redirect('/inscription-eleve');
             }
 
@@ -105,6 +126,9 @@ const inscriptionEleveController = {
                 return res.redirect('/inscription-eleve');
             }
 
+            // Hasher le mot de passe fourni par l'utilisateur
+            const hashedPassword = await bcrypt.hash(parentPassword, 12);
+
             // Création de la demande d'inscription avec plusieurs enfants
             const inscriptionRequest = await prisma.preInscriptionRequest.create({
                 data: {
@@ -114,6 +138,7 @@ const inscriptionEleveController = {
                     parentEmail,
                     parentPhone,
                     parentAddress,
+                    parentPassword: hashedPassword, // Mot de passe haché fourni par l'utilisateur
 
                     // Année scolaire
                     anneeScolaire,

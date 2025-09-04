@@ -435,7 +435,7 @@ const directeurController = {
                 data: {
                     firstName,
                     lastName,
-                    birthDate: new Date(birthDate),
+                    dateNaissance: new Date(birthDate),
                     classeId: parseInt(classeId),
                     parentId: parseInt(parentId)
                 }

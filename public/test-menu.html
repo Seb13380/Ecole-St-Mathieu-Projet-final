@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="cupcake" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Menu Burger - École Saint-Mathieu</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px #a7e3dd, 0 0 10px #a7e3dd, 0 0 15px #a7e3dd;
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 10px #8dd3cc, 0 0 20px #8dd3cc, 0 0 30px #8dd3cc;
+                transform: scale(1.02);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#a7e3dd] font-poppins">
+    <!-- Header avec menu burger -->
+    <nav class="bg-[#a7e3dd] shadow-lg relative z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo École -->
+                <div class="flex-none">
+                    <a href="/" class="flex items-center gap-4">
+                        <img src="/assets/images/testimage.jpg" alt="Logo École Saint-Mathieu"
+                            class="w-auto object-contain rounded-full" style="height: 80px;" />
+                        <span class="text-2xl font-bold text-[#304a4d] hidden sm:block">École Saint-Mathieu</span>
+                    </a>
+                </div>
+
+                <!-- Menu desktop (caché sur mobile) -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/" class="text-[#304a4d] font-semibold hover:underline">Accueil</a>
+                    <a href="/inscription" class="text-[#304a4d] font-semibold hover:underline">Inscription</a>
+                    <a href="/contact" class="text-[#304a4d] font-semibold hover:underline">Contact</a>
+                </div>
+
+                <!-- Logo Educartable Desktop -->
+                <div class="hidden md:block">
+                    <a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener">
+                        <img src="/assets/images/educartable2.png" alt="Logo Educartable"
+                            class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300 pulse-glow"
+                            style="height: 80px;" />
+                    </a>
+                </div>
+
+                <!-- Bouton burger (visible sur mobile) -->
+                <button id="mobile-menu-button" class="md:hidden btn btn-ghost text-[#304a4d] text-2xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu mobile fullscreen -->
+        <div id="mobile-menu"
+            class="fixed inset-0 bg-[#a7e3dd] z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+            <div class="flex flex-col h-full">
+                <!-- Header du menu mobile -->
+                <div class="flex justify-between items-center p-4 border-b border-[#8dd3cc]">
+                    <h2 class="text-xl font-bold text-[#304a4d]">Menu</h2>
+                    <button id="mobile-menu-close" class="btn btn-ghost text-[#304a4d] text-2xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Contenu du menu mobile -->
+                <div class="flex-1 overflow-y-auto p-4">
+                    <!-- Logo Educartable en mobile -->
+                    <div class="mb-6 text-center">
+                        <a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener">
+                            <img src="/assets/images/educartable2.png" alt="Logo Educartable"
+                                class="w-auto object-contain rounded-xl shadow-md mx-auto pulse-glow"
+                                style="height: 60px;" />
+                        </a>
+                    </div>
+
+                    <!-- Menu items -->
+                    <ul class="space-y-4 font-medium text-lg">
+                        <li>
+                            <a href="/"
+                                class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">🏠
+                                Accueil</a>
+                        </li>
+                        <li>
+                            <a href="/inscription"
+                                class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">📝
+                                Inscription</a>
+                        </li>
+                        <li>
+                            <a href="/contact"
+                                class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">📧
+                                Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-[#304a4d] mb-6">Test du Menu Burger</h1>
+        <p class="text-lg text-[#304a4d]">
+            Cliquez sur le bouton burger (☰) en haut à droite sur mobile pour tester le menu.
+        </p>
+        <p class="text-lg text-[#304a4d] mt-4">
+            Le logo Educartable devrait être visible dans le header desktop et dans le menu mobile.
+        </p>
+    </main>
+
+    <!-- Script pour le menu mobile -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🍔 Script de test menu burger chargé');
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+
+            console.log('📱 Éléments trouvés:', {
+                button: !!mobileMenuButton,
+                menu: !!mobileMenu,
+                close: !!mobileMenuClose
+            });
+
+            // Ouvrir le menu
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('🍔 Bouton burger cliqué');
+                    if (mobileMenu) {
+                        mobileMenu.classList.remove('translate-x-full');
+                        mobileMenu.classList.add('translate-x-0');
+                        document.body.style.overflow = 'hidden';
+                        console.log('✅ Menu ouvert');
+                    }
+                });
+            }
+
+            // Fermer le menu
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('❌ Bouton fermeture cliqué');
+                    if (mobileMenu) {
+                        mobileMenu.classList.remove('translate-x-0');
+                        mobileMenu.classList.add('translate-x-full');
+                        document.body.style.overflow = '';
+                        console.log('✅ Menu fermé');
+                    }
+                });
+            }
+
+            // Fermer avec Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
+                    console.log('⌨️ Escape pressé');
+                    mobileMenu.classList.remove('translate-x-0');
+                    mobileMenu.classList.add('translate-x-full');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

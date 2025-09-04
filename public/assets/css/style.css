@@ -3811,3 +3811,382 @@ input[type="submit"]:not(.no-style):hover::before {
 .shadow-2xl {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
+
+/* ======================================
+   STYLES RESPONSIVE POUR LE HEADER
+   ====================================== */
+
+/* Styles généraux pour le header */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Logo responsive */
+.logo-container .logo-img {
+  height: 120px;
+  transition: height 0.3s ease;
+}
+
+/* Menu burger - caché sur desktop */
+.burger-menu {
+  display: none;
+}
+
+/* Menu desktop - visible par défaut */
+.desktop-menu {
+  display: flex;
+}
+
+/* Menu mobile - caché par défaut */
+.mobile-menu {
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.mobile-menu.active {
+  transform: translateX(0);
+}
+
+/* Dropdown mobile */
+.mobile-dropdown .mobile-dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.mobile-dropdown.active .mobile-dropdown-content {
+  max-height: 300px;
+}
+
+.mobile-dropdown.active .mobile-dropdown-btn svg {
+  transform: rotate(180deg);
+}
+
+/* ======================================
+   MEDIA QUERIES RESPONSIVE
+   ====================================== */
+
+/* Tablettes et petits écrans (768px et moins) */
+@media (max-width: 768px) {
+
+  /* Header responsive */
+  .navbar {
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* Logos plus petits sur mobile */
+  .logo-container .logo-img {
+    height: 80px;
+  }
+
+  /* Cacher le logo diocèse sur mobile */
+  /* (Supprimé) : le second logo n'est plus caché sur mobile. Si besoin de le masquer à nouveau, ajouter une classe dédiée
+     .logo-diocese-hide-mobile { display:none; } et l'appliquer seulement au conteneur voulu. */
+
+  /* Afficher le menu burger */
+  .burger-menu {
+    display: block;
+    margin-left: auto;
+  }
+
+  /* Cacher le menu desktop */
+  .desktop-menu {
+    display: none;
+  }
+
+  /* User menu plus compact */
+  .user-menu .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* Button connexion plus petit */
+  .headerbutton {
+    padding: 8px 16px !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Très petits écrans (480px et moins) */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .logo-container .logo-img {
+    height: 60px;
+  }
+
+  .user-menu .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .headerbutton {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Menu mobile prend toute la largeur */
+  #mobile-menu {
+    width: 100vw;
+  }
+}
+
+/* Écrans moyens (entre 768px et 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .navbar {
+    padding: 1rem 2rem;
+  }
+
+  .logo-container .logo-img {
+    height: 100px;
+  }
+
+  /* Menu desktop avec taille de police réduite */
+  .desktop-menu ul.menu li a,
+  .desktop-menu ul.menu li div {
+    font-size: 22px !important;
+  }
+}
+
+/* Grands écrans (1024px et plus) */
+@media (min-width: 1025px) {
+  .navbar {
+    padding: 2rem 2.25rem;
+  }
+
+  .logo-container .logo-img {
+    height: 120px;
+  }
+
+  /* Taille de police normale pour desktop */
+  .desktop-menu ul.menu li a,
+  .desktop-menu ul.menu li div {
+    font-size: 27px !important;
+  }
+}
+
+/* Animation pour le menu burger */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Classes utilitaires pour les animations */
+.slide-in-right {
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.3s ease-in-out;
+}
+
+/* Amélioration de l'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+
+  .mobile-menu,
+  .mobile-dropdown .mobile-dropdown-content,
+  .logo-container .logo-img {
+    transition: none;
+  }
+
+  .slide-in-right,
+  .slide-out-right {
+    animation: none;
+  }
+}
+
+/* ======================================
+   AMÉLIORATIONS SUPPLÉMENTAIRES
+   ====================================== */
+
+/* Overlay pour fermer le menu mobile */
+.mobile-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}
+
+/* Amélioration du contenu du menu mobile */
+.mobile-menu .flex-1 {
+  background: #a7e3dd;
+  z-index: 1;
+  position: relative;
+  margin-left: auto;
+  width: 80%;
+  max-width: 400px;
+}
+
+/* Smooth scrolling pour le menu mobile */
+.mobile-menu .overflow-y-auto {
+  scroll-behavior: smooth;
+}
+
+/* Hover effects pour mobile (touch devices) */
+@media (hover: none) and (pointer: coarse) {
+
+  /* Styles spécifiques pour les appareils tactiles */
+  .mobile-dropdown .mobile-dropdown-btn:active,
+  .mobile-menu a:active {
+    background-color: #8dd3cc !important;
+    transform: scale(0.98);
+  }
+}
+
+/* Focus styles pour l'accessibilité */
+.mobile-menu a:focus,
+.mobile-menu button:focus,
+#mobile-menu-button:focus,
+#mobile-menu-close:focus {
+  outline: 2px solid #304a4d;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Protection contre les débordements */
+.mobile-menu {
+  overflow: hidden;
+}
+
+.mobile-menu .flex-1 {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Responsive breakpoints plus fins */
+@media (max-width: 360px) {
+
+  /* Très petits smartphones */
+  .logo-container .logo-img {
+    height: 50px;
+  }
+
+  .navbar {
+    padding: 0.25rem;
+  }
+
+  .mobile-menu .flex-1 {
+    width: 90%;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
+
+  /* Petits smartphones */
+  .logo-container .logo-img {
+    height: 60px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+
+  /* Grands smartphones et petites tablettes */
+  .logo-container .logo-img {
+    height: 70px;
+  }
+
+  .mobile-menu .flex-1 {
+    width: 75%;
+  }
+}
+
+/* Mode sombre (si supporté par le système) */
+@media (prefers-color-scheme: dark) {
+  /* Note: Votre design utilise déjà des couleurs claires, 
+     mais on peut ajouter des ajustements si nécessaire */
+}
+
+/* Amélioration pour les écrans haute densité */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  .logo-container .logo-img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* ======================================
+   COMPATIBILITÉ NAVIGATEURS
+   ====================================== */
+
+/* Support pour Safari et anciens navigateurs */
+.mobile-menu {
+  -webkit-transform: translateX(100%);
+  -moz-transform: translateX(100%);
+  -ms-transform: translateX(100%);
+  transform: translateX(100%);
+
+  -webkit-transition: -webkit-transform 0.3s ease-in-out;
+  -moz-transition: -moz-transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
+}
+
+.mobile-menu.active {
+  -webkit-transform: translateX(0);
+  -moz-transform: translateX(0);
+  -ms-transform: translateX(0);
+  transform: translateX(0);
+}
+
+/* Prefixes pour les animations */
+@-webkit-keyframes slideInRight {
+  from {
+    -webkit-transform: translateX(100%);
+  }
+
+  to {
+    -webkit-transform: translateX(0);
+  }
+}
+
+@-moz-keyframes slideInRight {
+  from {
+    -moz-transform: translateX(100%);
+  }
+
+  to {
+    -moz-transform: translateX(0);
+  }
+}
+
+/* Fix pour les anciens Android */
+.mobile-menu {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Performance optimizations */
+.logo-img,
+.mobile-menu,
+.mobile-dropdown-content {
+  will-change: transform;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
