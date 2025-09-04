@@ -135,6 +135,7 @@ const carouselRoutes = require("./src/routes/carouselRoutes");
 const heroCarouselRoutes = require("./src/routes/heroCarouselRoutes");
 const inscriptionsRoutes = require('./src/routes/inscriptions');
 const galleryRoutes = require('./src/routes/galleryRoutes');
+const credentialsController = require('./src/controllers/credentialsController');
 const documentRoutes = require('./src/routes/documentRoutes');
 const preInscriptionRoutes = require('./src/routes/preInscriptionRoutes');
 const userManagementRoutes = require('./src/routes/userManagementRoutes');
@@ -172,6 +173,10 @@ app.use('/inscription-management', inscriptionManagementRoutes);
 app.get('/inscription', (req, res) => {
   res.redirect('/inscription-eleve');
 });
+
+// Routes pour demande d'identifiants (système séparé)
+app.get('/demande-identifiants', credentialsController.showCredentialsForm);
+app.post('/demande-identifiants', credentialsController.processCredentialsRequest);
 
 // Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
 app.get('/inscriptions/manage', (req, res) => {

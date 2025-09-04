@@ -96,6 +96,54 @@ const inscriptionController = {
                 }
             });
 
+            // 🔥 ENVOI EMAIL NOTIFICATION ADMIN
+            try {
+                const adminEmailData = {
+                    requestId: inscriptionRequest.id,
+                    parentName: `${parentFirstName} ${parentLastName}`,
+                    parentEmail: parentEmail,
+                    parentPhone: parentPhone,
+                    parentAddress: parentAddress,
+                    children: childrenData,
+                    submittedAt: inscriptionRequest.submittedAt,
+                    adminEmail: 'sgdigitalweb13@gmail.com'
+                };
+
+                console.log('📧 Envoi notification admin pour demande ID:', inscriptionRequest.id);
+                const emailResult = await emailService.sendNewInscriptionNotification(adminEmailData);
+
+                if (emailResult.success) {
+                    console.log('✅ Email admin envoyé:', emailResult.messageId);
+                } else {
+                    console.error('❌ Erreur email admin:', emailResult.error);
+                }
+            } catch (emailError) {
+                console.error('❌ Erreur lors de l\'envoi de l\'email admin:', emailError);
+                // Ne pas faire échouer l'inscription si l'email échoue
+            }
+
+            // 📧 ENVOI EMAIL CONFIRMATION PARENT
+            try {
+                const parentConfirmationData = {
+                    parentFirstName,
+                    parentLastName,
+                    parentEmail,
+                    children: childrenData
+                };
+
+                console.log('📧 Envoi confirmation parent:', parentEmail);
+                const parentEmailResult = await emailService.sendInscriptionConfirmation(parentConfirmationData);
+
+                if (parentEmailResult.success) {
+                    console.log('✅ Email parent envoyé:', parentEmailResult.messageId);
+                } else {
+                    console.error('❌ Erreur email parent:', parentEmailResult.error);
+                }
+            } catch (emailError) {
+                console.error('❌ Erreur lors de l\'envoi de l\'email parent:', emailError);
+                // Ne pas faire échouer l'inscription si l'email échoue
+            }
+
             res.redirect('/auth/register?success=Votre demande d\'inscription a été envoyée avec succès. Vous recevrez une réponse sous 48h.');
 
         } catch (error) {
@@ -177,13 +225,16 @@ const inscriptionController = {
                 });
             }
 
-            // Créer le compte parent avec le mot de passe qu'il a choisi
+            // Créer le compte parent avec un mot de passe temporaire
+            const tempPassword = 'TempEcole' + Math.floor(Math.random() * 1000) + '!';
+            const hashedTempPassword = await bcrypt.hash(tempPassword, 12);
+
             const parentUser = await prisma.user.create({
                 data: {
                     firstName: request.parentFirstName,
                     lastName: request.parentLastName,
                     email: request.parentEmail,
-                    password: request.parentPassword, // Utiliser le mot de passe choisi par le parent
+                    password: hashedTempPassword, // Mot de passe temporaire sécurisé
                     role: 'PARENT',
                     phone: request.parentPhone,
                     adress: request.parentAddress
@@ -192,6 +243,34 @@ const inscriptionController = {
 
             console.log('✅ Compte parent créé:', request.parentEmail);
 
+            // 👶 CRÉER LES ENFANTS
+            let createdStudents = [];
+            if (request.children) {
+                const childrenData = typeof request.children === 'string'
+                    ? JSON.parse(request.children)
+                    : request.children;
+
+                console.log('👶 Création des enfants...');
+
+                for (const childData of childrenData) {
+                    if (childData.firstName && childData.lastName && childData.birthDate) {
+                        const student = await prisma.student.create({
+                            data: {
+                                firstName: childData.firstName,
+                                lastName: childData.lastName,
+                                birthDate: new Date(childData.birthDate),
+                                parentId: parentUser.id
+                            }
+                        });
+
+                        createdStudents.push(student);
+                        console.log(`   ✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id})`);
+                    }
+                }
+
+                console.log(`✅ ${createdStudents.length} enfant(s) créé(s) pour le parent ${request.parentEmail}`);
+            }
+
             // Mettre à jour le statut de la demande
             await prisma.preInscriptionRequest.update({
                 where: { id: parseInt(id) },
@@ -199,27 +278,21 @@ const inscriptionController = {
                     status: 'ACCEPTED',
                     processedAt: new Date(),
                     processedBy: req.session.user.id,
-                    adminNotes: comment || 'Demande approuvée - Compte parent créé'
+                    adminNotes: comment || `Demande approuvée - Compte parent et ${createdStudents.length} enfant(s) créés`
                 }
             });
 
-            // Envoyer email de confirmation d'activation du compte
+            // Envoyer email d'approbation avec identifiants
             try {
-                await emailService.sendAccountActivatedEmail({
+                await emailService.sendApprovalEmailWithCredentials({
                     parentFirstName: request.parentFirstName,
                     parentLastName: request.parentLastName,
-                    parentEmail: request.parentEmail
-                });
-                console.log('✅ Email d\'activation envoyé à:', request.parentEmail);
-            } catch (emailError) {
-                console.error('❌ Erreur envoi email activation:', emailError);
-                // Ne pas faire échouer la création du compte pour une erreur d'email
-            }
-
-            // Envoyer email d'approbation
-            try {
-                await emailService.sendApprovalEmail(request, comment);
-                console.log('✅ Email d\'approbation envoyé');
+                    parentEmail: request.parentEmail,
+                    children: request.children,
+                    tempPassword: tempPassword,
+                    createdStudents: createdStudents
+                }, comment);
+                console.log('✅ Email d\'approbation avec identifiants envoyé');
             } catch (emailError) {
                 console.error('❌ Erreur envoi approbation:', emailError);
             }

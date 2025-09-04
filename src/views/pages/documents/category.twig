@@ -76,7 +76,11 @@
 														</svg>
 													</a>
 												{% endif %}
-												{% if doc.pdfUrl %}
+												{% if doc.isExternalLink and doc.externalUrl %}
+													<a href="{{ doc.externalUrl }}" target="_blank" class="btn btn-xs btn-accent">
+														🔗
+													</a>
+												{% elseif doc.pdfUrl %}
 													<a href="{{ doc.pdfUrl }}" target="_blank" class="btn btn-xs btn-secondary">
 														📄
 													</a>
@@ -100,7 +104,11 @@
 														</svg>
 													</a>
 												{% endif %}
-												{% if doc.pdfUrl %}
+												{% if doc.isExternalLink and doc.externalUrl %}
+													<a href="{{ doc.externalUrl }}" target="_blank" class="btn btn-xs btn-accent">
+														🔗
+													</a>
+												{% elseif doc.pdfUrl %}
 													<a href="{{ doc.pdfUrl }}" target="_blank" class="btn btn-xs btn-secondary">
 														📄
 													</a>

@@ -104,18 +104,23 @@ const requireEnseignant = requireRole(['ENSEIGNANT', 'ADMIN', 'DIRECTION']);
 const requireParent = requireRole(['PARENT', 'ADMIN', 'DIRECTION']);
 
 const requireDirection = (req, res, next) => {
+    console.log('🏢 Vérification DIRECTION - Session user:', req.session.user ? req.session.user.email : 'Absent');
     if (!req.session.user) {
+        console.log('❌ Redirection vers login - pas de session direction');
         return res.redirect('/auth/login');
     }
 
-    const allowedRoles = ['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];
+    console.log('🎭 Rôle utilisateur:', req.session.user.role);
+    const allowedRoles = ['DIRECTEUR', 'DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];
     if (!allowedRoles.includes(req.session.user.role)) {
+        console.log('❌ Accès refusé - rôle insuffisant pour direction');
         return res.status(403).render('pages/error', {
             message: 'Accès refusé. Réservé aux directeurs et gestionnaires.',
             user: req.session.user
         });
     }
 
+    console.log('✅ Accès direction autorisé');
     next();
 };
 
