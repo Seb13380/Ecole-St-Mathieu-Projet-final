@@ -17,16 +17,33 @@ const directeurController = {
             }
 
             // Récupérer les statistiques
-            const stats = await Promise.all([
+            const statsArray = await Promise.all([
                 prisma.user.count(),
                 prisma.student.count(),
                 prisma.classe.count(),
                 prisma.message.count(),
                 prisma.actualite.count(),
                 prisma.travaux.count(),
-                prisma.inscriptionRequest.count({ where: { status: 'PENDING' } }),
+                prisma.preInscriptionRequest.count({ where: { status: 'PENDING' } }),
                 prisma.credentialsRequest.count({ where: { status: { in: ['PENDING', 'PROCESSING'] } } })
             ]);
+
+            // Créer l'objet stats
+            const stats = {
+                totalUsers: statsArray[0],
+                totalStudents: statsArray[1],
+                totalClasses: statsArray[2],
+                totalMessages: statsArray[3],
+                totalActualites: statsArray[4],
+                totalTravaux: statsArray[5],
+                pendingInscriptions: statsArray[6],
+                pendingCredentials: statsArray[7]
+            };
+
+            // Debug - vérification des valeurs
+            console.log('🔍 DEBUG STATS DASHBOARD:');
+            console.log('  - pendingInscriptions:', stats.pendingInscriptions);
+            console.log('  - pendingCredentials:', stats.pendingCredentials);
 
             // Récupérer les utilisateurs récents
             const recentUsers = await prisma.user.findMany({
@@ -55,16 +72,16 @@ const directeurController = {
             });
 
             // Récupérer les demandes d'inscription en attente
-            const pendingRequests = await prisma.inscriptionRequest.findMany({
+            const pendingRequests = await prisma.preInscriptionRequest.findMany({
                 where: { status: 'PENDING' },
                 take: 5,
-                orderBy: { createdAt: 'desc' },
+                orderBy: { submittedAt: 'desc' },
                 select: {
                     id: true,
                     parentFirstName: true,
                     parentLastName: true,
                     parentEmail: true,
-                    createdAt: true
+                    submittedAt: true
                 }
             });
 
@@ -89,16 +106,7 @@ const directeurController = {
             res.render('pages/directeur/dashboard.twig', {
                 title: 'Tableau de bord - Administration',
                 user: req.session.user,
-                stats: {
-                    totalUsers: stats[0],
-                    totalStudents: stats[1],
-                    totalClasses: stats[2],
-                    totalMessages: stats[3],
-                    totalActualites: stats[4],
-                    totalTravaux: stats[5],
-                    pendingInscriptions: stats[6],
-                    pendingCredentials: stats[7]
-                },
+                stats: stats,
                 recentUsers,
                 recentMessages,
                 pendingRequests,
@@ -558,7 +566,7 @@ const directeurController = {
             const classe = await prisma.classe.findUnique({
                 where: { id: parseInt(id) },
                 include: {
-                    students: {
+                    eleves: {
                         include: {
                             parent: {
                                 select: {
@@ -585,9 +593,13 @@ const directeurController = {
             let csvContent = `Classe ${classe.nom} (${classe.niveau}) - ${classe.anneeScolaire}\n\n`;
             csvContent += 'Nom;Prénom;Date de naissance;Parent;Email parent;Téléphone parent\n';
 
-            classe.students.forEach(student => {
-                const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
-                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${student.parent.firstName} ${student.parent.lastName};${student.parent.email};${student.parent.phone}\n`;
+            classe.eleves.forEach(student => {
+                const dateNaissance = student.dateNaissance ? new Date(student.dateNaissance).toLocaleDateString('fr-FR') : 'Non renseignée';
+                const parentName = student.parent ? `${student.parent.firstName} ${student.parent.lastName}` : 'Non renseigné';
+                const parentEmail = student.parent ? student.parent.email : 'Non renseigné';
+                const parentPhone = student.parent ? (student.parent.phone || 'Non renseigné') : 'Non renseigné';
+
+                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${parentName};${parentEmail};${parentPhone}\n`;
             });
 
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -607,7 +619,7 @@ const directeurController = {
         try {
             const classes = await prisma.classe.findMany({
                 include: {
-                    students: {
+                    eleves: {
                         include: {
                             parent: {
                                 select: {
@@ -646,10 +658,10 @@ const directeurController = {
             classes.forEach(classe => {
                 rapport += `\n=== CLASSE ${classe.nom} (${classe.niveau}) ===\n`;
                 rapport += `Année scolaire: ${classe.anneeScolaire}\n`;
-                rapport += `Nombre d'élèves: ${classe.students.length}\n\n`;
+                rapport += `Nombre d'élèves: ${classe.eleves.length}\n\n`;
 
-                if (classe.students.length > 0) {
-                    classe.students.forEach((student, index) => {
+                if (classe.eleves.length > 0) {
+                    classe.eleves.forEach((student, index) => {
                         const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
                         rapport += `${index + 1}. ${student.firstName} ${student.lastName}\n`;
                         rapport += `   Né(e) le: ${dateNaissance}\n`;
@@ -661,7 +673,7 @@ const directeurController = {
                     rapport += '   Aucun élève inscrit\n\n';
                 }
 
-                totalEleves += classe.students.length;
+                totalEleves += classe.eleves.length;
             });
 
             rapport += `\n=== RÉSUMÉ GÉNÉRAL ===\n`;

@@ -51,7 +51,7 @@
 							<p class="text-2xl font-bold text-slate-800">
 								{% set totalEleves = 0 %}
 								{% for classe in classes %}
-									{% set totalEleves = totalEleves + classe._count.students %}
+									{% set totalEleves = totalEleves + classe._count.eleves %}
 								{% endfor %}
 								{{ totalEleves }}
 							</p>
@@ -92,7 +92,11 @@
 							<p class="text-sm font-medium text-slate-500">Moyenne/Classe</p>
 							<p class="text-2xl font-bold text-slate-800">
 								{% if classes|length > 0 %}
-									{{ (totalEleves / classes|length)|round(1) }}
+									{% set totalStudents = 0 %}
+									{% for classe in classes %}
+										{% set totalStudents = totalStudents + classe._count.eleves %}
+									{% endfor %}
+									{{ (totalStudents / classes|length)|round(1) }}
 								{% else %}
 									0
 								{% endif %}
@@ -164,9 +168,9 @@
 									<!-- Liste des élèves (collapsible) -->
 									<div id="students-{{ classe.id }}" class="hidden mt-4 pt-4 border-t border-slate-200">
 										<h4 class="font-medium text-slate-700 mb-3">Élèves de cette classe :</h4>
-										{% if classe.students|length > 0 %}
+										{% if classe.eleves|length > 0 %}
 											<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-												{% for student in classe.students %}
+												{% for student in classe.eleves %}
 													<div class="flex items-center space-x-2 text-sm">
 														<div class="w-2 h-2 bg-blue-400 rounded-full"></div>
 														<span>{{ student.firstName }}
