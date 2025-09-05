@@ -78,6 +78,7 @@ model User {
   agendaEvents             AgendaEvent[]           @relation("UserAgenda")
   inscriptionConfigs       InscriptionConfig[]     @relation("InscriptionConfigModifier")
   inscriptionDocuments     InscriptionDocument[]   @relation("InscriptionDocumentAuteur")
+  siteLogs                 SiteLog[]               @relation("UserLogs")
 }
 
 model Student {
@@ -580,4 +581,54 @@ model InscriptionConfiguration {
   afficherAnnoncePS2026 Boolean  @default(false)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+}
+
+// 📊 SYSTÈME DE LOGS ET ANALYTICS
+model SiteLog {
+  id Int @id @default(autoincrement())
+
+  // Informations de la requête
+  method String // GET, POST, PUT, DELETE
+  url    String  @db.VarChar(500)
+  route  String? // Route Express identifiée
+
+  // Informations utilisateur
+  userId    Int? // ID utilisateur si connecté
+  userRole  String? // Rôle de l'utilisateur
+  userEmail String? // Email pour faciliter les recherches
+  sessionId String? // ID de session
+
+  // Informations techniques
+  ip        String // Adresse IP
+  userAgent String? @db.Text // User Agent complet
+  referer   String? @db.VarChar(500) // Page de référence
+
+  // Informations de performance
+  responseTime Int? // Temps de réponse en ms
+  statusCode   Int? // Code de statut HTTP
+
+  // Métadonnées
+  action       String? // Type d'action (login, view_page, download, etc.)
+  resourceType String? // Type de ressource (actualite, document, menu, etc.)
+  resourceId   Int? // ID de la ressource consultée
+
+  // Données contextuelles
+  searchQuery  String? // Requête de recherche si applicable
+  errorMessage String? @db.Text // Message d'erreur si applicable
+
+  // Géolocalisation (approximative par IP)
+  country String? // Pays
+  city    String? // Ville
+
+  timestamp DateTime @default(now())
+
+  // Relation avec User (optionnelle)
+  user User? @relation("UserLogs", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([timestamp])
+  @@index([userId])
+  @@index([action])
+  @@index([route])
+  @@index([ip])
+  @@index([statusCode])
 }

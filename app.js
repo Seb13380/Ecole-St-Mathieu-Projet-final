@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const session = require("express-session");
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
+const { loggingMiddleware, errorLoggingMiddleware } = require('./src/middleware/loggingMiddleware');
 
 dotenv.config();
 const app = express();
@@ -92,6 +93,9 @@ app.use(session({
 // Configuration du middleware flash pour les messages temporaires
 app.use(flash());
 
+// 📊 Middleware de logging pour analytics (après session, avant routes)
+app.use(loggingMiddleware);
+
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
 
@@ -150,6 +154,7 @@ const preInscriptionRoutes = require('./src/routes/preInscriptionRoutes');
 const userManagementRoutes = require('./src/routes/userManagementRoutes');
 const agendaRoutes = require('./src/routes/agendaRoutes');
 const inscriptionManagementRoutes = require('./src/routes/inscriptionManagementRoutes');
+const analyticsRoutes = require('./src/routes/analyticsRoutes');
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -177,6 +182,7 @@ app.use('/pre-inscription', preInscriptionRoutes);
 app.use('/user-management', userManagementRoutes);
 app.use('/agenda', agendaRoutes);
 app.use('/inscription-management', inscriptionManagementRoutes);
+app.use('/directeur/analytics', analyticsRoutes);
 
 // Redirection de /inscription vers /inscription-eleve
 app.get('/inscription', (req, res) => {
@@ -203,6 +209,9 @@ app.get('/inscriptions/manage', (req, res) => {
 app.get('/test-responsive', (req, res) => {
   res.sendFile(__dirname + '/test-responsive.html');
 });
+
+// 📊 Middleware de gestion des erreurs avec logging
+app.use(errorLoggingMiddleware);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
