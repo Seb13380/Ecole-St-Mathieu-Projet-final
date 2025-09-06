@@ -63,8 +63,6 @@ model User {
   messages                 Message[]               @relation("UserMessages")
   actualites               Actualite[]             @relation("UserActualites")
   travaux                  Travaux[]               @relation("UserTravaux")
-  horaires                 Horaire[]               @relation("EnseignantHoraires")
-  notes                    Note[]                  @relation("EnseignantNotes")
   menus                    Menu[]                  @relation("UserMenus")
   carouselImages           CarouselImage[]         @relation("UserCarouselImages")
   heroCarousel             HeroCarousel[]          @relation("UserHeroCarousel")
@@ -75,9 +73,12 @@ model User {
   galleryMedia             GalleryMedia[]          @relation("UserGalleryMedia")
   documents                Document[]              @relation("UserDocuments")
   processedPreInscriptions PreInscriptionRequest[] @relation("ProcessedPreInscriptions")
+  credentialsForParent     CredentialsRequest[]    @relation("CredentialsForParent")
+  processedCredentials     CredentialsRequest[]    @relation("ProcessedCredentials")
   agendaEvents             AgendaEvent[]           @relation("UserAgenda")
   inscriptionConfigs       InscriptionConfig[]     @relation("InscriptionConfigModifier")
   inscriptionDocuments     InscriptionDocument[]   @relation("InscriptionDocumentAuteur")
+  siteLogs                 SiteLog[]               @relation("UserLogs")
 }
 
 model Student {
@@ -93,8 +94,6 @@ model Student {
 
   parent          User              @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
   classe          Classe            @relation("ClasseEleves", fields: [classeId], references: [id])
-  notes           Note[]            @relation("EleveNotes")
-  absences        Absence[]         @relation("EleveAbsences")
   TicketBooklet   TicketBooklet[]
   MealReservation MealReservation[]
   TicketPurchase  TicketPurchase[]
@@ -109,56 +108,7 @@ model Classe {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  eleves   Student[] @relation("ClasseEleves")
-  horaires Horaire[] @relation("ClasseHoraires")
-  notes    Note[]    @relation("ClasseNotes")
-  absences Absence[] @relation("ClasseAbsences")
-}
-
-model Note {
-  id             Int      @id @default(autoincrement())
-  eleveId        Int
-  classeId       Int
-  enseignantId   Int
-  matiere        String
-  note           Float
-  coefficient    Float    @default(1)
-  commentaire    String?
-  dateEvaluation DateTime
-  createdAt      DateTime @default(now())
-
-  eleve      Student @relation("EleveNotes", fields: [eleveId], references: [id])
-  classe     Classe  @relation("ClasseNotes", fields: [classeId], references: [id])
-  enseignant User    @relation("EnseignantNotes", fields: [enseignantId], references: [id], onDelete: Cascade)
-}
-
-model Absence {
-  id          Int       @id @default(autoincrement())
-  eleveId     Int
-  classeId    Int
-  dateDebut   DateTime
-  dateFin     DateTime?
-  motif       String
-  justifiee   Boolean   @default(false)
-  commentaire String?
-  createdAt   DateTime  @default(now())
-
-  eleve  Student @relation("EleveAbsences", fields: [eleveId], references: [id])
-  classe Classe  @relation("ClasseAbsences", fields: [classeId], references: [id])
-}
-
-model Horaire {
-  id           Int      @id @default(autoincrement())
-  classeId     Int
-  enseignantId Int
-  jourSemaine  String
-  heureDebut   String
-  heureFin     String
-  matiere      String
-  createdAt    DateTime @default(now())
-
-  classe     Classe @relation("ClasseHoraires", fields: [classeId], references: [id])
-  enseignant User   @relation("EnseignantHoraires", fields: [enseignantId], references: [id], onDelete: Cascade)
+  eleves Student[] @relation("ClasseEleves")
 }
 
 model Actualite {
@@ -380,6 +330,7 @@ model InscriptionRequest {
   parentAddress   String
   password        String
   children        Json
+  anneeScolaire   String    @default("2025/2026") // Année scolaire pour laquelle l'inscription est demandée
   status          String    @default("PENDING")
   reviewedAt      DateTime?
   reviewedBy      Int?
@@ -437,18 +388,20 @@ enum GalleryMediaType {
 }
 
 model Document {
-  id          Int          @id @default(autoincrement())
-  type        DocumentType // Type de document (PROJET_EDUCATIF, REGLEMENT_INTERIEUR, etc.)
-  titre       String // Titre affiché 
-  description String? // Description optionnelle
-  contenu     String?      @db.LongText // Contenu HTML (optionnel si juste PDF)
-  pdfUrl      String? // URL du fichier PDF
-  pdfFilename String? // Nom original du fichier PDF
-  active      Boolean      @default(true) // Document actif ou archivé
-  ordre       Int          @default(0) // Ordre d'affichage
-  auteurId    Int // Qui a créé/modifié le document
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id             Int          @id @default(autoincrement())
+  type           DocumentType // Type de document (PROJET_EDUCATIF, REGLEMENT_INTERIEUR, etc.)
+  titre          String // Titre affiché 
+  description    String? // Description optionnelle
+  contenu        String?      @db.LongText // Contenu HTML (optionnel si juste PDF)
+  pdfUrl         String? // URL du fichier PDF
+  pdfFilename    String? // Nom original du fichier PDF
+  externalUrl    String? // URL externe (lien vers site web, Google Drive, etc.)
+  isExternalLink Boolean      @default(false) // True si c'est un lien externe
+  active         Boolean      @default(true) // Document actif ou archivé
+  ordre          Int          @default(0) // Ordre d'affichage
+  auteurId       Int // Qui a créé/modifié le document
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   auteur User @relation("UserDocuments", fields: [auteurId], references: [id], onDelete: Cascade)
 
@@ -484,6 +437,9 @@ model PreInscriptionRequest {
   parentAddress   String?
   parentPassword  String // Mot de passe choisi par le parent
 
+  // Année scolaire pour laquelle l'inscription est demandée
+  anneeScolaire String @default("2025/2026")
+
   // Informations des enfants (stockées en JSON)
   children     Json // Tableau des enfants avec firstName, lastName, birthDate, currentClass, requestedClass, previousSchool
   specialNeeds String? // Besoins particuliers
@@ -504,12 +460,55 @@ model PreInscriptionRequest {
   @@index([parentEmail])
 }
 
+model CredentialsRequest {
+  id                 Int     @id @default(autoincrement())
+  requestedEmail     String // Email fourni par le demandeur
+  requestedFirstName String // Prénom fourni
+  requestedLastName  String // Nom fourni
+  requestedPhone     String? // Téléphone fourni (optionnel)
+
+  // Parent trouvé (s'il existe)
+  foundParentId    Int? // ID du parent trouvé en base
+  foundParentEmail String? // Email réel du parent trouvé
+
+  // Statut et traitement
+  status      CredentialsRequestStatus @default(PENDING)
+  processed   Boolean                  @default(false)
+  processedAt DateTime?
+  processedBy Int? // ID de l'admin qui a traité
+
+  // Résultat
+  identifiersSent Boolean @default(false) // Identifiants envoyés ou non
+  errorMessage    String? // Message d'erreur si échec
+  adminNotes      String? // Notes de l'admin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  foundParent User? @relation("CredentialsForParent", fields: [foundParentId], references: [id])
+  processor   User? @relation("ProcessedCredentials", fields: [processedBy], references: [id])
+
+  @@index([status])
+  @@index([processed])
+  @@index([createdAt])
+  @@index([requestedEmail])
+}
+
 enum PreInscriptionStatus {
   PENDING // En attente
   REVIEWING // En cours d'examen
   ACCEPTED // Acceptée
   REJECTED // Refusée
   COMPLETED // Inscription finalisée
+}
+
+enum CredentialsRequestStatus {
+  PENDING // En attente de traitement
+  PROCESSING // En cours de traitement
+  COMPLETED // Identifiants envoyés
+  FAILED // Échec (parent non trouvé, erreur email, etc.)
+  REJECTED // Rejetée par l'admin
 }
 
 model AgendaEvent {
@@ -574,4 +573,62 @@ model InscriptionDocument {
   @@index([actif])
   @@index([ordre])
   @@index([type])
+}
+
+model InscriptionConfiguration {
+  id                    Int      @id @default(autoincrement())
+  soustitre             String   @default("Demande d'identifiants pour accéder à l'espace familles")
+  afficherAnnoncePS2026 Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// 📊 SYSTÈME DE LOGS ET ANALYTICS
+model SiteLog {
+  id Int @id @default(autoincrement())
+
+  // Informations de la requête
+  method String // GET, POST, PUT, DELETE
+  url    String  @db.VarChar(500)
+  route  String? // Route Express identifiée
+
+  // Informations utilisateur
+  userId    Int? // ID utilisateur si connecté
+  userRole  String? // Rôle de l'utilisateur
+  userEmail String? // Email pour faciliter les recherches
+  sessionId String? // ID de session
+
+  // Informations techniques
+  ip        String // Adresse IP
+  userAgent String? @db.Text // User Agent complet
+  referer   String? @db.VarChar(500) // Page de référence
+
+  // Informations de performance
+  responseTime Int? // Temps de réponse en ms
+  statusCode   Int? // Code de statut HTTP
+
+  // Métadonnées
+  action       String? // Type d'action (login, view_page, download, etc.)
+  resourceType String? // Type de ressource (actualite, document, menu, etc.)
+  resourceId   Int? // ID de la ressource consultée
+
+  // Données contextuelles
+  searchQuery  String? // Requête de recherche si applicable
+  errorMessage String? @db.Text // Message d'erreur si applicable
+
+  // Géolocalisation (approximative par IP)
+  country String? // Pays
+  city    String? // Ville
+
+  timestamp DateTime @default(now())
+
+  // Relation avec User (optionnelle)
+  user User? @relation("UserLogs", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([timestamp])
+  @@index([userId])
+  @@index([action])
+  @@index([route])
+  @@index([ip])
+  @@index([statusCode])
 }

@@ -17,15 +17,33 @@ const directeurController = {
             }
 
             // Récupérer les statistiques
-            const stats = await Promise.all([
+            const statsArray = await Promise.all([
                 prisma.user.count(),
                 prisma.student.count(),
                 prisma.classe.count(),
                 prisma.message.count(),
                 prisma.actualite.count(),
                 prisma.travaux.count(),
-                prisma.inscriptionRequest.count({ where: { status: 'PENDING' } })
+                prisma.preInscriptionRequest.count({ where: { status: 'PENDING' } }),
+                prisma.credentialsRequest.count({ where: { status: { in: ['PENDING', 'PROCESSING'] } } })
             ]);
+
+            // Créer l'objet stats
+            const stats = {
+                totalUsers: statsArray[0],
+                totalStudents: statsArray[1],
+                totalClasses: statsArray[2],
+                totalMessages: statsArray[3],
+                totalActualites: statsArray[4],
+                totalTravaux: statsArray[5],
+                pendingInscriptions: statsArray[6],
+                pendingCredentials: statsArray[7]
+            };
+
+            // Debug - vérification des valeurs
+            console.log('🔍 DEBUG STATS DASHBOARD:');
+            console.log('  - pendingInscriptions:', stats.pendingInscriptions);
+            console.log('  - pendingCredentials:', stats.pendingCredentials);
 
             // Récupérer les utilisateurs récents
             const recentUsers = await prisma.user.findMany({
@@ -54,34 +72,45 @@ const directeurController = {
             });
 
             // Récupérer les demandes d'inscription en attente
-            const pendingRequests = await prisma.inscriptionRequest.findMany({
+            const pendingRequests = await prisma.preInscriptionRequest.findMany({
                 where: { status: 'PENDING' },
                 take: 5,
-                orderBy: { createdAt: 'desc' },
+                orderBy: { submittedAt: 'desc' },
                 select: {
                     id: true,
                     parentFirstName: true,
                     parentLastName: true,
                     parentEmail: true,
-                    createdAt: true
+                    submittedAt: true
+                }
+            });
+
+            // Récupérer les demandes d'identifiants en attente
+            const pendingCredentials = await prisma.credentialsRequest.findMany({
+                where: {
+                    status: { in: ['PENDING', 'PROCESSING'] }
+                },
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    foundParent: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            email: true
+                        }
+                    }
                 }
             });
 
             res.render('pages/directeur/dashboard.twig', {
                 title: 'Tableau de bord - Administration',
                 user: req.session.user,
-                stats: {
-                    totalUsers: stats[0],
-                    totalStudents: stats[1],
-                    totalClasses: stats[2],
-                    totalMessages: stats[3],
-                    totalActualites: stats[4],
-                    totalTravaux: stats[5],
-                    pendingInscriptions: stats[6]
-                },
+                stats: stats,
                 recentUsers,
                 recentMessages,
-                pendingRequests
+                pendingRequests,
+                pendingCredentials
             });
 
         } catch (error) {
@@ -120,6 +149,27 @@ const directeurController = {
                 message: 'Erreur lors de la récupération des utilisateurs',
                 user: req.session.user
             });
+        }
+    },
+
+    async getUser(req, res) {
+        try {
+            const userId = parseInt(req.params.id);
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                include: {
+                    enfants: true
+                }
+            });
+
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+            }
+
+            res.json({ success: true, user });
+        } catch (error) {
+            console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+            res.status(500).json({ success: false, message: 'Erreur serveur' });
         }
     },
 
@@ -240,10 +290,44 @@ const directeurController = {
                 orderBy: { nom: 'asc' }
             });
 
+            // Gestion des messages de feedback
+            let message = null;
+            let messageType = 'info';
+
+            if (req.query.success) {
+                messageType = 'success';
+                switch (req.query.success) {
+                    case 'classe-created':
+                        message = 'Classe créée avec succès';
+                        break;
+                    case 'classe-updated':
+                        message = 'Classe mise à jour avec succès';
+                        break;
+                    case 'classe-deleted':
+                        message = 'Classe supprimée avec succès';
+                        break;
+                }
+            } else if (req.query.error) {
+                messageType = 'error';
+                switch (req.query.error) {
+                    case 'creation-failed':
+                        message = 'Erreur lors de la création de la classe';
+                        break;
+                    case 'update-failed':
+                        message = 'Erreur lors de la mise à jour de la classe';
+                        break;
+                    case 'delete-failed':
+                        message = 'Erreur lors de la suppression de la classe';
+                        break;
+                }
+            }
+
             res.render('pages/admin/classes', {
                 classes,
                 title: 'Gestion des classes',
-                user: req.session.user
+                user: req.session.user,
+                message,
+                messageType
             });
         } catch (error) {
             console.error('Erreur lors de la récupération des classes:', error);
@@ -256,47 +340,41 @@ const directeurController = {
 
     async createClasse(req, res) {
         try {
-            const { nom, niveau } = req.body;
+            const { nom, niveau, anneeScolaire } = req.body;
 
             const classe = await prisma.classe.create({
-                data: { nom, niveau }
+                data: {
+                    nom,
+                    niveau,
+                    anneeScolaire: anneeScolaire || new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
+                }
             });
 
-            res.json({
-                success: true,
-                message: 'Classe créée avec succès',
-                classe
-            });
+            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
+            res.redirect('/directeur/classes?success=classe-created');
         } catch (error) {
             console.error('Erreur lors de la création de la classe:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la création de la classe'
-            });
+            // Redirection avec erreur au lieu de JSON
+            res.redirect('/directeur/classes?error=creation-failed');
         }
     },
 
     async updateClasse(req, res) {
         try {
             const { id } = req.params;
-            const { nom, niveau } = req.body;
+            const { nom, niveau, anneeScolaire } = req.body;
 
             const classe = await prisma.classe.update({
                 where: { id: parseInt(id) },
-                data: { nom, niveau }
+                data: { nom, niveau, anneeScolaire }
             });
 
-            res.json({
-                success: true,
-                message: 'Classe mise à jour avec succès',
-                classe
-            });
+            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
+            res.redirect('/directeur/classes?success=classe-updated');
         } catch (error) {
             console.error('Erreur lors de la mise à jour de la classe:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la mise à jour de la classe'
-            });
+            // Redirection avec erreur au lieu de JSON
+            res.redirect('/directeur/classes?error=update-failed');
         }
     },
 
@@ -308,16 +386,12 @@ const directeurController = {
                 where: { id: parseInt(id) }
             });
 
-            res.json({
-                success: true,
-                message: 'Classe supprimée avec succès'
-            });
+            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
+            res.redirect('/directeur/classes?success=classe-deleted');
         } catch (error) {
             console.error('Erreur lors de la suppression de la classe:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la suppression de la classe'
-            });
+            // Redirection avec erreur au lieu de JSON
+            res.redirect('/directeur/classes?error=delete-failed');
         }
     },
 
@@ -369,7 +443,7 @@ const directeurController = {
                 data: {
                     firstName,
                     lastName,
-                    birthDate: new Date(birthDate),
+                    dateNaissance: new Date(birthDate),
                     classeId: parseInt(classeId),
                     parentId: parseInt(parentId)
                 }
@@ -492,7 +566,7 @@ const directeurController = {
             const classe = await prisma.classe.findUnique({
                 where: { id: parseInt(id) },
                 include: {
-                    students: {
+                    eleves: {
                         include: {
                             parent: {
                                 select: {
@@ -519,9 +593,13 @@ const directeurController = {
             let csvContent = `Classe ${classe.nom} (${classe.niveau}) - ${classe.anneeScolaire}\n\n`;
             csvContent += 'Nom;Prénom;Date de naissance;Parent;Email parent;Téléphone parent\n';
 
-            classe.students.forEach(student => {
-                const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
-                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${student.parent.firstName} ${student.parent.lastName};${student.parent.email};${student.parent.phone}\n`;
+            classe.eleves.forEach(student => {
+                const dateNaissance = student.dateNaissance ? new Date(student.dateNaissance).toLocaleDateString('fr-FR') : 'Non renseignée';
+                const parentName = student.parent ? `${student.parent.firstName} ${student.parent.lastName}` : 'Non renseigné';
+                const parentEmail = student.parent ? student.parent.email : 'Non renseigné';
+                const parentPhone = student.parent ? (student.parent.phone || 'Non renseigné') : 'Non renseigné';
+
+                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${parentName};${parentEmail};${parentPhone}\n`;
             });
 
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -541,7 +619,7 @@ const directeurController = {
         try {
             const classes = await prisma.classe.findMany({
                 include: {
-                    students: {
+                    eleves: {
                         include: {
                             parent: {
                                 select: {
@@ -580,10 +658,10 @@ const directeurController = {
             classes.forEach(classe => {
                 rapport += `\n=== CLASSE ${classe.nom} (${classe.niveau}) ===\n`;
                 rapport += `Année scolaire: ${classe.anneeScolaire}\n`;
-                rapport += `Nombre d'élèves: ${classe.students.length}\n\n`;
+                rapport += `Nombre d'élèves: ${classe.eleves.length}\n\n`;
 
-                if (classe.students.length > 0) {
-                    classe.students.forEach((student, index) => {
+                if (classe.eleves.length > 0) {
+                    classe.eleves.forEach((student, index) => {
                         const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
                         rapport += `${index + 1}. ${student.firstName} ${student.lastName}\n`;
                         rapport += `   Né(e) le: ${dateNaissance}\n`;
@@ -595,7 +673,7 @@ const directeurController = {
                     rapport += '   Aucun élève inscrit\n\n';
                 }
 
-                totalEleves += classe.students.length;
+                totalEleves += classe.eleves.length;
             });
 
             rapport += `\n=== RÉSUMÉ GÉNÉRAL ===\n`;
@@ -690,6 +768,140 @@ const directeurController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de la mise à jour des paramètres'
+            });
+        }
+    },
+
+    // === GESTION DES DEMANDES D'IDENTIFIANTS ===
+
+    async getCredentialsRequests(req, res) {
+        try {
+            console.log('🔑 Accès aux demandes d\'identifiants');
+
+            // Récupérer toutes les demandes d'identifiants
+            const credentialsRequests = await prisma.credentialsRequest.findMany({
+                include: {
+                    foundParent: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            role: true
+                        }
+                    }
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            // Statistiques
+            const stats = {
+                total: credentialsRequests.length,
+                pending: credentialsRequests.filter(r => r.status === 'PENDING').length,
+                processing: credentialsRequests.filter(r => r.status === 'PROCESSING').length,
+                completed: credentialsRequests.filter(r => r.status === 'COMPLETED').length,
+                rejected: credentialsRequests.filter(r => r.status === 'REJECTED').length
+            };
+
+            res.render('pages/directeur/credentials.twig', {
+                title: 'Demandes d\'identifiants - Gestion',
+                user: req.session.user,
+                credentialsRequests,
+                stats
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur récupération demandes identifiants:', error);
+            res.status(500).render('pages/error.twig', {
+                message: 'Erreur lors du chargement des demandes d\'identifiants'
+            });
+        }
+    },
+
+    async approveCredentialsRequest(req, res) {
+        try {
+            const { id } = req.params;
+            const { notes } = req.body;
+
+            console.log(`✅ Approbation demande identifiants ID: ${id}`);
+
+            await prisma.credentialsRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    status: 'COMPLETED',
+                    processedAt: new Date(),
+                    processed: true,
+                    identifiersSent: true,
+                    adminNotes: notes || null
+                }
+            });
+
+            res.json({
+                success: true,
+                message: 'Demande d\'identifiants approuvée et identifiants envoyés avec succès'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur approbation demande identifiants:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de l\'approbation de la demande'
+            });
+        }
+    },
+
+    async rejectCredentialsRequest(req, res) {
+        try {
+            const { id } = req.params;
+            const { reason, notes } = req.body;
+
+            console.log(`❌ Rejet demande identifiants ID: ${id}`);
+
+            await prisma.credentialsRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    status: 'REJECTED',
+                    processedAt: new Date(),
+                    processed: true,
+                    errorMessage: reason || null,
+                    adminNotes: notes || null
+                }
+            });
+
+            res.json({
+                success: true,
+                message: 'Demande d\'identifiants rejetée'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur rejet demande identifiants:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors du rejet de la demande'
+            });
+        }
+    },
+
+    async deleteCredentialsRequest(req, res) {
+        try {
+            const { id } = req.params;
+
+            console.log(`🗑️ Suppression demande identifiants ID: ${id}`);
+
+            await prisma.credentialsRequest.delete({
+                where: { id: parseInt(id) }
+            });
+
+            res.json({
+                success: true,
+                message: 'Demande d\'identifiants supprimée'
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur suppression demande identifiants:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la suppression de la demande'
             });
         }
     },

@@ -1,30 +1,41 @@
 <header class="w-full bg-[#a7e3dd]">
-	<nav class="navbar w-full px-9 font-poppins">
-
-		<div class="flex-none" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 0.5rem; margin-left: 0.5rem;">
-			<a href="/" class="flex items-center gap-6">
-				<img src="/assets/images/testimage.jpg" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md" style="height: 120px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+	<nav
+		class="navbar w-full px-9 font-poppins relative">
+		<!-- Logos (toujours visibles) -->
+		<div class="flex-none logo-container" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 0.5rem; margin-left: 0.5rem;">
+			<a href="/" class="flex items-center gap-5">
+				<img src="/assets/images/testimage.jpg" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md logo-img" style="height: 120px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
-		<div class="flex-none" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 0.5rem; margin-left: 0.5rem;">
-			<a href="https://www.enseignementcatho-marseille.fr//" target="_blank" rel="noopener" class="flex items-center gap-6">
-				<img src="/assets/images/logo_diocese.png" alt="Logo Diocèse" class="w-auto object-contain rounded-xl shadow-md" style="height: 120px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+		<div class="flex-none logo-container  md:block" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 0.5rem; margin-left: 0.5rem;">
+			<a href="https://www.enseignementcatho-marseille.fr/" target="_blank" rel="noopener" class="flex items-center gap-6">
+				<img src="/assets/images/logo_diocese.png" alt="Logo Diocèse" class="w-auto object-contain rounded-xl shadow-md logo-img" style="height: 120px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
 				<span class="text-xl font-bold text-[#304a4d]"></span>
 			</a>
 		</div>
 
-		<div class="flex-1 flex justify-center">
-			<ul class="menu menu-horizontal px-1 font-poppins-medium" style="font-size: 29px !important; font-weight: 600;">
+		<!-- Bouton burger pour mobile -->
+		<div class="flex-none md:hidden burger-menu">
+			<button id="mobile-menu-button" class="btn btn-ghost text-[#304a4d] text-2xl">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+				</svg>
+			</button>
+		</div>
+
+		<!-- Menu principal (desktop) et contenu mobile -->
+		<div class="flex-1 justify-center desktop-menu hidden md:flex">
+			<ul class="menu menu-horizontal px-1 font-poppins-medium" style="font-size: clamp(18px, 2.2vw, 24px) !important; font-weight: 600;">
 				<li style="margin-top: 0.5rem;">
-					<a href="/" class="hover:font-poppins-semibold transition-all" style="font-size: 29px !important;">Accueil</a>
+					<a href="/" class="hover:font-poppins-semibold transition-all" style="font-size: clamp(18px, 2.2vw, 24px) !important;">Accueil</a>
 				</li>
 				<li style="margin-top: 0.5rem;">
-					<a href="/gestion-ecole" class="hover:font-poppins-semibold transition-all" style="font-size: 29px !important;">OGEC</a>
+					<a href="/gestion-ecole" class="hover:font-poppins-semibold transition-all" style="font-size: clamp(18px, 2.2vw, 24px) !important;">OGEC</a>
 				</li>
 				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
-					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold" style="font-size: 29px !important;">
-						Ecole
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold" style="font-size: clamp(18px, 2.2vw, 24px) !important;">
+						École
 						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
@@ -46,15 +57,15 @@
 				</li>
 
 				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
-					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold" style="font-size: 29px !important;">
-						<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="hover:font-poppins-semibold transition-all" style="font-size: 29px !important; text-decoration: none; color: inherit;">Pastorale</a>
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold" style="font-size: clamp(18px, 2.2vw, 24px) !important;">
+						<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="hover:font-poppins-semibold transition-all" style="font-size: clamp(18px, 2.2vw, 24px) !important; text-decoration: none; color: inherit;">Pastorale</a>
 						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
 						</svg>
 					</div>
 					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-64 p-2 shadow font-poppins-regular text-xl" style="margin-top:-0.1rem;">
 						<li>
-							<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">🔗 Site Ensemble Pastoral</a>
+							<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">🌐 Site Ensemble Pastoral</a>
 						</li>
 						<li>
 							<a href="/documents/pastorale" class="hover:font-poppins-medium transition-all hover:bg-[#8dd3cc]">📄 Documents Pastorale</a>
@@ -62,7 +73,7 @@
 					</ul>
 				</li>
 				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
-					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold" style="font-size: 29px !important;">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold" style="font-size: clamp(18px, 2.2vw, 24px) !important;">
 						Restauration
 						<svg class="fill-current ml-1 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
 							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
@@ -79,16 +90,18 @@
 				</li>
 
 				<li style="margin-top: 0.5rem;">
-					<a href="https://sites.google.com/site/apelbdr/fonctionnement?authuser=0" class="hover:font-poppins-semibold transition-all" style="font-size: 29px !important;">APEL</a>
+					<a href="https://sites.google.com/site/apelbdr/fonctionnement?authuser=0" target="_blank" class="hover:font-poppins-semibold transition-all" style="font-size: clamp(18px, 2.2vw, 24px) !important;">APEL</a>
 				</li>
 
 				<li>
-					<a href="/auth/register" class="hover:font-poppins-semibold transition-all flex flex-col text-center leading-tight items-center justify-center" style="font-size: 29px !important; height: auto; min-height: 2.5rem;">
+					<a href="/auth/register" class="hover:font-poppins-semibold transition-all flex flex-col text-center leading-tight items-center justify-center" style="font-size: clamp(16px, 1.8vw, 20px) !important; height: auto; min-height: 2.5rem;">
 						<span style="line-height: 1;">Demande</span>
 						<span style="line-height: 1;">identifiants</span>
 					</a>
 				</li>
 			</ul>
+
+			<!-- Logo Educartable - Desktop seulement -->
 			<div class="flex-none" style="margin-left: 3rem;">
 				<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="flex items-center gap-6">
 					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300" style="height: 110px; animation: pulse-glow 4s ease-in-out infinite;"/>
@@ -96,17 +109,128 @@
 				</a>
 			</div>
 		</div>
-		<div class="flex-none gap-4">
+
+		<!-- Menu mobile (caché par défaut) -->
+		<div id="mobile-menu" class="mobile-menu fixed inset-0 bg-[#a7e3dd] z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+			<div
+				class="flex flex-col h-full">
+				<!-- En-tête du menu mobile -->
+				<div class="flex justify-between items-center p-4 border-b border-[#8dd3cc]">
+					<h2 class="text-xl font-bold text-[#304a4d]">Menu</h2>
+					<button id="mobile-menu-close" class="btn btn-ghost text-[#304a4d] text-2xl">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+
+				<!-- Contenu du menu mobile -->
+				<div
+					class="flex-1 overflow-y-auto p-4">
+					<!-- Logo Educartable dans le menu mobile -->
+					<div class="mb-6 text-center">
+						<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="inline-block">
+							<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md mx-auto" style="height: 80px; animation: pulse-glow 4s ease-in-out infinite;"/>
+						</a>
+					</div>
+
+					<ul class="space-y-4 font-poppins-medium text-lg">
+						<li>
+							<a href="/" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">🏠 Accueil</a>
+						</li>
+						<li>
+							<a href="/gestion-ecole" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">🏢 OGEC</a>
+						</li>
+
+						<!-- Dropdown École pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								🎓 École
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="/documents/ecole" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📄 Documents officiels</a>
+								</li>
+								<li>
+									<a href="/inscription-eleve" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🎓 Demande d'inscription élève</a>
+								</li>
+								<li>
+									<a href="/agenda" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📅 Agenda</a>
+								</li>
+								<li>
+									<a href="/gallery" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🖼️ Images et Vidéos</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- Dropdown Pastorale pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								⛪ Pastorale
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🌐 Site Ensemble Pastoral</a>
+								</li>
+								<li>
+									<a href="/documents/pastorale" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📄 Documents Pastorale</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- Dropdown Restauration pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								🍽️ Restauration
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="https://www.dupont-restauration.fr/" target="_blank" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🌐 Dupont Restauration</a>
+								</li>
+								<li>
+									<a href="/restauration/menus" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">👨‍🍳 Le chef vous propose</a>
+								</li>
+							</ul>
+						</li>
+
+						<li>
+							<a href="https://sites.google.com/site/apelbdr/fonctionnement?authuser=0" target="_blank" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">🤝 APEL</a>
+						</li>
+						<li>
+							<a href="/auth/register" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">📝 Demande identifiants</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- User menu (toujours visible à droite) -->
+		<div class="flex-none gap-4 user-menu">
+
+
 			{% if isAuthenticated %}
 				<div class="dropdown dropdown-end">
-					<div tabindex="0" role="button" class="btn btn-ghost font-poppins-medium">
+					<div tabindex="0" role="button" class="btn btn-ghost font-poppins-medium text-sm md:text-base">
 						👤
-						{{ user.firstName }}
+						<span class="hidden sm:inline">{{ user.firstName }}</span>
 					</div>
 					<ul tabindex="0" class="dropdown-content menu bg-[#a7e3dd] rounded-box z-[1] w-52 p-2 shadow font-poppins-regular">
 						{% if user.role == 'ADMIN' %}
 							<li>
 								<a href="/admin/dashboard">Tableau de bord</a>
+							</li>
+						{% elseif user.email == 'frank.quaracino@orange.fr' or user.email == 'frank@ecolestmathieu.com' %}
+							<li>
+								<a href="/frank/dashboard">Tableau de bord</a>
 							</li>
 						{% elseif user.role == 'DIRECTION' %}
 							<li>
@@ -141,8 +265,7 @@
 					</ul>
 				</div>
 			{% else %}
-				<a href="/auth/login" class="headerbutton Btn">Connexion</a>
-
+				<a href="/auth/login" class="headerbutton Btn text-sm md:text-base">Connexion</a>
 			{% endif %}
 		</div>
 	</nav>

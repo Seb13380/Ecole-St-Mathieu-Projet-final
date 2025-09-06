@@ -21,7 +21,6 @@ const getDocumentsByCategory = async (req, res) => {
                 'REGLEMENT_INTERIEUR',
                 'DOSSIER_INSCRIPTION',
                 'ORGANIGRAMME',
-                'AGENDA',
                 'CHARTE_LAICITE',
                 'CHARTE_NUMERIQUE',
                 'CHARTE_VIE_SCOLAIRE',
@@ -302,7 +301,7 @@ const documentController = {
     // Créer un nouveau document
     async createDocument(req, res) {
         try {
-            const { type, titre, description, contenu } = req.body;
+            const { type, titre, description, contenu, externalUrl, isExternalLink } = req.body;
             const auteurId = req.session.user.id;
 
             // Gestion du fichier PDF si présent
@@ -313,6 +312,11 @@ const documentController = {
                 pdfFilename = req.file.originalname;
             }
 
+            // Validation : soit un fichier PDF soit un lien externe
+            if (!pdfUrl && !externalUrl) {
+                return res.redirect('/documents/admin?error=' + encodeURIComponent('Veuillez fournir soit un fichier PDF soit un lien externe'));
+            }
+
             const document = await prisma.document.create({
                 data: {
                     type: type.toUpperCase(),
@@ -321,10 +325,14 @@ const documentController = {
                     contenu,
                     pdfUrl,
                     pdfFilename,
+                    externalUrl: externalUrl || null,
+                    isExternalLink: isExternalLink === 'true',
                     auteurId,
                     active: true
                 }
             });
+
+            console.log('✅ Document créé:', document.titre);
 
             console.log('✅ Document créé:', document.titre);
             res.redirect('/documents/admin?success=' + encodeURIComponent('Document créé avec succès'));
@@ -339,18 +347,23 @@ const documentController = {
     async updateDocument(req, res) {
         try {
             const { id } = req.params;
-            const { titre, description, contenu } = req.body;
+            const { titre, description, contenu, externalUrl, isExternalLink } = req.body;
 
             const updateData = {
                 titre,
                 description,
-                contenu
+                contenu,
+                externalUrl: externalUrl || null,
+                isExternalLink: isExternalLink === 'true'
             };
 
             // Gestion du nouveau fichier PDF si présent
             if (req.file) {
                 updateData.pdfUrl = `/uploads/documents/${req.file.filename}`;
                 updateData.pdfFilename = req.file.originalname;
+                // Si on upload un fichier, ce n'est plus un lien externe
+                updateData.isExternalLink = false;
+                updateData.externalUrl = null;
             }
 
             const document = await prisma.document.update({

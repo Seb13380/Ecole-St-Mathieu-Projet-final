@@ -1,0 +1,19 @@
+# Script pour obtenir la vraie URL Google Maps de l'École Saint-Mathieu
+
+# Adresse : 22 Place des Héros, 13013 Marseille - Château-Gombert
+
+# URL Google Maps pour recherche directe
+https://maps.google.com/maps?q=22+Place+des+Héros,+13013+Marseille,+France
+
+# URL d'embed générée (à tester et remplacer si nécessaire)
+https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2902.8764545678!2d5.427776056789!3d43.340678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c9c6c0a1b2c3d4%3A0x123456789abcdef0!2s22%20Place%20des%20H%C3%A9ros%2C%2013013%20Marseille%2C%20France!5e0!3m2!1sfr!2sfr!4v1693906800000!5m2!1sfr!2sfr
+
+# Coordonnées approximatives de Château-Gombert, Marseille 13013
+# Latitude: 43.340679
+# Longitude: 5.427776
+
+# Alternative : URL simplifiée qui devrait fonctionner
+https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=22+Place+des+Héros,13013+Marseille,France
+
+# Sans clé API (méthode embed basique)
+https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11611.506!2d5.427776!3d43.340679!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDIwJzI2LjQiTiA1wrAyNSczOS45IkU!5e0!3m2!1sfr!2sfr!4v1693906800000!5m2!1sfr!2sfr

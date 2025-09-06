@@ -1,0 +1,497 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Gestion des menus - École Saint-Mathieu
+{% endblock %}
+
+{% block styles %}
+	<style>
+		.menu-card {
+			transition: all 0.3s ease;
+		}
+		.menu-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		}
+		.status-badge {
+			display: inline-flex;
+			align-items: center;
+			padding: 0.5rem 1rem;
+			border-radius: 9999px;
+			font-size: 0.875rem;
+			font-weight: 500;
+		}
+		.status-actif {
+			background-color: #10b981;
+			color: white;
+		}
+		.status-planifie {
+			background-color: #3b82f6;
+			color: white;
+		}
+		.status-brouillon {
+			background-color: #6b7280;
+			color: white;
+		}
+		.status-archive {
+			background-color: #f59e0b;
+			color: white;
+		}
+	</style>
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto px-4 py-8">
+		<div class="flex justify-between items-center mb-8">
+			<div>
+				<h1 class="text-3xl font-bold text-[#304a4d]">🍽️ Gestion des menus</h1>
+				<p class="text-gray-600 mt-2">Gérez les menus hebdomadaires de la cantine</p>
+			</div>
+
+			<div class="flex space-x-3">
+				<button onclick="desactiverTousMenus()" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors">
+					<i class="fas fa-eye-slash mr-2"></i>Désactiver tous
+				</button>
+				<button onclick="ouvrirModalAjout()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+					<i class="fas fa-plus mr-2"></i>Nouveau menu PDF
+				</button>
+			</div>
+		</div>
+
+		<!-- Messages de statut -->
+		<div id="message-container" class="mb-6"></div>
+
+		<!-- Statistiques rapides -->
+		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+			<div class="bg-white p-4 rounded-lg shadow">
+				<div class="text-2xl font-bold text-green-600">{{ stats.actifs }}</div>
+				<div class="text-sm text-gray-600">Menu actif</div>
+			</div>
+			<div class="bg-white p-4 rounded-lg shadow">
+				<div class="text-2xl font-bold text-blue-600">{{ stats.planifies }}</div>
+				<div class="text-sm text-gray-600">Menus planifiés</div>
+			</div>
+			<div class="bg-white p-4 rounded-lg shadow">
+				<div class="text-2xl font-bold text-gray-600">{{ stats.brouillons }}</div>
+				<div class="text-sm text-gray-600">Brouillons</div>
+			</div>
+			<div class="bg-white p-4 rounded-lg shadow">
+				<div class="text-2xl font-bold text-orange-600">{{ stats.archives }}</div>
+				<div class="text-sm text-gray-600">Archivés</div>
+			</div>
+		</div>
+
+		<!-- Liste des menus -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{% for menu in menus %}
+				<div class="menu-card bg-white rounded-lg shadow-lg p-6 border-l-4 {% if menu.actif %}border-green-500{% elseif menu.statut == 'PLANIFIE' %}border-blue-500{% elseif menu.statut == 'BROUILLON' %}border-gray-500{% else %}border-orange-500{% endif %}">
+					<div class="flex justify-between items-start mb-4">
+						<h3 class="text-lg font-semibold text-gray-900">{{ menu.semaine }}</h3>
+						<span class="status-badge status-{{ menu.statut|lower }}">
+							{% if menu.actif %}
+								✅ ACTIF
+							{% else %}
+								{{ menu.statut }}
+							{% endif %}
+						</span>
+					</div>
+
+					<div class="space-y-2 mb-4">
+						<div class="flex items-center text-sm text-gray-600">
+							<i class="fas fa-calendar mr-2"></i>
+							{{ menu.dateDebut|date('d/m/Y') }}
+							-
+							{{ menu.dateFin|date('d/m/Y') }}
+						</div>
+						<div class="flex items-center text-sm text-gray-600">
+							<i class="fas fa-user mr-2"></i>
+							{{ menu.auteur.firstName }}
+							{{ menu.auteur.lastName }}
+						</div>
+						<div class="flex items-center text-sm text-gray-600">
+							<i class="fas fa-clock mr-2"></i>
+							Créé le
+							{{ menu.createdAt|date('d/m/Y à H:i') }}
+						</div>
+					</div>
+
+					<!-- Actions -->
+					<div class="flex flex-wrap gap-2">
+						<a href="{{ menu.pdfUrl }}" target="_blank" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200 transition-colors">
+							<i class="fas fa-file-pdf mr-1"></i>Voir PDF
+						</a>
+
+						{% if not menu.actif %}
+							<button onclick="activerMenu({{ menu.id }})" class="bg-green-100 text-green-700 px-3 py-1 rounded text-sm hover:bg-green-200 transition-colors">
+								<i class="fas fa-check mr-1"></i>Activer
+							</button>
+						{% endif %}
+
+						{% if menu.statut == 'BROUILLON' %}
+							<button onclick="planifierMenu({{ menu.id }})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200 transition-colors">
+								<i class="fas fa-calendar-plus mr-1"></i>Planifier
+							</button>
+						{% endif %}
+
+						<button onclick="remplacerMenu({{ menu.id }})" class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-sm hover:bg-yellow-200 transition-colors">
+							<i class="fas fa-exchange-alt mr-1"></i>Remplacer
+						</button>
+
+						<button onclick="supprimerMenu({{ menu.id }})" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm hover:bg-red-200 transition-colors">
+							<i class="fas fa-trash mr-1"></i>Supprimer
+						</button>
+					</div>
+				</div>
+			{% else %}
+				<div class="col-span-full text-center py-12">
+					<div class="text-6xl mb-4">📋</div>
+					<h2 class="text-xl font-semibold text-gray-600 mb-4">Aucun menu créé</h2>
+					<p class="text-gray-500 mb-6">Commencez par ajouter votre premier menu en PDF</p>
+					<button onclick="ouvrirModalAjout()" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+						<i class="fas fa-plus mr-2"></i>Ajouter un menu
+					</button>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<!-- Modal d'ajout de menu -->
+	<div id="modalAjout" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+		<div class="flex items-center justify-center min-h-screen p-4">
+			<div class="bg-white rounded-lg max-w-md w-full p-6">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-lg font-semibold">Ajouter un nouveau menu</h3>
+					<button onclick="fermerModalAjout()" class="text-gray-400 hover:text-gray-600">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<form id="formAjoutMenu" enctype="multipart/form-data">
+					<div class="space-y-4">
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">
+								Titre de la semaine *
+							</label>
+							<input type="text" name="semaine" required placeholder="ex: Semaine du 15 au 19 Janvier 2025" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">
+						</div>
+
+						<div class="grid grid-cols-2 gap-4">
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">
+									Date de début *
+								</label>
+								<input type="date" name="dateDebut" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">
+									Date de fin *
+								</label>
+								<input type="date" name="dateFin" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#304a4d]">
+							</div>
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">
+								Fichier PDF du menu *
+							</label>
+							<div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+								<input type="file" name="pdfMenu" accept=".pdf" required class="hidden" id="fileInput">
+								<label for="fileInput" class="cursor-pointer">
+									<i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+									<p class="text-sm text-gray-600">Cliquez pour sélectionner un fichier PDF</p>
+									<p class="text-xs text-gray-500 mt-1">Taille max: 10MB</p>
+								</label>
+								<div id="fileName" class="mt-2 text-sm text-green-600 hidden"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex justify-end space-x-3 mt-6">
+						<button type="button" onclick="fermerModalAjout()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
+							Annuler
+						</button>
+						<button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+							<i class="fas fa-plus mr-2"></i>Ajouter
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal de remplacement -->
+	<div id="modalRemplacement" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+		<div class="flex items-center justify-center min-h-screen p-4">
+			<div class="bg-white rounded-lg max-w-md w-full p-6">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-lg font-semibold">Remplacer le menu</h3>
+					<button onclick="fermerModalRemplacement()" class="text-gray-400 hover:text-gray-600">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<form id="formRemplacementMenu" enctype="multipart/form-data">
+					<input type="hidden" name="menuId" id="menuIdRemplacement">
+					<div class="space-y-4">
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">
+								Nouveau fichier PDF *
+							</label>
+							<div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+								<input type="file" name="nouveauPdf" accept=".pdf" required class="hidden" id="fileInputRemplacement">
+								<label for="fileInputRemplacement" class="cursor-pointer">
+									<i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+									<p class="text-sm text-gray-600">Sélectionnez le nouveau fichier PDF</p>
+								</label>
+								<div id="fileNameRemplacement" class="mt-2 text-sm text-green-600 hidden"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex justify-end space-x-3 mt-6">
+						<button type="button" onclick="fermerModalRemplacement()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
+							Annuler
+						</button>
+						<button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+							<i class="fas fa-exchange-alt mr-2"></i>Remplacer
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	<script>
+		// Variables globales
+let menuIdEnCours = null;
+
+// Gestion des modales
+function ouvrirModalAjout() {
+document.getElementById('modalAjout').classList.remove('hidden');
+}
+
+function fermerModalAjout() {
+document.getElementById('modalAjout').classList.add('hidden');
+document.getElementById('formAjoutMenu').reset();
+document.getElementById('fileName').classList.add('hidden');
+}
+
+function ouvrirModalRemplacement(menuId) {
+menuIdEnCours = menuId;
+document.getElementById('menuIdRemplacement').value = menuId;
+document.getElementById('modalRemplacement').classList.remove('hidden');
+}
+
+function fermerModalRemplacement() {
+document.getElementById('modalRemplacement').classList.add('hidden');
+document.getElementById('formRemplacementMenu').reset();
+document.getElementById('fileNameRemplacement').classList.add('hidden');
+menuIdEnCours = null;
+}
+
+// Gestion des fichiers
+document.getElementById('fileInput').addEventListener('change', function (e) {
+const file = e.target.files[0];
+if (file) {
+document.getElementById('fileName').textContent = file.name;
+document.getElementById('fileName').classList.remove('hidden');
+}
+});
+
+document.getElementById('fileInputRemplacement').addEventListener('change', function (e) {
+const file = e.target.files[0];
+if (file) {
+document.getElementById('fileNameRemplacement').textContent = file.name;
+document.getElementById('fileNameRemplacement').classList.remove('hidden');
+}
+});
+
+// Soumission du formulaire d'ajout
+document.getElementById('formAjoutMenu').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const formData = new FormData(this);
+
+try {
+const response = await fetch('/directeur/menus/ajouter', {
+method: 'POST',
+body: formData
+});
+
+const result = await response.json();
+
+if (result.success) {
+afficherMessage('Menu ajouté avec succès !', 'success');
+fermerModalAjout();
+location.reload();
+} else {
+afficherMessage(result.error || 'Erreur lors de l\'ajout du menu', 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+afficherMessage('Erreur lors de l\'ajout du menu', 'error');
+}
+});
+
+// Soumission du formulaire de remplacement
+document.getElementById('formRemplacementMenu').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const formData = new FormData(this);
+const menuId = document.getElementById('menuIdRemplacement').value;
+
+try {
+const response = await fetch (`/directeur/menus/${menuId}/remplacer`, {
+method: 'POST',
+body: formData
+});
+
+const result = await response.json();
+
+if (result.success) {
+afficherMessage('Menu remplacé avec succès !', 'success');
+fermerModalRemplacement();
+location.reload();
+} else {
+afficherMessage(result.error || 'Erreur lors du remplacement du menu', 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+afficherMessage('Erreur lors du remplacement du menu', 'error');
+}
+});
+
+// Fonctions d'action sur les menus
+async function activerMenu(id) {
+if (confirm('Êtes-vous sûr de vouloir activer ce menu ? Les autres menus actifs seront désactivés.')) {
+try {
+const response = await fetch (`/directeur/menus/${id}/activer`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+});
+
+const result = await response.json();
+
+if (result.success) {
+afficherMessage('Menu activé avec succès !', 'success');
+location.reload();
+} else {
+afficherMessage(result.error || 'Erreur lors de l\'activation', 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+afficherMessage('Erreur lors de l\'activation du menu', 'error');
+}
+}
+}
+
+async function planifierMenu(id) {
+try {
+const response = await fetch (`/directeur/menus/${id}/planifier`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+});
+
+const result = await response.json();
+
+if (result.success) {
+afficherMessage('Menu planifié avec succès !', 'success');
+location.reload();
+} else {
+afficherMessage(result.error || 'Erreur lors de la planification', 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+afficherMessage('Erreur lors de la planification du menu', 'error');
+}
+}
+
+function remplacerMenu(id) {
+ouvrirModalRemplacement(id);
+}
+
+async function supprimerMenu(id) {
+if (confirm('Êtes-vous sûr de vouloir supprimer ce menu ? Cette action est irréversible.')) {
+try {
+const response = await fetch (`/directeur/menus/${id}`, {
+method: 'DELETE',
+headers: {
+'Content-Type': 'application/json'
+}
+});
+
+const result = await response.json();
+
+if (result.success) {
+afficherMessage('Menu supprimé avec succès !', 'success');
+location.reload();
+} else {
+afficherMessage(result.error || 'Erreur lors de la suppression', 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+afficherMessage('Erreur lors de la suppression du menu', 'error');
+}
+}
+}
+
+async function desactiverTousMenus() {
+if (confirm('Êtes-vous sûr de vouloir désactiver tous les menus actifs ?')) {
+try {
+const response = await fetch('/directeur/menus/desactiver-tous', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+});
+
+const result = await response.json();
+
+if (result.success) {
+afficherMessage (`${
+result.count
+} menu(s) désactivé(s) avec succès !`, 'success');
+location.reload();
+} else {
+afficherMessage(result.error || 'Erreur lors de la désactivation', 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+afficherMessage('Erreur lors de la désactivation des menus', 'error');
+}
+}
+}
+
+// Fonction d'affichage des messages
+function afficherMessage(message, type) {
+const container = document.getElementById('message-container');
+const alertClass = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+
+container.innerHTML = `
+        <div class="alert ${alertClass} border px-4 py-3 rounded mb-4">
+            <strong>${
+type === 'success' ? 'Succès:' : 'Erreur:'
+}</strong> ${message}
+        </div>
+    `;
+
+// Faire disparaître le message après 5 secondes
+setTimeout(() => {
+container.innerHTML = '';
+}, 5000);
+}
+
+// Fermer les modales avec Escape
+document.addEventListener('keydown', function (e) {
+if (e.key === 'Escape') {
+fermerModalAjout();
+fermerModalRemplacement();
+}
+});
+	</script>
+{% endblock %}

@@ -8,12 +8,22 @@ const inscriptionEleveController = {
     // Affichage du formulaire d'inscription élève
     getInscriptionEleve: async (req, res) => {
         try {
+            // Récupérer la configuration des inscriptions
+            let config = await prisma.inscriptionConfiguration.findFirst();
+            if (!config) {
+                config = {
+                    soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
+                    afficherAnnoncePS2026: true // Par défaut, on affiche l'annonce
+                };
+            }
+
             res.render('pages/inscription-eleve', {
                 title: 'Inscription Élève - École Saint Mathieu',
                 user: req.session.user || null,
                 currentUrl: req.originalUrl,
                 success: req.flash('success'),
-                error: req.flash('error')
+                error: req.flash('error'),
+                config: config
             });
         } catch (error) {
             console.error('Erreur lors du chargement de la page inscription élève:', error);
@@ -34,14 +44,42 @@ const inscriptionEleveController = {
                 parentEmail,
                 parentPhone,
                 parentAddress,
+                parentPassword,
+                confirmPassword,
+                anneeScolaire,
                 children,
                 specialNeeds,
                 message
             } = req.body;
 
             // Validation des champs obligatoires du parent
-            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone) {
+            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone ||
+                !parentPassword || !confirmPassword) {
                 req.flash('error', 'Veuillez remplir tous les champs obligatoires du parent.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Validation du mot de passe
+            if (parentPassword !== confirmPassword) {
+                req.flash('error', 'Les mots de passe ne correspondent pas.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            if (parentPassword.length < 6) {
+                req.flash('error', 'Le mot de passe doit contenir au moins 6 caractères.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Validation format mot de passe (majuscule, minuscule, chiffre)
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+            if (!passwordRegex.test(parentPassword)) {
+                req.flash('error', 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.');
+                return res.redirect('/inscription-eleve');
+            }
+
+            // Validation de l'année scolaire
+            if (!anneeScolaire) {
+                req.flash('error', 'Veuillez sélectionner l\'année scolaire.');
                 return res.redirect('/inscription-eleve');
             }
 
@@ -88,6 +126,9 @@ const inscriptionEleveController = {
                 return res.redirect('/inscription-eleve');
             }
 
+            // Hasher le mot de passe fourni par l'utilisateur
+            const hashedPassword = await bcrypt.hash(parentPassword, 12);
+
             // Création de la demande d'inscription avec plusieurs enfants
             const inscriptionRequest = await prisma.preInscriptionRequest.create({
                 data: {
@@ -97,6 +138,10 @@ const inscriptionEleveController = {
                     parentEmail,
                     parentPhone,
                     parentAddress,
+                    parentPassword: hashedPassword, // Mot de passe haché fourni par l'utilisateur
+
+                    // Année scolaire
+                    anneeScolaire,
 
                     // Informations des enfants (stocker en JSON)
                     children: JSON.stringify(childrenData),

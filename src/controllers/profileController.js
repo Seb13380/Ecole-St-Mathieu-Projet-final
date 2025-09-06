@@ -1,4 +1,7 @@
-const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
+
+const prisma = new PrismaClient();
 
 const ProfileController = {
     /**
@@ -12,9 +15,29 @@ const ProfileController = {
                 return res.redirect('/auth/login?message=Vous devez être connecté pour voir votre profil');
             }
 
+            // Récupérer les données utilisateur depuis la base
+            const currentUser = await prisma.user.findUnique({
+                where: { id: user.id },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    phone: true,
+                    adress: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true
+                }
+            });
+
+            if (!currentUser) {
+                return res.redirect('/auth/login?message=Utilisateur non trouvé');
+            }
+
             // Données de profil étendues selon le rôle
             let profileData = {
-                ...user,
+                ...currentUser,
                 lastLogin: new Date().toLocaleDateString('fr-FR', {
                     weekday: 'long',
                     year: 'numeric',
@@ -23,33 +46,33 @@ const ProfileController = {
                     hour: 'numeric',
                     minute: 'numeric'
                 }),
-                memberSince: '2023', // Exemple
-                profileImage: ProfileController.getProfileImage(user.role)
+                memberSince: currentUser.createdAt.getFullYear(),
+                profileImage: ProfileController.getProfileImage(currentUser.role)
             };
 
             // Ajouter des données spécifiques selon le rôle
-            if (user.role === 'PARENT') {
-                profileData.children = [
-                    {
-                        id: 1,
-                        firstName: 'Paul',
-                        lastName: 'Cecchini',
-                        classe: { nom: 'CP-A' },
-                        age: 6,
-                        ticketsRemaining: 15
-                    },
-                    {
-                        id: 2,
-                        firstName: 'Marie',
-                        lastName: 'Cecchini',
-                        classe: { nom: 'CE2-B' },
-                        age: 8,
-                        ticketsRemaining: 12
+            if (currentUser.role === 'PARENT') {
+                const enfants = await prisma.student.findMany({
+                    where: { parentId: currentUser.id },
+                    include: {
+                        classe: {
+                            select: { nom: true, niveau: true }
+                        }
                     }
-                ];
-                profileData.totalTickets = profileData.children.reduce((sum, child) => sum + child.ticketsRemaining, 0);
+                });
+
+                profileData.children = enfants.map(enfant => ({
+                    id: enfant.id,
+                    firstName: enfant.firstName,
+                    lastName: enfant.lastName,
+                    classe: enfant.classe,
+                    age: Math.floor((new Date() - new Date(enfant.dateNaissance)) / (365.25 * 24 * 60 * 60 * 1000)),
+                    ticketsRemaining: 0 // À calculer selon le système de tickets
+                }));
+
+                profileData.totalTickets = profileData.children.length * 15; // Exemple
                 profileData.accountBalance = 125.50; // Exemple
-            } else if (user.role === 'RESTAURANT') {
+            } else if (currentUser.role === 'RESTAURANT') {
                 profileData.workingHours = {
                     start: '08:00',
                     end: '16:00'
@@ -61,7 +84,9 @@ const ProfileController = {
             res.render('pages/profile/index.twig', {
                 pageTitle: 'Mon Profil',
                 user: profileData,
-                canEdit: true
+                canEdit: true,
+                success: req.query.success,
+                error: req.query.error
             });
         } catch (error) {
             console.error('Erreur lors de l\'affichage du profil:', error);
@@ -152,7 +177,9 @@ const ProfileController = {
 
             res.render('pages/profile/change-password.twig', {
                 pageTitle: 'Changer le mot de passe',
-                user
+                user,
+                success: req.query.success,
+                error: req.query.error
             });
         } catch (error) {
             console.error('Erreur lors de l\'affichage du formulaire de mot de passe:', error);
@@ -170,40 +197,62 @@ const ProfileController = {
             const user = req.session.user;
             const { currentPassword, newPassword, confirmPassword } = req.body;
 
+            console.log('🔒 Tentative de changement de mot de passe pour:', user?.email);
+
             if (!user) {
                 return res.redirect('/auth/login');
             }
 
             // Validation
             if (!currentPassword || !newPassword || !confirmPassword) {
+                console.log('❌ Champs manquants');
                 return res.redirect('/profile/change-password?error=Tous les champs sont requis');
             }
 
             if (newPassword !== confirmPassword) {
+                console.log('❌ Mots de passe ne correspondent pas');
                 return res.redirect('/profile/change-password?error=Les nouveaux mots de passe ne correspondent pas');
             }
 
             if (newPassword.length < 6) {
+                console.log('❌ Mot de passe trop court');
                 return res.redirect('/profile/change-password?error=Le mot de passe doit contenir au moins 6 caractères');
             }
 
-            // Dans un vrai projet, on vérifierait le mot de passe actuel et on mettrait à jour
-            // const bcrypt = require('bcrypt');
-            // const isValidPassword = await bcrypt.compare(currentPassword, user.password);
-            // if (!isValidPassword) {
-            //     return res.redirect('/profile/change-password?error=Mot de passe actuel incorrect');
-            // }
-            // const hashedPassword = await bcrypt.hash(newPassword, 10);
-            // await prisma.user.update({
-            //     where: { id: user.id },
-            //     data: { password: hashedPassword }
-            // });
+            // Récupérer l'utilisateur actuel depuis la base de données
+            const currentUser = await prisma.user.findUnique({
+                where: { id: user.id }
+            });
+
+            if (!currentUser) {
+                console.log('❌ Utilisateur non trouvé en base');
+                return res.redirect('/profile/change-password?error=Utilisateur non trouvé');
+            }
+
+            // Vérifier le mot de passe actuel
+            const isValidPassword = await bcrypt.compare(currentPassword, currentUser.password);
+            if (!isValidPassword) {
+                console.log('❌ Mot de passe actuel incorrect');
+                return res.redirect('/profile/change-password?error=Mot de passe actuel incorrect');
+            }
+
+            // Hacher le nouveau mot de passe
+            const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+            // Mettre à jour le mot de passe en base
+            await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    password: hashedPassword,
+                    updatedAt: new Date()
+                }
+            });
 
             console.log(`✅ Mot de passe changé pour: ${user.email}`);
 
             res.redirect('/profile?success=Mot de passe changé avec succès');
         } catch (error) {
-            console.error('Erreur lors du changement de mot de passe:', error);
+            console.error('❌ Erreur lors du changement de mot de passe:', error);
             res.redirect('/profile/change-password?error=Erreur lors du changement de mot de passe');
         }
     },

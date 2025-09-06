@@ -1,0 +1,121 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	{{ title }}
+	- École Saint-Mathieu
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto p-4 font-poppins">
+		<h1 class="text-3xl font-bold mb-6 text-[#304a4d]">{{ title }}</h1>
+
+		{% if description %}
+			<div class="alert alert-info permanent mb-6">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+				</svg>
+				<div>
+					<h3 class="font-bold">{{ title }}</h3>
+					<div class="text-sm">{{ description }}</div>
+				</div>
+			</div>
+		{% endif %}
+
+		{% if documents and documents|length > 0 %}
+			{% for document in documents %}
+				<div class="mb-8">
+					<h2 class="text-2xl font-semibold mb-4 text-[#304a4d]">{{ document.titre }}</h2>
+
+					{% if document.description %}
+						<p class="text-lg mb-4 text-gray-700">{{ document.description }}</p>
+					{% endif %}
+
+					<!-- Bouton de téléchargement du PDF si disponible -->
+					{% if document.pdfUrl %}
+						<div class="alert alert-success permanent mb-6">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+							</svg>
+							<div>
+								<h3 class="font-bold">{{ document.titre }}
+									- Document PDF</h3>
+								<div class="text-sm">Téléchargez le document complet au format PDF</div>
+							</div>
+							<div class="flex-none">
+								<a href="{{ document.pdfUrl }}" target="_blank" download="{{ document.pdfFilename }}" class="btn btn-primary btn-sm">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+									</svg>
+									Télécharger PDF
+								</a>
+							</div>
+						</div>
+					{% endif %}
+
+					<!-- Contenu HTML si disponible -->
+					{% if document.contenu %}
+						<div class="prose max-w-none">
+							<div class="text-gray-700 leading-relaxed">
+								{{ document.contenu|raw }}
+							</div>
+						</div>
+					{% endif %}
+
+					<!-- Informations sur l'auteur et dates -->
+					<div class="mt-6 text-sm text-gray-500 border-t pt-4">
+						<div class="flex justify-between items-center">
+							<div>
+								Publié par
+								{{ document.auteur.firstName }}
+								{{ document.auteur.lastName }}
+								le
+								{{ document.createdAt|date('d/m/Y à H:i') }}
+							</div>
+							{% if document.createdAt != document.updatedAt %}
+								<div>
+									Mis à jour le
+									{{ document.updatedAt|date('d/m/Y à H:i') }}
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+
+				{% if not loop.last %}
+					<hr class="my-8 border-gray-200">
+				{% endif %}
+			{% endfor %}
+
+			<!-- Lien de gestion pour les administrateurs -->
+			{% if user and (user.role == 'DIRECTION' or user.role == 'GESTIONNAIRE_SITE') %}
+				<div class="mt-8 text-center">
+					<a href="/documents/admin/manage" class="btn btn-secondary">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m0 0h9.75m-9.75 0a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0m9.75 0H21m-9.75 6h9.75m-9.75 0a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 12H7.5m0 0h9.75m-9.75 0a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0m9.75 0H21m-9.75 6h9.75M10.5 18a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 18H7.5m0 0h9.75m-9.75 0a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0m9.75 0H21"/>
+						</svg>
+						Gérer les documents
+					</a>
+				</div>
+			{% endif %}
+
+		{% else %}
+			<!-- Message si aucun document -->
+			<div class="alert alert-warning permanent">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+				</svg>
+				<div>
+					<h3 class="font-bold">Aucun document disponible</h3>
+					<div class="text-sm">
+						{% if user and (user.role == 'DIRECTION' or user.role == 'GESTIONNAIRE_SITE') %}
+							Aucun document n'a encore été publié pour cette section.
+							<a href="/documents/admin/manage" class="font-bold underline">Gérer les documents</a>
+						{% else %}
+							Cette section sera bientôt disponible avec des documents à consulter.
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+{% endblock %}

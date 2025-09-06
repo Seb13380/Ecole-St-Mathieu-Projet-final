@@ -1,0 +1,115 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	<title>Frais de scolarité - École Saint-Mathieu</title>
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto p-4 font-poppins">
+		<h1 class="text-3xl font-bold mb-6 text-[#304a4d]">Frais de Scolarité - École Saint-Mathieu</h1>
+
+		<div class="card bg-base-100 shadow-xl mb-6">
+			<div class="card-body">
+				<h2 class="card-title text-2xl text-[#304a4d]">Règlement Financier</h2>
+				<p>Les frais de scolarité sont fixés par le conseil d'administration de l'école et sont révisés chaque année.</p>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h3 class="card-title text-xl text-[#304a4d]">Contribution Familiale</h3>
+					<p class="text-3xl font-bold text-primary">86,00 €</p>
+					<p class="text-sm text-gray-600">Par enfant et par mois</p>
+				</div>
+			</div>
+
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h3 class="card-title text-xl text-[#304a4d]">Cotisation A.P.E.L.</h3>
+					<p class="text-3xl font-bold text-secondary">28,00 €</p>
+					<p class="text-sm text-gray-600">Par famille et par an</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="collapse collapse-arrow bg-base-200 mb-4">
+			<input type="checkbox"/>
+			<div class="collapse-title text-xl font-medium">
+				À propos de l'A.P.E.L.
+			</div>
+			<div class="collapse-content">
+				<p class="mb-4">L'association des parents d'élèves (A.P.E.L.) représente les parents auprès de la Direction de l'établissement, de l'organisation de l'Enseignement catholique et des pouvoirs publics.</p>
+				<p class="mb-4">Elle participe activement à l'animation et à la vie de l'établissement et apporte aux familles un ensemble de services, dont la revue « Famille & Éducation ».</p>
+				<p class="text-sm text-gray-600">L'adhésion à cette association est volontaire et la cotisation est appelée sur le relevé de contribution.</p>
+			</div>
+		</div>
+
+		<div class="collapse collapse-arrow bg-base-200 mb-4">
+			<input type="checkbox"/>
+			<div class="collapse-title text-xl font-medium">
+				Prestations Scolaires
+			</div>
+			<div class="collapse-content">
+				<h4 class="font-semibold mb-2">Prestations obligatoires :</h4>
+				<ul class="list-disc list-inside mb-4">
+					<li>Livres et fournitures scolaires (prix variable)</li>
+				</ul>
+
+				<h4 class="font-semibold mb-2">Prestations facultatives :</h4>
+				<ul class="list-disc list-inside">
+					<li>Études du matin et du soir : 2,20 € par jour</li>
+					<li>Tickets études occasionnelles : 2,60 € par jour</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="collapse collapse-arrow bg-base-200 mb-4">
+			<input type="checkbox"/>
+			<div class="collapse-title text-xl font-medium">
+				Demi-pension
+			</div>
+			<div class="collapse-content">
+				<ul class="list-disc list-inside">
+					<li>3 ou 4 jours par semaine : 6,50 € par jour</li>
+					<li>Repas occasionnel : 7,30 € par repas</li>
+				</ul>
+				<p class="mt-4 text-sm text-gray-600">La demi-pension est facultative et déterminée par trimestre.</p>
+			</div>
+		</div>
+
+		<div class="collapse collapse-arrow bg-base-200 mb-4">
+			<input type="checkbox"/>
+			<div class="collapse-title text-xl font-medium">
+				Frais d'inscription
+			</div>
+			<div class="collapse-content">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div class="stat bg-base-100 rounded-lg">
+						<div class="stat-title">1 enfant</div>
+						<div class="stat-value text-primary">60 €</div>
+					</div>
+					<div class="stat bg-base-100 rounded-lg">
+						<div class="stat-title">2 enfants</div>
+						<div class="stat-value text-primary">100 €</div>
+					</div>
+					<div class="stat bg-base-100 rounded-lg">
+						<div class="stat-title">3 enfants</div>
+						<div class="stat-value text-primary">120 €</div>
+					</div>
+				</div>
+				<p class="mt-4">Réinscription annuelle : 35,00 € par enfant</p>
+			</div>
+		</div>
+
+		<div class="alert alert-info mt-6">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+			</svg>
+			<div>
+				<h3 class="font-bold">Mode de paiement privilégié</h3>
+				<div class="text-xs">Le prélèvement bancaire est le mode de règlement privilégié par l'établissement.</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

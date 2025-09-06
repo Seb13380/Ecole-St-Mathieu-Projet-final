@@ -2,8 +2,9 @@
 <html lang="fr" data-theme="cupcake" class="h-full">
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=3.0">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; frame-src 'self' https://www.google.com https://maps.google.com https://www.openstreetmap.org; img-src 'self' data: https: *.googleapis.com *.gstatic.com *.openstreetmap.org;">
+		<link rel="icon" type="image/png" href="/assets/images/testimage_1.jpg"/>
 		<title>
 			{% block title %}École Saint-Mathieu
 			{% endblock %}
@@ -15,14 +16,162 @@
 
 		<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
 		<link href="/assets/css/tailwind.css?v=20250820" rel="stylesheet">
-		<link rel="stylesheet" href="/assets/css/style.css"> {% block styles %}{% endblock %}
-		</head>
-		<body class="bg-[#a7e3dd] min-h-screen font-poppins">
-			{% include "partials/header.twig" %}
-			<main class="min-h-screen pt-4 pb-8"> {% block main %}{% endblock %}
-				</main>
-				{% include "partials/footer.twig" %}
+		<link rel="stylesheet" href="/assets/css/style.css">
+		<link
+		rel="stylesheet" href="/assets/css/https-fixes.css?v=20250906">
 
-				{% block scripts %}{% endblock %}
-			</body>
-		</html>
+		<!-- Optimisations pour le rendu HTTPS -->
+		<style>
+			/* Styles pour uniformiser le rendu sur tous les environnements */
+			html {
+				font-size: 16px !important;
+				-webkit-text-size-adjust: 100% !important;
+				-moz-text-size-adjust: 100% !important;
+				-ms-text-size-adjust: 100% !important;
+				text-size-adjust: 100% !important;
+			}
+
+			body {
+				font-size: 1rem !important;
+				line-height: 1.5 !important;
+				-webkit-font-smoothing: antialiased !important;
+				-moz-osx-font-smoothing: grayscale !important;
+			}
+
+			/* Réduction des tailles de police pour uniformiser */
+			.text-4xl {
+				font-size: 1.875rem !important;
+				line-height: 2.25rem !important;
+			}
+			.text-3xl {
+				font-size: 1.5rem !important;
+				line-height: 2rem !important;
+			}
+			.text-2xl {
+				font-size: 1.25rem !important;
+				line-height: 1.75rem !important;
+			}
+			.text-xl {
+				font-size: 1.125rem !important;
+				line-height: 1.75rem !important;
+			}
+			.text-lg {
+				font-size: 1rem !important;
+				line-height: 1.5rem !important;
+			}
+			.text-base {
+				font-size: 0.9rem !important;
+				line-height: 1.4rem !important;
+			}
+			.text-sm {
+				font-size: 0.8rem !important;
+				line-height: 1.25rem !important;
+			}
+			.text-xs {
+				font-size: 0.7rem !important;
+				line-height: 1rem !important;
+			}
+
+			/* Réduction de la taille des conteneurs pour un meilleur rendu */
+			.container {
+				max-width: 95% !important;
+			}
+
+			@media(min-width: 640px) {
+				.container {
+					max-width: 600px !important;
+				}
+			}
+
+			@media(min-width: 768px) {
+				.container {
+					max-width: 728px !important;
+				}
+			}
+
+			@media(min-width: 1024px) {
+				.container {
+					max-width: 980px !important;
+				}
+			}
+
+			@media(min-width: 1280px) {
+				.container {
+					max-width: 1200px !important;
+				}
+			}
+
+			@media(min-width: 1536px) {
+				.container {
+					max-width: 1400px !important;
+				}
+			}
+		</style>
+
+		<!-- Style de diagnostic pour le menu mobile -->
+		<style>
+			#mobile-menu {
+				background: rgba(167, 227, 221, 0.95) !important;
+				backdrop-filter: blur(5px);
+			}
+
+			#mobile-menu.translate-x-0 {
+				transform: translateX(0) !important;
+			}
+
+			#mobile-menu.translate-x-full {
+				transform: translateX(100%) !important;
+			}
+
+			.transition-transform {
+				transition: transform 0.3s ease-in-out !important;
+			}
+
+			/* Style pour les dropdowns mobiles */
+			.mobile-dropdown-content {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.3s ease-in-out;
+			}
+
+			.mobile-dropdown-content:not(.hidden) {
+				max-height: 500px;
+			}
+
+			.mobile-dropdown-content.hidden {
+				max-height: 0 !important;
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.mobile-dropdown-btn svg {
+				transition: transform 0.3s ease-in-out;
+			}
+
+			/* Améliorer la visibilité des sous-menus */
+			.mobile-dropdown-content li a {
+				background: rgba(141, 211, 204, 0.3);
+				margin: 2px 0;
+				border-radius: 8px;
+				border-left: 3px solid #8dd3cc;
+			}
+
+			.mobile-dropdown-content li a:hover {
+				background: rgba(141, 211, 204, 0.6) !important;
+			}
+		</style>
+
+		{% block styles %}{% endblock %}
+	</head>
+	<body class="bg-[#a7e3dd] min-h-screen font-poppins">
+		{% include "partials/header.twig" %}
+		<main class="min-h-screen pt-4 pb-8"> {% block main %}{% endblock %}
+			</main>
+			{% include "partials/footer.twig" %}
+
+			<!-- Script pour le menu mobile responsive -->
+			<script src="/assets/js/mobile-menu.js"></script>
+
+			{% block scripts %}{% endblock %}
+		</body>
+	</html>

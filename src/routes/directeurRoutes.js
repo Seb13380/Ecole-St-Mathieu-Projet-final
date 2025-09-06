@@ -16,6 +16,7 @@ router.get('/dashboard', directeurController.dashboard);
 
 // Gestion des utilisateurs
 router.get('/users', directeurController.getUsersManagement);
+router.get('/users/:id', directeurController.getUser);
 router.post('/users', directeurController.createUser);
 router.post('/users/:id/update', directeurController.updateUser);
 router.post('/users/:id/delete', directeurController.deleteUser);
@@ -46,9 +47,18 @@ router.get('/inscriptions/:id/details', inscriptionController.showRequestDetails
 router.get('/api/classes', inscriptionController.getAvailableClasses);
 router.post('/notify-yamina', inscriptionController.notifyYamina);
 
+// Configuration des inscriptions
+router.post('/inscription-config', inscriptionController.updateInscriptionConfig);
+
 // Messages de contact
 router.get('/contact-messages', directeurController.getContactMessages);
 router.post('/contact/:id/process', directeurController.markContactAsProcessed);
+
+// Demandes d'identifiants
+router.get('/credentials', directeurController.getCredentialsRequests);
+router.post('/credentials/:id/approve', directeurController.approveCredentialsRequest);
+router.post('/credentials/:id/reject', directeurController.rejectCredentialsRequest);
+router.post('/credentials/:id/delete', directeurController.deleteCredentialsRequest);
 
 // Rapports et statistiques
 router.get('/reports', directeurController.getReports);

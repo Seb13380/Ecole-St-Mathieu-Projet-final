@@ -1,0 +1,243 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Détails de la demande - Administration
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto px-4 py-8">
+		<div
+			class="max-w-4xl mx-auto">
+			<!-- En-tête -->
+			<div class="flex justify-between items-center mb-8">
+				<h1 class="text-3xl font-bold text-[#304a4d]">Détails de la demande d'inscription</h1>
+				<a href="/directeur/inscriptions" class="btn btn-ghost">
+					← Retour aux demandes
+				</a>
+			</div>
+
+			<!-- Statut de la demande -->
+			<div class="card bg-base-100 shadow-xl mb-6">
+				<div class="card-body">
+					<div class="flex justify-between items-center">
+						<h2 class="card-title">Statut de la demande</h2>
+						{% if request.status == 'PENDING' %}
+							<span class="badge badge-warning badge-lg">En attente</span>
+						{% elseif request.status == 'ACCEPTED' %}
+							<span class="badge badge-success badge-lg">Approuvée</span>
+						{% else %}
+							<span class="badge badge-error badge-lg">Refusée</span>
+						{% endif %}
+					</div>
+					<p class="text-sm text-gray-500">
+						Demande créée le
+						{{ request.submittedAt | date('d/m/Y à H:i') }}
+					</p>
+					{% if request.processedAt %}
+						<p class="text-sm text-gray-500">
+							Traitée le
+							{{ request.processedAt | date('d/m/Y à H:i') }}
+							{% if request.processor %}
+								par
+								{{ request.processor.firstName }}
+								{{ request.processor.lastName }}
+							{% endif %}
+						</p>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Informations du parent -->
+			<div class="card bg-base-100 shadow-xl mb-6">
+				<div class="card-body">
+					<h2 class="card-title text-[#304a4d] mb-4">
+						👨‍👩‍👧‍👦 Informations du parent
+					</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<p class="font-semibold">Nom complet</p>
+							<p>{{ request.parentFirstName }}
+								{{ request.parentLastName }}</p>
+						</div>
+						<div>
+							<p class="font-semibold">Email</p>
+							<p>{{ request.parentEmail }}</p>
+						</div>
+						<div>
+							<p class="font-semibold">Téléphone</p>
+							<p>{{ request.parentPhone }}</p>
+						</div>
+						<div>
+							<p class="font-semibold">Adresse</p>
+							<p>{{ request.parentAddress }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Informations des enfants -->
+			<div class="card bg-base-100 shadow-xl mb-6">
+				<div class="card-body">
+					<h2 class="card-title text-[#304a4d] mb-4">
+						👶 Enfant(s) à inscrire
+					</h2>
+					<div class="space-y-4">
+						{% for child in request.children %}
+							<div class="border rounded-lg p-4 bg-gray-50">
+								<p class="font-semibold text-lg">
+									{{ child.firstName }}
+									{{ child.lastName }}
+								</p>
+								<p class="text-gray-600">
+									Date de naissance :
+									{{ child.birthDate | date('d/m/Y') }}
+								</p>
+								<p class="text-gray-600">
+									Âge :
+									{{ 'now' | date('Y') - child.birthDate | date('Y') }}
+									ans
+								</p>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+
+			<!-- Commentaire de révision -->
+			{% if request.adminNotes %}
+				<div class="card bg-base-100 shadow-xl mb-6">
+					<div class="card-body">
+						<h2 class="card-title text-[#304a4d] mb-4">
+							💬 Notes administratives
+						</h2>
+						<p>{{ request.adminNotes }}</p>
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Actions -->
+			{% if request.status == 'PENDING' %}
+				<div class="card bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h2 class="card-title text-[#304a4d] mb-4">
+							⚡ Actions disponibles
+						</h2>
+						<div class="flex gap-4">
+							<button class="btn btn-success" onclick="showApproveModal({{ request.id }})">
+								✅ Approuver la demande
+							</button>
+							<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
+								❌ Refuser la demande
+							</button>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- Modals -->
+	<dialog id="approve_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-green-600">Approuver la demande</h3>
+			<p class="py-4">Êtes-vous sûr de vouloir approuver cette demande ?</p>
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text">Commentaire (optionnel)</span>
+				</label>
+				<textarea id="approve_comment" class="textarea textarea-bordered" placeholder="Commentaire..."></textarea>
+			</div>
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('approve_modal').close()">Annuler</button>
+				<button class="btn btn-success" onclick="processApproval()">Confirmer</button>
+			</div>
+		</div>
+	</dialog>
+
+	<dialog id="reject_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-red-600">Refuser la demande</h3>
+			<p class="py-4">Veuillez indiquer le motif du refus.</p>
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text">Motif du refus *</span>
+				</label>
+				<textarea id="reject_comment" class="textarea textarea-bordered" placeholder="Motif..." required></textarea>
+			</div>
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('reject_modal').close()">Annuler</button>
+				<button class="btn btn-error" onclick="processRejection()">Confirmer</button>
+			</div>
+		</div>
+	</dialog>
+
+	<script>
+		let currentRequestId = {{ request.id }};
+
+function showApproveModal() {
+document.getElementById('approve_modal').showModal();
+}
+
+function showRejectModal() {
+document.getElementById('reject_modal').showModal();
+}
+
+async function processApproval() {
+const comment = document.getElementById('approve_comment').value;
+
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/approve`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+credentials: 'include',
+body: JSON.stringify({comment})
+});
+const result = await response.json();
+
+if (result.success) {
+alert('✅ Demande approuvée avec succès !');
+window.location.href = '/directeur/inscriptions';
+} else {
+alert('❌ Erreur : ' + result.message);
+}
+} catch (error) {
+alert('❌ Erreur lors de l\'approbation');
+console.error(error);
+}
+}
+
+async function processRejection() {
+const comment = document.getElementById('reject_comment').value;
+
+if (! comment.trim()) {
+alert('Veuillez indiquer un motif de refus');
+return;
+}
+
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/reject`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+credentials: 'include',
+body: JSON.stringify(
+{reason: comment}
+)
+});
+const result = await response.json();
+
+if (result.success) {
+alert('✅ Demande refusée');
+window.location.href = '/directeur/inscriptions';
+} else {
+alert('❌ Erreur : ' + result.message);
+}
+} catch (error) {
+alert('❌ Erreur lors du refus');
+console.error(error);
+}
+}
+	</script>
+{% endblock %}

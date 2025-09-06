@@ -42,8 +42,8 @@ const heroCarouselController = {
     // Afficher la page de gestion des images hero carousel
     showManagement: async (req, res) => {
         try {
-            // Vérifier que l'utilisateur a les permissions (DIRECTION, MAINTENANCE_SITE ou ADMIN)
-            if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN'].includes(req.session.user.role)) {
+            // Vérifier que l'utilisateur a les permissions (DIRECTION, GESTIONNAIRE_SITE ou ADMIN)
+            if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
                 return res.status(403).render('pages/error', {
                     message: 'Accès non autorisé. Seuls les directeurs, administrateurs et le responsable maintenance peuvent gérer les images.',
                     title: 'Accès refusé'
@@ -96,7 +96,7 @@ const heroCarouselController = {
         async (req, res) => {
             try {
                 // Vérifier que l'utilisateur a les permissions
-                if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN'].includes(req.session.user.role)) {
+                if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
                     return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
                 }
 
@@ -164,7 +164,7 @@ const heroCarouselController = {
             const { titre, description, ordre, active } = req.body;
 
             // Vérifier que l'utilisateur a les permissions
-            if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN'].includes(req.session.user.role)) {
+            if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
                 return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
             }
 
@@ -202,7 +202,7 @@ const heroCarouselController = {
             const { id } = req.params;
 
             // Vérifier que l'utilisateur a les permissions
-            if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN'].includes(req.session.user.role)) {
+            if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
                 return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
             }
 
@@ -250,7 +250,7 @@ const heroCarouselController = {
             const { id } = req.params;
 
             // Vérifier que l'utilisateur a les permissions
-            if (!req.session.user || !['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN'].includes(req.session.user.role)) {
+            if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
                 return res.redirect('/hero-carousel/management?error=' + encodeURIComponent('Accès non autorisé.'));
             }
 

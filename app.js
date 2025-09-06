@@ -4,9 +4,19 @@ const dotenv = require('dotenv');
 const session = require("express-session");
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
+const { loggingMiddleware, errorLoggingMiddleware } = require('./src/middleware/loggingMiddleware');
 
 dotenv.config();
 const app = express();
+
+// Configuration pour faire confiance au proxy Nginx
+app.set('trust proxy', true);
+
+// Configuration CSP pour éviter les erreurs de sécurité
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net;");
+  next();
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -92,6 +102,9 @@ app.use(session({
 // Configuration du middleware flash pour les messages temporaires
 app.use(flash());
 
+// 📊 Middleware de logging pour analytics (après session, avant routes)
+app.use(loggingMiddleware);
+
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
 
@@ -105,6 +118,15 @@ app.set('twig options', {
 
 // Middleware pour rendre les variables de session disponibles dans les vues
 app.use((req, res, next) => {
+  // Debug temporaire
+  console.log('🔍 DEBUG SESSION:', {
+    hasSession: !!req.session,
+    hasUser: !!req.session?.user,
+    user: req.session?.user,
+    sessionID: req.sessionID,
+    url: req.url
+  });
+
   res.locals.user = req.session.user || null;
   res.locals.isAuthenticated = !!req.session.user;
   // Rendre les messages flash disponibles dans toutes les vues
@@ -135,11 +157,13 @@ const carouselRoutes = require("./src/routes/carouselRoutes");
 const heroCarouselRoutes = require("./src/routes/heroCarouselRoutes");
 const inscriptionsRoutes = require('./src/routes/inscriptions');
 const galleryRoutes = require('./src/routes/galleryRoutes');
+const credentialsController = require('./src/controllers/credentialsController');
 const documentRoutes = require('./src/routes/documentRoutes');
 const preInscriptionRoutes = require('./src/routes/preInscriptionRoutes');
 const userManagementRoutes = require('./src/routes/userManagementRoutes');
 const agendaRoutes = require('./src/routes/agendaRoutes');
 const inscriptionManagementRoutes = require('./src/routes/inscriptionManagementRoutes');
+const analyticsRoutes = require('./src/routes/analyticsRoutes');
 
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
@@ -167,11 +191,16 @@ app.use('/pre-inscription', preInscriptionRoutes);
 app.use('/user-management', userManagementRoutes);
 app.use('/agenda', agendaRoutes);
 app.use('/inscription-management', inscriptionManagementRoutes);
+app.use('/directeur/analytics', analyticsRoutes);
 
 // Redirection de /inscription vers /inscription-eleve
 app.get('/inscription', (req, res) => {
   res.redirect('/inscription-eleve');
 });
+
+// Routes pour demande d'identifiants (système séparé)
+app.get('/demande-identifiants', credentialsController.showCredentialsForm);
+app.post('/demande-identifiants', credentialsController.processCredentialsRequest);
 
 // Route optionnelle pour /inscriptions qui redirige vers /admin/inscriptions
 app.get('/inscriptions/manage', (req, res) => {
@@ -184,6 +213,14 @@ app.get('/inscriptions/manage', (req, res) => {
     });
   }
 });
+
+// Route de test pour le header responsive
+app.get('/test-responsive', (req, res) => {
+  res.sendFile(__dirname + '/test-responsive.html');
+});
+
+// 📊 Middleware de gestion des erreurs avec logging
+app.use(errorLoggingMiddleware);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
