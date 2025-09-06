@@ -9,6 +9,9 @@ const { loggingMiddleware, errorLoggingMiddleware } = require('./src/middleware/
 dotenv.config();
 const app = express();
 
+// Configuration pour faire confiance au proxy Nginx
+app.set('trust proxy', true);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
