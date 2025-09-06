@@ -1,0 +1,301 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}École Saint-Mathieu - OGEC
+{% endblock %}
+
+{% block main %}
+	<style>
+		/* Reset margins et padding pour pleine largeur */
+		.ogec-container {
+			margin: 0 -50vw;
+			padding: 0;
+			width: 100vw;
+			position: relative;
+			left: 50%;
+			right: 50%;
+		}
+
+		/* Section en pleine largeur avec 2 moitiés */
+		.section-split {
+			display: flex;
+			min-height: 60vh;
+		}
+
+		.section-half {
+			width: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 60px 40px;
+		}
+
+		.section-content {
+			max-width: 500px;
+			width: 100%;
+		}
+
+		.ogec-header {
+			background: #6fc7b7;
+			color: white;
+			padding: 40px 0;
+			text-align: center;
+		}
+
+		/* Section Présentation - Rose avec image enfant */
+		.presentation-text {
+			background: #f7b5a8;
+			color: #333;
+		}
+
+		.presentation-image {
+			background: #f7b5a8;
+			background-image: url('/assets/images/20250326_114849.jpg');
+			background-size: cover;
+			background-position: center;
+			position: relative;
+		}
+
+		/* Section Membres - Vert avec image équipe */
+		.membres-text {
+			background: #6fc7b7;
+			color: white;
+		}
+
+		.membres-image {
+			background: #6fc7b7;
+			background-image: url('/assets/images/20250326_114954.jpg');
+			background-size: cover;
+			background-position: center;
+		}
+
+		/* Section Missions - Rose */
+		.missions-text {
+			background: #f7b5a8;
+			color: #333;
+		}
+
+		.missions-image {
+			background: #f7b5a8;
+			background-image: url('/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg');
+			background-size: cover;
+			background-position: center;
+		}
+
+		/* Section Réalisations - Vert */
+		.realisations-text {
+			background: #6fc7b7;
+			color: white;
+		}
+
+		.realisations-image {
+			background: #6fc7b7;
+			background-image: url('/assets/images/travaux-ecole.jpg');
+			background-size: cover;
+			background-position: center;
+		}
+
+		/* Section Contact - Bleu foncé */
+		.contact-section {
+			background: #4a90a4;
+			color: white;
+			padding: 60px 40px;
+			text-align: center;
+		}
+
+		.section-title {
+			font-size: 2.5rem;
+			font-weight: bold;
+			margin-bottom: 1.5rem;
+			letter-spacing: 2px;
+			text-transform: uppercase;
+		}
+
+		.section-subtitle {
+			font-size: 1.3rem;
+			font-style: italic;
+			margin-bottom: 2rem;
+			font-weight: 300;
+		}
+
+		.section-text {
+			font-size: 1.1rem;
+			line-height: 1.7;
+			margin-bottom: 1.5rem;
+		}
+
+		.membres-list {
+			margin: 2rem 0;
+		}
+
+		.membres-category {
+			margin-bottom: 2rem;
+		}
+
+		.membres-category h4 {
+			font-size: 1.2rem;
+			font-weight: 600;
+			margin-bottom: 0.8rem;
+			color: #fff;
+		}
+
+		.membres-category p {
+			font-size: 1rem;
+			line-height: 1.5;
+			margin-bottom: 0.3rem;
+		}
+
+		@media(max-width: 768px) {
+			.section-split {
+				flex-direction: column;
+			}
+
+			.section-half {
+				width: 100%;
+				min-height: 40vh;
+				padding: 40px 20px;
+			}
+
+			.section-title {
+				font-size: 2rem;
+			}
+
+			.ogec-header h1 {
+				font-size: 2.2rem !important;
+			}
+		}
+	</style>
+
+	<div
+		class="ogec-container">
+
+		<!-- Header -->
+		<section class="ogec-header">
+			<h1 style="font-size: 4rem; font-weight: bold; margin-bottom: 1rem;">L'OGEC</h1>
+			<p style="font-size: 1.4rem;">Organisme de Gestion de l'Enseignement Catholique - École Saint-Mathieu</p>
+		</section>
+
+		<!-- Section Présentation -->
+		<section class="section-split">
+			<div
+				class="section-half presentation-image"><!-- Image ou motif de fond -->
+			</div>
+			<div class="section-half presentation-text">
+				<div class="section-content">
+					<h2 class="section-title">Présentation</h2>
+					<h3 class="section-subtitle">Organisme de gestion de l'Enseignement Catholique</h3>
+
+					<p class="section-text">Chaque école de l'enseignement catholique est gérée conjointement par un OGEC.</p>
+
+					<p class="section-text">C'est une association loi 1901, initiée par l'enseignement catholique, au service de l'école. Elle lui donne une existence juridique, c'est-à-dire une personnalité morale, regroupant des personnes bénévoles, choisies en fonction de leurs compétences et de leur attachement aux valeurs de l'enseignement catholique, pour assurer la bonne gestion de l'école, en lien avec le Chef d'établissement.</p>
+
+					<p class="section-text">L'OGEC doit déposer des statuts, élire un Conseil d'Administration et un bureau, réunir une Assemblée Générale.</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Section Membres -->
+		<section class="section-split">
+			<div class="section-half membres-text">
+				<div class="section-content">
+					<h2 class="section-title">Ses Membres</h2>
+					<p class="section-text">Pour l'école Saint-Mathieu, l'OGEC est constitué des membres suivants :</p>
+
+					<div class="membres-list">
+						<div class="membres-category">
+							<h4>Les membres de Droit :</h4>
+							<p>• M. Camboulives (DDEC)</p>
+							<p>• M./Mme Représentant(e) (UPOGEC)</p>
+							<p>• M./Mme Président(e) (APEL)</p>
+						</div>
+
+						<div class="membres-category">
+							<h4>Les membres du Bureau :</h4>
+							<p>
+								<strong>Elisabeth BERTELLI :</strong>
+								Présidente</p>
+							<p>
+								<strong>Jean-Philippe RIGAUD :</strong>
+								Trésorier</p>
+							<p>
+								<strong>David DUPUIS :</strong>
+								Secrétaire</p>
+						</div>
+
+						<div class="membres-category">
+							<h4>Administrateurs :</h4>
+							<p>• Christel DUCCI</p>
+							<p>• Nicolas FOURNIL</p>
+							<p>• Marc MESSINA</p>
+						</div>
+
+						<div class="membres-category">
+							<h4>Membre invité permanent :</h4>
+							<p>
+								<strong>Lionel CAMBOULIVES - Chef d'Établissement</strong>
+							</p>
+						</div>
+					</div>
+
+					<p class="section-text" style="font-style: italic; font-size: 1rem;">Notre CA regroupe des bénévoles en activité et une multi-compétences dans des domaines variés comme l'analyse financière, l'architecture et la conduite de travaux, la gestion du personnel, la communication, le juridique…</p>
+				</div>
+			</div>
+			<div
+				class="section-half membres-image"><!-- Image équipe -->
+			</div>
+		</section>
+
+		<!-- Section Missions -->
+		<section class="section-split">
+			<div
+				class="section-half missions-image"><!-- Image missions -->
+			</div>
+			<div class="section-half missions-text">
+				<div class="section-content">
+					<h2 class="section-title">Ses Missions</h2>
+					<p class="section-text" style="font-style: italic;">en collaboration avec le chef d'établissement</p>
+
+					<div style="margin-top: 2rem;">
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem;">La gestion financière de l'école</h4>
+						<p class="section-text" style="font-size: 1rem;">Calcul et suivi du budget, tenue des comptes, détermination de la contribution des familles, emploi et suivi des versements à la charge de l'État et des collectivités locales.</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.8rem;">La gestion de la cantine</h4>
+						<p class="section-text" style="font-size: 1rem;">Négociation avec le prestataire, gestion des infrastructures, du personnel, de l'hygiène et la sécurité.</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.8rem;">La gestion du personnel</h4>
+						<p class="section-text" style="font-size: 1rem;">Contrats de travail, rémunérations, formations du personnel non enseignant et du Chef d'Établissement.</p>
+
+						<h4 style="font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.8rem;">La gestion des locaux</h4>
+						<p class="section-text" style="font-size: 1rem;">Entretien, rénovation, aménagement, mobilier, hygiène, sécurité et mise aux normes.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+
+		<!-- Section Contact -->
+		<section class="contact-section">
+			<h2 style="font-size: 2.2rem; margin-bottom: 2rem;">NOUS CONTACTER</h2>
+
+			<div style="display: flex; justify-content: center; gap: 80px; flex-wrap: wrap;">
+				<div style="text-align: left;">
+					<h3 style="font-size: 1.3rem; margin-bottom: 1rem;">ADRESSE</h3>
+					<p>École Saint-Mathieu</p>
+					<p>22 Place des Héros</p>
+					<p>13013 Marseille</p>
+				</div>
+
+				<div style="text-align: left;">
+					<h3 style="font-size: 1.3rem; margin-bottom: 1rem;">CONTACT</h3>
+					<p>
+						<strong>Email :</strong>
+						l.camboulives@stmathieu.org</p>
+					<p>
+						<strong>Téléphone :</strong>
+						04.91.07.07.18</p>
+				</div>
+			</div>
+		</section>
+
+	</div>
+
+{% endblock %}

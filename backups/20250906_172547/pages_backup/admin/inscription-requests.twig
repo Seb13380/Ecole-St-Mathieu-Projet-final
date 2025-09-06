@@ -1,0 +1,384 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Demandes d'inscription - Administration
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto px-4 py-8">
+		<div class="flex justify-between items-center mb-8">
+			<h1 class="text-3xl font-bold text-[#304a4d]">Demandes d'inscription en attente</h1>
+			<div class="flex gap-2">
+				{% set pendingCount = 0 %}
+				{% set approvedCount = 0 %}
+				{% set rejectedCount = 0 %}
+				{% for request in requests %}
+					{% if request.status == 'PENDING' %}
+						{% set pendingCount = pendingCount + 1 %}
+					{% elseif request.status == 'ACCEPTED' %}
+						{% set approvedCount = approvedCount + 1 %}
+					{% elseif request.status == 'REJECTED' %}
+						{% set rejectedCount = rejectedCount + 1 %}
+					{% endif %}
+				{% endfor %}
+				<span class="badge badge-warning">{{ pendingCount }}
+					en attente</span>
+				<span class="badge badge-success">{{ approvedCount }}
+					approuvées</span>
+				<span class="badge badge-error">{{ rejectedCount }}
+					refusées</span>
+			</div>
+		</div>
+
+		<!-- Filtres -->
+		<div class="mb-6">
+			<div
+				class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+				<!-- Filtre par statut -->
+				<div>
+					<label class="text-sm font-medium text-gray-700 mb-2 block">Filtrer par statut :</label>
+					<div class="tabs tabs-boxed">
+						<a class="tab tab-active" data-filter="all">Toutes ({{ requests | length }})</a>
+						<a class="tab" data-filter="PENDING">En attente ({{ pendingCount }})</a>
+						<a class="tab" data-filter="ACCEPTED">Approuvées ({{ approvedCount }})</a>
+						<a class="tab" data-filter="REJECTED">Refusées ({{ rejectedCount }})</a>
+					</div>
+				</div>
+
+				<!-- Filtre par année scolaire -->
+				<div>
+					<label class="text-sm font-medium text-gray-700 mb-2 block">Filtrer par année scolaire :</label>
+					<select id="yearFilter" class="select select-bordered w-full">
+						<option value="all">Toutes les années</option>
+						<option value="2025/2026">2025/2026</option>
+						<option value="2026/2027">2026/2027</option>
+						<option value="2027/2028">2027/2028</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<!-- Liste des demandes -->
+		<div class="space-y-6">
+			{% for request in requests %}
+				<div class="card bg-base-100 shadow-xl request-item" data-status="{{ request.status }}" data-year="{{ request.anneeScolaire|default('2025/2026') }}">
+					<div class="card-body">
+						<div class="flex justify-between items-start mb-4">
+							<div>
+								<h2 class="card-title text-[#304a4d] text-xl">
+									{{ request.parentFirstName }}
+									{{ request.parentLastName }}
+								</h2>
+								<p class="text-gray-600">{{ request.parentEmail }}</p>
+								<p class="text-gray-600">{{ request.parentPhone }}</p>
+								<!-- Année scolaire -->
+								<div class="mt-2">
+									<span class="badge badge-primary">
+										📅
+										{{ request.anneeScolaire|default('2025/2026') }}
+									</span>
+								</div>
+							</div>
+
+							<div class="text-right">
+								{% if request.status == 'PENDING' %}
+									<span class="badge badge-warning badge-lg">En attente</span>
+								{% elseif request.status == 'ACCEPTED' %}
+									<span class="badge badge-success badge-lg">Approuvée</span>
+								{% else %}
+									<span class="badge badge-error badge-lg">Refusée</span>
+								{% endif %}
+								<p class="text-sm text-gray-500 mt-1">
+									Demande du
+									{{ request.submittedAt | date('d/m/Y à H:i') }}
+								</p>
+							</div>
+						</div>
+
+						<!-- Informations du parent -->
+						<div class="grid md:grid-cols-2 gap-6 mb-6">
+							<div class="bg-blue-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
+									👨‍👩‍👧‍👦 Informations parent
+								</h3>
+								<div class="space-y-2 text-sm">
+									<p>
+										<strong>Nom :</strong>
+										{{ request.parentFirstName }}
+										{{ request.parentLastName }}</p>
+									<p>
+										<strong>Email :</strong>
+										{{ request.parentEmail }}</p>
+									<p>
+										<strong>Téléphone :</strong>
+										{{ request.parentPhone }}</p>
+									<p>
+										<strong>Adresse :</strong>
+										{{ request.parentAddress }}</p>
+								</div>
+							</div>
+
+							<div class="bg-green-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
+									👶 Enfant(s) à inscrire
+								</h3>
+								<div class="space-y-3">
+									{% for child in request.children %}
+										<div class="border border-green-200 rounded p-3 text-sm">
+											<p>
+												<strong>{{ child.firstName }}
+													{{ child.lastName }}</strong>
+											</p>
+											<p class="text-gray-600">Né(e) le
+												{{ child.birthDate | date('d/m/Y') }}</p>
+											<p class="text-gray-600">Âge :
+												{{ 'now' | date('Y') - child.birthDate | date('Y') }}
+												ans</p>
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+
+						<!-- Commentaire de révision si existe -->
+						{% if request.adminNotes %}
+							<div class="bg-gray-50 p-4 rounded-lg mb-4">
+								<h3 class="font-semibold text-[#304a4d] mb-2">Notes administratives</h3>
+								<p class="text-gray-700">{{ request.adminNotes }}</p>
+								{% if request.processor %}
+									<p class="text-sm text-gray-500 mt-2">
+										Par
+										{{ request.processor.firstName }}
+										{{ request.processor.lastName }}
+										le
+										{{ request.processedAt | date('d/m/Y à H:i') }}
+									</p>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<!-- Actions -->
+						<div class="card-actions justify-end">
+							<button class="btn btn-info btn-outline" onclick="viewDetails({{ request.id }})">
+								Voir détails
+							</button>
+							{% if request.status == 'PENDING' %}
+								<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
+									Refuser
+								</button>
+								<button class="btn btn-success" onclick="showApproveModal({{ request.id }})">
+									Approuver
+								</button>
+							{% else %}
+								<button class="btn btn-outline btn-sm" onclick="showDeleteModal({{ request.id }})">
+									🗑️ Supprimer
+								</button>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% else %}
+				<div class="text-center py-12">
+					<p class="text-gray-500 text-lg">Aucune demande d'inscription trouvée.</p>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<!-- Modal d'approbation -->
+	<dialog id="approve_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-green-600">Approuver la demande</h3>
+			<p class="py-4">Êtes-vous sûr de vouloir approuver cette demande d'inscription ?</p>
+
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text">Commentaire (optionnel)</span>
+				</label>
+				<textarea id="approve_comment" class="textarea textarea-bordered" placeholder="Commentaire d'approbation..."></textarea>
+			</div>
+
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('approve_modal').close()">Annuler</button>
+				<button class="btn btn-success" onclick="processApproval()">Confirmer l'approbation</button>
+			</div>
+		</div>
+	</dialog>
+
+	<!-- Modal de refus -->
+	<dialog id="reject_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-red-600">Refuser la demande</h3>
+			<p class="py-4">Êtes-vous sûr de vouloir refuser cette demande d'inscription ?</p>
+
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text">Motif du refus *</span>
+				</label>
+				<textarea id="reject_comment" class="textarea textarea-bordered" placeholder="Veuillez indiquer le motif du refus..." required></textarea>
+			</div>
+
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('reject_modal').close()">Annuler</button>
+				<button class="btn btn-error" onclick="processRejection()">Confirmer le refus</button>
+			</div>
+		</div>
+	</dialog>
+
+	<!-- Modal de suppression -->
+	<dialog id="delete_modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-orange-600">Supprimer la demande</h3>
+			<p class="py-4">⚠️ Êtes-vous sûr de vouloir supprimer définitivement cette demande traitée ?</p>
+			<p class="text-sm text-gray-600">Cette action est irréversible.</p>
+
+			<div class="modal-action">
+				<button class="btn" onclick="document.getElementById('delete_modal').close()">Annuler</button>
+				<button class="btn btn-error" onclick="processDelete()">Supprimer définitivement</button>
+			</div>
+		</div>
+	</dialog>
+
+	<script>
+		let currentRequestId = null;
+
+// Fonction pour afficher le modal d'approbation
+function showApproveModal(requestId) {
+currentRequestId = requestId;
+document.getElementById('approve_modal').showModal();
+}
+
+// Fonction pour afficher le modal de refus
+function showRejectModal(requestId) {
+currentRequestId = requestId;
+document.getElementById('reject_modal').showModal();
+}
+
+// Fonction pour afficher le modal de suppression
+function showDeleteModal(requestId) {
+currentRequestId = requestId;
+document.getElementById('delete_modal').showModal();
+}
+
+// Fonction pour voir les détails
+function viewDetails(requestId) {
+window.location.href = `/directeur/inscriptions/${requestId}/details`;
+}
+
+// Traiter l'approbation
+async function processApproval() {
+const comment = document.getElementById('approve_comment').value;
+
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/approve`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+credentials: 'include',
+body: JSON.stringify({comment})
+});
+const result = await response.json();
+
+if (result.success) {
+location.reload();
+} else {
+alert('Erreur : ' + result.message);
+}
+} catch (error) {
+alert('Erreur lors de l\'approbation');
+}
+}
+
+// Traiter le refus
+async function processRejection() {
+const comment = document.getElementById('reject_comment').value;
+
+if (! comment.trim()) {
+alert('Veuillez indiquer un motif de refus');
+return;
+}
+
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/reject`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+credentials: 'include',
+body: JSON.stringify(
+{reason: comment}
+)
+});
+const result = await response.json();
+
+if (result.success) {
+location.reload();
+} else {
+alert('Erreur : ' + result.message);
+}
+} catch (error) {
+alert('Erreur lors du refus');
+}
+}
+
+// Traiter la suppression
+async function processDelete() {
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/delete`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+credentials: 'include'
+});
+
+const result = await response.json();
+
+if (result.success) {
+location.reload();
+} else {
+alert('Erreur : ' + result.message);
+}
+} catch (error) {
+alert('Erreur lors de la suppression');
+}
+}
+
+// Filtrage des demandes par statut
+document.querySelectorAll('.tab').forEach(tab => {
+tab.addEventListener('click', function () { // Retirer la classe active de tous les onglets
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+// Ajouter la classe active à l'onglet cliqué
+this.classList.add('tab-active');
+
+filterRequests();
+});
+});
+
+// Filtrage des demandes par année scolaire
+document.getElementById('yearFilter').addEventListener('change', function () {
+filterRequests();
+});
+
+// Fonction pour filtrer les demandes selon les critères sélectionnés
+function filterRequests() {
+const statusFilter = document.querySelector('.tab.tab-active').getAttribute('data-filter');
+const yearFilter = document.getElementById('yearFilter').value;
+const requests = document.querySelectorAll('.request-item');
+
+requests.forEach(request => {
+const requestStatus = request.getAttribute('data-status');
+const requestYear = request.getAttribute('data-year');
+
+const statusMatch = statusFilter === 'all' || requestStatus === statusFilter;
+const yearMatch = yearFilter === 'all' || requestYear === yearFilter;
+
+if (statusMatch && yearMatch) {
+request.style.display = 'block';
+} else {
+request.style.display = 'none';
+}
+});
+}
+	</script>
+{% endblock %}

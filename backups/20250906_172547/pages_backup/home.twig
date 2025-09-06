@@ -390,35 +390,13 @@
 						<i class="fas fa-phone text-[#a7e3dd] mr-2"></i>
 						Téléphone : 04 91 05 05 89
 					</p>
-
-					<!-- Bouton pour basculer entre les cartes -->
-					<div class="text-center mt-4">
-						<button id="map-switch-btn" onclick="switchToOSM()" class="bg-[#a7e3dd] text-[#304a4d] px-4 py-2 rounded-lg hover:bg-[#8dd3cc] transition-colors text-sm font-medium">
-							🌍 OpenStreetMap
-						</button>
-					</div>
 				</div>
-				<!-- Carte Google Maps avec fallback -->
-				<div
-					class="w-full h-[600px] overflow-hidden shadow-md maps-container">
-					<!-- Google Maps principal -->
-					<iframe id="google-maps" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11611.506!2d5.427776!3d43.340679!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z4oCOMjIgUGxhY2UgZGVzIEjDqXJvcywgMTMwMTMgTWFyc2VpbGxl!5e0!3m2!1sfr!2sfr!4v1693906800000!5m2!1sfr!2sfr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="École Saint-Mathieu - 22 Place des Héros, Marseille" onerror="showMapFallback()"></iframe>
-					<!-- Fallback OpenStreetMap (masqué par défaut) -->
-					<iframe id="osm-maps" src="https://www.openstreetmap.org/export/embed.html?bbox=5.4247776%2C43.3356789%2C5.4347776%2C43.3456789&layer=mapnik&marker=43.340679%2C5.427776" width="100%" height="100%" style="border:0; display:none;" allowfullscreen="" loading="lazy" title="École Saint-Mathieu - 22 Place des Héros, Marseille (OpenStreetMap)"></iframe>
 
-					<!-- Message d'erreur de fallback -->
-					<div id="map-error" style="display:none;" class="w-full h-full flex items-center justify-center bg-gray-100">
-						<div class="text-center p-8">
-							<i class="fas fa-map-marker-alt text-6xl text-[#a7e3dd] mb-4"></i>
-							<h4 class="text-xl font-bold text-[#304a4d] mb-2">École Saint-Mathieu</h4>
-							<p class="text-lg text-gray-600">22 Place des Héros, 13013 Marseille</p>
-							<p class="text-base text-gray-500 mt-2">Château-Gombert</p>
-							<a href="https://maps.google.com/maps?q=22+Place+des+Héros,+13013+Marseille" target="_blank" class="inline-block mt-4 bg-[#a7e3dd] text-[#304a4d] px-4 py-2 rounded-lg hover:bg-[#8dd3cc] transition-colors">
-								🗺️ Ouvrir dans Google Maps
-							</a>
-						</div>
-					</div>
+				<!-- Carte Google Maps -->
+				<div class="w-full h-[600px] overflow-hidden shadow-md maps-container">
+					<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.5234567890123!2d5.4297756!3d43.3406789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f15.5!3m3!1m2!1s0x12c9c6c234567890%3A0x9876543210fedcba!2s22%20Pl.%20des%20H%C3%A9ros%2C%2013013%20Marseille!5e1!3m2!1sfr!2sfr!4v1692345678901!5m2!1sfr!2sfr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="École Saint-Mathieu - 22 Place des Héros, Marseille"></iframe>
 				</div>
+
 				<!-- Informations pratiques -->
 				<div class="grid md:grid-cols-3 gap-6 mt-6 px-6">
 					<div class="text-center p-6 bg-[#a7e3dd]/10 rounded-lg info-card">
@@ -650,47 +628,5 @@ button.textContent = 'Réduire';
 button.className = 'bg-orange-500 hover:bg-orange-600 text-white font-medium ml-2 px-3 py-1 rounded-lg transition-colors duration-300 text-sm';
 }
 }
-
-// Gestion des cartes Google Maps avec fallback
-function showMapFallback() {
-console.log('⚠️ Erreur de chargement Google Maps, basculement vers OpenStreetMap');
-document.getElementById('google-maps').style.display = 'none';
-document.getElementById('osm-maps').style.display = 'block';
-}
-
-function switchToOSM() {
-document.getElementById('google-maps').style.display = 'none';
-document.getElementById('osm-maps').style.display = 'block';
-document.getElementById('map-switch-btn').textContent = '🗺️ Google Maps';
-document.getElementById('map-switch-btn').onclick = switchToGoogle;
-}
-
-function switchToGoogle() {
-document.getElementById('osm-maps').style.display = 'none';
-document.getElementById('google-maps').style.display = 'block';
-document.getElementById('map-switch-btn').textContent = '🌍 OpenStreetMap';
-document.getElementById('map-switch-btn').onclick = switchToOSM;
-}
-
-// Vérification du chargement de Google Maps
-document.addEventListener('DOMContentLoaded', function () {
-const googleMaps = document.getElementById('google-maps');
-if (googleMaps) {
-googleMaps.addEventListener('error', showMapFallback);
-
-// Test de chargement après 5 secondes
-setTimeout(function () {
-try {
-if (googleMaps.contentDocument || googleMaps.contentWindow) {
-console.log('✅ Google Maps chargé avec succès');
-} else {
-console.log('⚠️ Google Maps inaccessible, test du fallback');
-}
-} catch (e) {
-console.log('⚠️ Erreur d\'accès Google Maps:', e);
-}
-}, 5000);
-}
-});
 	</script>
 {% endblock %}

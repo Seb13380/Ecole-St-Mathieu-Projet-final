@@ -1,0 +1,133 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	{{ pageTitle }}
+	- École Saint-Mathieu
+{% endblock %}
+
+{% block main %}
+	<div
+		class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+		<!-- Header Section -->
+		<div class="bg-white shadow-lg">
+			<div class="container mx-auto px-6 py-8">
+				<div class="text-center">
+					<h1 class="text-4xl font-bold text-slate-800 mb-4">
+						{% if category == 'ecole' %}
+							<span class="mr-3">🏫</span>
+							Documents de l'École
+						{% else %}
+							<span class="mr-3">✝️</span>
+							Documents Pastorale
+						{% endif %}
+					</h1>
+					<p class="text-slate-600 text-lg">
+						{% if category == 'ecole' %}
+							Retrouvez tous les documents officiels, projets éducatifs et chartes de l'école
+						{% else %}
+							Découvrez les documents relatifs à la pastorale et à la spiritualité de l'école
+						{% endif %}
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Documents Content -->
+		<div class="container mx-auto px-6 py-12">
+			{% if documentsByType and documentsByType|length > 0 %}
+				<div class="space-y-12">
+					{% for type, documents in documentsByType %}
+						{% set firstDoc = documents[0] %}
+						<div
+							class="bg-white rounded-xl shadow-lg overflow-hidden">
+							<!-- Type Header -->
+							<div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+								<h2 class="text-2xl font-bold text-white">
+									📂
+									{{ type|replace('_', ' ')|replace('PASTORALE ', '')|replace('CHARTE ', '')|title }}
+								</h2>
+							</div>
+
+							<!-- Documents List -->
+							<div class="p-8">
+								{% for document in documents %}
+									<div class="{% if not loop.first %}border-t border-slate-200 pt-6 mt-6{% endif %}">
+										<div class="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+											<div class="flex-1">
+												<h3 class="text-2xl font-bold text-slate-800 mb-3">
+													{{ document.titre }}
+												</h3>
+
+												{% if document.description %}
+													<p class="text-slate-600 mb-4 leading-relaxed">
+														{{ document.description }}
+													</p>
+												{% endif %}
+
+												<div class="flex items-center text-sm text-slate-500 mb-6">
+													<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+													</svg>
+													Mis à jour le
+													{{ document.updatedAt|date('d/m/Y') }}
+													par
+													{{ document.auteur.firstName }}
+													{{ document.auteur.lastName }}
+												</div>
+											</div>
+
+											<div class="flex flex-col sm:flex-row gap-3 lg:ml-8">
+												{% if document.contenu %}
+													<a href="/documents/show/{{ document.id }}" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition-colors inline-flex items-center justify-center">
+														<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+														</svg>
+														Consulter
+													</a>
+												{% endif %}
+
+												{% if document.pdfUrl %}
+													<a href="{{ document.pdfUrl }}" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-6 rounded-lg transition-colors inline-flex items-center justify-center">
+														<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+														</svg>
+														Télécharger PDF
+													</a>
+												{% endif %}
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="text-center py-16">
+					<div class="bg-white rounded-xl shadow-lg p-12 max-w-2xl mx-auto">
+						<div class="text-6xl mb-6">📄</div>
+						<h2 class="text-2xl font-bold text-slate-800 mb-4">Aucun document disponible</h2>
+						<p class="text-slate-600">
+							{% if category == 'ecole' %}
+								Les documents de l'école seront bientôt disponibles.
+							{% else %}
+								Les documents de la pastorale seront bientôt disponibles.
+							{% endif %}
+						</p>
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Navigation -->
+			<div class="mt-12 text-center">
+				<a href="/" class="bg-slate-500 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-lg transition-colors inline-flex items-center">
+					<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+					</svg>
+					Retour à l'accueil
+				</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}

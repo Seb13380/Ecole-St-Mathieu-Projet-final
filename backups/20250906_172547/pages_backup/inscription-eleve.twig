@@ -1,0 +1,648 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<div class="min-h-screen bg-gradient-to-br from-[#a7e3dd] to-[#8dd3cc] py-12">
+		<div class="container mx-auto px-4">
+			<div
+				class="max-w-4xl mx-auto">
+				<!-- En-tête -->
+				<div class="text-center mb-8">
+					<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
+						🎓 Demande d'inscription Élève(s)
+					</h1>
+					<p class="text-lg text-[#304a4d]/80" id="inscriptionSubtitle">
+						Demande d'inscription pour l'année scolaire 2025-2026
+					</p>
+				</div>
+
+				<!-- Annonce Petite Section 2026 -->
+				{% if config and config.afficherAnnoncePS2026 %}
+					<div id="annoncePS2026" class="mb-8">
+						<div
+							class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
+							<!-- Icône décorative -->
+							<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
+								🎓
+							</div>
+
+							<div class="relative z-10">
+								<div class="flex items-center mb-4">
+									<span class="text-3xl mr-3">🌟</span>
+									<h2 class="text-2xl font-bold text-orange-700">
+										Inscription Petite Section - Rentrée 2026
+									</h2>
+								</div>
+
+								<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
+									<p class="text-lg text-orange-800 mb-3 font-medium">
+										📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
+									</p>
+									<p class="text-orange-700 mb-4">
+										Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
+									</p>
+
+									<div class="text-center">
+										<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
+											<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+											</svg>
+											Accéder au formulaire d'inscription PS 2026
+										</a>
+									</div>
+								</div>
+
+								<div class="text-center">
+									<p class="text-sm text-orange-600 italic">
+										⏰ Ce formulaire est spécialement conçu pour les futures petites sections
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+
+				<!-- Documents à télécharger -->
+				<div id="documentsSection" class="mb-8" style="display: none;">
+					<div class="bg-white rounded-xl shadow-lg p-6">
+						<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+							📁 Documents à télécharger
+						</h2>
+						<p class="text-[#304a4d]/80 mb-4">
+							Téléchargez et consultez les documents nécessaires pour l'inscription :
+						</p>
+						<div
+							id="documentsList" class="space-y-3"><!-- Les documents seront ajoutés ici par JavaScript -->
+						</div>
+					</div>
+				</div>
+
+				<!-- Messages flash -->
+				{% if success %}
+					<div class="alert alert-success mb-6">
+						<span>✅
+							{{ success }}</span>
+					</div>
+				{% endif %}
+
+				{% if error %}
+					<div class="alert alert-error mb-6">
+						<span>❌
+							{{ error }}</span>
+					</div>
+				{% endif %}
+
+				<!-- Formulaire -->
+				<div class="bg-white rounded-xl shadow-lg p-8">
+					<form
+						action="/inscription-eleve" method="POST" class="space-y-6">
+
+						<!-- Section Parent/Responsable -->
+						<div class="border-b border-gray-200 pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] text-center mb-4">
+								👤 Informations du Parent/Responsable
+							</h2>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Prénom *</span>
+									</label>
+									<input type="text" name="parentFirstName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Nom *</span>
+									</label>
+									<input type="text" name="parentLastName" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Email *</span>
+									</label>
+									<input type="email" name="parentEmail" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Téléphone *</span>
+									</label>
+									<input type="tel" name="parentPhone" class="input input-bordered w-full" required>
+								</div>
+
+								<div class="form-control md:col-span-2">
+									<label class="label">
+										<span class="label-text font-medium">Adresse complète *</span>
+									</label>
+									<textarea name="parentAddress" class="textarea textarea-bordered w-full" rows="3" required placeholder="Adresse, code postal, ville"></textarea>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Mot de passe -->
+						<div class="border-b border-gray-200 pb-6">
+							<div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
+								<h2 class="text-2xl font-semibold text-orange-800 text-center mb-4">
+									🔒 Mot de passe pour votre compte
+								</h2>
+								<p class="text-center text-orange-700 mb-4">
+									Choisissez un mot de passe sécurisé pour accéder à votre espace parent
+								</p>
+								
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+									<div class="form-control">
+										<label class="label">
+											<span class="label-text font-medium">Mot de passe *</span>
+										</label>
+										<input type="password" name="parentPassword" class="input input-bordered w-full" 
+											   placeholder="Minimum 6 caractères" minlength="6" required>
+										<label class="label">
+											<span class="label-text-alt text-gray-500">Au moins 6 caractères avec majuscule, minuscule et chiffre</span>
+										</label>
+									</div>
+
+									<div class="form-control">
+										<label class="label">
+											<span class="label-text font-medium">Confirmer le mot de passe *</span>
+										</label>
+										<input type="password" name="confirmPassword" class="input input-bordered w-full" 
+											   placeholder="Ressaisissez le mot de passe" minlength="6" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Année Scolaire -->
+						<div class="border-b border-gray-200 pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] text-center mb-4">
+								📅 Année Scolaire
+							</h2>
+
+							<div class="form-control max-w-md mx-auto">
+								<label class="label">
+									<span class="label-text font-medium text-lg">Pour quelle année scolaire souhaitez-vous inscrire votre/vos enfant(s) ? *</span>
+								</label>
+								<select name="anneeScolaire" class="select select-bordered w-full text-lg" required>
+									<option value="2025/2026" selected>2025/2026 (Année en cours)</option>
+									<option value="2026/2027">2026/2027 (Prochaine année)</option>
+									<option value="2027/2028">2027/2028</option>
+								</select>
+								<div class="label">
+									<span class="label-text-alt text-gray-600">
+										⚠️ Sélectionnez l'année scolaire concernée par votre demande
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Enfants -->
+						<div class="border-b border-gray-200 pb-6">
+							<div class="text-center mb-6">
+								<h2 class="text-2xl font-semibold text-[#304a4d]">
+									👶 Enfant(s) à Inscrire
+								</h2>
+							</div>
+							<div class="flex justify-end mb-4">
+								<button type="button" id="addChildBtn" class="btn btn-outline btn-sm bg-[#304a4d] text-white hover:bg-[#2a3f42] shadow-lg font-semibold border border-white/20">
+									➕ Ajouter un autre enfant
+								</button>
+							</div>
+
+							<div
+								id="childrenContainer" class="space-y-6">
+								<!-- Premier enfant (par défaut) -->
+								<div class="child-form bg-slate-50 p-4 rounded-lg border border-slate-200 relative" data-child-index="0">
+									<div class="flex justify-between items-center mb-4">
+										<h3 class="text-lg font-semibold text-[#304a4d]">Enfant 1</h3>
+										<button type="button" class="remove-child-btn btn btn-outline btn-xs text-red-600 hover:bg-red-50 shadow-md font-semibold bg-white border-2 border-red-200" style="display: none;">
+											🗑️ Supprimer
+										</button>
+									</div>
+
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Prénom de l'enfant *</span>
+											</label>
+											<input type="text" name="children[0][firstName]" class="input input-bordered w-full" required>
+										</div>
+
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Nom de l'enfant *</span>
+											</label>
+											<input type="text" name="children[0][lastName]" class="input input-bordered w-full" required>
+										</div>
+
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Date de naissance *</span>
+											</label>
+											<input type="date" name="children[0][birthDate]" class="input input-bordered w-full" required>
+										</div>
+
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Classe actuelle</span>
+											</label>
+											<select name="children[0][currentClass]" class="select select-bordered w-full">
+												<option value="">Sélectionner...</option>
+												<option value="TPS">TPS (Toute Petite Section)</option>
+												<option value="PS">PS (Petite Section)</option>
+												<option value="MS">MS (Moyenne Section)</option>
+												<option value="GS">GS (Grande Section)</option>
+												<option value="CP">CP</option>
+												<option value="CE1">CE1</option>
+												<option value="CE2">CE2</option>
+												<option value="CM1">CM1</option>
+												<option value="CM2">CM2</option>
+												<option value="Première_inscription">Première inscription</option>
+												<option value="Autre_école">Autre école</option>
+											</select>
+										</div>
+
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">Classe demandée *</span>
+											</label>
+											<select name="children[0][requestedClass]" class="select select-bordered w-full" required>
+												<option value="">Sélectionner la classe souhaitée...</option>
+												<option value="PS">PS (Petite Section)</option>
+												<option value="MS">MS (Moyenne Section)</option>
+												<option value="GS">GS (Grande Section)</option>
+												<option value="CP">CP</option>
+												<option value="CE1">CE1</option>
+												<option value="CE2">CE2</option>
+												<option value="CM1">CM1</option>
+												<option value="CM2">CM2</option>
+											</select>
+										</div>
+
+										<div class="form-control">
+											<label class="label">
+												<span class="label-text font-medium">École précédente</span>
+											</label>
+											<input type="text" name="children[0][previousSchool]" class="input input-bordered w-full" placeholder="Nom de l'école précédente (si applicable)">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section Informations Complémentaires -->
+						<div class="pb-6">
+							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
+								📋 Informations Complémentaires
+							</h2>
+
+							<div class="space-y-4">
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Besoins particuliers ou PAI</span>
+									</label>
+									<textarea name="specialNeeds" class="textarea textarea-bordered w-full" rows="3" placeholder="Allergie, handicap, troubles d'apprentissage, etc. (facultatif)"></textarea>
+								</div>
+
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text font-medium">Message ou demande particulière</span>
+									</label>
+									<textarea name="message" class="textarea textarea-bordered w-full" rows="4" placeholder="Votre message pour l'équipe pédagogique (facultatif)"></textarea>
+								</div>
+							</div>
+						</div>
+
+						<!-- Informations importantes -->
+						<div class="bg-blue-50 p-6 rounded-lg">
+							<h3 class="text-lg font-semibold text-[#304a4d] mb-3">
+								ℹ️ Informations importantes
+							</h3>
+							<ul class="list-disc list-inside space-y-2 text-[#304a4d]/80">
+								<li>Cette demande sera examinée par l'équipe de direction</li>
+								<li>Vous recevrez une réponse par email sous 48h</li>
+								<li>En cas d'acceptation, les identifiants de connexion vous seront envoyés</li>
+								<li>Les places sont limitées et attribuées selon l'ordre d'arrivée et les critères de l'école</li>
+								<li>Un entretien peut être demandé avant l'inscription définitive</li>
+							</ul>
+						</div>
+
+						<!-- Bouton de soumission -->
+						<div class="text-center pt-6">
+							<button type="submit" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white text-lg px-8 py-3 shadow-xl font-bold border border-white/30 transition-all duration-200 hover:shadow-2xl">
+								📤 Envoyer la demande d'inscription
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<!-- Informations de contact -->
+				<div class="mt-8 text-center">
+					<div class="bg-white/50 rounded-lg p-6">
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-2">
+							Besoin d'aide ?
+						</h3>
+						<p class="text-[#304a4d]/80">
+							Contactez le secrétariat au
+							<strong>04 91 05 05 89</strong><br>
+							ou par email :
+							<strong>secretariat@ecole-saint-mathieu.fr</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Variables globales
+let childIndex = 1;
+// Commence à 1 car nous avons déjà l'enfant 0
+
+// Charger les données d'inscription (sous-titre et documents)
+async function loadInscriptionData() {
+try {
+const response = await fetch('/inscription-management/data');
+const data = await response.json();
+
+if (data.success) { // Mettre à jour le sous-titre
+if (data.config && data.config.soustitre) {
+document.getElementById('inscriptionSubtitle').textContent = data.config.soustitre;
+}
+
+// Afficher/masquer l'annonce PS 2026
+if (data.config && data.config.afficherAnnoncePS2026) {
+document.getElementById('annoncePS2026').style.display = 'block';
+}
+
+// Afficher les documents s'il y en a
+if (data.documents && data.documents.length > 0) {
+displayDocuments(data.documents);
+}
+}
+} catch (error) {
+console.error('Erreur lors du chargement des données d\'inscription:', error);
+}
+}
+
+function displayDocuments(documents) {
+const documentsSection = document.getElementById('documentsSection');
+const documentsList = document.getElementById('documentsList');
+
+documentsList.innerHTML = '';
+
+documents.forEach(document => {
+const documentDiv = document.createElement('div');
+documentDiv.className = 'flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-200';
+
+const fileSize = (document.taille / 1024 / 1024).toFixed(2);
+
+documentDiv.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <span class="text-red-500 text-2xl">📄</span>
+                <div>
+                    <h3 class="font-semibold text-[#304a4d]">${
+document.nom
+}</h3>
+                    ${
+document.description ? `<p class="text-sm text-[#304a4d]/70">${
+document.description
+}</p>` : ''
+}
+                    <p class="text-xs text-[#304a4d]/60">${fileSize} MB</p>
+                </div>
+            </div>
+            <a href="/inscription-management/documents/${
+document.id
+}/download" 
+               class="bg-[#304a4d] hover:bg-[#2a3f42] text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Télécharger
+            </a>
+        `;
+
+documentsList.appendChild(documentDiv);
+});
+
+documentsSection.style.display = 'block';
+}
+
+// Fonction pour ajouter un nouvel enfant
+function addChild() {
+const container = document.getElementById('childrenContainer');
+const newChildDiv = document.createElement('div');
+newChildDiv.className = 'child-form bg-slate-50 p-4 rounded-lg border border-slate-200 relative';
+newChildDiv.setAttribute('data-child-index', childIndex);
+
+newChildDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-[#304a4d]">Enfant ${
+childIndex + 1
+}</h3>
+            <button type="button" class="remove-child-btn btn btn-outline btn-xs text-red-600 hover:bg-red-50 shadow-md font-semibold bg-white border-2 border-red-200">
+                🗑️ Supprimer
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Prénom de l'enfant *</span>
+                </label>
+                <input type="text" name="children[${childIndex}][firstName]" class="input input-bordered w-full" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Nom de l'enfant *</span>
+                </label>
+                <input type="text" name="children[${childIndex}][lastName]" class="input input-bordered w-full" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Date de naissance *</span>
+                </label>
+                <input type="date" name="children[${childIndex}][birthDate]" class="input input-bordered w-full" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Classe actuelle</span>
+                </label>
+                <select name="children[${childIndex}][currentClass]" class="select select-bordered w-full">
+                    <option value="">Sélectionner...</option>
+                    <option value="TPS">TPS (Toute Petite Section)</option>
+                    <option value="PS">PS (Petite Section)</option>
+                    <option value="MS">MS (Moyenne Section)</option>
+                    <option value="GS">GS (Grande Section)</option>
+                    <option value="CP">CP</option>
+                    <option value="CE1">CE1</option>
+                    <option value="CE2">CE2</option>
+                    <option value="CM1">CM1</option>
+                    <option value="CM2">CM2</option>
+                    <option value="Première_inscription">Première inscription</option>
+                    <option value="Autre_école">Autre école</option>
+                </select>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">Classe demandée *</span>
+                </label>
+                <select name="children[${childIndex}][requestedClass]" class="select select-bordered w-full" required>
+                    <option value="">Sélectionner la classe souhaitée...</option>
+                    <option value="PS">PS (Petite Section)</option>
+                    <option value="MS">MS (Moyenne Section)</option>
+                    <option value="GS">GS (Grande Section)</option>
+                    <option value="CP">CP</option>
+                    <option value="CE1">CE1</option>
+                    <option value="CE2">CE2</option>
+                    <option value="CM1">CM1</option>
+                    <option value="CM2">CM2</option>
+                </select>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-medium">École précédente</span>
+                </label>
+                <input type="text" name="children[${childIndex}][previousSchool]" class="input input-bordered w-full" placeholder="Nom de l'école précédente (si applicable)">
+            </div>
+        </div>
+    `;
+
+container.appendChild(newChildDiv);
+childIndex++;
+
+// Mettre à jour l'affichage des boutons supprimer
+updateRemoveButtons();
+}
+
+// Fonction pour supprimer un enfant
+function removeChild(element) {
+const childForm = element.closest('.child-form');
+childForm.remove();
+
+// Renuméroter les enfants restants
+renumberChildren();
+updateRemoveButtons();
+}
+
+// Fonction pour renuméroter les enfants après suppression
+function renumberChildren() {
+const childForms = document.querySelectorAll('.child-form');
+childForms.forEach((form, index) => {
+form.setAttribute('data-child-index', index);
+
+// Mettre à jour le titre
+const title = form.querySelector('h3');
+title.textContent = `Enfant ${
+index + 1
+}`;
+
+// Mettre à jour les noms des inputs
+const inputs = form.querySelectorAll('input, select');
+inputs.forEach(input => {
+const name = input.getAttribute('name');
+if (name && name.includes('children[')) {
+const newName = name.replace(/children\[\d+\]/, `children[${index}]`);
+input.setAttribute('name', newName);
+}
+});
+});
+
+// Mettre à jour l'index pour les prochains ajouts
+childIndex = childForms.length;
+}
+
+// Fonction pour mettre à jour l'affichage des boutons supprimer
+function updateRemoveButtons() {
+const childForms = document.querySelectorAll('.child-form');
+const removeButtons = document.querySelectorAll('.remove-child-btn');
+
+// Montrer/cacher les boutons supprimer selon le nombre d'enfants
+removeButtons.forEach(btn => {
+if (childForms.length > 1) {
+btn.style.display = 'inline-block';
+} else {
+btn.style.display = 'none';
+}
+});
+}
+
+// Charger les données au chargement de la page
+document.addEventListener('DOMContentLoaded', function () {
+loadInscriptionData();
+
+// Gérer l'ajout d'enfants
+document.getElementById('addChildBtn').addEventListener('click', addChild);
+
+// Gérer la suppression d'enfants (délégation d'événement)
+document.addEventListener('click', function (e) {
+if (e.target.classList.contains('remove-child-btn') || e.target.closest('.remove-child-btn')) {
+const button = e.target.classList.contains('remove-child-btn') ? e.target : e.target.closest('.remove-child-btn');
+removeChild(button);
+}
+});
+
+// Initialiser l'affichage des boutons
+updateRemoveButtons();
+
+// === VALIDATION DES MOTS DE PASSE ===
+const passwordInput = document.querySelector('input[name="parentPassword"]');
+const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
+const form = document.querySelector('form');
+
+function validatePassword() {
+	const password = passwordInput.value;
+	const confirmPassword = confirmPasswordInput.value;
+	
+	// Validation de la force du mot de passe
+	const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+	
+	if (password.length > 0) {
+		if (!passwordRegex.test(password)) {
+			passwordInput.classList.add('input-error');
+		} else {
+			passwordInput.classList.remove('input-error');
+		}
+	}
+
+	// Validation de la correspondance
+	if (confirmPassword.length > 0) {
+		if (password !== confirmPassword) {
+			confirmPasswordInput.classList.add('input-error');
+		} else {
+			confirmPasswordInput.classList.remove('input-error');
+		}
+	}
+}
+
+passwordInput.addEventListener('input', validatePassword);
+confirmPasswordInput.addEventListener('input', validatePassword);
+
+// Validation au moment de la soumission
+form.addEventListener('submit', function(e) {
+	const password = passwordInput.value;
+	const confirmPassword = confirmPasswordInput.value;
+	const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+	if (!passwordRegex.test(password)) {
+		e.preventDefault();
+		alert('Le mot de passe doit contenir au moins 6 caractères avec une majuscule, une minuscule et un chiffre.');
+		return;
+	}
+
+	if (password !== confirmPassword) {
+		e.preventDefault();
+		alert('Les mots de passe ne correspondent pas.');
+		return;
+	}
+});
+
+});
+	</script>
+{% endblock %}

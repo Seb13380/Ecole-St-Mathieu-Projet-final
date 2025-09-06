@@ -1,0 +1,229 @@
+{% extends "layouts/admin.twig" %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block content %}
+	<div
+		class="container mx-auto px-4 py-6">
+		<!-- En-tête -->
+		<div class="mb-6">
+			<h1 class="text-3xl font-bold text-gray-800 mb-2">{{ title }}</h1>
+			<p class="text-gray-600">Statistiques et rapports détaillés de l'école</p>
+		</div>
+
+		<!-- Statistiques générales -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<i class="fas fa-users text-2xl text-blue-600"></i>
+						</div>
+						<div class="ml-5 w-0 flex-1">
+							<dl>
+								<dt class="text-sm font-medium text-gray-500 truncate">
+									Utilisateurs totaux
+								</dt>
+								<dd class="text-lg font-medium text-gray-900">
+									{{ stats.totalUsers }}
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<i class="fas fa-child text-2xl text-green-600"></i>
+						</div>
+						<div class="ml-5 w-0 flex-1">
+							<dl>
+								<dt class="text-sm font-medium text-gray-500 truncate">
+									Élèves inscrits
+								</dt>
+								<dd class="text-lg font-medium text-gray-900">
+									{{ stats.totalStudents }}
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<i class="fas fa-school text-2xl text-purple-600"></i>
+						</div>
+						<div class="ml-5 w-0 flex-1">
+							<dl>
+								<dt class="text-sm font-medium text-gray-500 truncate">
+									Classes actives
+								</dt>
+								<dd class="text-lg font-medium text-gray-900">
+									{{ stats.totalClasses }}
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<i class="fas fa-envelope text-2xl text-red-600"></i>
+						</div>
+						<div class="ml-5 w-0 flex-1">
+							<dl>
+								<dt class="text-sm font-medium text-gray-500 truncate">
+									Messages reçus
+								</dt>
+								<dd class="text-lg font-medium text-gray-900">
+									{{ stats.totalMessages }}
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Inscriptions -->
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<h3 class="text-lg font-medium text-gray-900 mb-4">
+						<i class="fas fa-clock mr-2 text-orange-500"></i>
+						Inscriptions en attente
+					</h3>
+					<div class="text-3xl font-bold text-orange-600">{{ stats.pendingInscriptions }}</div>
+				</div>
+			</div>
+
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<h3 class="text-lg font-medium text-gray-900 mb-4">
+						<i class="fas fa-check mr-2 text-green-500"></i>
+						Inscriptions acceptées
+					</h3>
+					<div class="text-3xl font-bold text-green-600">{{ stats.approvedInscriptions }}</div>
+				</div>
+			</div>
+
+			<div class="bg-white overflow-hidden shadow rounded-lg">
+				<div class="p-5">
+					<h3 class="text-lg font-medium text-gray-900 mb-4">
+						<i class="fas fa-times mr-2 text-red-500"></i>
+						Inscriptions refusées
+					</h3>
+					<div class="text-3xl font-bold text-red-600">{{ stats.rejectedInscriptions }}</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Répartition par rôle -->
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+			<div class="bg-white shadow rounded-lg p-6">
+				<h3 class="text-lg font-medium text-gray-900 mb-4">
+					<i class="fas fa-user-tag mr-2"></i>
+					Répartition par rôle
+				</h3>
+				<div class="space-y-3">
+					{% for userRole in usersByRole %}
+						<div class="flex justify-between items-center">
+							<span class="text-sm font-medium text-gray-700">{{ userRole.role }}</span>
+							<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+									                        {% if userRole.role == 'ADMIN' or userRole.role == 'DIRECTION' %}
+									                            bg-red-100 text-red-800
+									                        {% elseif userRole.role == 'ENSEIGNANT' %}
+									                            bg-blue-100 text-blue-800
+									                        {% elseif userRole.role == 'PARENT' %}
+									                            bg-green-100 text-green-800
+									                        {% else %}
+									                            bg-gray-100 text-gray-800
+									                        {% endif %}">
+								{{ userRole._count.id }}
+							</span>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<div class="bg-white shadow rounded-lg p-6">
+				<h3 class="text-lg font-medium text-gray-900 mb-4">
+					<i class="fas fa-chart-bar mr-2"></i>
+					Élèves par classe
+				</h3>
+				<div class="space-y-3">
+					{% for classe in studentsByClass %}
+						<div class="flex justify-between items-center">
+							<span class="text-sm font-medium text-gray-700">{{ classe.nom }}</span>
+							<div class="flex items-center space-x-2">
+								<span class="text-sm text-gray-500">{{ classe.niveau }}</span>
+								<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+									{{ classe._count.eleves }}
+									élèves
+								</span>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+		<!-- Messages non traités -->
+		{% if pendingMessages > 0 %}
+			<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+				<div class="flex">
+					<div class="flex-shrink-0">
+						<i class="fas fa-exclamation-triangle text-yellow-400"></i>
+					</div>
+					<div class="ml-3">
+						<p class="text-sm text-yellow-700">
+							<strong>Attention :</strong>
+							{{ pendingMessages }}
+							message(s) en attente de traitement.
+							<a href="/admin/contact-messages" class="font-medium underline text-yellow-700 hover:text-yellow-600">
+								Voir les messages
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+
+		<!-- Actions rapides -->
+		<div class="bg-white shadow rounded-lg p-6">
+			<h3 class="text-lg font-medium text-gray-900 mb-4">
+				<i class="fas fa-bolt mr-2"></i>
+				Actions rapides
+			</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+				<a href="/admin/users" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+					<i class="fas fa-users mr-2"></i>
+					Gérer utilisateurs
+				</a>
+				<a href="/admin/students" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+					<i class="fas fa-child mr-2"></i>
+					Gérer élèves
+				</a>
+				<a href="/admin/classes" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
+					<i class="fas fa-school mr-2"></i>
+					Gérer classes
+				</a>
+				<a href="/admin/inscriptions" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700">
+					<i class="fas fa-clipboard-list mr-2"></i>
+					Inscriptions
+				</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}

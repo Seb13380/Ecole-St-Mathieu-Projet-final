@@ -1,0 +1,153 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Mentions légales -
+	{{ parent() }}
+{% endblock %}
+
+{% block main %}
+	<div
+		class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+		<!-- Hero Section -->
+		<div class="bg-white shadow-sm">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+				<div class="text-center">
+					<h1 class="text-4xl font-bold text-gray-900 mb-4">
+						Mentions légales
+					</h1>
+					<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+						Informations légales et réglementaires
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Contenu principal -->
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+			<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+				<div
+					class="p-8">
+					<!-- Identification -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Identification</h2>
+						<div class="bg-gray-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-2">
+								<strong>Raison sociale :</strong>
+								École Saint Mathieu</p>
+							<p class="text-gray-700 mb-2">
+								<strong>Adresse :</strong>
+								22 Place des Héros, 13013 Marseille</p>
+							<p class="text-gray-700 mb-2">
+								<strong>Téléphone :</strong>
+								04.91.07.07.18</p>
+							<p class="text-gray-700 mb-2">
+								<strong>Email :</strong>
+								ecole-saint-mathieu@wanadoo.fr</p>
+							<p class="text-gray-700 mb-2">
+								<strong>Chef d'établissement :</strong>
+								Lionel CAMBOULIVES</p>
+						</div>
+					</div>
+
+					<!-- Hébergement -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Hébergement</h2>
+						<div class="bg-gray-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-2">
+								<strong>Hébergeur :</strong>
+								IONOS</p>
+							<p class="text-gray-700 mb-2">
+								<strong>Adresse :</strong>
+								7 place de la Gare, 57200 Sarreguemines</p>
+							<p class="text-gray-700">Le site est hébergé sur les serveurs IONOS.</p>
+						</div>
+					</div>
+
+					<!-- Propriété intellectuelle -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Propriété intellectuelle</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								L'ensemble de ce site relève de la législation française et internationale sur le droit d'auteur 
+								                            et la propriété intellectuelle. Tous les droits de reproduction sont réservés, y compris pour 
+								                            les documents téléchargeables et les représentations iconographiques et photographiques.
+							</p>
+							<p class="text-gray-700 mb-4">
+								La reproduction de tout ou partie de ce site sur un support électronique quel qu'il soit 
+								                            est formellement interdite sauf autorisation expresse du directeur de la publication.
+							</p>
+						</div>
+					</div>
+
+					<!-- Protection des données -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Protection des données personnelles</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								Conformément à la loi "Informatique et Libertés" du 6 janvier 1978 modifiée et au 
+								                            Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, 
+								                            de rectification, de suppression et d'opposition aux données personnelles vous concernant.
+							</p>
+							<p class="text-gray-700 mb-4">
+								Pour exercer ces droits, vous pouvez nous contacter à l'adresse :
+								<a href="mailto:ecole-saint-mathieu@wanadoo.fr" class="text-blue-600 hover:underline">
+									ecole-saint-mathieu@wanadoo.fr
+								</a>
+							</p>
+							<p class="text-gray-700">
+								Pour plus d'informations sur notre politique de confidentialité, 
+								                            consultez notre
+								<a href="/politique-confidentialite" class="text-blue-600 hover:underline">
+									politique de confidentialité
+								</a>.
+							</p>
+						</div>
+					</div>
+
+					<!-- Cookies -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Cookies</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								Le site utilise des cookies techniques nécessaires au bon fonctionnement du site, 
+								                            notamment pour la gestion des sessions utilisateur et l'authentification.
+							</p>
+							<p class="text-gray-700">
+								Aucun cookie de suivi ou publicitaire n'est utilisé sur ce site.
+							</p>
+						</div>
+					</div>
+
+					<!-- Responsabilité -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Limitation de responsabilité</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								L'École Saint Mathieu s'efforce d'assurer au mieux de ses possibilités, l'exactitude 
+								                            et la mise à jour des informations diffusées sur ce site.
+							</p>
+							<p class="text-gray-700 mb-4">
+								Toutefois, l'École Saint Mathieu ne peut garantir l'exactitude, la précision ou 
+								                            l'exhaustivité des informations mises à disposition sur ce site.
+							</p>
+							<p class="text-gray-700">
+								En conséquence, l'École Saint Mathieu décline toute responsabilité pour toute 
+								                            imprécision, inexactitude ou omission portant sur des informations disponibles sur le site.
+							</p>
+						</div>
+					</div>
+
+					<!-- Droit applicable -->
+					<div>
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Droit applicable</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700">
+								Les présentes mentions légales sont soumises au droit français. 
+								                            En cas de litige, les tribunaux français seront seuls compétents.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -5,21 +5,20 @@
 {% endblock %}
 
 {% block main %}
-	<div class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50">
+	<div class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 demande-identifiants-form">
 		<div
-			class="container mx-auto px-4 py-12">
+			class="container mx-auto px-4 py-8">
 
 			{# En-tête #}
-			<div class="text-center mb-12">
-				<h1 class="text-4xl font-bold text-gray-800 mb-4">
+			<div class="text-center mb-8">
+				<h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
 					🔑 Demande d'identifiants de connexion
 				</h1>
-				<p class="text-lg text-gray-600 max-w-2xl mx-auto">
+				<p class="text-base text-gray-600 max-w-2xl mx-auto">
 					Vous avez déjà un compte parent mais vous avez oublié vos identifiants ? 
-					                Remplissez ce formulaire pour recevoir vos nouveaux codes d'accès.
+									                Remplissez ce formulaire pour recevoir vos nouveaux codes d'accès.
 				</p>
 			</div>
-
 			{# Messages #}
 			{% if message %}
 				<div class="max-w-md mx-auto mb-8">
@@ -51,60 +50,58 @@
 			<div class="max-w-md mx-auto">
 				<div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
 
-					<div class="text-center mb-6">
-						<div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4">
-							<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+					<div class="text-center mb-4">
+						<div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-3">
+							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9a2 2 0 012-2m0 0V7a2 2 0 012-2m0 0a2 2 0 012-2h2a2 2 0 012 2v2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9a2 2 0 012-2"></path>
 							</svg>
 						</div>
-						<h2 class="text-xl font-semibold text-gray-800">
+						<h2 class="text-lg font-semibold text-gray-800">
 							Récupération d'identifiants
 						</h2>
-						<p class="text-sm text-gray-600 mt-2">
+						<p class="text-sm text-gray-600 mt-1">
 							Saisissez vos informations pour recevoir vos nouveaux identifiants
 						</p>
 					</div>
-
 					<form
-						method="POST" action="/demande-identifiants" class="space-y-6">
+						method="POST" action="/demande-identifiants" class="space-y-4">
 
 						{# Email #}
 						<div>
-							<label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+							<label for="email" class="block text-sm font-medium text-gray-700 mb-1">
 								📧 Adresse email *
 							</label>
-							<input type="email" id="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="votre.email@exemple.com">
+							<input type="email" id="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="votre.email@exemple.com">
 						</div>
 
 						{# Prénom #}
 						<div>
-							<label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
+							<label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">
 								👤 Prénom *
 							</label>
-							<input type="text" id="firstName" name="firstName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="Jean">
+							<input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="Jean">
 						</div>
 
 						{# Nom #}
 						<div>
-							<label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
+							<label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">
 								👤 Nom *
 							</label>
-							<input type="text" id="lastName" name="lastName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="Dupont">
+							<input type="text" id="lastName" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="Dupont">
 						</div>
 
 						{# Téléphone (optionnel) #}
 						<div>
-							<label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+							<label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
 								📱 Téléphone (optionnel)
 							</label>
-							<input type="tel" id="phone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="06.12.34.56.78">
+							<input type="tel" id="phone" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="06.12.34.56.78">
 						</div>
 
 						{# Bouton #}
-						<button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition duration-200 shadow-lg">
+						<button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition duration-200 shadow-lg">
 							🔑 Recevoir mes identifiants
 						</button>
-
 					</form>
 
 					{# Informations importantes #}

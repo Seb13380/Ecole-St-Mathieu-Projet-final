@@ -55,7 +55,7 @@ async function fixUsers() {
 
             if (existingUser) {
                 console.log(`✅ Utilisateur existant trouvé: ${userData.email} (ID: ${existingUser.id})`);
-                
+
                 // Mettre à jour le mot de passe seulement
                 const hashedPassword = await bcrypt.hash(userData.password, 12);
                 await prisma.user.update({

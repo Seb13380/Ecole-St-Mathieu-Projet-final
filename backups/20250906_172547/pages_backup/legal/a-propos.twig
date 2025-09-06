@@ -1,0 +1,144 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}À propos de nous -
+	{{ parent() }}
+{% endblock %}
+
+{% block main %}
+	<div
+		class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+		<!-- Hero Section -->
+		<div class="bg-white shadow-sm">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+				<div class="text-center">
+					<h1 class="text-4xl font-bold text-gray-900 mb-4">
+						À propos de nous
+					</h1>
+					<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+						Découvrez l'École Saint Mathieu, notre histoire et nos valeurs
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Contenu principal -->
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+			<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+				<div
+					class="p-8">
+					<!-- Section Histoire -->
+					<div class="mb-12">
+						<h2 class="text-3xl font-bold text-gray-900 mb-6">Notre Histoire</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								L'École Saint Mathieu est un établissement d'enseignement catholique situé à Marseille, 
+								                            dans le 13ème arrondissement. Fondée dans l'esprit de l'enseignement catholique, 
+								                            notre école accueille les enfants de la maternelle au CM2.
+							</p>
+							<p class="text-gray-700 mb-4">
+								Depuis sa création, l'École Saint Mathieu s'attache à offrir un enseignement de qualité 
+								                            dans un cadre bienveillant et respectueux des valeurs chrétiennes.
+							</p>
+						</div>
+					</div>
+
+					<!-- Section Mission -->
+					<div class="mb-12">
+						<h2 class="text-3xl font-bold text-gray-900 mb-6">Notre Mission</h2>
+						<div class="bg-blue-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-4">
+								Notre mission est d'accompagner chaque enfant dans son développement personnel, 
+								                            intellectuel et spirituel, en lui offrant :
+							</p>
+							<ul class="list-disc list-inside text-gray-700 space-y-2">
+								<li>Un enseignement de qualité adapté à chaque niveau</li>
+								<li>Un environnement bienveillant et sécurisé</li>
+								<li>Le respect des valeurs chrétiennes et humaines</li>
+								<li>L'ouverture sur le monde et la citoyenneté</li>
+								<li>Le développement de l'autonomie et de la confiance en soi</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Section Valeurs -->
+					<div class="mb-12">
+						<h2 class="text-3xl font-bold text-gray-900 mb-6">Nos Valeurs</h2>
+						<div class="grid md:grid-cols-2 gap-6">
+							<div class="bg-green-50 p-6 rounded-lg">
+								<h3 class="text-xl font-semibold text-green-900 mb-3">Respect</h3>
+								<p class="text-gray-700">
+									Respect de soi, des autres et de l'environnement, 
+									                                base de toute relation harmonieuse.
+								</p>
+							</div>
+							<div class="bg-purple-50 p-6 rounded-lg">
+								<h3 class="text-xl font-semibold text-purple-900 mb-3">Bienveillance</h3>
+								<p class="text-gray-700">
+									Accueil et accompagnement de chaque enfant 
+									                                avec attention et bienveillance.
+								</p>
+							</div>
+							<div class="bg-yellow-50 p-6 rounded-lg">
+								<h3 class="text-xl font-semibold text-yellow-900 mb-3">Excellence</h3>
+								<p class="text-gray-700">
+									Recherche de l'excellence pédagogique 
+									                                pour permettre à chaque enfant de réussir.
+								</p>
+							</div>
+							<div class="bg-red-50 p-6 rounded-lg">
+								<h3 class="text-xl font-semibold text-red-900 mb-3">Solidarité</h3>
+								<p class="text-gray-700">
+									Développement de l'esprit de solidarité 
+									                                et d'entraide entre tous les membres de la communauté.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Section Équipe -->
+					<div class="mb-12">
+						<h2 class="text-3xl font-bold text-gray-900 mb-6">Notre Équipe</h2>
+						<div class="bg-gray-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-4">
+								L'École Saint Mathieu est dirigée par
+								<strong>Lionel CAMBOULIVES</strong>, 
+									                            Chef d'établissement, entouré d'une équipe pédagogique expérimentée et dévouée.
+							</p>
+							<p class="text-gray-700">
+								Notre équipe éducative travaille en étroite collaboration avec l'OGEC 
+								                            (Organisme de Gestion de l'École Catholique) pour assurer le bon fonctionnement 
+								                            de l'établissement et le bien-être de tous les élèves.
+							</p>
+						</div>
+					</div>
+
+					<!-- Section Contact -->
+					<div>
+						<h2 class="text-3xl font-bold text-gray-900 mb-6">Nous Contacter</h2>
+						<div class="bg-blue-50 p-6 rounded-lg">
+							<div class="grid md:grid-cols-2 gap-6">
+								<div>
+									<h3 class="text-lg font-semibold text-blue-900 mb-3">Adresse</h3>
+									<p class="text-gray-700">
+										École Saint Mathieu<br>
+										22 Place des Héros<br>
+										13013 Marseille
+									</p>
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold text-blue-900 mb-3">Contact</h3>
+									<p class="text-gray-700">
+										<strong>Téléphone :</strong>
+										04.91.07.07.18<br>
+										<strong>Email :</strong>
+										ecole-saint-mathieu@wanadoo.fr
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
