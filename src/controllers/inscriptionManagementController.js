@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+﻿const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const multer = require('multer');
 const path = require('path');
@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
         }
     },
     filename: (req, file, cb) => {
-        // Générer un nom unique pour le fichier
+        // GÃ©nÃ©rer un nom unique pour le fichier
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const extension = path.extname(file.originalname);
         cb(null, `inscription-doc-${uniqueSuffix}${extension}`);
@@ -30,7 +30,7 @@ const upload = multer({
         if (file.mimetype === 'application/pdf') {
             cb(null, true);
         } else {
-            cb(new Error('Seuls les fichiers PDF sont autorisés!'), false);
+            cb(new Error('Seuls les fichiers PDF sont autorisÃ©s!'), false);
         }
     },
     limits: {
@@ -40,21 +40,21 @@ const upload = multer({
 
 const inscriptionManagementController = {
 
-    // ============ GESTION DE LA CONFIGURATION ============
+    // ===== GESTION DE LA CONFIGURATION =====
 
     async getInscriptionManagement(req, res) {
         try {
-            console.log('🔍 Accès à la gestion des inscriptions par:', req.session.user?.email);
+            console.log('ðŸ” AccÃ¨s Ã  la gestion des inscriptions par:', req.session.user?.email);
 
-            // Vérifier les autorisations
+            // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
                 return res.status(403).render('pages/error', {
-                    message: 'Accès refusé - Réservé à la direction et gestionnaire site',
+                    message: 'AccÃ¨s refusÃ© - RÃ©servÃ© Ã  la direction et gestionnaire site',
                     user: req.session.user
                 });
             }
 
-            // Récupérer la configuration actuelle
+            // RÃ©cupÃ©rer la configuration actuelle
             let config = await prisma.inscriptionConfig.findFirst({
                 where: { actif: true },
                 include: {
@@ -64,11 +64,11 @@ const inscriptionManagementController = {
                 }
             });
 
-            // Si aucune config n'existe, en créer une par défaut
+            // Si aucune config n'existe, en crÃ©er une par dÃ©faut
             if (!config) {
                 config = await prisma.inscriptionConfig.create({
                     data: {
-                        soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
+                        soustitre: "Demande d'inscription pour l'annÃ©e scolaire 2025-2026",
                         actif: true,
                         modifiePar: req.session.user.id
                     },
@@ -78,10 +78,10 @@ const inscriptionManagementController = {
                         }
                     }
                 });
-                console.log('✅ Configuration par défaut créée');
+                console.log('âœ… Configuration par dÃ©faut crÃ©Ã©e');
             }
 
-            // Récupérer les documents d'inscription
+            // RÃ©cupÃ©rer les documents d'inscription
             const documents = await prisma.inscriptionDocument.findMany({
                 where: { actif: true },
                 include: {
@@ -92,7 +92,7 @@ const inscriptionManagementController = {
                 orderBy: { ordre: 'asc' }
             });
 
-            console.log('📊 Données récupérées:');
+            console.log('ðŸ“Š DonnÃ©es rÃ©cupÃ©rÃ©es:');
             console.log('   - Configuration:', config.soustitre);
             console.log('   - Documents actifs:', documents.length);
 
@@ -104,7 +104,7 @@ const inscriptionManagementController = {
             });
 
         } catch (error) {
-            console.error('❌ Erreur lors de la récupération de la gestion des inscriptions:', error);
+            console.error('âŒ Erreur lors de la rÃ©cupÃ©ration de la gestion des inscriptions:', error);
             res.status(500).render('pages/error', {
                 message: 'Erreur lors du chargement de la gestion des inscriptions',
                 user: req.session.user
@@ -114,11 +114,11 @@ const inscriptionManagementController = {
 
     async updateInscriptionConfig(req, res) {
         try {
-            console.log('🔄 Mise à jour configuration inscription par:', req.session.user?.email);
+            console.log('ðŸ”„ Mise Ã  jour configuration inscription par:', req.session.user?.email);
 
-            // Vérifier les autorisations
+            // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({ success: false, message: 'Accès refusé' });
+                return res.status(403).json({ success: false, message: 'AccÃ¨s refusÃ©' });
             }
 
             const { soustitre, afficherAnnoncePS2026 } = req.body;
@@ -126,17 +126,17 @@ const inscriptionManagementController = {
             if (!soustitre || soustitre.trim().length === 0) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Le sous-titre ne peut pas être vide'
+                    message: 'Le sous-titre ne peut pas Ãªtre vide'
                 });
             }
 
-            // Désactiver l'ancienne configuration
+            // DÃ©sactiver l'ancienne configuration
             await prisma.inscriptionConfig.updateMany({
                 where: { actif: true },
                 data: { actif: false }
             });
 
-            // Créer la nouvelle configuration
+            // CrÃ©er la nouvelle configuration
             const newConfig = await prisma.inscriptionConfig.create({
                 data: {
                     soustitre: soustitre.trim(),
@@ -146,32 +146,32 @@ const inscriptionManagementController = {
                 }
             });
 
-            console.log('✅ Configuration mise à jour:', { soustitre, afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026) });
+            console.log('âœ… Configuration mise Ã  jour:', { soustitre, afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026) });
 
             res.json({
                 success: true,
-                message: 'Configuration mise à jour avec succès',
+                message: 'Configuration mise Ã  jour avec succÃ¨s',
                 config: newConfig
             });
 
         } catch (error) {
-            console.error('❌ Erreur lors de la mise à jour de la configuration:', error);
+            console.error('âŒ Erreur lors de la mise Ã  jour de la configuration:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la mise à jour de la configuration'
+                message: 'Erreur lors de la mise Ã  jour de la configuration'
             });
         }
     },
 
-    // ============ GESTION DES DOCUMENTS ============
+    // ===== GESTION DES DOCUMENTS =====
 
     async addDocument(req, res) {
         try {
-            console.log('📁 Ajout document inscription par:', req.session.user?.email);
+            console.log('ðŸ“ Ajout document inscription par:', req.session.user?.email);
 
-            // Vérifier les autorisations
+            // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({ success: false, message: 'Accès refusé' });
+                return res.status(403).json({ success: false, message: 'AccÃ¨s refusÃ©' });
             }
 
             const { nom, description, type, lienExterne } = req.body;
@@ -200,7 +200,7 @@ const inscriptionManagementController = {
             if (type === 'FILE' && !req.file) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Aucun fichier sélectionné pour un document de type fichier'
+                    message: 'Aucun fichier sÃ©lectionnÃ© pour un document de type fichier'
                 });
             }
 
@@ -211,7 +211,7 @@ const inscriptionManagementController = {
                 });
             }
 
-            // Créer l'entrée en base de données
+            // CrÃ©er l'entrÃ©e en base de donnÃ©es
             const documentData = {
                 nom: nom.trim(),
                 description: description?.trim() || null,
@@ -227,7 +227,7 @@ const inscriptionManagementController = {
                 documentData.taille = req.file.size;
             } else if (type === 'LINK') {
                 documentData.lienExterne = lienExterne.trim();
-                // Supprimer le fichier s'il a été uploadé par erreur
+                // Supprimer le fichier s'il a Ã©tÃ© uploadÃ© par erreur
                 if (req.file) {
                     await fs.unlink(req.file.path).catch(console.error);
                 }
@@ -242,16 +242,16 @@ const inscriptionManagementController = {
                 }
             });
 
-            console.log('✅ Document ajouté:', nom, '- Type:', type);
+            console.log('âœ… Document ajoutÃ©:', nom, '- Type:', type);
 
             res.json({
                 success: true,
-                message: 'Document ajouté avec succès',
+                message: 'Document ajoutÃ© avec succÃ¨s',
                 document
             });
 
         } catch (error) {
-            console.error('❌ Erreur lors de l\'upload du document:', error);
+            console.error('âŒ Erreur lors de l\'upload du document:', error);
 
             // Supprimer le fichier en cas d'erreur
             if (req.file) {
@@ -267,11 +267,11 @@ const inscriptionManagementController = {
 
     async deleteDocument(req, res) {
         try {
-            console.log('🗑️  Suppression document inscription par:', req.session.user?.email);
+            console.log('ðŸ—‘ï¸  Suppression document inscription par:', req.session.user?.email);
 
-            // Vérifier les autorisations
+            // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({ success: false, message: 'Accès refusé' });
+                return res.status(403).json({ success: false, message: 'AccÃ¨s refusÃ©' });
             }
 
             const { id } = req.params;
@@ -283,7 +283,7 @@ const inscriptionManagementController = {
             if (!document) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Document non trouvé'
+                    message: 'Document non trouvÃ©'
                 });
             }
 
@@ -291,26 +291,26 @@ const inscriptionManagementController = {
             if (document.type === 'FILE' && document.cheminFichier) {
                 try {
                     await fs.unlink(document.cheminFichier);
-                    console.log('🗑️  Fichier physique supprimé:', document.nomFichier);
+                    console.log('ðŸ—‘ï¸  Fichier physique supprimÃ©:', document.nomFichier);
                 } catch (error) {
-                    console.warn('⚠️  Impossible de supprimer le fichier physique:', error.message);
+                    console.warn('âš ï¸  Impossible de supprimer le fichier physique:', error.message);
                 }
             }
 
-            // Supprimer l'entrée en base de données
+            // Supprimer l'entrÃ©e en base de donnÃ©es
             await prisma.inscriptionDocument.delete({
                 where: { id: parseInt(id) }
             });
 
-            console.log('✅ Document supprimé:', document.nom, '- Type:', document.type);
+            console.log('âœ… Document supprimÃ©:', document.nom, '- Type:', document.type);
 
             res.json({
                 success: true,
-                message: 'Document supprimé avec succès'
+                message: 'Document supprimÃ© avec succÃ¨s'
             });
 
         } catch (error) {
-            console.error('❌ Erreur lors de la suppression du document:', error);
+            console.error('âŒ Erreur lors de la suppression du document:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de la suppression du document'
@@ -320,11 +320,11 @@ const inscriptionManagementController = {
 
     async updateDocumentOrder(req, res) {
         try {
-            console.log('🔄 Mise à jour ordre documents par:', req.session.user?.email);
+            console.log('ðŸ”„ Mise Ã  jour ordre documents par:', req.session.user?.email);
 
-            // Vérifier les autorisations
+            // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
-                return res.status(403).json({ success: false, message: 'Accès refusé' });
+                return res.status(403).json({ success: false, message: 'AccÃ¨s refusÃ©' });
             }
 
             const { documents } = req.body; // Array d'objets {id, ordre}
@@ -332,11 +332,11 @@ const inscriptionManagementController = {
             if (!Array.isArray(documents)) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Format de données invalide'
+                    message: 'Format de donnÃ©es invalide'
                 });
             }
 
-            // Mettre à jour l'ordre de chaque document
+            // Mettre Ã  jour l'ordre de chaque document
             const updatePromises = documents.map(doc =>
                 prisma.inscriptionDocument.update({
                     where: { id: parseInt(doc.id) },
@@ -346,38 +346,38 @@ const inscriptionManagementController = {
 
             await Promise.all(updatePromises);
 
-            console.log('✅ Ordre des documents mis à jour');
+            console.log('âœ… Ordre des documents mis Ã  jour');
 
             res.json({
                 success: true,
-                message: 'Ordre des documents mis à jour avec succès'
+                message: 'Ordre des documents mis Ã  jour avec succÃ¨s'
             });
 
         } catch (error) {
-            console.error('❌ Erreur lors de la mise à jour de l\'ordre:', error);
+            console.error('âŒ Erreur lors de la mise Ã  jour de l\'ordre:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la mise à jour de l\'ordre'
+                message: 'Erreur lors de la mise Ã  jour de l\'ordre'
             });
         }
     },
 
-    // ============ API PUBLIQUE POUR LA PAGE D'INSCRIPTION ============
+    // ===== API PUBLIQUE POUR LA PAGE D'INSCRIPTION =====
 
     async getInscriptionData(req, res) {
         try {
-            console.log('📄 Récupération données inscription publiques');
+            console.log('ðŸ“„ RÃ©cupÃ©ration donnÃ©es inscription publiques');
 
-            // Récupérer la configuration active
+            // RÃ©cupÃ©rer la configuration active
             const config = await prisma.inscriptionConfig.findFirst({
                 where: { actif: true }
             });
 
-            // Récupérer les documents actifs (seulement les fichiers PDF pour la page publique)
+            // RÃ©cupÃ©rer les documents actifs (seulement les fichiers PDF pour la page publique)
             const documents = await prisma.inscriptionDocument.findMany({
                 where: {
                     actif: true,
-                    type: 'FILE' // Seulement les fichiers PDF pour téléchargement
+                    type: 'FILE' // Seulement les fichiers PDF pour tÃ©lÃ©chargement
                 },
                 select: {
                     id: true,
@@ -392,17 +392,17 @@ const inscriptionManagementController = {
             res.json({
                 success: true,
                 config: config || {
-                    soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
+                    soustitre: "Demande d'inscription pour l'annÃ©e scolaire 2025-2026",
                     afficherAnnoncePS2026: false
                 },
                 documents
             });
 
         } catch (error) {
-            console.error('❌ Erreur lors de la récupération des données d\'inscription:', error);
+            console.error('âŒ Erreur lors de la rÃ©cupÃ©ration des donnÃ©es d\'inscription:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors du chargement des données'
+                message: 'Erreur lors du chargement des donnÃ©es'
             });
         }
     },
@@ -421,7 +421,7 @@ const inscriptionManagementController = {
             if (!document) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Document non trouvé'
+                    message: 'Document non trouvÃ©'
                 });
             }
 
@@ -430,21 +430,21 @@ const inscriptionManagementController = {
                 return res.redirect(document.lienExterne);
             }
 
-            // Si c'est un fichier, vérifier qu'il existe
+            // Si c'est un fichier, vÃ©rifier qu'il existe
             if (document.type === 'FILE') {
                 try {
                     await fs.access(document.cheminFichier);
                 } catch (error) {
-                    console.error('❌ Fichier physique non trouvé:', document.cheminFichier);
+                    console.error('âŒ Fichier physique non trouvÃ©:', document.cheminFichier);
                     return res.status(404).json({
                         success: false,
                         message: 'Fichier non disponible'
                     });
                 }
 
-                console.log('📥 Téléchargement document:', document.nom, 'par IP:', req.ip);
+                console.log('ðŸ“¥ TÃ©lÃ©chargement document:', document.nom, 'par IP:', req.ip);
 
-                // Configurer les headers pour le téléchargement
+                // Configurer les headers pour le tÃ©lÃ©chargement
                 res.setHeader('Content-Type', 'application/pdf');
                 res.setHeader('Content-Disposition', `attachment; filename="${document.nom}.pdf"`);
 
@@ -453,12 +453,12 @@ const inscriptionManagementController = {
             } else {
                 return res.status(400).json({
                     success: false,
-                    message: 'Type de document non supporté'
+                    message: 'Type de document non supportÃ©'
                 });
             }
 
         } catch (error) {
-            console.error('❌ Erreur lors du téléchargement:', error);
+            console.error('âŒ Erreur lors du tÃ©lÃ©chargement:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur serveur'
@@ -470,7 +470,7 @@ const inscriptionManagementController = {
     uploadMiddleware: upload.single('document')
 };
 
-// ============ FONCTIONS UTILITAIRES ============
+// ===== FONCTIONS UTILITAIRES =====
 
 async function getNextOrderValue() {
     const lastDocument = await prisma.inscriptionDocument.findFirst({
@@ -489,3 +489,4 @@ function formatFileSize(bytes) {
 }
 
 module.exports = inscriptionManagementController;
+

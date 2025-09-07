@@ -1,29 +1,29 @@
-const { PrismaClient } = require('@prisma/client');
+﻿const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
 async function fullDiagnostic() {
     try {
-        console.log('🔍 DIAGNOSTIC COMPLET DE CONNEXION');
-        console.log('=====================================');
+        console.log('ðŸ” DIAGNOSTIC COMPLET DE CONNEXION');
+        console.log('==');
 
-        // 1. Vérifier la base de données
-        console.log('\n1️⃣ Test de connexion à la base de données...');
+        // 1. VÃ©rifier la base de donnÃ©es
+        console.log('\n1ï¸âƒ£ Test de connexion Ã  la base de donnÃ©es...');
         const dbTest = await prisma.user.count();
-        console.log('✅ Base de données accessible -', dbTest, 'utilisateurs trouvés');
+        console.log('âœ… Base de donnÃ©es accessible -', dbTest, 'utilisateurs trouvÃ©s');
 
-        // 2. Vérifier l'utilisateur admin
-        console.log('\n2️⃣ Recherche de l\'utilisateur admin...');
+        // 2. VÃ©rifier l'utilisateur admin
+        console.log('\n2ï¸âƒ£ Recherche de l\'utilisateur admin...');
         const adminUser = await prisma.user.findUnique({
             where: { email: 'l.camboulives@orange.fr' }
         });
 
         if (!adminUser) {
-            console.log('❌ PROBLÈME: Utilisateur admin non trouvé !');
+            console.log('âŒ PROBLÃˆME: Utilisateur admin non trouvÃ© !');
 
-            // Créer un nouvel admin
-            console.log('🔧 Création d\'un nouvel administrateur...');
+            // CrÃ©er un nouvel admin
+            console.log('ðŸ”§ CrÃ©ation d\'un nouvel administrateur...');
             const hashedPassword = await bcrypt.hash('AdminStMathieu2025!', 10);
 
             const newAdmin = await prisma.user.create({
@@ -33,18 +33,18 @@ async function fullDiagnostic() {
                     email: 'admin.stmathieu@gmail.com',
                     password: hashedPassword,
                     phone: '01.23.45.67.89',
-                    adress: 'École Saint-Mathieu',
+                    adress: 'Ã‰cole Saint-Mathieu',
                     role: 'ADMIN'
                 }
             });
 
-            console.log('✅ Nouvel admin créé !');
-            console.log('📧 Email: admin.stmathieu@gmail.com');
-            console.log('🔑 Mot de passe: AdminStMathieu2025!');
+            console.log('âœ… Nouvel admin crÃ©Ã© !');
+            console.log('ðŸ“§ Email: admin.stmathieu@gmail.com');
+            console.log('ðŸ”‘ Mot de passe: AdminStMathieu2025!');
             return;
         }
 
-        console.log('✅ Utilisateur admin trouvé:', {
+        console.log('âœ… Utilisateur admin trouvÃ©:', {
             email: adminUser.email,
             firstName: adminUser.firstName,
             lastName: adminUser.lastName,
@@ -52,23 +52,23 @@ async function fullDiagnostic() {
         });
 
         // 3. Test des mots de passe
-        console.log('\n3️⃣ Test des mots de passe...');
+        console.log('\n3ï¸âƒ£ Test des mots de passe...');
         const passwords = ['StMathieu2025!', 'AdminStMathieu2024!', 'admin123'];
 
         for (const pwd of passwords) {
             const isValid = await bcrypt.compare(pwd, adminUser.password);
-            console.log(`🔑 "${pwd}": ${isValid ? '✅ VALIDE' : '❌ Invalide'}`);
+            console.log(`ðŸ”‘ "${pwd}": ${isValid ? 'âœ… VALIDE' : 'âŒ Invalide'}`);
 
             if (isValid) {
-                console.log('\n🎉 MOT DE PASSE TROUVÉ !');
-                console.log('📧 Email:', adminUser.email);
-                console.log('🔑 Mot de passe:', pwd);
+                console.log('\nðŸŽ‰ MOT DE PASSE TROUVÃ‰ !');
+                console.log('ðŸ“§ Email:', adminUser.email);
+                console.log('ðŸ”‘ Mot de passe:', pwd);
                 return;
             }
         }
 
-        // 4. Réinitialiser le mot de passe
-        console.log('\n4️⃣ Aucun mot de passe ne fonctionne - Réinitialisation...');
+        // 4. RÃ©initialiser le mot de passe
+        console.log('\n4ï¸âƒ£ Aucun mot de passe ne fonctionne - RÃ©initialisation...');
         const newPassword = 'AdminStMathieu2025!';
         const newHash = await bcrypt.hash(newPassword, 10);
 
@@ -77,13 +77,13 @@ async function fullDiagnostic() {
             data: { password: newHash }
         });
 
-        console.log('✅ Mot de passe réinitialisé !');
-        console.log('\n🔐 NOUVEAUX IDENTIFIANTS :');
-        console.log('📧 Email:', adminUser.email);
-        console.log('🔑 Mot de passe:', newPassword);
+        console.log('âœ… Mot de passe rÃ©initialisÃ© !');
+        console.log('\nðŸ” NOUVEAUX IDENTIFIANTS :');
+        console.log('ðŸ“§ Email:', adminUser.email);
+        console.log('ðŸ”‘ Mot de passe:', newPassword);
 
         // 5. Lister tous les admins
-        console.log('\n5️⃣ Tous les administrateurs disponibles :');
+        console.log('\n5ï¸âƒ£ Tous les administrateurs disponibles :');
         const allAdmins = await prisma.user.findMany({
             where: { role: 'ADMIN' },
             select: { email: true, firstName: true, lastName: true }
@@ -94,10 +94,11 @@ async function fullDiagnostic() {
         });
 
     } catch (error) {
-        console.error('❌ ERREUR CRITIQUE:', error);
+        console.error('âŒ ERREUR CRITIQUE:', error);
     } finally {
         await prisma.$disconnect();
     }
 }
 
 fullDiagnostic();
+

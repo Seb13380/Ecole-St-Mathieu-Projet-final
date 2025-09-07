@@ -1,4 +1,4 @@
-*,
+﻿*,
 ::before,
 ::after {
   --tw-border-spacing-x: 0;
@@ -3019,7 +3019,7 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Styles personnalisés pour les boutons */
+/* Styles personnalisÃ©s pour les boutons */
 
 /* Animation pour le logo Educartable */
 
@@ -3670,7 +3670,7 @@ video {
   }
 }
 
-/* Styles globaux pour tous les boutons - Thème Teal Gelly */
+/* Styles globaux pour tous les boutons - ThÃ¨me Teal Gelly */
 .btn-teal-gelly,
 button:not(.btn-alt):not(.no-style),
 .headerbutton,
@@ -3735,7 +3735,7 @@ input[type="submit"]:not(.no-style):hover::before {
   left: 100% !important;
 }
 
-/* Styles pour les cartes d'actualités modernes */
+/* Styles pour les cartes d'actualitÃ©s modernes */
 .actualite-card {
   position: relative;
   overflow: hidden;
@@ -3803,7 +3803,7 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* Amélioration des ombres pour les cartes */
+/* AmÃ©lioration des ombres pour les cartes */
 .shadow-xl {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -3812,11 +3812,11 @@ input[type="submit"]:not(.no-style):hover::before {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-/* ======================================
+/* ===
    STYLES RESPONSIVE POUR LE HEADER
-   ====================================== */
+   === */
 
-/* Styles généraux pour le header */
+/* Styles gÃ©nÃ©raux pour le header */
 .navbar {
   display: flex;
   align-items: center;
@@ -3830,17 +3830,17 @@ input[type="submit"]:not(.no-style):hover::before {
   transition: height 0.3s ease;
 }
 
-/* Menu burger - caché sur desktop */
+/* Menu burger - cachÃ© sur desktop */
 .burger-menu {
   display: none;
 }
 
-/* Menu desktop - visible par défaut */
+/* Menu desktop - visible par dÃ©faut */
 .desktop-menu {
   display: flex;
 }
 
-/* Menu mobile - caché par défaut */
+/* Menu mobile - cachÃ© par dÃ©faut */
 .mobile-menu {
   transform: translateX(100%);
   transition: transform 0.3s ease-in-out;
@@ -3865,11 +3865,11 @@ input[type="submit"]:not(.no-style):hover::before {
   transform: rotate(180deg);
 }
 
-/* ======================================
+/* ===
    MEDIA QUERIES RESPONSIVE
-   ====================================== */
+   === */
 
-/* Tablettes et petits écrans (768px et moins) */
+/* Tablettes et petits Ã©crans (768px et moins) */
 @media (max-width: 768px) {
 
   /* Header responsive */
@@ -3883,8 +3883,8 @@ input[type="submit"]:not(.no-style):hover::before {
     height: 80px;
   }
 
-  /* Cacher le logo diocèse sur mobile */
-  /* (Supprimé) : le second logo n'est plus caché sur mobile. Si besoin de le masquer à nouveau, ajouter une classe dédiée
+  /* Cacher le logo diocÃ¨se sur mobile */
+  /* (SupprimÃ©) : le second logo n'est plus cachÃ© sur mobile. Si besoin de le masquer Ã  nouveau, ajouter une classe dÃ©diÃ©e
      .logo-diocese-hide-mobile { display:none; } et l'appliquer seulement au conteneur voulu. */
 
   /* Afficher le menu burger */
@@ -3911,7 +3911,7 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* Très petits écrans (480px et moins) */
+/* TrÃ¨s petits Ã©crans (480px et moins) */
 @media (max-width: 480px) {
   .navbar {
     padding: 0.25rem 0.5rem;
@@ -3937,7 +3937,7 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* Écrans moyens (entre 768px et 1024px) */
+/* Ã‰crans moyens (entre 768px et 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .navbar {
     padding: 1rem 2rem;
@@ -3947,14 +3947,14 @@ input[type="submit"]:not(.no-style):hover::before {
     height: 100px;
   }
 
-  /* Menu desktop avec taille de police réduite */
+  /* Menu desktop avec taille de police rÃ©duite */
   .desktop-menu ul.menu li a,
   .desktop-menu ul.menu li div {
     font-size: 22px !important;
   }
 }
 
-/* Grands écrans (1024px et plus) */
+/* Grands Ã©crans (1024px et plus) */
 @media (min-width: 1025px) {
   .navbar {
     padding: 2rem 2.25rem;
@@ -4001,7 +4001,7 @@ input[type="submit"]:not(.no-style):hover::before {
   animation: slideOutRight 0.3s ease-in-out;
 }
 
-/* Amélioration de l'accessibilité */
+/* AmÃ©lioration de l'accessibilitÃ© */
 @media (prefers-reduced-motion: reduce) {
 
   .mobile-menu,
@@ -4016,9 +4016,9 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* ======================================
-   AMÉLIORATIONS SUPPLÉMENTAIRES
-   ====================================== */
+/* ===
+   AMÃ‰LIORATIONS SUPPLÃ‰MENTAIRES
+   === */
 
 /* Overlay pour fermer le menu mobile */
 .mobile-menu::before {
@@ -4032,7 +4032,7 @@ input[type="submit"]:not(.no-style):hover::before {
   z-index: -1;
 }
 
-/* Amélioration du contenu du menu mobile */
+/* AmÃ©lioration du contenu du menu mobile */
 .mobile-menu .flex-1 {
   background: #a7e3dd;
   z-index: 1;
@@ -4050,7 +4050,7 @@ input[type="submit"]:not(.no-style):hover::before {
 /* Hover effects pour mobile (touch devices) */
 @media (hover: none) and (pointer: coarse) {
 
-  /* Styles spécifiques pour les appareils tactiles */
+  /* Styles spÃ©cifiques pour les appareils tactiles */
   .mobile-dropdown .mobile-dropdown-btn:active,
   .mobile-menu a:active {
     background-color: #8dd3cc !important;
@@ -4058,7 +4058,7 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* Focus styles pour l'accessibilité */
+/* Focus styles pour l'accessibilitÃ© */
 .mobile-menu a:focus,
 .mobile-menu button:focus,
 #mobile-menu-button:focus,
@@ -4068,7 +4068,7 @@ input[type="submit"]:not(.no-style):hover::before {
   border-radius: 4px;
 }
 
-/* Protection contre les débordements */
+/* Protection contre les dÃ©bordements */
 .mobile-menu {
   overflow: hidden;
 }
@@ -4081,7 +4081,7 @@ input[type="submit"]:not(.no-style):hover::before {
 /* Responsive breakpoints plus fins */
 @media (max-width: 360px) {
 
-  /* Très petits smartphones */
+  /* TrÃ¨s petits smartphones */
   .logo-container .logo-img {
     height: 50px;
   }
@@ -4115,13 +4115,13 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* Mode sombre (si supporté par le système) */
+/* Mode sombre (si supportÃ© par le systÃ¨me) */
 @media (prefers-color-scheme: dark) {
-  /* Note: Votre design utilise déjà des couleurs claires, 
-     mais on peut ajouter des ajustements si nécessaire */
+  /* Note: Votre design utilise dÃ©jÃ  des couleurs claires, 
+     mais on peut ajouter des ajustements si nÃ©cessaire */
 }
 
-/* Amélioration pour les écrans haute densité */
+/* AmÃ©lioration pour les Ã©crans haute densitÃ© */
 @media (-webkit-min-device-pixel-ratio: 2),
 (min-resolution: 192dpi) {
   .logo-container .logo-img {
@@ -4130,9 +4130,9 @@ input[type="submit"]:not(.no-style):hover::before {
   }
 }
 
-/* ======================================
-   COMPATIBILITÉ NAVIGATEURS
-   ====================================== */
+/* ===
+   COMPATIBILITÃ‰ NAVIGATEURS
+   === */
 
 /* Support pour Safari et anciens navigateurs */
 .mobile-menu {

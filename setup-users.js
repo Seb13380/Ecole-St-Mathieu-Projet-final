@@ -1,14 +1,14 @@
-const { PrismaClient } = require('@prisma/client');
+﻿const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
 async function setupUsers() {
     try {
-        console.log('🔧 Configuration des utilisateurs principaux...\n');
+        console.log('ðŸ”§ Configuration des utilisateurs principaux...\n');
 
-        // 1. Mettre à jour le rôle de Lionel : ADMIN → DIRECTEUR
-        console.log('👨‍💼 Mise à jour du rôle de Lionel Camboulives...');
+        // 1. Mettre Ã  jour le rÃ´le de Lionel : ADMIN â†’ DIRECTEUR
+        console.log('ðŸ‘¨â€ðŸ’¼ Mise Ã  jour du rÃ´le de Lionel Camboulives...');
         const lionel = await prisma.user.findUnique({
             where: { email: 'l.camboulives@orange.fr' }
         });
@@ -18,13 +18,13 @@ async function setupUsers() {
                 where: { email: 'l.camboulives@orange.fr' },
                 data: { role: 'DIRECTEUR' }
             });
-            console.log('✅ Lionel Camboulives mis à jour : ADMIN → DIRECTEUR');
+            console.log('âœ… Lionel Camboulives mis Ã  jour : ADMIN â†’ DIRECTEUR');
         } else {
-            console.log('❌ Compte de Lionel non trouvé');
+            console.log('âŒ Compte de Lionel non trouvÃ©');
         }
 
-        // 2. Créer votre compte SUPER_ADMIN
-        console.log('\n🛠️ Création du compte SUPER_ADMIN...');
+        // 2. CrÃ©er votre compte SUPER_ADMIN
+        console.log('\nðŸ› ï¸ CrÃ©ation du compte SUPER_ADMIN...');
         const superAdminEmail = 'admin@st-mathieu.fr'; // Changez par votre email
         const superAdminPassword = 'SuperAdmin2025!'; // Changez par votre mot de passe
 
@@ -42,17 +42,17 @@ async function setupUsers() {
                     email: superAdminEmail,
                     password: hashedPassword,
                     phone: '00.00.00.00.00',
-                    adress: 'École Saint-Mathieu',
+                    adress: 'Ã‰cole Saint-Mathieu',
                     role: 'SUPER_ADMIN'
                 }
             });
-            console.log('✅ Compte SUPER_ADMIN créé');
+            console.log('âœ… Compte SUPER_ADMIN crÃ©Ã©');
         } else {
-            console.log('⚠️ Compte SUPER_ADMIN existe déjà');
+            console.log('âš ï¸ Compte SUPER_ADMIN existe dÃ©jÃ ');
         }
 
-        // 3. Créer un compte ASSISTANT_DIRECTION (optionnel)
-        console.log('\n👩‍💼 Création du compte ASSISTANT_DIRECTION...');
+        // 3. CrÃ©er un compte ASSISTANT_DIRECTION (optionnel)
+        console.log('\nðŸ‘©â€ðŸ’¼ CrÃ©ation du compte ASSISTANT_DIRECTION...');
         const assistantEmail = 'assistant@st-mathieu.fr'; // Changez par l'email de l'assistante
         const assistantPassword = 'Assistant2025!';
 
@@ -70,17 +70,17 @@ async function setupUsers() {
                     email: assistantEmail,
                     password: hashedPassword,
                     phone: '00.00.00.00.00',
-                    adress: 'École Saint-Mathieu',
+                    adress: 'Ã‰cole Saint-Mathieu',
                     role: 'ASSISTANT_DIRECTION'
                 }
             });
-            console.log('✅ Compte ASSISTANT_DIRECTION créé');
+            console.log('âœ… Compte ASSISTANT_DIRECTION crÃ©Ã©');
         } else {
-            console.log('⚠️ Compte ASSISTANT_DIRECTION existe déjà');
+            console.log('âš ï¸ Compte ASSISTANT_DIRECTION existe dÃ©jÃ ');
         }
 
-        // 4. Créer un compte APEL (optionnel)
-        console.log('\n👨‍👩‍👧‍👦 Création du compte APEL...');
+        // 4. CrÃ©er un compte APEL (optionnel)
+        console.log('\nðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦ CrÃ©ation du compte APEL...');
         const apelEmail = 'apel@st-mathieu.fr'; // Changez par l'email de l'APEL
         const apelPassword = 'Apel2025!';
 
@@ -98,18 +98,18 @@ async function setupUsers() {
                     email: apelEmail,
                     password: hashedPassword,
                     phone: '00.00.00.00.00',
-                    adress: 'École Saint-Mathieu',
+                    adress: 'Ã‰cole Saint-Mathieu',
                     role: 'APEL'
                 }
             });
-            console.log('✅ Compte APEL créé');
+            console.log('âœ… Compte APEL crÃ©Ã©');
         } else {
-            console.log('⚠️ Compte APEL existe déjà');
+            console.log('âš ï¸ Compte APEL existe dÃ©jÃ ');
         }
 
-        // Affichage des comptes créés
-        console.log('\n📋 RÉCAPITULATIF DES COMPTES :');
-        console.log('=====================================');
+        // Affichage des comptes crÃ©Ã©s
+        console.log('\nðŸ“‹ RÃ‰CAPITULATIF DES COMPTES :');
+        console.log('==');
 
         const users = await prisma.user.findMany({
             where: {
@@ -129,24 +129,25 @@ async function setupUsers() {
         });
 
         users.forEach(user => {
-            console.log(`📧 ${user.role}: ${user.firstName} ${user.lastName} (${user.email})`);
+            console.log(`ðŸ“§ ${user.role}: ${user.firstName} ${user.lastName} (${user.email})`);
         });
 
-        console.log('\n🔑 MOTS DE PASSE :');
-        console.log('=====================================');
-        console.log('🎯 DIRECTEUR (Lionel): StMathieu2025!');
-        console.log('🛠️ SUPER_ADMIN: SuperAdmin2025!');
-        console.log('👩‍💼 ASSISTANT_DIRECTION: Assistant2025!');
-        console.log('👨‍👩‍👧‍👦 APEL: Apel2025!');
+        console.log('\nðŸ”‘ MOTS DE PASSE :');
+        console.log('==');
+        console.log('ðŸŽ¯ DIRECTEUR (Lionel): StMathieu2025!');
+        console.log('ðŸ› ï¸ SUPER_ADMIN: SuperAdmin2025!');
+        console.log('ðŸ‘©â€ðŸ’¼ ASSISTANT_DIRECTION: Assistant2025!');
+        console.log('ðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦ APEL: Apel2025!');
 
-        console.log('\n⚠️ IMPORTANT: Changez ces mots de passe après la première connexion !');
-        console.log('✅ Configuration terminée avec succès !');
+        console.log('\nâš ï¸ IMPORTANT: Changez ces mots de passe aprÃ¨s la premiÃ¨re connexion !');
+        console.log('âœ… Configuration terminÃ©e avec succÃ¨s !');
 
     } catch (error) {
-        console.error('❌ Erreur lors de la configuration:', error);
+        console.error('âŒ Erreur lors de la configuration:', error);
     } finally {
         await prisma.$disconnect();
     }
 }
 
 setupUsers();
+
