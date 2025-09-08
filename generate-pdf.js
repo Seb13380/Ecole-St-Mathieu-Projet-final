@@ -27,19 +27,19 @@ async function generatePDF() {
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-    
+
     const page = await browser.newPage();
-    
+
     // Charger le contenu HTML
     await page.setContent(html, {
         waitUntil: 'networkidle0'
     });
-    
+
     // Générer le PDF
     const outputPath = path.join(__dirname, 'public', 'assets', 'documents', 'reglement-interieur-2025-2026.pdf');
-    
+
     console.log('Génération du PDF vers:', outputPath);
-    
+
     await page.pdf({
         path: outputPath,
         format: 'A4',
@@ -51,7 +51,7 @@ async function generatePDF() {
         },
         printBackground: true
     });
-    
+
     await browser.close();
     console.log('PDF généré avec succès:', outputPath);
 }
