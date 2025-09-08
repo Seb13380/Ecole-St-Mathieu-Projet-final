@@ -10,11 +10,11 @@ dotenv.config();
 const app = express();
 
 // Configuration pour faire confiance au proxy Nginx
-app.set('trust proxy', true);
+app.enable("trust proxy");
 
-// Configuration CSP pour éviter les erreurs de sécurité
+// Configuration CSP complète et correcte
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.google.com https://maps.google.com https://www.openstreetmap.org; img-src 'self' data: https: *.googleapis.com *.gstatic.com *.openstreetmap.org; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net");
   next();
 });
 
