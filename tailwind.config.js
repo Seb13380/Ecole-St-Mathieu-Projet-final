@@ -21,6 +21,7 @@ module.exports = {
         'my-auto',
         'max-w-6xl',
         'max-w-7xl',
+        'max-w-[900px]',
         'gap-4',
         'gap-6',
         'rounded-lg',
