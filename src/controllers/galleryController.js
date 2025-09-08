@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+﻿const { PrismaClient } = require('@prisma/client');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -28,7 +28,7 @@ const upload = multer({
         fileSize: 10 * 1024 * 1024 // 10MB max
     },
     fileFilter: function (req, file, cb) {
-        // Accepter images et vidéos
+        // Accepter images et vidÃ©os
         const allowedTypes = /jpeg|jpg|png|gif|mp4|avi|mov|webm/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
@@ -36,7 +36,7 @@ const upload = multer({
         if (mimetype && extname) {
             return cb(null, true);
         } else {
-            cb(new Error('Seuls les fichiers image et vidéo sont autorisés'));
+            cb(new Error('Seuls les fichiers image et vidÃ©o sont autorisÃ©s'));
         }
     }
 });
@@ -44,7 +44,7 @@ const upload = multer({
 // Afficher la galerie publique
 const showGallery = async (req, res) => {
     try {
-        // Récupérer tous les thèmes avec leurs médias
+        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias
         const themes = await prisma.galleryTheme.findMany({
             include: {
                 medias: {
@@ -59,7 +59,7 @@ const showGallery = async (req, res) => {
         });
 
         res.render('pages/gallery', {
-            title: 'Images et Vidéos',
+            title: 'Images et VidÃ©os',
             themes,
             isAuthenticated: req.session.user ? true : false,
             user: req.session.user || null
@@ -81,9 +81,9 @@ const showAdminGallery = async (req, res) => {
         console.log('=== DEBUG GALLERY ADMIN ===');
         console.log('User:', req.session.user);
         console.log('User role:', req.session.user?.role);
-        console.log('=========================');
+        console.log('====');
 
-        // Récupérer tous les thèmes avec leurs médias
+        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias
         const themes = await prisma.galleryTheme.findMany({
             include: {
                 medias: {
@@ -124,13 +124,13 @@ const showAdminGallery = async (req, res) => {
     }
 };
 
-// Créer un nouveau thème
+// CrÃ©er un nouveau thÃ¨me
 const createTheme = async (req, res) => {
     try {
         const { name, description } = req.body;
 
         if (!name) {
-            return res.status(400).json({ error: 'Le nom du thème est requis' });
+            return res.status(400).json({ error: 'Le nom du thÃ¨me est requis' });
         }
 
         const theme = await prisma.galleryTheme.create({
@@ -142,32 +142,32 @@ const createTheme = async (req, res) => {
 
         res.json({ success: true, theme });
     } catch (error) {
-        console.error('Erreur lors de la création du thème:', error);
-        res.status(500).json({ error: 'Erreur lors de la création du thème' });
+        console.error('Erreur lors de la crÃ©ation du thÃ¨me:', error);
+        res.status(500).json({ error: 'Erreur lors de la crÃ©ation du thÃ¨me' });
     }
 };
 
-// Uploader des médias
+// Uploader des mÃ©dias
 const uploadMedia = async (req, res) => {
     try {
         const { themeId, title, description } = req.body;
         const files = req.files;
 
         if (!files || files.length === 0) {
-            return res.status(400).json({ error: 'Aucun fichier sélectionné' });
+            return res.status(400).json({ error: 'Aucun fichier sÃ©lectionnÃ©' });
         }
 
         if (!themeId) {
-            return res.status(400).json({ error: 'Thème requis' });
+            return res.status(400).json({ error: 'ThÃ¨me requis' });
         }
 
-        // Vérifier que le thème existe
+        // VÃ©rifier que le thÃ¨me existe
         const theme = await prisma.galleryTheme.findUnique({
             where: { id: parseInt(themeId) }
         });
 
         if (!theme) {
-            return res.status(404).json({ error: 'Thème non trouvé' });
+            return res.status(404).json({ error: 'ThÃ¨me non trouvÃ©' });
         }
 
         const mediaPromises = files.map(file => {
@@ -195,7 +195,7 @@ const uploadMedia = async (req, res) => {
     }
 };
 
-// Supprimer un média
+// Supprimer un mÃ©dia
 const deleteMedia = async (req, res) => {
     try {
         const { id } = req.params;
@@ -205,7 +205,7 @@ const deleteMedia = async (req, res) => {
         });
 
         if (!media) {
-            return res.status(404).json({ error: 'Média non trouvé' });
+            return res.status(404).json({ error: 'MÃ©dia non trouvÃ©' });
         }
 
         // Supprimer le fichier physique
@@ -214,7 +214,7 @@ const deleteMedia = async (req, res) => {
             fs.unlinkSync(filePath);
         }
 
-        // Supprimer de la base de données
+        // Supprimer de la base de donnÃ©es
         await prisma.galleryMedia.delete({
             where: { id: parseInt(id) }
         });
@@ -226,19 +226,19 @@ const deleteMedia = async (req, res) => {
     }
 };
 
-// Supprimer un thème
+// Supprimer un thÃ¨me
 const deleteTheme = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Récupérer tous les médias du thème pour supprimer les fichiers
+        // RÃ©cupÃ©rer tous les mÃ©dias du thÃ¨me pour supprimer les fichiers
         const theme = await prisma.galleryTheme.findUnique({
             where: { id: parseInt(id) },
             include: { medias: true }
         });
 
         if (!theme) {
-            return res.status(404).json({ error: 'Thème non trouvé' });
+            return res.status(404).json({ error: 'ThÃ¨me non trouvÃ©' });
         }
 
         // Supprimer les fichiers physiques
@@ -249,15 +249,15 @@ const deleteTheme = async (req, res) => {
             }
         });
 
-        // Supprimer le thème (cascade supprimera les médias)
+        // Supprimer le thÃ¨me (cascade supprimera les mÃ©dias)
         await prisma.galleryTheme.delete({
             where: { id: parseInt(id) }
         });
 
         res.json({ success: true });
     } catch (error) {
-        console.error('Erreur lors de la suppression du thème:', error);
-        res.status(500).json({ error: 'Erreur lors de la suppression du thème' });
+        console.error('Erreur lors de la suppression du thÃ¨me:', error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du thÃ¨me' });
     }
 };
 
@@ -270,3 +270,4 @@ module.exports = {
     deleteMedia,
     deleteTheme
 };
+

@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+﻿const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
@@ -8,14 +8,14 @@ async function checkDocuments() {
             orderBy: { type: 'asc' }
         });
 
-        console.log('📄 Documents dans la base:');
-        console.log('=========================');
+        console.log('ðŸ“„ Documents dans la base:');
+        console.log('====');
 
         documents.forEach(doc => {
-            console.log(`ID: ${doc.id} | Type: ${doc.type} | Titre: ${doc.titre} | Actif: ${doc.active ? '✅' : '❌'}`);
+            console.log(`ID: ${doc.id} | Type: ${doc.type} | Titre: ${doc.titre} | Actif: ${doc.active ? 'âœ…' : 'âŒ'}`);
         });
 
-        console.log(`\n📊 Total: ${documents.length} documents`);
+        console.log(`\nðŸ“Š Total: ${documents.length} documents`);
 
     } catch (error) {
         console.error('Erreur:', error);
@@ -25,3 +25,4 @@ async function checkDocuments() {
 }
 
 checkDocuments();
+

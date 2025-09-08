@@ -1,14 +1,14 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 const mysql = require('mysql2/promise');
 
 async function addExternalLinksColumns() {
     let connection;
     try {
-        console.log('📊 === AJOUT COLONNES EXTERNAL LINKS ===');
-        console.log('=======================================\n');
+        console.log('ðŸ“Š === AJOUT COLONNES EXTERNAL LINKS ===');
+        console.log('====\n');
 
-        // Connexion à MySQL
+        // Connexion Ã  MySQL
         connection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
@@ -16,10 +16,10 @@ async function addExternalLinksColumns() {
             database: 'ecole_st_mathieu'
         });
 
-        console.log('✅ Connexion à la base de données réussie');
+        console.log('âœ… Connexion Ã  la base de donnÃ©es rÃ©ussie');
 
-        // Vérifier si les colonnes existent déjà
-        console.log('\n🔍 Vérification des colonnes existantes...');
+        // VÃ©rifier si les colonnes existent dÃ©jÃ 
+        console.log('\nðŸ” VÃ©rification des colonnes existantes...');
         const [columns] = await connection.execute(`
             SELECT COLUMN_NAME 
             FROM INFORMATION_SCHEMA.COLUMNS 
@@ -33,30 +33,30 @@ async function addExternalLinksColumns() {
 
         // Ajouter externalUrl si elle n'existe pas
         if (!existingColumns.includes('externalUrl')) {
-            console.log('\n➕ Ajout de la colonne externalUrl...');
+            console.log('\nâž• Ajout de la colonne externalUrl...');
             await connection.execute(`
                 ALTER TABLE Document 
                 ADD COLUMN externalUrl VARCHAR(255) NULL
             `);
-            console.log('✅ Colonne externalUrl ajoutée');
+            console.log('âœ… Colonne externalUrl ajoutÃ©e');
         } else {
-            console.log('✅ Colonne externalUrl existe déjà');
+            console.log('âœ… Colonne externalUrl existe dÃ©jÃ ');
         }
 
         // Ajouter isExternalLink si elle n'existe pas
         if (!existingColumns.includes('isExternalLink')) {
-            console.log('\n➕ Ajout de la colonne isExternalLink...');
+            console.log('\nâž• Ajout de la colonne isExternalLink...');
             await connection.execute(`
                 ALTER TABLE Document 
                 ADD COLUMN isExternalLink BOOLEAN NOT NULL DEFAULT FALSE
             `);
-            console.log('✅ Colonne isExternalLink ajoutée');
+            console.log('âœ… Colonne isExternalLink ajoutÃ©e');
         } else {
-            console.log('✅ Colonne isExternalLink existe déjà');
+            console.log('âœ… Colonne isExternalLink existe dÃ©jÃ ');
         }
 
-        // Vérifier le résultat
-        console.log('\n🔍 Vérification finale...');
+        // VÃ©rifier le rÃ©sultat
+        console.log('\nðŸ” VÃ©rification finale...');
         const [finalColumns] = await connection.execute(`
             SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
             FROM INFORMATION_SCHEMA.COLUMNS 
@@ -65,21 +65,22 @@ async function addExternalLinksColumns() {
             ORDER BY ORDINAL_POSITION
         `);
 
-        console.log('\n📋 Structure finale de la table Document:');
+        console.log('\nðŸ“‹ Structure finale de la table Document:');
         finalColumns.forEach(col => {
             console.log(`   ${col.COLUMN_NAME} (${col.DATA_TYPE}) - NULL: ${col.IS_NULLABLE} - DEFAULT: ${col.COLUMN_DEFAULT}`);
         });
 
-        console.log('\n🎉 Migration terminée avec succès !');
+        console.log('\nðŸŽ‰ Migration terminÃ©e avec succÃ¨s !');
 
     } catch (error) {
-        console.error('❌ Erreur lors de la migration:', error);
+        console.error('âŒ Erreur lors de la migration:', error);
     } finally {
         if (connection) {
             await connection.end();
-            console.log('\n🔌 Connexion fermée');
+            console.log('\nðŸ”Œ Connexion fermÃ©e');
         }
     }
 }
 
 addExternalLinksColumns();
+

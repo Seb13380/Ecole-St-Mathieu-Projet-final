@@ -1,6 +1,6 @@
-// Gestion des Inscriptions - Interface d'Administration
+﻿// Gestion des Inscriptions - Interface d'Administration
 
-// ============ GESTION DE LA CONFIGURATION ============
+// ===== GESTION DE LA CONFIGURATION =====
 
 document.getElementById('configForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -10,12 +10,12 @@ document.getElementById('configForm').addEventListener('submit', async (e) => {
     const afficherAnnoncePS2026 = formData.get('afficherAnnoncePS2026') === '1';
 
     if (!soustitre) {
-        showAlert('Le sous-titre ne peut pas être vide', 'error');
+        showAlert('Le sous-titre ne peut pas Ãªtre vide', 'error');
         return;
     }
 
     try {
-        showLoading('Mise à jour en cours...');
+        showLoading('Mise Ã  jour en cours...');
 
         const response = await fetch('/inscription-management/admin/config', {
             method: 'PUT',
@@ -31,13 +31,13 @@ document.getElementById('configForm').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (result.success) {
-            showAlert('Configuration mise à jour avec succès', 'success');
-            // Recharger la page après 1 seconde pour afficher les nouvelles données
+            showAlert('Configuration mise Ã  jour avec succÃ¨s', 'success');
+            // Recharger la page aprÃ¨s 1 seconde pour afficher les nouvelles donnÃ©es
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
         } else {
-            showAlert(result.message || 'Erreur lors de la mise à jour', 'error');
+            showAlert(result.message || 'Erreur lors de la mise Ã  jour', 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);
@@ -47,12 +47,12 @@ document.getElementById('configForm').addEventListener('submit', async (e) => {
     }
 });
 
-// ============ GESTION DES DOCUMENTS ============
+// ===== GESTION DES DOCUMENTS =====
 
 function openUploadModal() {
     document.getElementById('uploadModal').style.display = 'flex';
     document.getElementById('documentName').focus();
-    // S'assurer que FILE est sélectionné par défaut
+    // S'assurer que FILE est sÃ©lectionnÃ© par dÃ©faut
     document.querySelector('input[name="type"][value="FILE"]').checked = true;
     toggleDocumentType();
 }
@@ -60,7 +60,7 @@ function openUploadModal() {
 function closeUploadModal() {
     document.getElementById('uploadModal').style.display = 'none';
     document.getElementById('uploadForm').reset();
-    // Remettre FILE par défaut
+    // Remettre FILE par dÃ©faut
     document.querySelector('input[name="type"][value="FILE"]').checked = true;
     toggleDocumentType();
 }
@@ -79,7 +79,7 @@ function toggleDocumentType() {
     }
 }
 
-// Fermer le modal en cliquant à l'extérieur
+// Fermer le modal en cliquant Ã  l'extÃ©rieur
 document.getElementById('uploadModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('uploadModal')) {
         closeUploadModal();
@@ -103,17 +103,17 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         const file = formData.get('document');
 
         if (!file || file.size === 0) {
-            showAlert('Veuillez sélectionner un fichier PDF', 'error');
+            showAlert('Veuillez sÃ©lectionner un fichier PDF', 'error');
             return;
         }
 
         if (file.type !== 'application/pdf') {
-            showAlert('Seuls les fichiers PDF sont acceptés', 'error');
+            showAlert('Seuls les fichiers PDF sont acceptÃ©s', 'error');
             return;
         }
 
         if (file.size > 10 * 1024 * 1024) { // 10MB
-            showAlert('Le fichier ne peut pas dépasser 10MB', 'error');
+            showAlert('Le fichier ne peut pas dÃ©passer 10MB', 'error');
             return;
         }
     } else if (type === 'LINK') {
@@ -124,7 +124,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             return;
         }
 
-        // Vérification basique de l'URL
+        // VÃ©rification basique de l'URL
         try {
             new URL(lienExterne);
         } catch (e) {
@@ -144,7 +144,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (result.success) {
-            showAlert('Document ajouté avec succès', 'success');
+            showAlert('Document ajoutÃ© avec succÃ¨s', 'success');
             closeUploadModal();
             // Recharger la page pour afficher le nouveau document
             setTimeout(() => {
@@ -163,7 +163,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
 
 // Suppression de document
 async function deleteDocument(id, nom) {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer le document "${nom}" ?\n\nCette action est irréversible.`)) {
+    if (!confirm(`ÃŠtes-vous sÃ»r de vouloir supprimer le document "${nom}" ?\n\nCette action est irrÃ©versible.`)) {
         return;
     }
 
@@ -177,8 +177,8 @@ async function deleteDocument(id, nom) {
         const result = await response.json();
 
         if (result.success) {
-            showAlert('Document supprimé avec succès', 'success');
-            // Supprimer l'élément du DOM
+            showAlert('Document supprimÃ© avec succÃ¨s', 'success');
+            // Supprimer l'Ã©lÃ©ment du DOM
             const documentElement = document.querySelector(`[data-document-id="${id}"]`);
             if (documentElement) {
                 documentElement.remove();
@@ -194,7 +194,7 @@ async function deleteDocument(id, nom) {
     }
 }
 
-// Déplacement de document (ordre)
+// DÃ©placement de document (ordre)
 async function moveDocument(id, direction) {
     const container = document.getElementById('documentsContainer');
     const currentElement = document.querySelector(`[data-document-id="${id}"]`);
@@ -208,16 +208,16 @@ async function moveDocument(id, direction) {
         targetElement = currentElement.nextElementSibling;
     }
 
-    if (!targetElement) return; // Déjà en première/dernière position
+    if (!targetElement) return; // DÃ©jÃ  en premiÃ¨re/derniÃ¨re position
 
-    // Échanger les positions dans le DOM
+    // Ã‰changer les positions dans le DOM
     if (direction === 'up') {
         container.insertBefore(currentElement, targetElement);
     } else {
         container.insertBefore(targetElement, currentElement);
     }
 
-    // Récupérer le nouvel ordre et l'envoyer au serveur
+    // RÃ©cupÃ©rer le nouvel ordre et l'envoyer au serveur
     const documents = Array.from(container.children).map((element, index) => ({
         id: parseInt(element.dataset.documentId),
         ordre: index + 1
@@ -235,18 +235,18 @@ async function moveDocument(id, direction) {
         const result = await response.json();
 
         if (!result.success) {
-            showAlert('Erreur lors de la réorganisation', 'error');
+            showAlert('Erreur lors de la rÃ©organisation', 'error');
             // Recharger la page en cas d'erreur
             window.location.reload();
         }
     } catch (error) {
         console.error('Erreur:', error);
-        showAlert('Erreur lors de la réorganisation', 'error');
+        showAlert('Erreur lors de la rÃ©organisation', 'error');
         window.location.reload();
     }
 }
 
-// ============ FONCTIONS UTILITAIRES ============
+// ===== FONCTIONS UTILITAIRES =====
 
 function showAlert(message, type = 'info') {
     const container = document.getElementById('alertContainer');
@@ -254,7 +254,7 @@ function showAlert(message, type = 'info') {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} mb-4 animate-fade-in`;
 
-    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    const icon = type === 'success' ? 'âœ…' : type === 'error' ? 'âŒ' : 'â„¹ï¸';
     alertDiv.innerHTML = `
         <div class="flex items-center justify-between">
             <span>${icon} ${message}</span>
@@ -264,7 +264,7 @@ function showAlert(message, type = 'info') {
 
     container.appendChild(alertDiv);
 
-    // Auto-suppression après 5 secondes
+    // Auto-suppression aprÃ¨s 5 secondes
     setTimeout(() => {
         if (alertDiv.parentElement) {
             alertDiv.remove();
@@ -298,25 +298,25 @@ function hideLoading() {
     }
 }
 
-// ============ ÉVÉNEMENTS GLOBAUX ============
+// ===== Ã‰VÃ‰NEMENTS GLOBAUX =====
 
 // Gestion des raccourcis clavier
 document.addEventListener('keydown', (e) => {
-    // Échap pour fermer les modals
+    // Ã‰chap pour fermer les modals
     if (e.key === 'Escape') {
         closeUploadModal();
     }
 });
 
-// Prévisualisation du fichier sélectionné
+// PrÃ©visualisation du fichier sÃ©lectionnÃ©
 document.getElementById('documentFile').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
         const size = (file.size / 1024 / 1024).toFixed(2);
-        console.log(`Fichier sélectionné: ${file.name} (${size} MB)`);
+        console.log(`Fichier sÃ©lectionnÃ©: ${file.name} (${size} MB)`);
 
         if (file.size > 10 * 1024 * 1024) {
-            showAlert('Attention: le fichier dépasse 10MB', 'warning');
+            showAlert('Attention: le fichier dÃ©passe 10MB', 'warning');
         }
     }
 });
@@ -328,4 +328,5 @@ document.addEventListener('change', (e) => {
     }
 });
 
-console.log('✅ Interface de gestion des inscriptions chargée');
+console.log('âœ… Interface de gestion des inscriptions chargÃ©e');
+

@@ -1,9 +1,9 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const inscriptionManagementController = require('../controllers/inscriptionManagementController');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
-// ============ ROUTES ADMINISTRATION (Frank & Lionel) ============
+// ===== ROUTES ADMINISTRATION (Frank & Lionel) =====
 
 // Middleware d'authentification et d'autorisation pour l'admin
 router.use('/admin', requireAuth);
@@ -25,12 +25,13 @@ router.delete('/admin/documents/:id', inscriptionManagementController.deleteDocu
 
 router.put('/admin/documents/order', inscriptionManagementController.updateDocumentOrder);
 
-// ============ ROUTES PUBLIQUES ============
+// ===== ROUTES PUBLIQUES =====
 
-// API pour récupérer les données d'inscription (publique)
+// API pour rÃ©cupÃ©rer les donnÃ©es d'inscription (publique)
 router.get('/data', inscriptionManagementController.getInscriptionData);
 
-// Téléchargement de documents (publique)
+// TÃ©lÃ©chargement de documents (publique)
 router.get('/documents/:id/download', inscriptionManagementController.downloadDocument);
 
 module.exports = router;
+
