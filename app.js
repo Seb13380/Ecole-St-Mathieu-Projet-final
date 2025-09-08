@@ -14,7 +14,7 @@ app.set('trust proxy', true);
 
 // Configuration CSP pour éviter les erreurs de sécurité
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.google.com https://maps.google.com https://www.openstreetmap.org; img-src 'self' data: https: *.googleapis.com *.gstatic.com *.openstreetmap.org; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;");
   next();
 });
 

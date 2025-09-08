@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const pdf = require('html-pdf');
+const puppeteer = require('puppeteer');
 
 // Lire le fichier HTML
 const htmlPath = path.join(__dirname, 'public', 'assets', 'documents', 'reglement-interieur-2025-2026.html');
@@ -21,29 +21,40 @@ if (!html || html.trim().length === 0) {
 
 console.log('Fichier HTML lu avec succès, taille:', html.length, 'caractères');
 
-// Options pour le PDF
-const options = {
-    format: 'A4',
-    margin: {
-        top: '15mm',
-        right: '10mm',
-        bottom: '15mm',
-        left: '10mm'
-    },
-    dpi: 300,
-    quality: '75',
-    zoomFactor: 1
-};
+// Fonction pour générer le PDF avec Puppeteer
+async function generatePDF() {
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
 
-// Générer le PDF
-const outputPath = path.join(__dirname, 'public', 'assets', 'documents', 'reglement-interieur-2025-2026.pdf');
+    const page = await browser.newPage();
 
-console.log('Génération du PDF vers:', outputPath);
+    // Charger le contenu HTML
+    await page.setContent(html, {
+        waitUntil: 'networkidle0'
+    });
 
-pdf.create(html, options).toFile(outputPath, function (err, res) {
-    if (err) {
-        console.error('Erreur lors de la génération du PDF:', err);
-        return;
-    }
-    console.log('PDF généré avec succès:', res.filename);
-});
+    // Générer le PDF
+    const outputPath = path.join(__dirname, 'public', 'assets', 'documents', 'reglement-interieur-2025-2026.pdf');
+
+    console.log('Génération du PDF vers:', outputPath);
+
+    await page.pdf({
+        path: outputPath,
+        format: 'A4',
+        margin: {
+            top: '15mm',
+            right: '10mm',
+            bottom: '15mm',
+            left: '10mm'
+        },
+        printBackground: true
+    });
+
+    await browser.close();
+    console.log('PDF généré avec succès:', outputPath);
+}
+
+// Exécuter la génération
+generatePDF().catch(console.error);
