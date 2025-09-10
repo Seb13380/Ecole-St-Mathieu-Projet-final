@@ -42,7 +42,7 @@
 	<div class="w-full">
 		{% if heroCarouselImages and heroCarouselImages|length > 0 %}
 			<!-- Hero Carousel DaisyUI avec images uploadées -->
-			<div class="carousel w-full h-[1200px] hero-carousel">
+			<div class="carousel w-full h-[600px] hero-carousel">
 				{% for image in heroCarouselImages %}
 					<div id="hero-slide{{ loop.index }}" class="carousel-item relative w-full">
 						<img src="/uploads/hero-carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'École Saint-Mathieu' }}">
@@ -67,7 +67,7 @@
 			</div>
 		{% else %}
 			<!-- Fallback: Hero Carousel DaisyUI avec images par défaut -->
-			<div class="carousel w-full h-[1200px] hero-carousel">
+			<div class="carousel w-full h-[600px] hero-carousel">
 				<div id="hero-fallback-slide1" class="carousel-item relative w-full">
 					<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="École Saint-Mathieu">
 					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
