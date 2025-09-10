@@ -151,7 +151,16 @@ const carouselController = {
             const { id } = req.params;
             const { titre, description, ordre, active } = req.body;
 
-            console.log('📝 Modification image carousel:', { id, titre, ordre, active });
+            console.log('📝 Modification image carousel:', {
+                id,
+                titre,
+                ordre,
+                active,
+                body: req.body
+            });
+
+            // Gérer la checkbox active
+            const isActive = active === 'on' || active === 'true' || active === true || active === '1';
 
             const updatedImage = await prisma.carouselImage.update({
                 where: { id: parseInt(id) },
@@ -159,17 +168,23 @@ const carouselController = {
                     titre: titre || null,
                     description: description || null,
                     ordre: parseInt(ordre) || 0,
-                    active: active === 'on' || active === 'true' || active === true,
+                    active: isActive,
                     updatedAt: new Date()
                 }
             });
 
-            console.log('✅ Image carousel modifiée:', updatedImage.id);
+            console.log('✅ Image carousel modifiée:', {
+                id: updatedImage.id,
+                titre: updatedImage.titre,
+                active: updatedImage.active
+            });
+
             res.redirect('/carousel/manage?success=' + encodeURIComponent('Image modifiée avec succès'));
 
         } catch (error) {
             console.error('❌ Erreur modification image:', error);
-            res.redirect('/carousel/manage?error=' + encodeURIComponent('Erreur lors de la modification'));
+            console.error('❌ Détails erreur:', error.message);
+            res.redirect('/carousel/manage?error=' + encodeURIComponent('Erreur lors de la modification: ' + error.message));
         }
     },
 
