@@ -127,8 +127,7 @@ const processCredentialsRequest = async (req, res) => {
 
         // Envoyer notification à l'admin
         try {
-            await emailService.sendAdminNotification({
-                type: 'credentials_request',
+            await emailService.sendCredentialsRequestNotification({
                 parentName: `${existingParent.firstName} ${existingParent.lastName}`,
                 parentEmail: existingParent.email,
                 timestamp: new Date()

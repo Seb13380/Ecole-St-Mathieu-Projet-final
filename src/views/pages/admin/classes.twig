@@ -287,11 +287,30 @@ document.getElementById('classeModal').classList.add('hidden');
 
 function deleteClasse(id, nom) {
 if (confirm (`Êtes-vous sûr de vouloir supprimer la classe "${nom}" ?`)) {
-const form = document.createElement('form');
-form.method = 'POST';
-form.action = `/directeur/classes/${id}/delete`;
-document.body.appendChild(form);
-form.submit();
+console.log('🗑️ Suppression classe ID:', id);
+
+fetch (`/directeur/classes/${id}/delete`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+}).then(response => {
+console.log('📡 Réponse serveur:', response.status);
+return response.json();
+}).then(data => {
+console.log('📦 Données reçues:', data);
+if (data.success) { // Succès - recharger la page ou supprimer l'élément du DOM
+alert('Classe supprimée avec succès !');
+location.reload();
+} else { // Erreur - afficher le message
+alert('Erreur : ' + (
+data.message || 'Une erreur est survenue'
+));
+}
+}).catch(error => {
+console.error('❌ Erreur requête:', error);
+alert('Erreur de connexion. Veuillez réessayer.');
+});
 }
 }
 
