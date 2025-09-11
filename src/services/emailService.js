@@ -1367,6 +1367,89 @@ class EmailService {
     }
 
     /**
+     * Envoyer une notification à l'admin pour une demande d'identifiants
+     * @param {Object} requestData - Données de la demande d'identifiants
+     */
+    async sendCredentialsRequestNotification(requestData) {
+        try {
+            console.log('📧 Envoi notification demande d\'identifiants:', requestData);
+
+            const adminEmail = process.env.TEST_MODE === 'true' ? 
+                process.env.TEST_EMAIL : 'sgdigitalweb13@gmail.com';
+
+            const mailOptions = {
+                from: `"École Saint-Mathieu" <${process.env.EMAIL_USER}>`,
+                to: adminEmail,
+                bcc: 'l.camboulives@stmathieu.org', // Copie pour Lionel
+                subject: '🔑 Nouvelle demande d\'identifiants - École Saint-Mathieu',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; padding: 20px;">
+                        <div style="background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h1 style="color: #2563eb; margin: 0; font-size: 24px;">🔑 Demande d'identifiants</h1>
+                                <div style="width: 50px; height: 3px; background: linear-gradient(90deg, #2563eb, #3b82f6); margin: 15px auto;"></div>
+                            </div>
+
+                            <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
+                                <p style="margin: 0; color: #1e40af; font-weight: 600;">
+                                    📅 Reçue le ${new Date(requestData.timestamp).toLocaleDateString('fr-FR', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </p>
+                            </div>
+
+                            <h2 style="color: #374151; font-size: 18px; margin-bottom: 15px;">📋 Informations du demandeur</h2>
+                            
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                                <tr style="background-color: #f8fafc;">
+                                    <td style="padding: 12px; border: 1px solid #e5e7eb; font-weight: 600; color: #374151; width: 30%;">👤 Nom complet</td>
+                                    <td style="padding: 12px; border: 1px solid #e5e7eb; color: #6b7280;">${requestData.parentName}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #e5e7eb; font-weight: 600; color: #374151;">📧 Email</td>
+                                    <td style="padding: 12px; border: 1px solid #e5e7eb; color: #6b7280;">${requestData.parentEmail}</td>
+                                </tr>
+                            </table>
+
+                            <div style="background-color: #dcfce7; border: 1px solid #16a34a; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+                                <h3 style="color: #15803d; margin: 0 0 10px 0; font-size: 16px;">✅ Action automatique effectuée</h3>
+                                <p style="margin: 0; color: #166534;">
+                                    Les identifiants de connexion ont été automatiquement générés et envoyés à l'utilisateur par email.
+                                    Cette notification est uniquement à titre informatif.
+                                </p>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 30px;">
+                                <a href="${process.env.BASE_URL || 'http://localhost:3007'}/directeur/dashboard" 
+                                   style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                                    👥 Tableau de bord
+                                </a>
+                            </div>
+
+                            <div style="border-top: 2px solid #e5e7eb; margin-top: 30px; padding-top: 20px; text-align: center; color: #6b7280; font-size: 12px;">
+                                <p style="margin: 0;">📧 Email automatique envoyé depuis le site École Saint-Mathieu</p>
+                                <p style="margin: 5px 0 0 0;">🔒 Type: Demande d'identifiants</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email notification demande d\'identifiants envoyé:', result.messageId);
+            return { success: true, messageId: result.messageId };
+
+        } catch (error) {
+            console.error('❌ Erreur envoi notification demande identifiants:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Envoyer un email avec identifiants temporaires
      * @param {Object} data - Données pour l'envoi d'identifiants
      */

@@ -493,6 +493,85 @@
 					</div>
 				{% endif %}
 
+				<!-- Demandes d'inscription récentes -->
+				{% if pendingRequests|length > 0 %}
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+							<span class="mr-3">📝</span>
+							Demandes d'Inscription Récentes
+						</h2>
+						<div class="flex flex-wrap justify-center gap-4 sm:p-6">
+							{% for request in pendingRequests %}
+								<div class="bg-white shadow-md border-l-4 border-pink-500 p-4 sm:p-6 hover:shadow-xl transition-all duration-300 text-center min-h-[180px] sm:min-h-[200px]">
+									<div class="flex flex-col items-center h-full justify-center">
+										<div class="flex items-center justify-between w-full mb-4">
+											<div class="bg-pink-100 p-3 rounded-lg">
+												<svg class="h-6 w-6 sm:h-8 sm:w-8 text-pink-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+												</svg>
+											</div>
+											<span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800">
+												PENDING
+											</span>
+										</div>
+										<h3 class="text-sm sm:text-lg font-bold text-slate-800 mb-2">
+											{{ request.parentFirstName }} {{ request.parentLastName }}
+										</h3>
+										<p class="text-slate-600 text-xs sm:text-sm mb-2">{{ request.parentEmail }}</p>
+										<div class="flex items-center justify-between w-full">
+											<a href="/directeur/inscriptions" class="text-pink-600 hover:text-pink-800 text-sm font-medium">
+												Examiner →
+											</a>
+											<p class="text-xs text-slate-500">{{ request.submittedAt|date('d/m/Y') }}</p>
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endif %}
+
+				<!-- Demandes d'identifiants récentes -->
+				{% if pendingCredentials|length > 0 %}
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+							<span class="mr-3">🔑</span>
+							Demandes d'Identifiants Récentes
+						</h2>
+						<div class="flex flex-wrap justify-center gap-4 sm:p-6">
+							{% for request in pendingCredentials %}
+								<div class="bg-white shadow-md border-l-4 border-indigo-500 p-4 sm:p-6 hover:shadow-xl transition-all duration-300 text-center min-h-[180px] sm:min-h-[200px]">
+									<div class="flex flex-col items-center h-full justify-center">
+										<div class="flex items-center justify-between w-full mb-4">
+											<div class="bg-indigo-100 p-3 rounded-lg">
+												<svg class="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z"/>
+												</svg>
+											</div>
+											<span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800">
+												{{ request.status|upper }}
+											</span>
+										</div>
+										<h3 class="text-sm sm:text-lg font-bold text-slate-800 mb-2">
+											{{ request.requestedFirstName }} {{ request.requestedLastName }}
+										</h3>
+										<p class="text-slate-600 text-xs sm:text-sm mb-2">{{ request.requestedEmail }}</p>
+										{% if request.foundParent %}
+											<p class="text-green-600 text-xs mb-2">✅ Parent trouvé: {{ request.foundParent.firstName }} {{ request.foundParent.lastName }}</p>
+										{% endif %}
+										<div class="flex items-center justify-between w-full">
+											<a href="/directeur/credentials" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+												Gérer →
+											</a>
+											<p class="text-xs text-slate-500">{{ request.createdAt|date('d/m/Y') }}</p>
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endif %}
+
 				<!-- Accès Rapides -->
 				<div class="mb-8">
 					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">

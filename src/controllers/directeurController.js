@@ -381,17 +381,56 @@ const directeurController = {
     async deleteClasse(req, res) {
         try {
             const { id } = req.params;
+            console.log('🗑️ [DELETE CLASSE] Début suppression classe ID:', id);
+            console.log('🗑️ [DELETE CLASSE] User session:', req.session?.user?.email);
+            console.log('🗑️ [DELETE CLASSE] Method:', req.method);
+            console.log('🗑️ [DELETE CLASSE] Headers:', req.headers);
 
+            // Vérifier si la classe existe
+            const existingClasse = await prisma.classe.findUnique({
+                where: { id: parseInt(id) },
+                include: { eleves: true }
+            });
+
+            if (!existingClasse) {
+                console.log('❌ [DELETE CLASSE] Classe non trouvée:', id);
+                return res.status(404).json({
+                    success: false,
+                    message: 'Classe non trouvée'
+                });
+            }
+
+            console.log('📚 [DELETE CLASSE] Classe trouvée:', existingClasse.nom);
+            console.log('👶 [DELETE CLASSE] Nombre d\'élèves:', existingClasse.eleves.length);
+
+            if (existingClasse.eleves.length > 0) {
+                console.log('❌ [DELETE CLASSE] Impossible de supprimer - élèves présents');
+                return res.status(400).json({
+                    success: false,
+                    message: 'Impossible de supprimer une classe qui contient des élèves'
+                });
+            }
+
+            // Supprimer la classe
             await prisma.classe.delete({
                 where: { id: parseInt(id) }
             });
 
-            // Redirection au lieu de JSON pour éviter l'affichage du JSON brut
-            res.redirect('/directeur/classes?success=classe-deleted');
+            console.log('✅ [DELETE CLASSE] Classe supprimée avec succès:', id);
+
+            // Retourner JSON au lieu de rediriger
+            res.json({
+                success: true,
+                message: 'Classe supprimée avec succès'
+            });
+
         } catch (error) {
-            console.error('Erreur lors de la suppression de la classe:', error);
-            // Redirection avec erreur au lieu de JSON
-            res.redirect('/directeur/classes?error=delete-failed');
+            console.error('❌ [DELETE CLASSE] Erreur:', error);
+            console.error('❌ [DELETE CLASSE] Stack:', error.stack);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la suppression de la classe: ' + error.message
+            });
         }
     },
 
