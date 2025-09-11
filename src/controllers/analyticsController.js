@@ -1,4 +1,5 @@
 const LoggingService = require('../services/loggingService');
+const analyticsDataService = require('../services/analyticsDataService');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -72,17 +73,17 @@ async function getAdditionalStats(startDate, endDate) {
     const deviceStats = analyzeDeviceTypes(deviceTypes);
 
     return {
-        loginsByRole: loginsByRole.map(l => ({ 
-            role: l.userRole, 
-            logins: l._count.userRole 
+        loginsByRole: loginsByRole.map(l => ({
+            role: l.userRole,
+            logins: l._count.userRole
         })),
-        topDownloads: topDownloads.map(d => ({ 
-            url: d.url, 
-            downloads: d._count.url 
+        topDownloads: topDownloads.map(d => ({
+            url: d.url,
+            downloads: d._count.url
         })),
-        topSearches: topSearches.map(s => ({ 
-            query: s.searchQuery, 
-            count: s._count.searchQuery 
+        topSearches: topSearches.map(s => ({
+            query: s.searchQuery,
+            count: s._count.searchQuery
         })),
         hourlyTraffic: hourlyTraffic.map(h => ({
             hour: h.hour,
@@ -171,60 +172,95 @@ function generateCSV(logs) {
  */
 const analyticsController = {
     /**
-     * Page principale du dashboard Analytics
+     * Page principale du dashboard Analytics (NOUVELLE VERSION DYNAMIQUE)
      */
     async getAnalyticsDashboard(req, res) {
         try {
-            // Période par défaut : 30 derniers jours
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 30);
+            console.log('📊 Chargement de la page analytics dynamique...');
 
-            // Récupérer les statistiques générales
-            const stats = await LoggingService.getStatistics(startDate, endDate);
+            // Récupérer toutes les données dynamiques
+            const [
+                generalStats,
+                dailyVisits,
+                deviceTypes,
+                popularPages,
+                hourlyTraffic
+            ] = await Promise.all([
+                analyticsDataService.getGeneralStats(30),
+                analyticsDataService.getDailyVisits(30),
+                analyticsDataService.getDeviceTypes(30),
+                analyticsDataService.getPopularPages(30, 10),
+                analyticsDataService.getHourlyTraffic(7)
+            ]);
 
-            // Statistiques additionnelles spécifiques
-            const additionalStats = await getAdditionalStats(startDate, endDate);
+            console.log('📊 Données récupérées:', {
+                visites: generalStats.totalVisits,
+                visiteurs: generalStats.uniqueVisitors,
+                pages: popularPages.length
+            });
 
-            res.render('pages/directeur/analytics.twig', {
+            res.render('pages/directeur/analytics', {
                 title: 'Analytics et Statistiques',
                 user: req.session.user,
-                stats,
-                additionalStats,
-                period: '30 derniers jours'
+                generalStats,
+                dailyVisits: JSON.stringify(dailyVisits),
+                deviceTypes,
+                popularPages,
+                hourlyTraffic: JSON.stringify(hourlyTraffic)
             });
 
         } catch (error) {
             console.error('❌ Erreur analytics dashboard:', error);
-            res.status(500).render('pages/error.twig', {
-                message: 'Erreur lors du chargement des statistiques'
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors du chargement des analytics',
+                user: req.session.user
             });
         }
     },
 
     /**
-     * API pour récupérer les statistiques (pour AJAX)
+     * API pour récupérer les statistiques (pour AJAX) - VERSION AMÉLIORÉE
      */
     async getAnalyticsData(req, res) {
         try {
-            const { startDate, endDate, period } = req.query;
-            
-            const stats = await LoggingService.getStatistics(startDate, endDate);
-            const additionalStats = await getAdditionalStats(startDate, endDate);
+            const { period = 30, type = 'all' } = req.query;
+            console.log(`📊 Récupération données analytics: période=${period}, type=${type}`);
 
-            res.json({
-                success: true,
-                data: {
-                    stats,
-                    additionalStats
-                }
-            });
+            let data = {};
+
+            switch (type) {
+                case 'general':
+                    data = await analyticsDataService.getGeneralStats(period);
+                    break;
+                case 'daily':
+                    data = await analyticsDataService.getDailyVisits(period);
+                    break;
+                case 'devices':
+                    data = await analyticsDataService.getDeviceTypes(period);
+                    break;
+                case 'pages':
+                    data = await analyticsDataService.getPopularPages(period, 10);
+                    break;
+                case 'hourly':
+                    data = await analyticsDataService.getHourlyTraffic(7);
+                    break;
+                default:
+                    data = {
+                        general: await analyticsDataService.getGeneralStats(period),
+                        daily: await analyticsDataService.getDailyVisits(period),
+                        devices: await analyticsDataService.getDeviceTypes(period),
+                        pages: await analyticsDataService.getPopularPages(period, 10),
+                        hourly: await analyticsDataService.getHourlyTraffic(7)
+                    };
+            }
+
+            res.json({ success: true, data });
 
         } catch (error) {
             console.error('❌ Erreur API analytics:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la récupération des statistiques'
+                message: 'Erreur lors de la récupération des données'
             });
         }
     },
@@ -235,9 +271,9 @@ const analyticsController = {
     async getDetailedStats(req, res) {
         try {
             const { type, period } = req.params;
-            
+
             let startDate = new Date();
-            
+
             switch (period) {
                 case 'today':
                     startDate.setHours(0, 0, 0, 0);
@@ -276,46 +312,44 @@ const analyticsController = {
      */
     async exportLogsCSV(req, res) {
         try {
-            const { startDate, endDate } = req.query;
-            
-            // Construire la clause WHERE pour la période
-            const whereClause = {};
-            if (startDate || endDate) {
-                whereClause.timestamp = {};
-                if (startDate) whereClause.timestamp.gte = new Date(startDate);
-                if (endDate) whereClause.timestamp.lte = new Date(endDate);
+            const { startDate, endDate, format = 'csv' } = req.query;
+            console.log(`📤 Export demandé: ${startDate} -> ${endDate} (${format})`);
+
+            // Récupérer les données pour la période
+            const data = await analyticsDataService.getAnalyticsForExport(startDate, endDate);
+
+            if (format === 'csv') {
+                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader('Content-Disposition', 'attachment; filename=analytics_ecole_saint_mathieu.csv');
+
+                // Convertir en CSV
+                const csv = this.convertToCSV(data);
+                res.send(csv);
+            } else {
+                res.json(data);
             }
 
-            const logs = await prisma.siteLog.findMany({
-                where: whereClause,
-                orderBy: { timestamp: 'desc' },
-                take: 10000, // Limiter à 10k entrées pour éviter les gros exports
-                include: {
-                    user: {
-                        select: {
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            role: true
-                        }
-                    }
-                }
-            });
-
-            // Générer le CSV
-            const csv = generateCSV(logs);
-            
-            res.setHeader('Content-Type', 'text/csv');
-            res.setHeader('Content-Disposition', 'attachment; filename="logs_ecole_saint_mathieu.csv"');
-            res.send(csv);
-
         } catch (error) {
-            console.error('❌ Erreur export logs:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erreur lors de l\'export des logs'
-            });
+            console.error('❌ Erreur export:', error);
+            res.status(500).json({ message: 'Erreur lors de l\'export' });
         }
+    },
+
+    convertToCSV(data) {
+        if (!data.length) return 'Aucune donnée à exporter';
+
+        const headers = ['Date', 'Heure', 'Route', 'IP', 'User Agent', 'Statut', 'Temps Réponse'];
+        const rows = data.map(row => [
+            row.timestamp.toISOString().split('T')[0],
+            row.timestamp.toISOString().split('T')[1].split('.')[0],
+            row.route || '',
+            row.ip || '',
+            row.userAgent || '',
+            row.statusCode || '',
+            row.responseTime || ''
+        ]);
+
+        return [headers, ...rows].map(row => row.join(',')).join('\n');
     }
 };
 

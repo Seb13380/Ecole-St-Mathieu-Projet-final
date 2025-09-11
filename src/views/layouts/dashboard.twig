@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>
+			{% block title %}École Saint-Mathieu - Administration
+			{% endblock %}
+		</title>
+
+		<!-- CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="/assets/css/style.css">
+		<link
+		rel="stylesheet" href="/assets/css/https-fixes.css">
+
+		<!-- Chart.js pour les graphiques -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+		<!-- Favicon -->
+		<link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico"> {% block styles %}{% endblock %}
+		</head>
+		<body
+			class="bg-gray-50 min-h-screen flex flex-col">
+			<!-- Header -->
+			<header class="bg-white shadow-sm border-b">
+				<div class="container mx-auto px-4 py-3">
+					<div class="flex justify-between items-center">
+						<div class="flex items-center space-x-4">
+							<h1 class="text-xl font-bold text-gray-800">🏫 École Saint-Mathieu</h1>
+							<span class="text-sm text-gray-500 bg-blue-100 px-2 py-1 rounded">Administration</span>
+						</div>
+
+						<div class="flex items-center space-x-4">
+							{% if user %}
+								<div class="flex items-center space-x-2">
+									<div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+										{{ user.firstName|first }}{{ user.lastName|first }}
+									</div>
+									<div class="text-sm">
+										<div class="font-medium text-gray-800">{{ user.firstName }}
+											{{ user.lastName }}</div>
+										<div class="text-gray-500">{{ user.role }}</div>
+									</div>
+								</div>
+								<a href="/auth/logout" class="text-sm text-red-600 hover:text-red-800 bg-red-50 px-3 py-1 rounded transition-colors">
+									🚪 Déconnexion
+								</a>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<!-- Navigation -->
+			<nav class="bg-blue-600 text-white shadow-md">
+				<div class="container mx-auto px-4">
+					<div class="flex space-x-8 py-3">
+						<a href="/directeur/dashboard" class="flex items-center space-x-2 hover:text-blue-200 transition-colors px-3 py-1 rounded">
+							<span>📊</span>
+							<span>Dashboard</span>
+						</a>
+						<a href="/directeur/analytics" class="flex items-center space-x-2 hover:text-blue-200 transition-colors px-3 py-1 rounded bg-blue-700">
+							<span>📈</span>
+							<span>Analytics</span>
+						</a>
+						<a href="/directeur/inscriptions" class="flex items-center space-x-2 hover:text-blue-200 transition-colors px-3 py-1 rounded">
+							<span>📝</span>
+							<span>Inscriptions</span>
+						</a>
+						<a href="/directeur/users" class="flex items-center space-x-2 hover:text-blue-200 transition-colors px-3 py-1 rounded">
+							<span>👥</span>
+							<span>Utilisateurs</span>
+						</a>
+						<a href="/directeur/contact-messages" class="flex items-center space-x-2 hover:text-blue-200 transition-colors px-3 py-1 rounded">
+							<span>✉️</span>
+							<span>Messages</span>
+						</a>
+					</div>
+				</div>
+			</nav>
+
+			<!-- Contenu principal -->
+			<main class="flex-1 py-6"> {% block content %}{% endblock %}
+				</main>
+
+				<!-- Footer -->
+				<footer class="bg-gray-800 text-white py-4 mt-auto">
+					<div class="container mx-auto px-4 text-center">
+						<p class="text-sm">&copy;
+							{{ "now"|date("Y") }}
+							École Saint-Mathieu - Système d'administration</p>
+					</div>
+				</footer>
+
+				<!-- Scripts globaux -->
+				<script>
+					// Fonction utilitaire pour les requêtes AJAX
+window.apiRequest = async function (url, options = {}) {
+const defaultOptions = {
+headers: {
+'Content-Type': 'application/json',
+'X-Requested-With': 'XMLHttpRequest'
+},
+credentials: 'include'
+};
+
+const response = await fetch(url, {
+... defaultOptions,
+...options
+});
+return response.json();
+};
+
+// Fonction pour afficher les notifications
+window.showNotification = function (message, type = 'info') { // Créer une notification toast
+const notification = document.createElement('div');
+notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white max-w-sm transform transition-transform duration-300 translate-x-full`;
+
+switch (type) {
+case 'success': notification.classList.add('bg-green-500');
+break;
+case 'error': notification.classList.add('bg-red-500');
+break;
+case 'warning': notification.classList.add('bg-yellow-500');
+break;
+default: notification.classList.add('bg-blue-500');
+}
+
+notification.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        ✕
+                    </button>
+                </div>
+            `;
+
+document.body.appendChild(notification);
+
+// Animer l'entrée
+setTimeout(() => {
+notification.classList.remove('translate-x-full');
+}, 100);
+
+// Auto-suppression après 5 secondes
+setTimeout(() => {
+notification.classList.add('translate-x-full');
+setTimeout(() => notification.remove(), 300);
+}, 5000);
+};
+				</script>
+
+				{% block scripts %}{% endblock %}
+			</body>
+		</html>
