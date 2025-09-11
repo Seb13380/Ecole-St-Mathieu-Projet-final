@@ -260,7 +260,7 @@
 				<div class="p-6">
 					<div class="flex items-center mb-4">
 						<div class="bg-red-100 p-3 rounded-lg mr-4">
-							<svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<svg class="h-6 w-6 text-red-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
 							</svg>
 						</div>
@@ -286,8 +286,8 @@
 			<div class="bg-white rounded-lg shadow-xl max-w-md w-full">
 				<div class="p-6">
 					<div class="flex items-center mb-4">
-						<div id="notificationIcon" class="p-3 rounded-lg mr-4">
-							<!-- Icône sera insérée dynamiquement -->
+						<div
+							id="notificationIcon" class="p-3 rounded-lg mr-4"><!-- Icône sera insérée dynamiquement -->
 						</div>
 						<h3 id="notificationTitle" class="text-xl font-bold text-slate-800">Notification</h3>
 					</div>
@@ -334,90 +334,86 @@ function closeModal() {
 document.getElementById('classeModal').classList.add('hidden');
 }
 
-function deleteClasse(id, nom) {
-    // Ouvrir la modale de confirmation
-    document.getElementById('deleteMessage').textContent = `Êtes-vous sûr de vouloir supprimer la classe "${nom}" ?`;
-    document.getElementById('deleteModal').classList.remove('hidden');
-    
-    // Gérer la confirmation
-    document.getElementById('confirmDeleteBtn').onclick = function() {
-        closeDeleteModal();
-        performDelete(id, nom);
-    };
+function deleteClasse(id, nom) { // Ouvrir la modale de confirmation
+document.getElementById('deleteMessage').textContent = `Êtes-vous sûr de vouloir supprimer la classe "${nom}" ?`;
+document.getElementById('deleteModal').classList.remove('hidden');
+
+// Gérer la confirmation
+document.getElementById('confirmDeleteBtn').onclick = function () {
+closeDeleteModal();
+performDelete(id, nom);
+};
 }
 
 function performDelete(id, nom) {
-    console.log('🗑️ Suppression classe ID:', id);
-    
-    fetch(`/directeur/classes/${id}/delete`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        console.log('📡 Réponse serveur:', response.status, response.statusText);
-        
-        // Vérifier si la réponse est bien du JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            console.error('❌ Réponse non-JSON reçue:', contentType);
-            throw new Error('Le serveur a retourné une réponse non-JSON. Vérifiez les logs serveur.');
-        }
-        
-        return response.json();
-    })
-    .then(data => {
-        console.log('📦 Données reçues:', data);
-        if (data.success) {
-            showNotification('success', 'Succès', 'Classe supprimée avec succès !');
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        } else {
-            showNotification('error', 'Erreur', data.message || 'Une erreur est survenue');
-        }
-    })
-    .catch(error => {
-        console.error('❌ Erreur requête:', error);
-        showNotification('error', 'Erreur de connexion', 'Impossible de supprimer la classe. Vérifiez votre connexion et réessayez.');
-    });
+console.log('🗑️ Suppression classe ID:', id);
+
+fetch (`/directeur/classes/${id}/delete`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+}).then(response => {
+console.log('📡 Réponse serveur:', response.status, response.statusText);
+
+// Vérifier si la réponse est bien du JSON
+const contentType = response.headers.get('content-type');
+if (! contentType || ! contentType.includes('application/json')) {
+console.error('❌ Réponse non-JSON reçue:', contentType);
+throw new Error('Le serveur a retourné une réponse non-JSON. Vérifiez les logs serveur.');
+}
+
+return response.json();
+}).then(data => {
+console.log('📦 Données reçues:', data);
+if (data.success) {
+showNotification('success', 'Succès', 'Classe supprimée avec succès !');
+setTimeout(() => {
+location.reload();
+}, 1500);
+} else {
+showNotification('error', 'Erreur', data.message || 'Une erreur est survenue');
+}
+}).catch(error => {
+console.error('❌ Erreur requête:', error);
+showNotification('error', 'Erreur de connexion', 'Impossible de supprimer la classe. Vérifiez votre connexion et réessayez.');
+});
 }
 
 function showNotification(type, title, message) {
-    const modal = document.getElementById('notificationModal');
-    const icon = document.getElementById('notificationIcon');
-    const titleEl = document.getElementById('notificationTitle');
-    const messageEl = document.getElementById('notificationMessage');
-    
-    // Configurer l'icône et les couleurs selon le type
-    if (type === 'success') {
-        icon.className = 'bg-green-100 p-3 rounded-lg mr-4';
-        icon.innerHTML = `
+const modal = document.getElementById('notificationModal');
+const icon = document.getElementById('notificationIcon');
+const titleEl = document.getElementById('notificationTitle');
+const messageEl = document.getElementById('notificationMessage');
+
+// Configurer l'icône et les couleurs selon le type
+if (type === 'success') {
+icon.className = 'bg-green-100 p-3 rounded-lg mr-4';
+icon.innerHTML = `
             <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
         `;
-    } else if (type === 'error') {
-        icon.className = 'bg-red-100 p-3 rounded-lg mr-4';
-        icon.innerHTML = `
+} else if (type === 'error') {
+icon.className = 'bg-red-100 p-3 rounded-lg mr-4';
+icon.innerHTML = `
             <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         `;
-    }
-    
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    modal.classList.remove('hidden');
+}
+
+titleEl.textContent = title;
+messageEl.textContent = message;
+modal.classList.remove('hidden');
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
+document.getElementById('deleteModal').classList.add('hidden');
 }
 
 function closeNotificationModal() {
-    document.getElementById('notificationModal').classList.add('hidden');
+document.getElementById('notificationModal').classList.add('hidden');
 }
 
 function viewStudents(classeId) {
@@ -431,21 +427,21 @@ window.open (`/directeur/classes/${classeId}/export`, '_blank');
 
 // Fermer modales en cliquant à l'extérieur
 document.getElementById('classeModal').addEventListener('click', function (e) {
-    if (e.target === this) {
-        closeModal();
-    }
+if (e.target === this) {
+closeModal();
+}
 });
 
 document.getElementById('deleteModal').addEventListener('click', function (e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
+if (e.target === this) {
+closeDeleteModal();
+}
 });
 
 document.getElementById('notificationModal').addEventListener('click', function (e) {
-    if (e.target === this) {
-        closeNotificationModal();
-    }
+if (e.target === this) {
+closeNotificationModal();
+}
 });
 	</script>
 
