@@ -74,7 +74,7 @@ const userManagementController = {
                     email,
                     password: hashedPassword,
                     phone: phone || null,
-                    adress: adress || null,
+                    adress: adress || 'Adresse non renseignée',
                     role: 'PARENT'
                 }
             });
