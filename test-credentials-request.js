@@ -34,10 +34,10 @@ async function testCredentialsRequest() {
         });
 
         console.log(`✅ Réponse: ${response.status}`);
-        
+
         if (response.status === 302) {
             console.log('🔄 Redirection vers:', response.headers.location);
-            
+
             if (response.headers.location.includes('message=')) {
                 const message = decodeURIComponent(response.headers.location.split('message=')[1]);
                 console.log('💬 Message:', message);
@@ -49,7 +49,7 @@ async function testCredentialsRequest() {
     } catch (error) {
         if (error.response?.status === 302) {
             console.log('🔄 Redirection vers:', error.response.headers.location);
-            
+
             if (error.response.headers.location.includes('message=')) {
                 const message = decodeURIComponent(error.response.headers.location.split('message=')[1]);
                 console.log('💬 Message:', message);

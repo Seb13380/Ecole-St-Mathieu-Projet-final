@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function createTestInscription() {
     try {
         console.log('🧪 Création d\'une demande de pré-inscription de test...');
-        
+
         // Créer une demande de test
         const testRequest = await prisma.preInscriptionRequest.create({
             data: {
@@ -26,12 +26,12 @@ async function createTestInscription() {
                 status: 'PENDING'
             }
         });
-        
+
         console.log('✅ Demande créée avec l\'ID:', testRequest.id);
         console.log('Enfants:', JSON.parse(testRequest.children));
-        
+
         return testRequest;
-        
+
     } catch (error) {
         console.error('❌ Erreur:', error.message);
     } finally {

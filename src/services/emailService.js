@@ -1374,7 +1374,7 @@ class EmailService {
         try {
             console.log('📧 Envoi notification demande d\'identifiants:', requestData);
 
-            const adminEmail = process.env.TEST_MODE === 'true' ? 
+            const adminEmail = process.env.TEST_MODE === 'true' ?
                 process.env.TEST_EMAIL : 'sgdigitalweb13@gmail.com';
 
             const mailOptions = {
@@ -1393,12 +1393,12 @@ class EmailService {
                             <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
                                 <p style="margin: 0; color: #1e40af; font-weight: 600;">
                                     📅 Reçue le ${new Date(requestData.timestamp).toLocaleDateString('fr-FR', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}
                                 </p>
                             </div>
 

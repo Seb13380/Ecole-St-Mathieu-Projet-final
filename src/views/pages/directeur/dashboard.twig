@@ -515,7 +515,8 @@
 											</span>
 										</div>
 										<h3 class="text-sm sm:text-lg font-bold text-slate-800 mb-2">
-											{{ request.parentFirstName }} {{ request.parentLastName }}
+											{{ request.parentFirstName }}
+											{{ request.parentLastName }}
 										</h3>
 										<p class="text-slate-600 text-xs sm:text-sm mb-2">{{ request.parentEmail }}</p>
 										<div class="flex items-center justify-between w-full">
@@ -553,11 +554,14 @@
 											</span>
 										</div>
 										<h3 class="text-sm sm:text-lg font-bold text-slate-800 mb-2">
-											{{ request.requestedFirstName }} {{ request.requestedLastName }}
+											{{ request.requestedFirstName }}
+											{{ request.requestedLastName }}
 										</h3>
 										<p class="text-slate-600 text-xs sm:text-sm mb-2">{{ request.requestedEmail }}</p>
 										{% if request.foundParent %}
-											<p class="text-green-600 text-xs mb-2">✅ Parent trouvé: {{ request.foundParent.firstName }} {{ request.foundParent.lastName }}</p>
+											<p class="text-green-600 text-xs mb-2">✅ Parent trouvé:
+												{{ request.foundParent.firstName }}
+												{{ request.foundParent.lastName }}</p>
 										{% endif %}
 										<div class="flex items-center justify-between w-full">
 											<a href="/directeur/credentials" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
