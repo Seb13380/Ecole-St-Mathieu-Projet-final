@@ -254,54 +254,29 @@ const inscriptionController = {
 
                 for (const childData of childrenData) {
                     if (childData.firstName && childData.lastName && childData.birthDate) {
-
-                        // Déterminer la classe selon le niveau scolaire
-                        let classeId = null;
+                        // 🎯 Attribution dynamique de la classe selon le niveau scolaire
+                        let classeId = 1; // CP A par défaut
+                        
                         if (childData.schoolLevel) {
-                            let classe;
-                            switch (childData.schoolLevel?.toUpperCase()) {
-                                case 'PS': case 'PETITE SECTION':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'PS' } });
+                            switch (childData.schoolLevel.toLowerCase()) {
+                                case 'cp':
+                                    classeId = 1; // CP A
                                     break;
-                                case 'MS': case 'MOYENNE SECTION':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'MS' } });
+                                case 'ce1':
+                                    classeId = 2; // CE1 A
                                     break;
-                                case 'GS': case 'GRANDE SECTION':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'GS' } });
+                                case 'ce2':
+                                    classeId = 3; // CE2 A
                                     break;
-                                case 'CP': case 'COURS PRÉPARATOIRE':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'CP' } });
+                                case 'cm1':
+                                    classeId = 4; // CM1 A
                                     break;
-                                case 'CE1': case 'COURS ÉLÉMENTAIRE 1':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'CE1' } });
-                                    break;
-                                case 'CE2': case 'COURS ÉLÉMENTAIRE 2':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'CE2' } });
-                                    break;
-                                case 'CM1': case 'COURS MOYEN 1':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'CM1' } });
-                                    break;
-                                case 'CM2': case 'COURS MOYEN 2':
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'CM2' } });
+                                case 'cm2':
+                                    classeId = 5; // CM2 A
                                     break;
                                 default:
-                                    // Par défaut, prendre la première classe CP disponible
-                                    classe = await prisma.classe.findFirst({ where: { nom: 'CP' } });
+                                    classeId = 1; // CP A par défaut
                             }
-
-                            if (classe) {
-                                classeId = classe.id;
-                                console.log(`   📚 ${childData.firstName} ${childData.lastName}: ${childData.schoolLevel} → Classe ${classe.nom} (ID: ${classeId})`);
-                            } else {
-                                console.log(`   ⚠️ Classe non trouvée pour le niveau ${childData.schoolLevel}, utilisation de la première classe disponible`);
-                                const firstClasse = await prisma.classe.findFirst();
-                                classeId = firstClasse?.id || 1;
-                            }
-                        } else {
-                            // Si pas de niveau spécifié, prendre la première classe disponible
-                            const firstClasse = await prisma.classe.findFirst();
-                            classeId = firstClasse?.id || 1;
-                            console.log(`   📚 ${childData.firstName} ${childData.lastName}: Niveau non spécifié → Classe par défaut (ID: ${classeId})`);
                         }
 
                         const student = await prisma.student.create({
