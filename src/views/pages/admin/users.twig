@@ -102,12 +102,12 @@
 								{{ user.createdAt|date('d/m/Y') }}
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-								<button onclick="editUser({{ user.id }})" class="text-indigo-600 hover:text-indigo-900 mr-3 px-2 py-1 rounded hover:bg-indigo-50 transition-colors">
-									<i class="fas fa-edit mr-1"></i>Modifier
+								<button onclick="editUser({{ user.id }})" class="text-indigo-600 hover:text-indigo-900 mr-3">
+									<i class="fas fa-edit"></i>
 								</button>
 								{% if user.role != 'ADMIN' and user.role != 'DIRECTION' %}
-									<button onclick="deleteUser({{ user.id }})" class="text-red-600 hover:text-red-900 px-2 py-1 rounded hover:bg-red-50 transition-colors">
-										<i class="fas fa-trash mr-1"></i>Supprimer
+									<button onclick="deleteUser({{ user.id }})" class="text-red-600 hover:text-red-900">
+										<i class="fas fa-trash"></i>
 									</button>
 								{% endif %}
 							</td>

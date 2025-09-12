@@ -1,7 +1,6 @@
 const express = require('express');
 const directeurController = require('../controllers/directeurController');
 const inscriptionController = require('../controllers/inscriptionController');
-const analyticsController = require('../controllers/analyticsController');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
@@ -63,11 +62,6 @@ router.post('/credentials/:id/delete', directeurController.deleteCredentialsRequ
 
 // Rapports et statistiques
 router.get('/reports', directeurController.getReports);
-
-// Analytics
-router.get('/analytics', analyticsController.getAnalyticsDashboard);
-router.get('/analytics/data', analyticsController.getAnalyticsData);
-router.get('/analytics/export', analyticsController.exportLogsCSV);
 
 // Paramètres système
 router.get('/settings', directeurController.getSettings);

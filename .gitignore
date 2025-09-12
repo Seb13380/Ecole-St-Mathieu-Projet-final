@@ -12,6 +12,14 @@ public/images/galerie/
 public/documents/
 uploads/
 
+# Scripts de test temporaires
+check-*.js
+create-*.js
+test-*.js
+get-*.js
+search-*.js
+setup-*.js
+
 # Logs et fichiers temporaires
 *.log
 .DS_Store
