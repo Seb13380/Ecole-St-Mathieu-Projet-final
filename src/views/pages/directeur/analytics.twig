@@ -1,17 +1,33 @@
-{% extends "layouts/dashboard.twig" %}
+{% extends "layouts/base.twig" %}
 
-{% block title %}Analytics et Statistiques
+{% block title %}Analytics et Statistiques - École Saint-Mathieu
 {% endblock %}
 
 {% block styles %}
 	<style>
 		.stats-card {
-			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-radius: 12px;
+			padding: 1.5rem;
+			color: white;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s ease;
 		}
 
 		.stats-card:hover {
-			transform: translateY(-4px);
+			transform: translateY(-2px);
 			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		}
+
+		.stats-number {
+			font-size: 2.5rem;
+			font-weight: bold;
+			margin-bottom: 0.5rem;
+		}
+
+		.stats-label {
+			font-size: 1rem;
+			opacity: 0.9;
 		}
 
 		.chart-container {
@@ -20,404 +36,342 @@
 			padding: 1.5rem;
 			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 			margin-bottom: 1.5rem;
-			transition: box-shadow 0.3s ease;
 		}
 
-		.chart-container:hover {
-			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+		.metric-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid #e5e7eb;
+			transition: background-color 0.2s ease;
 		}
 
-		.loading-spinner {
-			border: 3px solid #f3f3f3;
-			border-top: 3px solid #3498db;
-			border-radius: 50%;
-			width: 20px;
-			height: 20px;
-			animation: spin 1s linear infinite;
+		.metric-item:hover {
+			background-color: #f9fafb;
 		}
 
-		@keyframes spin {
-			0% {
-				transform: rotate(0deg);
-			}
-			100% {
-				transform: rotate(360deg);
-			}
+		.metric-item:last-child {
+			border-bottom: none;
 		}
 
 		.progress-bar {
-			transition: width 0.5s ease-in-out;
+			width: 100%;
+			height: 8px;
+			background-color: #e5e7eb;
+			border-radius: 4px;
+			overflow: hidden;
 		}
 
-		.btn-period {
-			transition: all 0.3s ease;
+		.progress-fill {
+			height: 100%;
+			background: linear-gradient(90deg, #10b981, #34d399);
+			transition: width 0.3s ease;
 		}
 
-		.btn-period.active {
-			background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-			transform: scale(1.05);
+		.device-icon {
+			width: 24px;
+			height: 24px;
+			margin-right: 8px;
 		}
 	</style>
 {% endblock %}
 
-{% block content %}
-	<div class="container mx-auto px-4 py-6">
-		<div class="flex justify-between items-center mb-6">
-			<div>
-				<h1 class="text-3xl font-bold text-gray-800">📊 Analytics et Statistiques</h1>
-				<p class="text-gray-600 mt-2">Tableau de bord des performances du site en temps réel</p>
-			</div>
+{% block main %}
+	<div
+		class="max-w-7xl mx-auto p-6">
+		<!-- En-tête -->
+		<div class="mb-8">
+			<h1 class="text-4xl font-bold text-gray-900 mb-2">📊 Analytics et Statistiques</h1>
+			<p class="text-gray-600">Tableau de bord des performances du site -
+				{{ period }}</p>
 
-			<!-- Boutons de période -->
-			<div class="flex gap-2">
-				<button onclick="loadPeriod(7)" class="btn-period px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all">7 jours</button>
-				<button onclick="loadPeriod(30)" class="btn-period active px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all">30 jours</button>
-				<button onclick="loadPeriod(90)" class="btn-period px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all">90 jours</button>
-				<button onclick="exportData()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all">📤 Export CSV</button>
-			</div>
-		</div>
-
-		<!-- Indicateur de chargement -->
-		<div id="loadingIndicator" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" style="display: none;">
-			<div class="flex items-center justify-center h-full">
-				<div class="bg-white p-6 rounded-lg shadow-xl">
-					<div class="flex items-center space-x-3">
-						<div class="loading-spinner"></div>
-						<span class="text-gray-700">Chargement des données...</span>
-					</div>
-				</div>
+			<!-- Contrôles de période -->
+			<div class="mt-4 flex gap-2">
+				<button onclick="loadPeriod('today')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">Aujourd'hui</button>
+				<button onclick="loadPeriod('week')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">7 jours</button>
+				<button onclick="loadPeriod('month')" class="px-4 py-2 bg-blue-600 text-white rounded">30 jours</button>
+				<button onclick="loadPeriod('year')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">1 an</button>
+				<button onclick="exportLogs()" class="ml-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">📥 Export CSV</button>
 			</div>
 		</div>
 
-		<!-- Statistiques générales -->
+		<!-- Statistiques principales -->
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-			<div class="stats-card bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-				<div class="text-3xl font-bold" id="totalVisits">{{ generalStats.totalVisits | number_format }}</div>
-				<div class="text-purple-100">Total des visites</div>
-				<div class="mt-2 text-sm text-purple-200">
-					<span id="visitsGrowth" class="inline-flex items-center">
-						📈 Période actuelle
-					</span>
-				</div>
+			<div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+				<div class="stats-number">{{ stats.totalVisits|number_format }}</div>
+				<div class="stats-label">Total des visites</div>
 			</div>
 
-			<div class="stats-card bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white">
-				<div class="text-3xl font-bold" id="uniqueVisitors">{{ generalStats.uniqueVisitors | number_format }}</div>
-				<div class="text-pink-100">Visiteurs uniques</div>
-				<div class="mt-2 text-sm text-pink-200">
-					<span id="visitorsGrowth" class="inline-flex items-center">
-						👥 Utilisateurs distincts
-					</span>
-				</div>
+			<div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+				<div class="stats-number">{{ stats.uniqueVisitors|number_format }}</div>
+				<div class="stats-label">Visiteurs uniques</div>
 			</div>
 
-			<div class="stats-card bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-				<div class="text-3xl font-bold" id="avgResponseTime">{{ generalStats.avgResponseTime }}ms</div>
-				<div class="text-blue-100">Temps de réponse moyen</div>
-				<div class="mt-2 text-sm text-blue-200">
-					<span class="inline-flex items-center">
-						{% if generalStats.avgResponseTime < 500 %}⚡ Excellent{% elseif generalStats.avgResponseTime < 1000 %}✅ Bon{% else %}⚠️ À améliorer
-						{% endif %}
-					</span>
-				</div>
+			<div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+				<div class="stats-number">{{ stats.avgResponseTime }}ms</div>
+				<div class="stats-label">Temps de réponse moyen</div>
 			</div>
 
-			<div class="stats-card bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
-				<div class="text-3xl font-bold" id="successRate">{{ generalStats.successRate }}%</div>
-				<div class="text-green-100">Taux de succès</div>
-				<div class="mt-2 text-sm text-green-200">
-					<span class="inline-flex items-center">
-						{% if generalStats.successRate > 95 %}🎯 Excellent{% elseif generalStats.successRate > 90 %}✅ Bon{% else %}⚠️ À surveiller
-						{% endif %}
-					</span>
-				</div>
+			<div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+				<div class="stats-number">{{ ((stats.totalVisits - (stats.topErrors|length)) / stats.totalVisits * 100)|round(1) }}%</div>
+				<div class="stats-label">Taux de succès</div>
 			</div>
 		</div>
 
-		<!-- Graphique des visites quotidiennes -->
-		<div class="chart-container">
-			<div class="flex justify-between items-center mb-4">
-				<h2 class="text-xl font-semibold">📈 Évolution des visites</h2>
-				<div class="text-sm text-gray-500">
-					<span id="lastUpdate">Dernière mise à jour:
-						{{ "now"|date("d/m/Y H:i") }}</span>
-				</div>
-			</div>
-			<canvas id="dailyVisitsChart" width="400" height="100"></canvas>
-		</div>
-
+		<!-- Graphiques et métriques -->
 		<div
-			class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+			class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+			<!-- Visites par jour -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">📈 Visites quotidiennes</h3>
+				<canvas id="dailyVisitsChart" width="400" height="200"></canvas>
+			</div>
+
 			<!-- Types d'appareils -->
 			<div class="chart-container">
-				<h2 class="text-xl font-semibold mb-4">📱 Types d'appareils</h2>
-				<div class="space-y-4" id="deviceTypesContainer">
-					<div class="flex justify-between items-center">
-						<div class="flex items-center space-x-2">
-							<span>🖥️ Desktop</span>
-							<div class="bg-gray-200 rounded-full h-2 w-32">
-								<div class="bg-blue-500 h-2 rounded-full progress-bar" style="width: {{ deviceTypes.desktop }}%" id="desktopBar"></div>
-							</div>
+				<h3 class="text-xl font-bold mb-4">📱 Types d'appareils</h3>
+				<div class="space-y-4">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center">
+							<span class="device-icon">💻</span>
+							<span>Desktop</span>
 						</div>
-						<span class="font-bold" id="desktopPercent">{{ deviceTypes.desktop }}%</span>
+						<div class="flex items-center gap-3">
+							<div class="progress-bar w-32">
+								<div class="progress-fill" style="width: {{ additionalStats.deviceStats.desktop.percentage }}%"></div>
+							</div>
+							<span class="text-sm font-medium">{{ additionalStats.deviceStats.desktop.percentage }}%</span>
+						</div>
 					</div>
-					<div class="flex justify-between items-center">
-						<div class="flex items-center space-x-2">
-							<span>📱 Mobile</span>
-							<div class="bg-gray-200 rounded-full h-2 w-32">
-								<div class="bg-green-500 h-2 rounded-full progress-bar" style="width: {{ deviceTypes.mobile }}%" id="mobileBar"></div>
-							</div>
+
+					<div class="flex items-center justify-between">
+						<div class="flex items-center">
+							<span class="device-icon">📱</span>
+							<span>Mobile</span>
 						</div>
-						<span class="font-bold" id="mobilePercent">{{ deviceTypes.mobile }}%</span>
+						<div class="flex items-center gap-3">
+							<div class="progress-bar w-32">
+								<div class="progress-fill" style="width: {{ additionalStats.deviceStats.mobile.percentage }}%"></div>
+							</div>
+							<span class="text-sm font-medium">{{ additionalStats.deviceStats.mobile.percentage }}%</span>
+						</div>
 					</div>
-					<div class="flex justify-between items-center">
-						<div class="flex items-center space-x-2">
-							<span>📟 Tablette</span>
-							<div class="bg-gray-200 rounded-full h-2 w-32">
-								<div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: {{ deviceTypes.tablet }}%" id="tabletBar"></div>
-							</div>
+
+					<div class="flex items-center justify-between">
+						<div class="flex items-center">
+							<span class="device-icon">📟</span>
+							<span>Tablette</span>
 						</div>
-						<span class="font-bold" id="tabletPercent">{{ deviceTypes.tablet }}%</span>
+						<div class="flex items-center gap-3">
+							<div class="progress-bar w-32">
+								<div class="progress-fill" style="width: {{ additionalStats.deviceStats.tablet.percentage }}%"></div>
+							</div>
+							<span class="text-sm font-medium">{{ additionalStats.deviceStats.tablet.percentage }}%</span>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- Pages populaires -->
+			<!-- Pages les plus visitées -->
 			<div class="chart-container">
-				<h2 class="text-xl font-semibold mb-4">🔥 Pages populaires</h2>
-				<div id="popularPagesList" class="space-y-2 max-h-60 overflow-y-auto">
-					{% for page in popularPages %}
-						<div class="flex justify-between items-center py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors">
-							<span class="text-sm truncate font-medium">{{ page.route }}</span>
-							<span class="font-bold text-blue-600">{{ page.visits }}</span>
+				<h3 class="text-xl font-bold mb-4">🔥 Pages populaires</h3>
+				<div class="space-y-2">
+					{% for page in stats.topPages|slice(0, 8) %}
+						<div class="metric-item">
+							<span class="text-sm truncate">{{ page.url }}</span>
+							<span class="font-medium text-blue-600">{{ page.visits }}</span>
 						</div>
 					{% endfor %}
 				</div>
 			</div>
+
+			<!-- Connexions par rôle -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">👥 Connexions par rôle</h3>
+				<div class="space-y-2">
+					{% for login in additionalStats.loginsByRole %}
+						<div class="metric-item">
+							<span class="text-sm">
+								{% if login.role == 'PARENT' %}👨‍👩‍👧‍👦 Parents
+									{% elseif login.role == 'ENSEIGNANT' %}👩‍🏫 Enseignants
+									{% elseif login.role == 'DIRECTION' %}🏛️ Direction
+									{% elseif login.role == 'ADMIN' %}⚙️ Administrateurs
+									{% elseif login.role == 'SECRETAIRE_DIRECTION' %}📋 Secrétariat
+									{% elseif login.role == 'RESTAURANT' %}🍽️ Restaurant
+								{% else %}
+									{{ login.role }}
+								{% endif %}
+							</span>
+							<span class="font-medium text-green-600">{{ login.logins }}</span>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<!-- Recherches populaires -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">🔍 Recherches populaires</h3>
+				<div class="space-y-2">
+					{% if additionalStats.topSearches|length > 0 %}
+						{% for search in additionalStats.topSearches|slice(0, 6) %}
+							<div class="metric-item">
+								<span class="text-sm">{{ search.query }}</span>
+								<span class="font-medium text-purple-600">{{ search.count }}</span>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="text-center text-gray-500 py-4">
+							Aucune recherche enregistrée
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Téléchargements populaires -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">📥 Téléchargements populaires</h3>
+				<div class="space-y-2">
+					{% if additionalStats.topDownloads|length > 0 %}
+						{% for download in additionalStats.topDownloads|slice(0, 6) %}
+							<div class="metric-item">
+								<span class="text-sm truncate">{{ download.url|replace({'/download/': '', '/uploads/': ''}) }}</span>
+								<span class="font-medium text-orange-600">{{ download.downloads }}</span>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="text-center text-gray-500 py-4">
+							Aucun téléchargement enregistré
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
 		</div>
 
 		<!-- Trafic par heure -->
-		<div class="chart-container mt-8">
-			<h2 class="text-xl font-semibold mb-4">🕐 Trafic par heure de la journée</h2>
-			<canvas id="hourlyTrafficChart" width="400" height="100"></canvas>
-		</div>
+		{% if additionalStats.hourlyTraffic|length > 0 %}
+			<div class="chart-container mt-6">
+				<h3 class="text-xl font-bold mb-4">⏰ Trafic par heure de la journée</h3>
+				<canvas id="hourlyTrafficChart" width="800" height="300"></canvas>
+			</div>
+		{% endif %}
+
 	</div>
 {% endblock %}
 
 {% block scripts %}
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
-		// Variables globales pour les graphiques
-let dailyChart,
-hourlyChart;
-let currentPeriod = 30;
+		document.addEventListener('DOMContentLoaded', function () { // Graphique des visites quotidiennes
+const dailyVisitsData = {{ stats.dailyVisits|json_encode|raw }};
 
-// Données initiales
-let dailyData = {{ dailyVisits | raw }};
-let hourlyData = {{ hourlyTraffic | raw }};
-
-document.addEventListener('DOMContentLoaded', function () {
-initializeCharts();
-});
-
-function initializeCharts() { // Graphique des visites quotidiennes
 const dailyCtx = document.getElementById('dailyVisitsChart').getContext('2d');
-dailyChart = new Chart(dailyCtx, {
+new Chart(dailyCtx, {
 type: 'line',
 data: {
-labels: dailyData.map(d => new Date(d.date).toLocaleDateString('fr-FR', {
+labels: dailyVisitsData.map(d => {
+const date = new Date(d.date);
+return date.toLocaleDateString('fr-FR', {
 day: '2-digit',
 month: '2-digit'
-})),
+});
+}),
 datasets: [
 {
 label: 'Visites',
-data: dailyData.map(d => d.visits),
-borderColor: 'rgb(59, 130, 246)',
-backgroundColor: 'rgba(59, 130, 246, 0.1)',
-tension: 0.4,
-fill: true,
+data: dailyVisitsData.map(d => d.visits),
+borderColor: '#667eea',
+backgroundColor: 'rgba(102, 126, 234, 0.1)',
 borderWidth: 3,
-pointBackgroundColor: 'rgb(59, 130, 246)',
-pointBorderColor: '#ffffff',
-pointBorderWidth: 2,
-pointRadius: 5,
-pointHoverRadius: 8
+fill: true,
+tension: 0.4
 }
 ]
 },
 options: {
 responsive: true,
-interaction: {
-intersect: false,
-mode: 'index'
-},
-plugins: {
-legend: {
-display: false
-},
-tooltip: {
-backgroundColor: 'rgba(0, 0, 0, 0.8)',
-titleColor: '#ffffff',
-bodyColor: '#ffffff',
-borderColor: 'rgb(59, 130, 246)',
-borderWidth: 1
-}
-},
 scales: {
 y: {
 beginAtZero: true,
 ticks: {
-precision: 0
-},
-grid: {
-color: 'rgba(0, 0, 0, 0.1)'
+stepSize: 1
+}
 }
 },
-x: {
-grid: {
-color: 'rgba(0, 0, 0, 0.1)'
-}
+plugins: {
+legend: {
+display: false
 }
 }
 }
 });
 
 // Graphique du trafic horaire
+{% if additionalStats.hourlyTraffic|length > 0 %}
+const hourlyTrafficData = {{ additionalStats.hourlyTraffic|json_encode|raw }};
+
 const hourlyCtx = document.getElementById('hourlyTrafficChart').getContext('2d');
-hourlyChart = new Chart(hourlyCtx, {
+new Chart(hourlyCtx, {
 type: 'bar',
 data: {
-labels: hourlyData.map(d => d.hour + 'h'),
+labels: hourlyTrafficData.map(h => h.hour + 'h'),
 datasets: [
 {
 label: 'Visites',
-data: hourlyData.map(d => d.visits),
-backgroundColor: 'rgba(34, 197, 94, 0.8)',
-borderColor: 'rgb(34, 197, 94)',
-borderWidth: 2,
-borderRadius: 4,
-borderSkipped: false
+data: hourlyTrafficData.map(h => h.visits),
+backgroundColor: 'rgba(67, 233, 123, 0.7)',
+borderColor: '#43e97b',
+borderWidth: 2
 }
 ]
 },
 options: {
 responsive: true,
+scales: {
+y: {
+beginAtZero: true
+}
+},
 plugins: {
 legend: {
 display: false
-},
-tooltip: {
-backgroundColor: 'rgba(0, 0, 0, 0.8)',
-titleColor: '#ffffff',
-bodyColor: '#ffffff',
-borderColor: 'rgb(34, 197, 94)',
-borderWidth: 1
-}
-},
-scales: {
-y: {
-beginAtZero: true,
-ticks: {
-precision: 0
-},
-grid: {
-color: 'rgba(0, 0, 0, 0.1)'
-}
-},
-x: {
-grid: {
-color: 'rgba(0, 0, 0, 0.1)'
 }
 }
 }
-}
+});{% endif %}
 });
-}
 
-// Fonction pour changer de période
-async function loadPeriod(days) {
-try {
-showLoading();
-currentPeriod = days;
-
-// Mettre à jour les boutons actifs
-document.querySelectorAll('.btn-period').forEach(btn => {
-btn.classList.remove('active', 'bg-blue-500', 'hover:bg-blue-600');
-btn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+function loadPeriod(period) { // Mettre à jour l'apparence des boutons
+document.querySelectorAll('button[onclick^="loadPeriod"]').forEach(btn => {
+btn.className = 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors';
 });
-event.target.classList.remove('bg-gray-500', 'hover:bg-gray-600');
-event.target.classList.add('active', 'bg-blue-500', 'hover:bg-blue-600');
+event.target.className = 'px-4 py-2 bg-blue-600 text-white rounded';
 
+// Charger les nouvelles données
+fetch (`/directeur/analytics/data?period=${period}`).then(response => response.json()).then(data => {
+if (data.success) { // Recharger la page avec les nouvelles données
 window.location.reload();
-
-hideLoading();
-} catch (error) {
+} else {
+console.error('Erreur lors du chargement des données:', data.message);
+}
+}).catch(error => {
 console.error('Erreur:', error);
-hideLoading();
-showNotification('Erreur lors du chargement des données: ' + error.message, 'error');
-}
+});
 }
 
-function exportData() {
+function exportLogs() {
 const startDate = new Date();
-startDate.setDate(startDate.getDate() - currentPeriod);
+startDate.setDate(startDate.getDate() - 30);
+
 const endDate = new Date();
 
 window.open(`/directeur/analytics/export?startDate=${
 startDate.toISOString()
 }&endDate=${
 endDate.toISOString()
-}&format=csv`);
-}
-
-function showLoading() {
-const indicator = document.getElementById('loadingIndicator');
-indicator.classList.remove('hidden');
-indicator.style.display = 'flex';
-}
-
-function hideLoading() {
-const indicator = document.getElementById('loadingIndicator');
-indicator.classList.add('hidden');
-indicator.style.display = 'none';
-}
-
-function showNotification(message, type = 'info') { // Créer une notification toast
-const notification = document.createElement('div');
-notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white max-w-sm transform transition-transform duration-300 translate-x-full`;
-
-switch (type) {
-case 'success': notification.classList.add('bg-green-500');
-break;
-case 'error': notification.classList.add('bg-red-500');
-break;
-case 'warning': notification.classList.add('bg-yellow-500');
-break;
-default: notification.classList.add('bg-blue-500');
-}
-
-notification.innerHTML = `
-        <div class="flex items-center justify-between">
-            <span>${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                ✕
-            </button>
-        </div>
-    `;
-
-document.body.appendChild(notification);
-
-// Animer l'entrée
-setTimeout(() => {
-notification.classList.remove('translate-x-full');
-}, 100);
-
-// Auto-suppression après 5 secondes
-setTimeout(() => {
-notification.classList.add('translate-x-full');
-setTimeout(() => notification.remove(), 300);
-}, 5000);
+}`);
 }
 	</script>
 {% endblock %}

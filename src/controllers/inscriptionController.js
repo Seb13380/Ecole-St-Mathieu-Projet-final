@@ -256,7 +256,7 @@ const inscriptionController = {
                     if (childData.firstName && childData.lastName && childData.birthDate) {
                         // 🎯 Attribution dynamique de la classe selon le niveau scolaire
                         let classeId = 1; // CP A par défaut
-                        
+
                         if (childData.schoolLevel) {
                             switch (childData.schoolLevel.toLowerCase()) {
                                 case 'cp':
