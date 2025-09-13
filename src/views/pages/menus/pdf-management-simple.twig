@@ -279,11 +279,12 @@ fileName.classList.add('hidden');
 }
 }
 
-		function confirmDelete(menuId, menuTitle) {
-			document.getElementById('menuTitle').textContent = menuTitle;
-			document.getElementById('deleteForm').action = `/admin/menus-pdf/${menuId}?_method=DELETE`;
-			document.getElementById('deleteModal').classList.remove('hidden');
-		}function closeDeleteModal() {
+function confirmDelete(menuId, menuTitle) {
+document.getElementById('menuTitle').textContent = menuTitle;
+document.getElementById('deleteForm').action = `/admin/menus-pdf/${menuId}?_method=DELETE`;
+document.getElementById('deleteModal').classList.remove('hidden');
+}
+function closeDeleteModal() {
 document.getElementById('deleteModal').classList.add('hidden');
 }
 

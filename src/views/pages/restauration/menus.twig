@@ -6,6 +6,7 @@
 {% block head %}
 	<style>
 		.menu-tab {
+			;
 			/* Les couleurs sont maintenant définies dynamiquement dans le template */
 		}
 
@@ -52,12 +53,12 @@
 									{% set isCurrentWeek = false %}
 									{% set statusClass = 'bg-gray-200 text-gray-700' %}
 									{% set statusIcon = '' %}
-									
+
 									{% if menu.dateDebut and menu.dateFin %}
 										{% set today = "now"|date('Y-m-d') %}
 										{% set menuStart = menu.dateDebut|date('Y-m-d') %}
 										{% set menuEnd = menu.dateFin|date('Y-m-d') %}
-										
+
 										{% if today >= menuStart and today <= menuEnd %}
 											{% set isCurrentWeek = true %}
 											{% set statusClass = 'bg-green-500 text-white' %}
@@ -70,9 +71,10 @@
 											{% set statusIcon = '⚪' %}
 										{% endif %}
 									{% endif %}
-									
+
 									<button onclick="showMenu({{ loop.index0 }})" class="menu-tab px-4 py-2 rounded-lg font-semibold transition-colors {{ statusClass }} {% if loop.first %}active{% endif %}" id="tab-{{ loop.index0 }}">
-										{{ statusIcon }} {{ menu.semaine }}
+										{{ statusIcon }}
+										{{ menu.semaine }}
 										{% if isCurrentWeek %}
 											<span class="block text-xs opacity-90">Semaine actuelle</span>
 										{% endif %}
@@ -208,11 +210,14 @@ const currentMenu = document.getElementById('currentMenu');
 if (prevBtn) 
 prevBtn.disabled = currentMenuIndex === 0;
 
+
 if (nextBtn) 
 nextBtn.disabled = currentMenuIndex === totalMenus - 1;
 
+
 if (currentMenu) 
 currentMenu.textContent = currentMenuIndex + 1;
+
 
 }
 
@@ -221,8 +226,10 @@ document.addEventListener('keydown', function (e) {
 if (e.key === 'ArrowLeft') 
 previousMenu();
 
+
 if (e.key === 'ArrowRight') 
 nextMenu();
+
 
 });
 
