@@ -97,11 +97,8 @@ const menuPdfController = {
 
             // Si ce menu est actif, désactiver les autres
             if (actif === 'on') {
-                console.log('🔄 Désactivation des anciens menus actifs...');
-                await prisma.menu.updateMany({
-                    where: { actif: true },
-                    data: { actif: false, statut: 'ARCHIVE' }
-                });
+                console.log('🔄 Nouveau menu actif créé - les autres restent tels quels');
+                // Note: On permet maintenant plusieurs menus actifs simultanément
             }
 
             // Utiliser les dates saisies par l'utilisateur, en s'assurant qu'elles sont correctement formatées
@@ -205,15 +202,11 @@ const menuPdfController = {
                 return res.redirect('/admin/menus-pdf?error=Menu non trouvé');
             }
 
-            // Si on active ce menu, désactiver les autres
+            // Si on active ce menu, ne plus désactiver les autres
+            // Note: Permet maintenant d'avoir plusieurs menus actifs simultanément
             if (!menu.actif) {
-                await prisma.menu.updateMany({
-                    where: {
-                        id: { not: parseInt(id) },
-                        actif: true
-                    },
-                    data: { actif: false, statut: 'PLANIFIE' }
-                });
+                console.log('🔄 Activation du menu - les autres restent tels quels');
+                // Les autres menus actifs restent actifs
             }
 
             // Basculer l'état du menu
@@ -242,15 +235,10 @@ const menuPdfController = {
 
             console.log(`🔄 Mise à jour du statut du menu ${id}:`, { statut, actif });
 
-            // Si on active ce menu, désactiver les autres
+            // Si on active ce menu, ne plus désactiver les autres automatiquement
             if (actif === 'true' || statut === 'ACTIF') {
-                await prisma.menu.updateMany({
-                    where: {
-                        id: { not: parseInt(id) },
-                        actif: true
-                    },
-                    data: { actif: false, statut: 'PLANIFIE' }
-                });
+                console.log('🔄 Activation du menu - les autres menus actifs restent actifs');
+                // Note: Permet maintenant d'avoir plusieurs menus actifs simultanément
             }
 
             const menuMisAJour = await prisma.menu.update({
@@ -312,11 +300,8 @@ const menuPdfController = {
     // Afficher les menus actifs (page publique)
     getPublicMenus: async (req, res) => {
         try {
-            const menuActif = await prisma.menu.findFirst({
-                where: {
-                    actif: true,
-                    statut: 'ACTIF'
-                },
+            // Récupérer tous les menus disponibles, triés par date
+            const todosLesMenus = await prisma.menu.findMany({
                 include: {
                     auteur: {
                         select: { firstName: true, lastName: true }
@@ -325,9 +310,68 @@ const menuPdfController = {
                 orderBy: { dateDebut: 'desc' }
             });
 
+            // Récupérer la semaine demandée via paramètre de requête
+            const semaineRequise = req.query.semaine;
+            let menuSelectionne = null;
+
+            if (semaineRequise) {
+                // Chercher le menu pour la semaine spécifique
+                menuSelectionne = todosLesMenus.find(menu => {
+                    const dateDebut = new Date(menu.dateDebut);
+                    const semaineFormat = dateDebut.toISOString().split('T')[0];
+                    return semaineFormat === semaineRequise;
+                });
+            }
+
+            // Si aucun menu spécifique demandé ou trouvé, prendre le menu actif ou le plus récent
+            if (!menuSelectionne) {
+                menuSelectionne = todosLesMenus.find(menu => menu.actif) || todosLesMenus[0];
+            }
+
+            // Préparer les données pour la navigation
+            const today = new Date();
+            const menusAvecNavigation = todosLesMenus.map(menu => {
+                const dateDebut = new Date(menu.dateDebut);
+                const dateFin = new Date(menu.dateFin);
+                const semaineId = dateDebut.toISOString().split('T')[0];
+
+                // Déterminer le statut temporel
+                let statutTemporel = 'future';
+                if (today >= dateDebut && today <= dateFin) {
+                    statutTemporel = 'presente';
+                } else if (today > dateFin) {
+                    statutTemporel = 'passee';
+                }
+
+                return {
+                    ...menu,
+                    semaineId,
+                    statutTemporel,
+                    nomSemaine: `${dateDebut.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} au ${dateFin.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                };
+            });
+
+            // Trouver les menus précédent et suivant
+            let menuPrecedent = null;
+            let menuSuivant = null;
+
+            if (menuSelectionne) {
+                const indexActuel = menusAvecNavigation.findIndex(m => m.id === menuSelectionne.id);
+                if (indexActuel > 0) {
+                    menuSuivant = menusAvecNavigation[indexActuel - 1]; // Plus récent
+                }
+                if (indexActuel < menusAvecNavigation.length - 1) {
+                    menuPrecedent = menusAvecNavigation[indexActuel + 1]; // Plus ancien
+                }
+            }
+
             res.render('pages/restauration/menus-pdf', {
                 title: 'École Saint-Mathieu - Menu de la semaine',
-                menu: menuActif
+                menu: menuSelectionne,
+                todosLesMenus: menusAvecNavigation,
+                menuPrecedent,
+                menuSuivant,
+                semaineActuelle: menuSelectionne ? menusAvecNavigation.find(m => m.id === menuSelectionne.id)?.semaineId : null
             });
         } catch (error) {
             console.error('❌ Erreur lors de la récupération du menu actif:', error);
@@ -337,21 +381,13 @@ const menuPdfController = {
         }
     },
 
-    // Activer un menu (désactive automatiquement les autres)
+    // Activer un menu (permet maintenant plusieurs menus actifs)
     activateMenu: async (req, res) => {
         try {
             const { id } = req.params;
 
-            // Désactiver tous les autres menus
-            await prisma.menu.updateMany({
-                where: {
-                    id: { not: parseInt(id) }
-                },
-                data: {
-                    actif: false,
-                    statut: 'PLANIFIE'
-                }
-            });
+            // Note: On ne désactive plus automatiquement les autres menus
+            // Cela permet d'avoir plusieurs menus actifs simultanément
 
             // Activer le menu sélectionné
             const menuActive = await prisma.menu.update({
@@ -362,7 +398,7 @@ const menuPdfController = {
                 }
             });
 
-            console.log('✅ Menu activé:', menuActive.semaine);
+            console.log('✅ Menu activé (les autres menus actifs restent actifs):', menuActive.semaine);
             res.redirect('/admin/menus-pdf?success=Menu activé avec succès');
 
         } catch (error) {

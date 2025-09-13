@@ -16,15 +16,69 @@ const menuController = {
                         select: { firstName: true, lastName: true }
                     }
                 },
-                orderBy: { createdAt: 'desc' }
+                orderBy: { dateDebut: 'asc' } // Tri par date de début (chronologique)
             });
 
             console.log(`📊 Menus actifs trouvés: ${menusActifs.length}`);
+
+            // Logique de sélection du menu par défaut selon la date actuelle
+            let menusOrdonnes = [];
+            const aujourdhui = new Date();
+            aujourdhui.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour comparaison de dates
+
+            console.log('📅 Date actuelle:', aujourdhui.toLocaleDateString('fr-FR'));
+
+            if (menusActifs.length > 0) {
+                // Séparer les menus par statut temporel
+                const menusSemaineCourante = [];
+                const menusAvenir = [];
+                const menusPasses = [];
+
+                menusActifs.forEach(menu => {
+                    if (!menu.dateDebut || !menu.dateFin) {
+                        // Menu sans dates définies - considéré comme actuel
+                        menusSemaineCourante.push(menu);
+                        return;
+                    }
+
+                    const dateDebut = new Date(menu.dateDebut);
+                    const dateFin = new Date(menu.dateFin);
+                    dateDebut.setHours(0, 0, 0, 0);
+                    dateFin.setHours(23, 59, 59, 999);
+
+                    if (aujourdhui >= dateDebut && aujourdhui <= dateFin) {
+                        // Menu de la semaine en cours
+                        menusSemaineCourante.push(menu);
+                        console.log(`📅 Menu semaine courante: ${menu.semaine}`);
+                    } else if (aujourdhui < dateDebut) {
+                        // Menu futur
+                        menusAvenir.push(menu);
+                        console.log(`📅 Menu futur: ${menu.semaine}`);
+                    } else {
+                        // Menu passé
+                        menusPasses.push(menu);
+                        console.log(`📅 Menu passé: ${menu.semaine}`);
+                    }
+                });
+
+                // Ordonner les menus : semaine courante en premier, puis futur, puis passé
+                menusOrdonnes = [
+                    ...menusSemaineCourante,
+                    ...menusAvenir.sort((a, b) => new Date(a.dateDebut) - new Date(b.dateDebut)),
+                    ...menusPasses.sort((a, b) => new Date(b.dateDebut) - new Date(a.dateDebut))
+                ];
+
+                console.log('📋 Ordre final des menus:');
+                menusOrdonnes.forEach((menu, index) => {
+                    console.log(`  ${index + 1}. ${menu.semaine} ${index === 0 ? '← AFFICHÉ PAR DÉFAUT' : ''}`);
+                });
+            }
+
             console.log('📍 Tentative de rendu du template...');
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',
-                menus: menusActifs // Maintenant on passe tous les menus actifs
+                menus: menusOrdonnes // Menus triés avec priorité à la semaine courante
             });
 
             console.log('✅ Template rendu avec succès');
