@@ -21,58 +21,21 @@ const menuController = {
 
             console.log(`📊 Menus actifs trouvés: ${menusActifs.length}`);
 
-            // Logique de sélection du menu par défaut selon la date actuelle
-            let menusOrdonnes = [];
-            const aujourdhui = new Date();
-            aujourdhui.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour comparaison de dates
+            // Simple tri chronologique par date de début
+            let menusOrdonnes = menusActifs.sort((a, b) => {
+                if (!a.dateDebut && !b.dateDebut) return 0;
+                if (!a.dateDebut) return 1;
+                if (!b.dateDebut) return -1;
+                return new Date(a.dateDebut) - new Date(b.dateDebut);
+            });
 
-            console.log('📅 Date actuelle:', aujourdhui.toLocaleDateString('fr-FR'));
-
-            if (menusActifs.length > 0) {
-                // Séparer les menus par statut temporel
-                const menusSemaineCourante = [];
-                const menusAvenir = [];
-                const menusPasses = [];
-
-                menusActifs.forEach(menu => {
-                    if (!menu.dateDebut || !menu.dateFin) {
-                        // Menu sans dates définies - considéré comme actuel
-                        menusSemaineCourante.push(menu);
-                        return;
-                    }
-
-                    const dateDebut = new Date(menu.dateDebut);
-                    const dateFin = new Date(menu.dateFin);
-                    dateDebut.setHours(0, 0, 0, 0);
-                    dateFin.setHours(23, 59, 59, 999);
-
-                    if (aujourdhui >= dateDebut && aujourdhui <= dateFin) {
-                        // Menu de la semaine en cours
-                        menusSemaineCourante.push(menu);
-                        console.log(`📅 Menu semaine courante: ${menu.semaine}`);
-                    } else if (aujourdhui < dateDebut) {
-                        // Menu futur
-                        menusAvenir.push(menu);
-                        console.log(`📅 Menu futur: ${menu.semaine}`);
-                    } else {
-                        // Menu passé
-                        menusPasses.push(menu);
-                        console.log(`📅 Menu passé: ${menu.semaine}`);
-                    }
-                });
-
-                // Ordonner les menus : semaine courante en premier, puis futur, puis passé
-                menusOrdonnes = [
-                    ...menusSemaineCourante,
-                    ...menusAvenir.sort((a, b) => new Date(a.dateDebut) - new Date(b.dateDebut)),
-                    ...menusPasses.sort((a, b) => new Date(b.dateDebut) - new Date(a.dateDebut))
-                ];
-
-                console.log('📋 Ordre final des menus:');
-                menusOrdonnes.forEach((menu, index) => {
-                    console.log(`  ${index + 1}. ${menu.semaine} ${index === 0 ? '← AFFICHÉ PAR DÉFAUT' : ''}`);
-                });
-            }
+            console.log('📅 Date actuelle:', new Date().toLocaleDateString('fr-FR'));
+            console.log('� Ordre chronologique des menus:');
+            menusOrdonnes.forEach((menu, index) => {
+                const debut = menu.dateDebut ? new Date(menu.dateDebut).toLocaleDateString('fr-FR') : 'Non définie';
+                const fin = menu.dateFin ? new Date(menu.dateFin).toLocaleDateString('fr-FR') : 'Non définie';
+                console.log(`  ${index + 1}. ${menu.semaine} (${debut} - ${fin})`);
+            });
 
             console.log('📍 Tentative de rendu du template...');
 

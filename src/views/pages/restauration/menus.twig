@@ -169,8 +169,59 @@
 
 	{% if menus|length > 1 %}
 		<script>
-			let currentMenuIndex = 0;
-const totalMenus = {{ menus|length }};
+			// Fonction pour trouver le menu par défaut le plus approprié
+			function findDefaultMenuIndex() {
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+				
+				const menus = [
+					{% for menu in menus %}
+					{
+						index: {{ loop.index0 }},
+						dateDebut: {% if menu.dateDebut %}'{{ menu.dateDebut|date('Y-m-d') }}'{% else %}null{% endif %},
+						dateFin: {% if menu.dateFin %}'{{ menu.dateFin|date('Y-m-d') }}'{% else %}null{% endif %},
+						semaine: '{{ menu.semaine|e('js') }}'
+					}{% if not loop.last %},{% endif %}
+					{% endfor %}
+				];
+				
+				// 1. Chercher le menu de la semaine en cours
+				for (let menu of menus) {
+					if (menu.dateDebut && menu.dateFin) {
+						const debut = new Date(menu.dateDebut);
+						const fin = new Date(menu.dateFin);
+						if (today >= debut && today <= fin) {
+							console.log('🎯 Menu de la semaine courante trouvé:', menu.semaine);
+							return menu.index;
+						}
+					}
+				}
+				
+				// 2. Chercher le menu futur le plus proche
+				let menuFuturProche = null;
+				for (let menu of menus) {
+					if (menu.dateDebut) {
+						const debut = new Date(menu.dateDebut);
+						if (today < debut) {
+							if (!menuFuturProche || debut < new Date(menuFuturProche.dateDebut)) {
+								menuFuturProche = menu;
+							}
+						}
+					}
+				}
+				
+				if (menuFuturProche) {
+					console.log('🔮 Menu futur le plus proche trouvé:', menuFuturProche.semaine);
+					return menuFuturProche.index;
+				}
+				
+				// 3. Sinon prendre le dernier menu (le plus récent)
+				console.log('📅 Aucun menu actuel/futur, utilisation du dernier menu');
+				return menus.length - 1;
+			}
+
+			let currentMenuIndex = findDefaultMenuIndex();
+			const totalMenus = {{ menus|length }};
 
 function showMenu(index) { // Masquer tous les menus
 document.querySelectorAll('.menu-content').forEach(content => {
@@ -233,9 +284,10 @@ nextMenu();
 
 });
 
-// Initialiser la navigation
+// Initialiser la navigation avec le menu par défaut
 document.addEventListener('DOMContentLoaded', function () {
-updateNavigation();
+	showMenu(currentMenuIndex); // Afficher le menu par défaut calculé
+	updateNavigation();
 });
 		</script>
 	{% endif %}
