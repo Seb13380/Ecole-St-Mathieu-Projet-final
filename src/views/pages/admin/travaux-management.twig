@@ -118,7 +118,7 @@
 
 					<!-- Actions -->
 					<div class="flex justify-end space-x-2">
-						<button onclick="editTravail({{ travail.id }})" class="text-indigo-600 hover:text-indigo-900">
+						<button onclick="editTravail({{ travail.id }}, '{{ travail.titre|e('js') }}', '{{ travail.description|e('js') }}', '{{ travail.dateDebutFormatted }}', '{{ travail.dateFinFormatted }}', {{ travail.progression }}, '{{ travail.statut }}', {{ travail.important ? 'true' : 'false' }}, {{ travail.visible ? 'true' : 'false' }})" class="text-indigo-600 hover:text-indigo-900">
 							<i class="fas fa-edit mr-1"></i>Modifier
 						</button>
 						<button onclick="toggleVisibility({{ travail.id }}, {{ travail.visible ? 'false' : 'true' }})" class="text-blue-600 hover:text-blue-900">
@@ -236,17 +236,27 @@ document.getElementById('travauxModal').classList.add('hidden');
 });
 
 // Éditer un travail
-function editTravail(travauxId) {
-isEditMode = true;
-currentTravauxId = travauxId;
-document.getElementById('modalTitle').textContent = 'Modifier le travail';
-document.getElementById('travauxForm').action = `/travaux/${travauxId}/update`;
+function editTravail(travauxId, titre, description, dateDebut, dateFin, progression, statut, important, visible) {
+	isEditMode = true;
+	currentTravauxId = travauxId;
+	document.getElementById('modalTitle').textContent = 'Modifier le travail';
+	document.getElementById('travauxForm').action = `/travaux/${travauxId}/update`;
 
-// Ici il faudrait récupérer les données du travail pour pré-remplir le formulaire
-document.getElementById('travauxModal').classList.remove('hidden');
-}
+	// Pré-remplir le formulaire avec les données
+	document.getElementById('titre').value = titre || '';
+	document.getElementById('description').value = description || '';
+	document.getElementById('dateDebut').value = dateDebut || '';
+	document.getElementById('dateFin').value = dateFin || '';
+	document.getElementById('progression').value = progression || 0;
+	document.getElementById('statut').value = statut || 'EN_COURS';
+	document.getElementById('important').checked = important === true || important === 'true';
+	document.getElementById('visible').checked = visible === true || visible === 'true';
+	
+	// Mettre à jour l'affichage de la progression
+	document.getElementById('progressionValue').textContent = (progression || 0) + '%';
 
-// Basculer la visibilité
+	document.getElementById('travauxModal').classList.remove('hidden');
+}// Basculer la visibilité
 function toggleVisibility(travauxId, newVisibility) {
 const form = document.createElement('form');
 form.method = 'POST';
