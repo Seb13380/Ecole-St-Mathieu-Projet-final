@@ -9,11 +9,19 @@ const getAgenda = async (req, res) => {
             return res.redirect('/auth/login');
         }
 
-        // Récupérer tous les événements visibles
+        // Récupérer les événements selon le rôle de l'utilisateur
+        let whereClause = {};
+
+        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE') {
+            // La direction voit tous les événements
+            whereClause = {};
+        } else {
+            // Les autres utilisateurs connectés ne voient que les événements visibles
+            whereClause = { visible: true };
+        }
+
         const events = await prisma.agendaEvent.findMany({
-            where: {
-                visible: true
-            },
+            where: whereClause,
             include: {
                 auteur: {
                     select: {
@@ -260,11 +268,11 @@ const toggleVisibility = async (req, res) => {
             }
         });
 
-        console.log(`👁️ Événement agenda ${event.visible ? 'affiché' : 'masqué'}:`, event.titre);
+        console.log(`👁️ Événement agenda ${event.visible ? 'ouvert aux connectés' : 'réservé direction'}:`, event.titre);
 
         res.json({
             success: true,
-            message: `Événement ${event.visible ? 'affiché' : 'masqué'} avec succès`,
+            message: `Événement ${event.visible ? 'ouvert aux personnes connectées' : 'réservé à la direction'} avec succès`,
             visible: event.visible
         });
 
@@ -285,10 +293,19 @@ const getEventsAPI = async (req, res) => {
             return res.status(401).json({ error: 'Non autorisé' });
         }
 
+        // Récupérer les événements selon le rôle de l'utilisateur
+        let whereClause = {};
+
+        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE') {
+            // La direction voit tous les événements
+            whereClause = {};
+        } else {
+            // Les autres utilisateurs connectés ne voient que les événements visibles
+            whereClause = { visible: true };
+        }
+
         const events = await prisma.agendaEvent.findMany({
-            where: {
-                visible: true
-            },
+            where: whereClause,
             include: {
                 auteur: {
                     select: {
