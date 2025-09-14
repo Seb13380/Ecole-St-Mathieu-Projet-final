@@ -3,6 +3,29 @@
 {% block title %}École Saint-Mathieu - Menus de la semaine
 {% endblock %}
 
+{% block head %}
+	<style>
+		.menu-tab {
+			;
+			/* Les couleurs sont maintenant définies dynamiquement dans le template */
+		}
+
+		.menu-tab.active {
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+			transform: translateY(-1px) !important;
+		}
+
+		.menu-tab:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		}
+
+		.menu-content {
+			transition: opacity 0.3s ease-in-out;
+		}
+	</style>
+{% endblock %}
+
 {% block main %}
 	<div class="container mx-auto px-4 py-8">
 		<div class="text-center mb-8">
@@ -16,39 +39,77 @@
 
 		{% if menus|length > 0 %}
 			<div class="w-full flex justify-center">
-				<div class="w-full max-w-8xl space-y-6">
+				<div class="w-full max-w-7xl bg-white rounded-lg shadow-lg p-6">
+					<div class="text-center mb-6">
+						<h3 class="text-3xl font-bold text-slate-800 mb-4">🍽️ Le Chef vous propose</h3>
+						<p class="text-lg text-gray-600 mb-4">{{ menus|length }}
+							menu{{ menus|length > 1 ? 's' : '' }}
+							de la semaine</p>
+
+						<!-- Navigation entre les menus -->
+						{% if menus|length > 1 %}
+							<div class="flex justify-center gap-4 mb-6 flex-wrap">
+								{% for menu in menus %}
+									{% set isCurrentWeek = false %}
+									{% set statusClass = 'bg-gray-200 text-gray-700' %}
+									{% set statusIcon = '' %}
+
+									{% if menu.dateDebut and menu.dateFin %}
+										{% set today = "now"|date('Y-m-d') %}
+										{% set menuStart = menu.dateDebut|date('Y-m-d') %}
+										{% set menuEnd = menu.dateFin|date('Y-m-d') %}
+
+										{% if today >= menuStart and today <= menuEnd %}
+											{% set isCurrentWeek = true %}
+											{% set statusClass = 'bg-green-500 text-white' %}
+											{% set statusIcon = '🟢' %}
+										{% elseif today < menuStart %}
+											{% set statusClass = 'bg-blue-500 text-white' %}
+											{% set statusIcon = '🔵' %}
+										{% else %}
+											{% set statusClass = 'bg-gray-400 text-white' %}
+											{% set statusIcon = '⚪' %}
+										{% endif %}
+									{% endif %}
+
+									<button onclick="showMenu({{ loop.index0 }})" class="menu-tab px-4 py-2 rounded-lg font-semibold transition-colors {{ statusClass }} {% if loop.first %}active{% endif %}" id="tab-{{ loop.index0 }}">
+										{{ statusIcon }}
+										{{ menu.semaine }}
+										{% if isCurrentWeek %}
+											<span class="block text-xs opacity-90">Semaine actuelle</span>
+										{% endif %}
+									</button>
+								{% endfor %}
+							</div>
+						{% endif %}
+					</div>
+
+					<!-- Affichage des menus -->
 					{% for menu in menus %}
-						<div class="bg-white rounded-lg shadow-lg p-6">
-							<div class="text-center mb-6">
-								<h3 class="text-2xl font-bold text-slate-800 mb-2">{{ menu.semaine }}</h3>
-								
+						<div class="menu-content {% if not loop.first %}hidden{% endif %}" id="menu-{{ loop.index0 }}">
+							<div class="text-center mb-4">
+								<h4 class="text-xl font-semibold text-slate-700">{{ menu.semaine }}</h4>
+								<p class="text-sm text-gray-500">Menu
+									{{ loop.index }}
+									sur
+									{{ menus|length }}</p>
 							</div>
 
 							{% if menu.imageUrls %}
 								{% set images = menu.imageUrls|json_decode %}
-								<div class="space-y-6">
+								<div class="space-y-4">
 									{% for imageUrl in images %}
-										<div class="w-full flex justify-center">
-											<img src="{{ imageUrl }}" alt="Menu de la semaine - Page {{ loop.index }}" class="max-w-full h-auto rounded-lg shadow-lg border border-gray-200" style="max-height: 1000px;">
+										<div class="w-full">
+											<img src="{{ imageUrl }}" alt="Menu {{ menu.semaine }} - Page {{ loop.index }}" class="w-full h-auto rounded-lg shadow-lg border border-gray-200" style="max-height: 600px; object-fit: contain; background: white;">
 										</div>
 									{% endfor %}
 								</div>
 							{% elseif menu.pdfUrl %}
-								<div class="w-full bg-white rounded-lg p-6 shadow-lg">
-									<style>
-										.pdf-viewer {
-											background: white !important;
-											border-radius: 8px;
-											overflow: hidden;
-										}
-										.pdf-viewer iframe {
-											background: white !important;
-										}
-									</style>
+								<div class="w-full bg-white rounded-lg p-4 shadow-lg">
 									<div class="pdf-viewer">
-										<iframe src="{{ menu.pdfUrl }}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom=110" width="100%" height="1100" style="border: none; background: white !important; border-radius: 8px;" frameborder="0" allowfullscreen></iframe>
+										<iframe src="{{ menu.pdfUrl }}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom=120" width="100%" height="600" style="border: none; background: white; border-radius: 8px;" frameborder="0" allowfullscreen></iframe>
 									</div>
-									<div class="text-center mt-4">
+									<div class="text-center mt-3">
 										<p class="text-sm text-gray-500">
 											💡 Pour une meilleure lisibilité, vous pouvez zoomer avec Ctrl + molette
 										</p>
@@ -58,11 +119,32 @@
 								<div class="text-center p-12 bg-gradient-to-b from-blue-50 to-white rounded-lg border border-blue-100">
 									<div class="text-6xl mb-4">🍽️</div>
 									<h4 class="text-xl font-semibold text-slate-800 mb-2">Menu en préparation</h4>
-									<p class="text-gray-600">Le Chef prépare le menu de la semaine.<br>Il sera disponible très prochainement.</p>
+									<p class="text-gray-600">Le Chef prépare le menu
+										{{ menu.semaine }}.<br>Il sera disponible très prochainement.</p>
 								</div>
 							{% endif %}
 						</div>
 					{% endfor %}
+
+					<!-- Navigation précédent/suivant -->
+					{% if menus|length > 1 %}
+						<div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
+							<button onclick="previousMenu()" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="prevBtn">
+								← Précédent
+							</button>
+
+							<div class="text-center">
+								<span class="text-gray-600">Menu
+									<span id="currentMenu">1</span>
+									sur
+									{{ menus|length }}</span>
+							</div>
+
+							<button onclick="nextMenu()" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="nextBtn">
+								Suivant →
+							</button>
+						</div>
+					{% endif %}
 				</div>
 			</div>
 		{% else %}
@@ -75,7 +157,6 @@
 			</div>
 		{% endif %}
 
-
 		<div class="text-center mt-8">
 			<a href="https://www.dupont-restauration.fr/" target="_blank" class="inline-flex items-center px-6 py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors">
 				<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -85,4 +166,136 @@
 			</a>
 		</div>
 	</div>
+
+	{% if menus|length > 1 %}
+		<script>
+			// Fonction pour trouver le menu par défaut le plus approprié
+function findDefaultMenuIndex() {
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const menus = [{% for menu in menus %}
+{
+index: {{ loop.index0 }},
+dateDebut:{% if menu.dateDebut %}'{{ menu.dateDebut|date('Y-m-d') }}'
+{% else %}
+null{% endif %},
+dateFin:{% if menu.dateFin %}'{{ menu.dateFin|date('Y-m-d') }}'
+{% else %}
+null{% endif %},
+semaine: '{{ menu.semaine|e('js') }}'
+}
+{% if not loop.last %},{% endif %}{% endfor %}];
+
+// 1. Chercher le menu de la semaine en cours
+for (let menu of menus) {
+if (menu.dateDebut && menu.dateFin) {
+const debut = new Date(menu.dateDebut);
+const fin = new Date(menu.dateFin);
+if (today >= debut && today <= fin) {
+console.log('🎯 Menu de la semaine courante trouvé:', menu.semaine);
+return menu.index;
+}
+}
+}
+
+// 2. Chercher le menu futur le plus proche
+let menuFuturProche = null;
+for (let menu of menus) {
+if (menu.dateDebut) {
+const debut = new Date(menu.dateDebut);
+if (today < debut) {
+if (! menuFuturProche || debut < new Date(menuFuturProche.dateDebut)) {
+menuFuturProche = menu;
+}
+}
+}
+}
+
+if (menuFuturProche) {
+console.log('🔮 Menu futur le plus proche trouvé:', menuFuturProche.semaine);
+return menuFuturProche.index;
+}
+
+// 3. Sinon prendre le dernier menu (le plus récent)
+console.log('📅 Aucun menu actuel/futur, utilisation du dernier menu');
+return menus.length - 1;
+}
+
+let currentMenuIndex = findDefaultMenuIndex();
+const totalMenus = {{ menus|length }};
+
+function showMenu(index) { // Masquer tous les menus
+document.querySelectorAll('.menu-content').forEach(content => {
+content.classList.add('hidden');
+});
+
+// Désactiver tous les onglets
+document.querySelectorAll('.menu-tab').forEach(tab => {
+tab.classList.remove('active');
+});
+
+// Afficher le menu sélectionné
+document.getElementById('menu-' + index).classList.remove('hidden');
+document.getElementById('tab-' + index).classList.add('active');
+
+currentMenuIndex = index;
+updateNavigation();
+}
+
+function nextMenu() {
+if (currentMenuIndex < totalMenus - 1) {
+showMenu(currentMenuIndex + 1);
+}
+}
+
+function previousMenu() {
+if (currentMenuIndex > 0) {
+showMenu(currentMenuIndex - 1);
+}
+}
+
+function updateNavigation() {
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const currentMenu = document.getElementById('currentMenu');
+
+if (prevBtn) 
+prevBtn.disabled = currentMenuIndex === 0;
+
+
+
+if (nextBtn) 
+nextBtn.disabled = currentMenuIndex === totalMenus - 1;
+
+
+
+if (currentMenu) 
+currentMenu.textContent = currentMenuIndex + 1;
+
+
+
+}
+
+// Navigation au clavier
+document.addEventListener('keydown', function (e) {
+if (e.key === 'ArrowLeft') 
+previousMenu();
+
+
+
+if (e.key === 'ArrowRight') 
+nextMenu();
+
+
+
+});
+
+// Initialiser la navigation avec le menu par défaut
+document.addEventListener('DOMContentLoaded', function () {
+showMenu(currentMenuIndex); // Afficher le menu par défaut calculé
+updateNavigation();
+});
+		</script>
+	{% endif %}
 {% endblock %}

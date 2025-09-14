@@ -59,7 +59,7 @@ const actualiteController = {
       console.log('📝 Données reçues pour création:', req.body);
       console.log('📁 Fichier reçu:', req.file);
 
-      const { titre, contenu, important, visible, datePublication } = req.body;
+      const { titre, contenu, important, visible, datePublication, lienUrl, lienTexte } = req.body;
       const auteurId = req.session.user.id;
 
       // Gestion de la date de publication
@@ -84,6 +84,8 @@ const actualiteController = {
           auteurId,
           mediaUrl,
           mediaType,
+          lienUrl: lienUrl && lienUrl.trim() ? lienUrl.trim() : null,
+          lienTexte: lienTexte && lienTexte.trim() ? lienTexte.trim() : null,
           important: important === 'true',
           visible: visible === 'true',
           datePublication: datePublicationFinal
@@ -157,12 +159,14 @@ const actualiteController = {
         file: req.file
       });
 
-      const { titre, contenu, important, visible } = req.body;
+      const { titre, contenu, important, visible, lienUrl, lienTexte } = req.body;
 
       // Préparer les données de mise à jour
       const updateData = {
         titre,
         contenu,
+        lienUrl: lienUrl && lienUrl.trim() ? lienUrl.trim() : null,
+        lienTexte: lienTexte && lienTexte.trim() ? lienTexte.trim() : null,
         important: important === 'true',
         visible: visible === 'true'
       };

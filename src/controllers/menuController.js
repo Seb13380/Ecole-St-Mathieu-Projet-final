@@ -16,15 +16,32 @@ const menuController = {
                         select: { firstName: true, lastName: true }
                     }
                 },
-                orderBy: { createdAt: 'desc' }
+                orderBy: { dateDebut: 'asc' } // Tri par date de début (chronologique)
             });
 
             console.log(`📊 Menus actifs trouvés: ${menusActifs.length}`);
+
+            // Simple tri chronologique par date de début
+            let menusOrdonnes = menusActifs.sort((a, b) => {
+                if (!a.dateDebut && !b.dateDebut) return 0;
+                if (!a.dateDebut) return 1;
+                if (!b.dateDebut) return -1;
+                return new Date(a.dateDebut) - new Date(b.dateDebut);
+            });
+
+            console.log('📅 Date actuelle:', new Date().toLocaleDateString('fr-FR'));
+            console.log('� Ordre chronologique des menus:');
+            menusOrdonnes.forEach((menu, index) => {
+                const debut = menu.dateDebut ? new Date(menu.dateDebut).toLocaleDateString('fr-FR') : 'Non définie';
+                const fin = menu.dateFin ? new Date(menu.dateFin).toLocaleDateString('fr-FR') : 'Non définie';
+                console.log(`  ${index + 1}. ${menu.semaine} (${debut} - ${fin})`);
+            });
+
             console.log('📍 Tentative de rendu du template...');
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',
-                menus: menusActifs // Maintenant on passe tous les menus actifs
+                menus: menusOrdonnes // Menus triés avec priorité à la semaine courante
             });
 
             console.log('✅ Template rendu avec succès');

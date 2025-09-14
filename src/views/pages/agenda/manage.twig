@@ -3,7 +3,7 @@
 {% block main %}
 	<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
 		<div
-			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
 			<!-- En-tête -->
 			<div class="text-center mb-8">
@@ -71,10 +71,10 @@
 							<tbody class="bg-white divide-y divide-gray-200">
 								{% for event in events %}
 									<tr class="hover:bg-gray-50">
-										<td class="px-6 py-4 whitespace-nowrap">
+										<td class="px-6 py-4">
 											<div class="flex items-center">
 												<div class="w-4 h-4 rounded-full mr-3" style="background-color: {{ event.couleur }}"></div>
-												<div>
+												<div class="min-w-0 flex-1">
 													<div class="text-sm font-medium text-gray-900">
 														{{ event.titre }}
 														{% if event.important %}
@@ -84,7 +84,7 @@
 														{% endif %}
 													</div>
 													{% if event.description %}
-														<div class="text-sm text-gray-500 max-w-xs truncate">{{ event.description }}</div>
+														<div class="text-sm text-gray-500 mt-1">{{ event.description }}</div>
 													{% endif %}
 												</div>
 											</div>
@@ -111,8 +111,8 @@
 											{{ event.lieu|default('Non spécifié') }}
 										</td>
 										<td class="px-6 py-4 whitespace-nowrap">
-											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ event.visible ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-												{{ event.visible ? '👁️ Visible' : '👁️‍🗨️ Masqué' }}
+											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ event.visible ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800' }}">
+												{{ event.visible ? '� Personnes connectées' : '�‍� Direction seulement' }}
 											</span>
 										</td>
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -125,7 +125,7 @@
 													✏️ Modifier
 												</button>
 												<button onclick="toggleVisibility({{ event.id }})" class="text-blue-600 hover:text-blue-900">
-													{{ event.visible ? '👁️‍🗨️ Masquer' : '👁️ Afficher' }}
+													{{ event.visible ? '�‍� Réserver direction' : '� Ouvrir aux connectés' }}
 												</button>
 												<button onclick="deleteEvent({{ event.id }})" class="text-red-600 hover:text-red-900">
 													🗑️ Supprimer
@@ -218,7 +218,7 @@
 								</label>
 								<label class="flex items-center">
 									<input type="checkbox" id="visible" name="visible" checked class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-									<span class="ml-2 text-sm text-gray-700">Visible publiquement</span>
+									<span class="ml-2 text-sm text-gray-700">Visible pour les personnes connectées</span>
 								</label>
 							</div>
 						</div>

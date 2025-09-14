@@ -62,6 +62,39 @@
     .Btn:hover {
         animation: jello-horizontal 0.9s both;
     }
+
+    /* Solution pour menus dropdowns multiples actifs */
+    .multi-dropdown {
+        position: relative;
+    }
+
+    .multi-dropdown:hover .dropdown-content {
+        display: block !important;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .multi-dropdown .dropdown-content {
+        display: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease-in-out;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 50;
+    }
+
+    /* Support pour les dashboards spécifiques */
+    .dashboard-nav .multi-dropdown:hover .dropdown-content,
+    .frank-nav .multi-dropdown:hover .dropdown-content,
+    .lionel-nav .multi-dropdown:hover .dropdown-content {
+        display: block !important;
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 /* Animation pour le logo Educartable */

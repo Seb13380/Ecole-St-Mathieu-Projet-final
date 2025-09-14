@@ -1,207 +1,227 @@
 {% extends "layouts/base.twig" %}
 
 {% block main %}
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- En-tête -->
-        <div class="text-center mb-8">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-                <h1 class="text-4xl font-bold text-slate-800 mb-2">
-                    📅 Agenda Scolaire
-                </h1>
-                <p class="text-xl text-slate-600">
-                    Tous les événements importants de l'école
-                </p>
-                <div class="text-3xl mt-4">🗓️</div>
-            </div>
-        </div>
+	<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+		<div
+			class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- Bouton de gestion pour les admins -->
-        {% if user.role == 'DIRECTION' or user.role == 'GESTIONNAIRE_SITE' %}
-            <div class="text-center mb-6">
-                <a href="/agenda/manage" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                    ⚙️ Gérer l'agenda
-                </a>
-            </div>
-        {% endif %}
+			<!-- En-tête -->
+			<div class="text-center mb-8">
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+					<h1 class="text-4xl font-bold text-slate-800 mb-2">
+						📅 Agenda Scolaire
+					</h1>
+					<p class="text-xl text-slate-600">
+						Tous les événements importants de l'école
+					</p>
+					<div class="text-3xl mt-4">🗓️</div>
+				</div>
+			</div>
 
-        <!-- Calendrier interactif -->
-        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-8">
-            <div id="calendar"></div>
-        </div>
+			<!-- Bouton de gestion pour les admins -->
+			{% if user.role == 'DIRECTION' or user.role == 'GESTIONNAIRE_SITE' %}
+				<div class="text-center mb-6">
+					<a href="/agenda/manage" class="inline-flex items-center px-6 py-3 bg-[#a7e3dd] text-[#2d5a57] font-semibold rounded-lg hover:bg-[#7dd3d8] hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 border-2 border-[#6dc5be]">
+						⚙️ Gérer l'agenda
+					</a>
+				</div>
+			{% endif %}
 
-        <!-- Événements à venir -->
-        {% if upcomingEvents|length > 0 %}
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
-                    <span class="mr-3">📋</span>
-                    Événements à venir
-                </h2>
-                <div class="grid gap-4 max-w-4xl mx-auto">
-                    {% for event in upcomingEvents %}
-                        <div class="bg-white shadow-md border-l-4 {{ event.important ? 'border-red-500' : 'border-blue-500' }} p-6 hover:shadow-lg transition-all duration-300 rounded-r-lg">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <div class="flex items-center mb-2">
-                                        <h3 class="text-xl font-bold text-slate-800" style="color: {{ event.couleur }}">
-                                            {{ event.titre }}
-                                        </h3>
-                                        {% if event.important %}
-                                            <span class="ml-2 bg-red-100 text-red-800 px-2 py-1 text-xs font-medium rounded">
-                                                ⚠️ IMPORTANT
-                                            </span>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    {% if event.description %}
-                                        <p class="text-slate-600 mb-3">{{ event.description }}</p>
-                                    {% endif %}
-                                    
-                                    <div class="flex flex-wrap gap-4 text-sm text-slate-500">
-                                        <div class="flex items-center">
-                                            <span class="mr-1">📅</span>
-                                            {{ event.dateDebut|date('d/m/Y') }}
-                                            {% if event.dateFin and event.dateFin != event.dateDebut %}
-                                                - {{ event.dateFin|date('d/m/Y') }}
-                                            {% endif %}
-                                        </div>
-                                        
-                                        {% if event.heureDebut %}
-                                            <div class="flex items-center">
-                                                <span class="mr-1">🕒</span>
-                                                {{ event.heureDebut }}
-                                                {% if event.heureFin %}
-                                                    - {{ event.heureFin }}
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
-                                        
-                                        {% if event.lieu %}
-                                            <div class="flex items-center">
-                                                <span class="mr-1">📍</span>
-                                                {{ event.lieu }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <div class="text-xs text-slate-400 mt-2">
-                                        Publié par {{ event.auteur.firstName }} {{ event.auteur.lastName }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
+			<!-- Calendrier interactif -->
+			<div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-8">
+				<div id="calendar"></div>
+			</div>
 
-        <!-- Événements passés -->
-        {% if pastEvents|length > 0 %}
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
-                    <span class="mr-3">📚</span>
-                    Événements passés
-                </h2>
-                <div class="grid gap-3 max-w-4xl mx-auto">
-                    {% for event in pastEvents|slice(0, 5) %}
-                        <div class="bg-gray-50 shadow-sm border-l-4 border-gray-400 p-4 hover:shadow-md transition-all duration-300 rounded-r-lg opacity-75">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-slate-700 mb-1">
-                                        {{ event.titre }}
-                                    </h3>
-                                    
-                                    <div class="flex flex-wrap gap-3 text-sm text-slate-500">
-                                        <div class="flex items-center">
-                                            <span class="mr-1">📅</span>
-                                            {{ event.dateDebut|date('d/m/Y') }}
-                                        </div>
-                                        
-                                        {% if event.lieu %}
-                                            <div class="flex items-center">
-                                                <span class="mr-1">📍</span>
-                                                {{ event.lieu }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                    
-                    {% if pastEvents|length > 5 %}
-                        <div class="text-center text-slate-500 text-sm">
-                            ... et {{ pastEvents|length - 5 }} autres événements passés
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
+			<!-- Événements à venir -->
+			{% if upcomingEvents|length > 0 %}
+				<div class="mb-8">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+						<span class="mr-3">📋</span>
+						Événements à venir
+					</h2>
+					<div class="grid gap-4 max-w-4xl mx-auto">
+						{% for event in upcomingEvents %}
+							<div class="bg-white shadow-md border-l-4 {{ event.important ? 'border-red-500' : 'border-blue-500' }} p-6 hover:shadow-lg transition-all duration-300 rounded-r-lg">
+								<div class="flex justify-between items-start">
+									<div class="flex-1">
+										<div class="flex items-center mb-2">
+											<h3 class="text-xl font-bold text-slate-800" style="color: {{ event.couleur }}">
+												{{ event.titre }}
+											</h3>
+											{% if event.important %}
+												<span class="ml-2 bg-red-100 text-red-800 px-2 py-1 text-xs font-medium rounded">
+													⚠️ IMPORTANT
+												</span>
+											{% endif %}
+										</div>
 
-        <!-- Aucun événement -->
-        {% if upcomingEvents|length == 0 and pastEvents|length == 0 %}
-            <div class="text-center py-12">
-                <div class="bg-white shadow-md border-l-4 border-gray-300 p-8 max-w-md mx-auto rounded-r-lg">
-                    <div class="text-gray-400 text-6xl mb-4">📅</div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">Aucun événement</h3>
-                    <p class="text-slate-600">L'agenda est actuellement vide</p>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</div>
+										{% if event.description %}
+											<p class="text-slate-600 mb-3">{{ event.description }}</p>
+										{% endif %}
 
-<!-- FullCalendar CSS et JS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/fr.global.min.js"></script>
+										<div class="flex flex-wrap gap-4 text-sm text-slate-500">
+											<div class="flex items-center">
+												<span class="mr-1">📅</span>
+												{{ event.dateDebut|date('d/m/Y') }}
+												{% if event.dateFin and event.dateFin != event.dateDebut %}
+													-
+													{{ event.dateFin|date('d/m/Y') }}
+												{% endif %}
+											</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const calendarEl = document.getElementById('calendar');
-    
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'fr',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek'
-        },
-        buttonText: {
-            today: 'Aujourd\'hui',
-            month: 'Mois',
-            week: 'Semaine',
-            list: 'Liste'
-        },
-        height: 'auto',
-        events: '/agenda/api/events',
-        eventClick: function(info) {
-            // Afficher les détails de l'événement
-            const event = info.event;
-            let details = `<strong>${event.title}</strong><br>`;
-            
-            if (event.extendedProps.description) {
-                details += `<br>${event.extendedProps.description}<br>`;
-            }
-            
-            details += `<br><strong>📅 Date:</strong> ${event.start.toLocaleDateString('fr-FR')}`;
-            
-            if (event.end && event.end.toDateString() !== event.start.toDateString()) {
-                details += ` - ${event.end.toLocaleDateString('fr-FR')}`;
-            }
-            
-            if (event.extendedProps.lieu) {
-                details += `<br><strong>📍 Lieu:</strong> ${event.extendedProps.lieu}`;
-            }
-            
-            details += `<br><br><small>Publié par ${event.extendedProps.auteur}</small>`;
-            
-            // Créer une modal simple
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            modal.innerHTML = `
+											{% if event.heureDebut %}
+												<div class="flex items-center">
+													<span class="mr-1">🕒</span>
+													{{ event.heureDebut }}
+													{% if event.heureFin %}
+														-
+														{{ event.heureFin }}
+													{% endif %}
+												</div>
+											{% endif %}
+
+											{% if event.lieu %}
+												<div class="flex items-center">
+													<span class="mr-1">📍</span>
+													{{ event.lieu }}
+												</div>
+											{% endif %}
+										</div>
+
+										<div class="text-xs text-slate-400 mt-2">
+											Publié par
+											{{ event.auteur.firstName }}
+											{{ event.auteur.lastName }}
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Événements passés -->
+			{% if pastEvents|length > 0 %}
+				<div class="mb-8">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+						<span class="mr-3">📚</span>
+						Événements passés
+					</h2>
+					<div class="grid gap-3 max-w-4xl mx-auto">
+						{% for event in pastEvents|slice(0, 5) %}
+							<div class="bg-gray-50 shadow-sm border-l-4 border-gray-400 p-4 hover:shadow-md transition-all duration-300 rounded-r-lg opacity-75">
+								<div class="flex justify-between items-start">
+									<div class="flex-1">
+										<h3 class="text-lg font-semibold text-slate-700 mb-1">
+											{{ event.titre }}
+										</h3>
+
+										<div class="flex flex-wrap gap-3 text-sm text-slate-500">
+											<div class="flex items-center">
+												<span class="mr-1">📅</span>
+												{{ event.dateDebut|date('d/m/Y') }}
+											</div>
+
+											{% if event.lieu %}
+												<div class="flex items-center">
+													<span class="mr-1">📍</span>
+													{{ event.lieu }}
+												</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+
+						{% if pastEvents|length > 5 %}
+							<div class="text-center text-slate-500 text-sm">
+								... et
+								{{ pastEvents|length - 5 }}
+								autres événements passés
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Aucun événement -->
+			{% if upcomingEvents|length == 0 and pastEvents|length == 0 %}
+				<div class="text-center py-12">
+					<div class="bg-white shadow-md border-l-4 border-gray-300 p-8 max-w-md mx-auto rounded-r-lg">
+						<div class="text-gray-400 text-6xl mb-4">📅</div>
+						<h3 class="text-xl font-bold text-slate-800 mb-2">Aucun événement</h3>
+						<p class="text-slate-600">L'agenda est actuellement vide</p>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- FullCalendar CSS et JS -->
+	<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/fr.global.min.js"></script>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const calendarEl = document.getElementById('calendar');
+
+const calendar = new FullCalendar.Calendar(calendarEl, {
+initialView: 'dayGridMonth',
+locale: 'fr',
+headerToolbar: {
+left: 'title',
+center: '',
+right: 'prev,next today dayGridMonth,timeGridWeek,listWeek'
+},
+buttonText: {
+today: 'Aujourd\'hui',
+month: 'Mois',
+week: 'Semaine',
+list: 'Liste',
+prev: '◀ Précédent',
+next: 'Suivant ▶'
+},
+height: 'auto',
+events: '/agenda/api/events',
+eventClick: function (info) { // Afficher les détails de l'événement
+const event = info.event;
+let details = `<strong>${
+event.title
+}</strong><br>`;
+
+if (event.extendedProps.description) {
+details += `<br>${
+event.extendedProps.description
+}<br>`;
+}
+
+details += `<br><strong>📅 Date:</strong> ${
+event.start.toLocaleDateString('fr-FR')
+}`;
+
+if (event.end && event.end.toDateString() !== event.start.toDateString()) {
+details += ` - ${
+event.end.toLocaleDateString('fr-FR')
+}`;
+}
+
+if (event.extendedProps.lieu) {
+details += `<br><strong>📍 Lieu:</strong> ${
+event.extendedProps.lieu
+}`;
+}
+
+details += `<br><br><small>Publié par ${
+event.extendedProps.auteur
+}</small>`;
+
+// Créer une modal simple
+const modal = document.createElement('div');
+modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+modal.innerHTML = `
                 <div class="bg-white rounded-lg p-6 max-w-md mx-4">
                     <div class="mb-4">${details}</div>
                     <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
@@ -209,18 +229,260 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 </div>
             `;
-            document.body.appendChild(modal);
-        },
-        eventDidMount: function(info) {
-            // Ajouter un indicateur pour les événements importants
-            if (info.event.extendedProps.important) {
-                info.el.style.border = '2px solid #ef4444';
-                info.el.style.fontWeight = 'bold';
-            }
-        }
-    });
-    
-    calendar.render();
+document.body.appendChild(modal);
+},
+eventDidMount: function (info) { // Ajouter un indicateur pour les événements importants
+if (info.event.extendedProps.important) {
+info.el.style.border = '2px solid #ef4444';
+info.el.style.fontWeight = 'bold';
+}
+}
 });
-</script>
+
+calendar.render();
+});
+	</script>
+
+	<!-- CSS personnalisé pour améliorer l'affichage du calendrier -->
+	<style>
+		/* Styles CSS purs pour les boutons FullCalendar - pas de JavaScript ! */
+
+		/* Tous les boutons FullCalendar */
+		.fc .fc-button,
+		.fc .fc-button:not(:disabled),
+		.fc .fc-button-primary {
+			min-width: 100px !important;
+			min-height: 48px !important;
+			padding: 12px 20px !important;
+			font-size: 16px !important;
+			font-weight: 600 !important;
+			line-height: 1.2 !important;
+			border-radius: 8px !important;
+			border: 2px solid #5fb3ac !important;
+			background: linear-gradient(135deg, #5fb3ac 0%, #4a9b94 100%) !important;
+			color: white !important;
+			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+			box-shadow: 0 2px 4px rgba(95, 179, 172, 0.3) !important;
+			transition: all 0.2s ease !important;
+			cursor: pointer !important;
+			font-family: system-ui, -apple-system, sans-serif !important;
+		}
+
+		/* États hover et focus */
+		.fc .fc-button:hover,
+		.fc .fc-button:not(:disabled):hover {
+			background: linear-gradient(135deg, #4a9b94 0%, #3d807a 100%) !important;
+			border-color: #4a9b94 !important;
+			transform: translateY(-1px) !important;
+			box-shadow: 0 4px 8px rgba(95, 179, 172, 0.4) !important;
+		}
+
+		.fc .fc-button:focus,
+		.fc .fc-button:not(:disabled):focus {
+			outline: 3px solid rgba(167, 227, 221, 0.6) !important;
+			outline-offset: 2px !important;
+		}
+
+		.fc .fc-button:active,
+		.fc .fc-button:not(:disabled):active {
+			transform: translateY(0) !important;
+			box-shadow: 0 2px 4px rgba(95, 179, 172, 0.3) !important;
+		}
+
+		/* Boutons de navigation - Previous/Next */
+		.fc .fc-prev-button,
+		.fc .fc-next-button {
+			min-width: 140px !important;
+			min-height: 52px !important;
+			padding: 15px 25px !important;
+			font-size: 18px !important;
+			border-radius: 10px !important;
+			background: linear-gradient(135deg, #6dc5be 0%, #5fb3ac 100%) !important;
+			border-color: #6dc5be !important;
+			box-shadow: 0 3px 6px rgba(109, 197, 190, 0.3) !important;
+		}
+
+		.fc .fc-prev-button:hover,
+		.fc .fc-next-button:hover {
+			background: linear-gradient(135deg, #5fb3ac 0%, #4a9b94 100%) !important;
+			border-color: #5fb3ac !important;
+			box-shadow: 0 5px 10px rgba(109, 197, 190, 0.4) !important;
+		}
+
+		/* Bouton Today/Aujourd'hui */
+		.fc .fc-today-button {
+			min-width: 140px !important;
+			min-height: 50px !important;
+			padding: 14px 28px !important;
+			font-size: 17px !important;
+			background: linear-gradient(135deg, #a7e3dd 0%, #7dd3d8 100%) !important;
+			border-color: #a7e3dd !important;
+			font-weight: 700 !important;
+			box-shadow: 0 3px 6px rgba(167, 227, 221, 0.4) !important;
+			color: #2d5a57 !important;
+		}
+
+		.fc .fc-today-button:hover {
+			background: linear-gradient(135deg, #7dd3d8 0%, #5fb3ac 100%) !important;
+			border-color: #7dd3d8 !important;
+			box-shadow: 0 5px 10px rgba(167, 227, 221, 0.5) !important;
+			color: white !important;
+		}
+
+		/* Boutons de vue - Month/Week/List */
+		.fc .fc-dayGridMonth-button,
+		.fc .fc-timeGridWeek-button,
+		.fc .fc-listWeek-button {
+			min-width: 110px !important;
+			min-height: 46px !important;
+			background: linear-gradient(135deg, #7dd3d8 0%, #6dc5be 100%) !important;
+			border-color: #7dd3d8 !important;
+			box-shadow: 0 2px 4px rgba(125, 211, 216, 0.3) !important;
+		}
+
+		.fc .fc-dayGridMonth-button:hover,
+		.fc .fc-timeGridWeek-button:hover,
+		.fc .fc-listWeek-button:hover {
+			background: linear-gradient(135deg, #6dc5be 0%, #5fb3ac 100%) !important;
+			border-color: #6dc5be !important;
+		}
+
+		/* Bouton actif/sélectionné */
+		.fc .fc-button-active,
+		.fc .fc-button-primary:disabled {
+			background: linear-gradient(135deg, #3d807a 0%, #2d5a57 100%) !important;
+			border-color: #3d807a !important;
+			box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+			color: white !important;
+		}
+
+		/* Amélioration du titre du calendrier */
+		.fc .fc-toolbar-title {
+			font-size: 2.2rem !important;
+			font-weight: 800 !important;
+			color: #2d5a57 !important;
+			margin: 0 !important;
+			text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+			text-align: left !important;
+		}
+
+		/* Amélioration de la toolbar */
+		.fc .fc-toolbar {
+			margin-bottom: 2rem !important;
+			padding: 20px !important;
+			background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+			border-radius: 15px !important;
+			border: 1px solid #e2e8f0 !important;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+			display: flex !important;
+			flex-direction: column !important;
+			gap: 15px !important;
+		}
+
+		.fc .fc-toolbar-chunk {
+			display: flex !important;
+			align-items: center !important;
+			gap: 15px !important;
+			justify-content: flex-end !important;
+		}
+
+		.fc .fc-toolbar-chunk:first-child {
+			justify-content: flex-start !important;
+			margin-bottom: 10px !important;
+		}
+
+		/* Améliorations responsive */
+		@media(max-width: 768px) {
+			.fc .fc-button {
+				min-width: 80px !important;
+				min-height: 42px !important;
+				padding: 10px 16px !important;
+				font-size: 14px !important;
+			}
+
+			.fc .fc-prev-button,
+			.fc .fc-next-button {
+				min-width: 90px !important;
+				min-height: 46px !important;
+				padding: 12px 18px !important;
+				font-size: 16px !important;
+			}
+
+			.fc .fc-today-button {
+				min-width: 100px !important;
+				padding: 12px 20px !important;
+				font-size: 15px !important;
+			}
+
+			.fc .fc-toolbar-title {
+				font-size: 1.7rem !important;
+				margin-bottom: 15px !important;
+			}
+
+			.fc .fc-toolbar {
+				padding: 15px !important;
+			}
+
+			.fc .fc-toolbar-chunk {
+				gap: 10px !important;
+				flex-wrap: wrap !important;
+				justify-content: center !important;
+			}
+
+			.fc .fc-toolbar-chunk:first-child {
+				justify-content: center !important;
+			}
+		}
+
+		@media(max-width: 480px) {
+			.fc .fc-button {
+				min-width: 70px !important;
+				min-height: 40px !important;
+				padding: 8px 12px !important;
+				font-size: 13px !important;
+			}
+
+			.fc .fc-prev-button,
+			.fc .fc-next-button {
+				min-width: 80px !important;
+				min-height: 44px !important;
+			}
+
+			.fc .fc-toolbar-title {
+				font-size: 1.4rem !important;
+				margin-bottom: 10px !important;
+			}
+		}
+
+		/* Force le style immédiatement */
+		.fc {
+			font-family: system-ui, -apple-system, sans-serif !important;
+		}
+
+		/* Suppression des styles par défaut qui pourraient interférer */
+		.fc .fc-button-group > .fc-button {
+			margin: 0 2px !important;
+		}
+
+		/* Texte des boutons plus visible */
+		.fc .fc-button .fc-icon,
+		.fc .fc-button-primary .fc-icon {
+			color: white !important;
+			font-size: inherit !important;
+			font-weight: bold !important;
+		}
+
+		/* Masquer les icônes qui s'affichent comme des carrés */
+		.fc .fc-icon {
+			display: none !important;
+		}
+
+		.fc .fc-button {
+			white-space: nowrap !important;
+			overflow: visible !important;
+		}
+
+	</style>
+
+
 {% endblock %}
