@@ -78,25 +78,25 @@
 							class="flex flex-col items-end space-y-2">
 							<!-- Statut -->
 							<span class="px-3 py-1 rounded-full text-sm font-medium
-									                        {% if travail.statut == 'TERMINE' %}
-									                            bg-green-100 text-green-800
-									                        {% elseif travail.statut == 'EN_COURS' %}
-									                            bg-blue-100 text-blue-800
-									                        {% elseif travail.statut == 'EN_ATTENTE' %}
-									                            bg-yellow-100 text-yellow-800
-									                        {% else %}
-									                            bg-gray-100 text-gray-800
-									                        {% endif %}">
+																		                        {% if travail.statut == 'TERMINE' %}
+																		                            bg-green-100 text-green-800
+																		                        {% elseif travail.statut == 'EN_COURS' %}
+																		                            bg-blue-100 text-blue-800
+																		                        {% elseif travail.statut == 'EN_ATTENTE' %}
+																		                            bg-yellow-100 text-yellow-800
+																		                        {% else %}
+																		                            bg-gray-100 text-gray-800
+																		                        {% endif %}">
 								{{ travail.statut|replace('_', ' ') }}
 							</span>
 
 							<!-- Visibilité -->
 							<span class="px-2 py-1 rounded text-xs
-									                        {% if travail.visible %}
-									                            bg-green-100 text-green-600
-									                        {% else %}
-									                            bg-gray-100 text-gray-600
-									                        {% endif %}">
+																		                        {% if travail.visible %}
+																		                            bg-green-100 text-green-600
+																		                        {% else %}
+																		                            bg-gray-100 text-gray-600
+																		                        {% endif %}">
 								{% if travail.visible %}Visible{% else %}Masqué
 								{% endif %}
 							</span>
@@ -237,26 +237,26 @@ document.getElementById('travauxModal').classList.add('hidden');
 
 // Éditer un travail
 function editTravail(travauxId, titre, description, dateDebut, dateFin, progression, statut, important, visible) {
-	isEditMode = true;
-	currentTravauxId = travauxId;
-	document.getElementById('modalTitle').textContent = 'Modifier le travail';
-	document.getElementById('travauxForm').action = `/travaux/${travauxId}/update`;
+isEditMode = true;
+currentTravauxId = travauxId;
+document.getElementById('modalTitle').textContent = 'Modifier le travail';
+document.getElementById('travauxForm').action = `/travaux/${travauxId}/update`;
 
-	// Pré-remplir le formulaire avec les données
-	document.getElementById('titre').value = titre || '';
-	document.getElementById('description').value = description || '';
-	document.getElementById('dateDebut').value = dateDebut || '';
-	document.getElementById('dateFin').value = dateFin || '';
-	document.getElementById('progression').value = progression || 0;
-	document.getElementById('statut').value = statut || 'EN_COURS';
-	document.getElementById('important').checked = important === true || important === 'true';
-	document.getElementById('visible').checked = visible === true || visible === 'true';
-	
-	// Mettre à jour l'affichage de la progression
-	document.getElementById('progressionValue').textContent = (progression || 0) + '%';
+// Pré-remplir le formulaire avec les données
+document.getElementById('titre').value = titre || '';
+document.getElementById('description').value = description || '';
+document.getElementById('dateDebut').value = dateDebut || '';
+document.getElementById('dateFin').value = dateFin || '';
+document.getElementById('progression').value = progression || 0;
+document.getElementById('statut').value = statut || 'EN_COURS';
+document.getElementById('important').checked = important === true || important === 'true';
+document.getElementById('visible').checked = visible === true || visible === 'true';
 
-	document.getElementById('travauxModal').classList.remove('hidden');
-}// Basculer la visibilité
+// Mettre à jour l'affichage de la progression
+document.getElementById('progressionValue').textContent = (progression || 0) + '%';
+
+document.getElementById('travauxModal').classList.remove('hidden');
+} // Basculer la visibilité
 function toggleVisibility(travauxId, newVisibility) {
 const form = document.createElement('form');
 form.method = 'POST';
