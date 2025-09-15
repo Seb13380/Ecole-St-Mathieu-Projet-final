@@ -6,8 +6,19 @@ const prisma = new PrismaClient();
 const actualiteController = {
   async getActualites(req, res) {
     try {
+      // Déterminer quelles actualités afficher selon l'état de connexion
+      let whereClause = { visible: true };
+
+      if (req.session && req.session.user) {
+        // Utilisateur connecté : voir toutes les actualités visibles (publiques ET privées)
+        whereClause = { visible: true };
+      } else {
+        // Utilisateur non connecté : voir seulement les actualités publiques
+        whereClause = { visible: true, public: true };
+      }
+
       const actualites = await prisma.actualite.findMany({
-        where: { visible: true },
+        where: whereClause,
         include: {
           auteur: {
             select: { firstName: true, lastName: true, role: true }
@@ -21,7 +32,9 @@ const actualiteController = {
 
       res.render('pages/actualites', {
         actualites,
-        title: 'Actualités de l\'école'
+        title: 'Actualités de l\'école',
+        isAuthenticated: req.session && req.session.user,
+        user: req.session ? req.session.user : null
       });
     } catch (error) {
       console.error('Erreur lors de la récupération des actualités:', error);
@@ -59,7 +72,7 @@ const actualiteController = {
       console.log('📝 Données reçues pour création:', req.body);
       console.log('📁 Fichier reçu:', req.file);
 
-      const { titre, contenu, important, visible, datePublication, lienUrl, lienTexte } = req.body;
+      const { titre, contenu, important, visible, public: isPublic, datePublication, lienUrl, lienTexte } = req.body;
       const auteurId = req.session.user.id;
 
       // Gestion de la date de publication
@@ -88,6 +101,7 @@ const actualiteController = {
           lienTexte: lienTexte && lienTexte.trim() ? lienTexte.trim() : null,
           important: important === 'true',
           visible: visible === 'true',
+          public: isPublic === 'true',
           datePublication: datePublicationFinal
         },
         include: {
@@ -97,7 +111,7 @@ const actualiteController = {
         }
       });
 
-      console.log('✅ Actualité créée:', actualite.titre);
+      console.log('✅ Actualité créée:', actualite.titre, `(Public: ${actualite.public})`);
 
       // Envoyer des notifications par email aux parents si l'actualité est visible
       if (visible === 'true') {
@@ -159,7 +173,7 @@ const actualiteController = {
         file: req.file
       });
 
-      const { titre, contenu, important, visible, lienUrl, lienTexte } = req.body;
+      const { titre, contenu, important, visible, public: isPublic, lienUrl, lienTexte } = req.body;
 
       // Préparer les données de mise à jour
       const updateData = {
@@ -168,7 +182,8 @@ const actualiteController = {
         lienUrl: lienUrl && lienUrl.trim() ? lienUrl.trim() : null,
         lienTexte: lienTexte && lienTexte.trim() ? lienTexte.trim() : null,
         important: important === 'true',
-        visible: visible === 'true'
+        visible: visible === 'true',
+        public: isPublic === 'true'
       };
 
       // Gestion du nouveau fichier média
@@ -183,7 +198,7 @@ const actualiteController = {
         data: updateData
       });
 
-      console.log('✅ Actualité mise à jour:', actualite.titre);
+      console.log('✅ Actualité mise à jour:', actualite.titre, `(Public: ${actualite.public})`);
       res.redirect(`/actualites/manage?success=${encodeURIComponent('Actualité mise à jour avec succès')}#actualite-${id}`);
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'actualité:', error);

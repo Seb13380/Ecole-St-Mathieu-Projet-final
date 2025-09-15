@@ -1,0 +1,72 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Email Validé - École Saint Mathieu
+{% endblock %}
+
+{% block content %}
+	<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+		<div
+			class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-green-200 overflow-hidden">
+			<!-- En-tête avec succès -->
+			<div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-8 text-center">
+				<div class="text-white text-6xl mb-4">✅</div>
+				<h1 class="text-2xl font-bold text-white mb-2">Email Validé !</h1>
+				<p class="text-green-100">Votre demande d'inscription a été confirmée</p>
+			</div>
+
+			<!-- Corps du message -->
+			<div class="px-6 py-8">
+				<div class="text-center mb-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Félicitations ! 🎉</h2>
+					<p class="text-gray-600 leading-relaxed">
+						{{ message or "Votre email a été validé avec succès. Votre demande d'inscription est maintenant transmise à la direction de l'école." }}
+					</p>
+				</div>
+
+				<!-- Étapes suivantes -->
+				<div class="bg-blue-50 rounded-xl p-4 mb-6">
+					<h3 class="font-semibold text-blue-800 mb-3 flex items-center">
+						<span class="text-xl mr-2">📋</span>
+						Prochaines étapes :
+					</h3>
+					<ul class="text-sm text-blue-700 space-y-2">
+						<li class="flex items-start">
+							<span class="text-blue-500 mr-2 mt-1">•</span>
+							Votre demande est maintenant en cours d'examen par l'équipe de direction
+						</li>
+						<li class="flex items-start">
+							<span class="text-blue-500 mr-2 mt-1">•</span>
+							Vous recevrez une réponse par email sous 48 heures
+						</li>
+						<li class="flex items-start">
+							<span class="text-blue-500 mr-2 mt-1">•</span>
+							En cas d'acceptation, les identifiants de connexion vous seront envoyés
+						</li>
+					</ul>
+				</div>
+
+				<!-- Contact -->
+				<div class="text-center text-sm text-gray-500 mb-6">
+					<p>Pour toute question, contactez-nous :</p>
+					<p class="font-medium text-gray-700">📧 direction@ecole-saint-mathieu.fr</p>
+					<p class="font-medium text-gray-700">📞 0X XX XX XX XX</p>
+				</div>
+
+				<!-- Bouton de retour -->
+				<div class="text-center">
+					<a href="/" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl">
+						<span class="mr-2">🏠</span>
+						Retour à l'accueil
+					</a>
+				</div>
+			</div>
+
+			<!-- Pied de page -->
+			<div class="bg-gray-50 px-6 py-4 text-center">
+				<p class="text-xs text-gray-500">
+					École Saint Mathieu - Inscription en ligne sécurisée
+				</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}

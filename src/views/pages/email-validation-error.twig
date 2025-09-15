@@ -1,0 +1,99 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Erreur de Validation - École Saint Mathieu
+{% endblock %}
+
+{% block content %}
+	<div class="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
+		<div
+			class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-red-200 overflow-hidden">
+			<!-- En-tête avec erreur -->
+			<div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-8 text-center">
+				<div class="text-white text-6xl mb-4">❌</div>
+				<h1 class="text-2xl font-bold text-white mb-2">Erreur de Validation</h1>
+				<p class="text-red-100">Un problème est survenu</p>
+			</div>
+
+			<!-- Corps du message -->
+			<div class="px-6 py-8">
+				<div class="text-center mb-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Oops ! 😔</h2>
+					<p class="text-gray-600 leading-relaxed">
+						{{ message or "Le lien de validation semble invalide ou a expiré." }}
+					</p>
+				</div>
+
+				<!-- Causes possibles -->
+				<div class="bg-orange-50 rounded-xl p-4 mb-6">
+					<h3 class="font-semibold text-orange-800 mb-3 flex items-center">
+						<span class="text-xl mr-2">🔍</span>
+						Causes possibles :
+					</h3>
+					<ul class="text-sm text-orange-700 space-y-2">
+						<li class="flex items-start">
+							<span class="text-orange-500 mr-2 mt-1">•</span>
+							Le lien de validation a expiré (valide 24h seulement)
+						</li>
+						<li class="flex items-start">
+							<span class="text-orange-500 mr-2 mt-1">•</span>
+							Le lien a déjà été utilisé
+						</li>
+						<li class="flex items-start">
+							<span class="text-orange-500 mr-2 mt-1">•</span>
+							Le lien est incomplet ou endommagé
+						</li>
+					</ul>
+				</div>
+
+				<!-- Solutions -->
+				<div class="bg-blue-50 rounded-xl p-4 mb-6">
+					<h3 class="font-semibold text-blue-800 mb-3 flex items-center">
+						<span class="text-xl mr-2">💡</span>
+						Solutions :
+					</h3>
+					<ul class="text-sm text-blue-700 space-y-2">
+						<li class="flex items-start">
+							<span class="text-blue-500 mr-2 mt-1">•</span>
+							Refaites une nouvelle demande d'inscription
+						</li>
+						<li class="flex items-start">
+							<span class="text-blue-500 mr-2 mt-1">•</span>
+							Vérifiez que le lien est complet dans votre email
+						</li>
+						<li class="flex items-start">
+							<span class="text-blue-500 mr-2 mt-1">•</span>
+							Contactez l'école si le problème persiste
+						</li>
+					</ul>
+				</div>
+
+				<!-- Contact -->
+				<div class="text-center text-sm text-gray-500 mb-6">
+					<p>Besoin d'aide ? Contactez-nous :</p>
+					<p class="font-medium text-gray-700">📧 direction@ecole-saint-mathieu.fr</p>
+					<p class="font-medium text-gray-700">📞 0X XX XX XX XX</p>
+				</div>
+
+				<!-- Boutons d'action -->
+				<div class="text-center space-y-3">
+					<a href="/inscription-eleve" class="block w-full px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg hover:shadow-xl">
+						<span class="mr-2">📝</span>
+						Nouvelle demande d'inscription
+					</a>
+
+					<a href="/" class="block w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl">
+						<span class="mr-2">🏠</span>
+						Retour à l'accueil
+					</a>
+				</div>
+			</div>
+
+			<!-- Pied de page -->
+			<div class="bg-gray-50 px-6 py-4 text-center">
+				<p class="text-xs text-gray-500">
+					École Saint Mathieu - Support technique
+				</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}

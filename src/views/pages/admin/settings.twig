@@ -119,13 +119,37 @@
 					</h3>
 					<div class="space-y-4">
 						<div class="flex items-center justify-between">
-							<div>
+							<div class="flex-1">
 								<h4 class="text-sm font-medium text-gray-900">Mode maintenance</h4>
 								<p class="text-sm text-gray-500">Désactiver temporairement l'accès public au site</p>
+								<span id="maintenanceStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1">
+									✅ Site accessible
+								</span>
 							</div>
-							<button type="button" id="maintenanceToggle" class="bg-gray-200 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+							<button type="button" id="maintenanceToggle" style="
+																	width: 80px !important;
+																	height: 40px !important;
+																	background-color: #ef4444 !important;
+																	border: 3px solid #dc2626 !important;
+																	border-radius: 25px !important;
+																	position: relative !important;
+																	cursor: pointer !important;
+																	transition: all 0.3s ease !important;
+																	display: flex !important;
+																	align-items: center !important;
+																	padding: 3px !important;
+																">
 								<span class="sr-only">Activer le mode maintenance</span>
-								<span id="maintenanceToggleIcon" class="translate-x-0 pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+								<span id="maintenanceToggleIcon" style="
+																		width: 30px !important;
+																		height: 30px !important;
+																		background-color: white !important;
+																		border: 2px solid #dc2626 !important;
+																		border-radius: 50% !important;
+																		transition: transform 0.3s ease !important;
+																		transform: translateX(0px) !important;
+																		display: block !important;
+																	"></span>
 							</button>
 						</div>
 
@@ -182,17 +206,28 @@ alert('Export en cours... Vous recevrez un email avec le fichier.');
 document.getElementById('maintenanceToggle').addEventListener('click', function () {
 const toggle = this;
 const icon = document.getElementById('maintenanceToggleIcon');
+const status = document.getElementById('maintenanceStatus');
 
-if (toggle.classList.contains('bg-gray-200')) {
-toggle.classList.remove('bg-gray-200');
-toggle.classList.add('bg-red-600');
-icon.classList.remove('translate-x-0');
-icon.classList.add('translate-x-5');
-} else {
-toggle.classList.remove('bg-red-600');
-toggle.classList.add('bg-gray-200');
-icon.classList.remove('translate-x-5');
-icon.classList.add('translate-x-0');
+// Vérifier l'état actuel en regardant la couleur de fond
+const currentBg = window.getComputedStyle(toggle).backgroundColor;
+const isInactive = currentBg === 'rgb(239, 68, 68)' || toggle.style.backgroundColor.includes('#ef4444');
+
+if (isInactive) { // Activer le mode maintenance - rouge très foncé
+toggle.style.backgroundColor = '#991b1b !important';
+toggle.style.borderColor = '#7f1d1d !important';
+icon.style.transform = 'translateX(40px) !important';
+icon.style.borderColor = '#7f1d1d !important';
+status.textContent = '🚧 Mode maintenance actif';
+status.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1';
+alert('⚠️ Mode maintenance ACTIVÉ - Le site est désormais inaccessible au public');
+} else { // Désactiver le mode maintenance - rouge moyen
+toggle.style.backgroundColor = '#ef4444 !important';
+toggle.style.borderColor = '#dc2626 !important';
+icon.style.transform = 'translateX(0px) !important';
+icon.style.borderColor = '#dc2626 !important';
+status.textContent = '✅ Site accessible';
+status.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1';
+alert('✅ Mode maintenance DÉSACTIVÉ - Le site est à nouveau accessible au public');
 }
 });
 	</script>

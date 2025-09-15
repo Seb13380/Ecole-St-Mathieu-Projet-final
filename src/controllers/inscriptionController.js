@@ -315,7 +315,6 @@ const inscriptionController = {
                     parentLastName: request.parentLastName,
                     parentEmail: request.parentEmail,
                     children: request.children,
-                    tempPassword: tempPassword,
                     createdStudents: createdStudents
                 }, comment);
                 console.log('✅ Email d\'approbation avec identifiants envoyé');
