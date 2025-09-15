@@ -201,92 +201,7 @@ class EmailService {
         }
     }
 
-    /**
-     * Envoyer un email d'approbation de demande d'inscription
-     * @param {Object} inscriptionData - Données de la demande d'inscription
-     * @param {string} reviewComment - Commentaire de l'admin
-     */
-    async sendApprovalEmail(inscriptionData, reviewComment) {
-        const { parentFirstName, parentLastName, parentEmail, children } = inscriptionData;
 
-        const childrenList = children.map(child =>
-            `• ${child.firstName} ${child.lastName}`
-        ).join('\n');
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
-            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
-            subject: '🎉 Demande d\'inscription approuvée - École Saint-Mathieu',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
-                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
-                            🎓 École Saint-Mathieu
-                        </h1>
-                        
-                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 30px;">
-                            <h2 style="color: #155724; margin-top: 0; text-align: center;">
-                                ✅ Félicitations ! Votre demande est acceptée
-                            </h2>
-                        </div>
-                        
-                        <p style="color: #333; line-height: 1.6;">
-                            Bonjour <strong>${parentFirstName} ${parentLastName}</strong>,
-                        </p>
-                        
-                        <p style="color: #333; line-height: 1.6;">
-                            Nous avons le plaisir de vous informer que votre demande d'inscription a été <strong>approuvée</strong> pour :
-                        </p>
-                        
-                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="color: #304a4d; margin-top: 0;">👶 Enfant(s) accepté(s) :</h3>
-                            <pre style="color: #333; font-family: Arial; white-space: pre-wrap;">${childrenList}</pre>
-                        </div>
-
-                        ${reviewComment ? `
-                        <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="color: #004085; margin-top: 0;">💬 Message de l'équipe :</h3>
-                            <p style="color: #004085; margin: 0; font-style: italic;">"${reviewComment}"</p>
-                        </div>
-                        ` : ''}
-                        
-                        <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
-                            <h3 style="color: #856404; margin-top: 0;">📋 Prochaines étapes :</h3>
-                            <ol style="color: #856404; margin: 0; padding-left: 20px;">
-                                <li><strong>Votre compte parent sera créé automatiquement</strong></li>
-                                <li>Vous recevrez vos identifiants de connexion par email</li>
-                                <li>Vous pourrez accéder à l'espace parent pour suivre la scolarité</li>
-                                <li>Notre secrétariat vous contactera pour finaliser l'inscription</li>
-                            </ol>
-                        </div>
-                        
-                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="color: #0c5460; margin-top: 0;">📞 Contact :</h3>
-                            <p style="color: #0c5460; margin: 0;">
-                                Secrétariat : <strong>01 23 45 67 89</strong><br>
-                                Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a>
-                            </p>
-                        </div>
-                        
-                        <p style="color: #333; line-height: 1.6; margin-top: 30px;">
-                            Nous sommes ravis d'accueillir votre famille dans notre établissement !<br><br>
-                            Cordialement,<br>
-                            <strong>L'équipe de l'École Saint-Mathieu</strong>
-                        </p>
-                    </div>
-                </div>
-            `
-        };
-
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            console.log('Email d\'approbation envoyé:', info.messageId);
-            return { success: true, messageId: info.messageId };
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi de l\'email d\'approbation:', error);
-            return { success: false, error: error.message };
-        }
-    }
 
     /**
      * Envoyer un email de rejet de demande d'inscription
@@ -756,11 +671,10 @@ class EmailService {
     /**
      * Envoyer un email d'approbation avec identifiants de connexion
      * @param {Object} inscriptionData - Données de la demande d'inscription
-     * @param {String} tempPassword - Mot de passe temporaire généré
      * @param {String} comment - Commentaire du directeur
      */
     async sendApprovalEmailWithCredentials(inscriptionData, comment = '') {
-        const { parentFirstName, parentLastName, parentEmail, children, tempPassword, createdStudents } = inscriptionData;
+        const { parentFirstName, parentLastName, parentEmail, children, createdStudents } = inscriptionData;
 
         const childrenList = createdStudents ? createdStudents.map(student =>
             `• ${student.firstName} ${student.lastName} - Classe: ${student.classe?.nom || 'Non assigné'}`
@@ -779,7 +693,7 @@ class EmailService {
                         
                         <div style="background-color: #dcfce7; padding: 20px; border-radius: 8px; border-left: 4px solid #16a34a; margin-bottom: 30px;">
                             <h2 style="color: #16a34a; margin: 0; font-size: 24px;">
-                                ✅ Félicitations ! L'inscription de votre enfant a été approuvée
+                                📞 Demande d'inscription - Prise de rendez-vous
                             </h2>
                         </div>
                         
@@ -788,8 +702,7 @@ class EmailService {
                         </p>
                         
                         <p style="color: #333; line-height: 1.6;">
-                            Nous sommes ravis de vous informer que la demande d'inscription de votre enfant a été acceptée. 
-                            Votre/vos enfant(s) sont désormais officiellement inscrits à l'École Saint-Mathieu !
+                            Nous sommes ravis de votre démarche de demande d'inscription. Nous revenons vers vous pour convenir d'un rendez-vous selon les places disponibles.
                         </p>
 
                         ${comment ? `
@@ -804,20 +717,6 @@ class EmailService {
                             <pre style="color: #333; font-family: Arial; white-space: pre-wrap; margin: 0;">${childrenList}</pre>
                         </div>
                         
-                        <div style="background-color: #e0f2fe; padding: 20px; border-radius: 8px; margin: 30px 0; border: 2px solid #0284c7;">
-                            <h3 style="color: #0284c7; margin-top: 0;">🔑 Accès à votre espace parent</h3>
-                            <p style="color: #333; margin: 10px 0;">
-                                Un compte parent a été créé pour vous permettre de suivre la scolarité de votre enfant :
-                            </p>
-                            <p style="color: #333; margin: 10px 0;"><strong>Email :</strong> ${parentEmail}</p>
-                            <p style="color: #333; margin: 10px 0;"><strong>Mot de passe temporaire :</strong> 
-                                <span style="background-color: #f1f5f9; padding: 5px 10px; border-radius: 4px; font-family: monospace; font-size: 16px; font-weight: bold;">${tempPassword}</span>
-                            </p>
-                            <p style="color: #dc2626; font-size: 14px; margin-top: 15px;">
-                                ⚠️ <strong>Important :</strong> Changez ce mot de passe dès votre première connexion pour votre sécurité.
-                            </p>
-                        </div>
-                        
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="http://localhost:3007/auth/login" 
                                style="background-color: #16a34a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
@@ -828,8 +727,7 @@ class EmailService {
                         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
                             <h3 style="color: #495057; margin-top: 0;">📋 Prochaines étapes :</h3>
                             <ul style="color: #333; line-height: 1.6;">
-                                <li>Connectez-vous à votre espace parent avec les identifiants ci-dessus</li>
-                                <li>Modifiez votre mot de passe temporaire</li>
+                                <li>Connectez-vous à votre espace parent avec votre email et le mot de passe que vous avez choisi</li>
                                 <li>Consultez les informations de votre/vos enfant(s)</li>
                                 <li>Vérifiez les coordonnées et mettez-les à jour si nécessaire</li>
                                 <li>Prenez connaissance du calendrier scolaire et des actualités</li>
@@ -1063,6 +961,110 @@ class EmailService {
             return { success: true, messageId: info.messageId };
         } catch (error) {
             console.error('❌ Erreur envoi confirmation:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * ✉️ NOUVELLE FONCTION - Envoyer un email de validation d'inscription
+     * @param {Object} data - { parentEmail, parentFirstName, validationToken, children }
+     */
+    async sendValidationEmail(data) {
+        const { parentEmail, parentFirstName, validationToken, children } = data;
+
+        // Construire l'URL de validation
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+        const validationUrl = `${baseUrl}/pre-inscription/validate-email/${validationToken}`;
+
+        const childrenList = children.map(child =>
+            `• ${child.firstName} ${child.lastName} (né(e) le ${new Date(child.birthDate).toLocaleDateString('fr-FR')}) - Classe demandée: ${child.requestedClass}`
+        ).join('\n');
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
+            subject: '✉️ Validez votre demande d\'inscription - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fdfc;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <h2 style="color: #304a4d; border-bottom: 2px solid #a7e3dd; padding-bottom: 10px;">
+                            📧 Validation de votre demande d'inscription
+                        </h2>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour <strong>${parentFirstName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Merci pour votre demande d'inscription pour ${children.length} enfant(s) :
+                        </p>
+                        
+                        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #304a4d; margin-top: 0;">👶 Enfant(s) concerné(s) :</h3>
+                            <pre style="color: #333; font-family: Arial; white-space: pre-wrap; font-size: 14px;">${childrenList}</pre>
+                        </div>
+                        
+                        <div style="background-color: #fff3cd; border: 1px solid #ffecb5; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #856404; margin-top: 0; display: flex; align-items: center;">
+                                ⚠️ Action requise
+                            </h3>
+                            <p style="color: #856404; margin-bottom: 15px; font-weight: bold;">
+                                Pour finaliser votre demande d'inscription, vous devez valider votre adresse email en cliquant sur le lien ci-dessous :
+                            </p>
+                            
+                            <div style="text-align: center; margin: 25px 0;">
+                                <a href="${validationUrl}" 
+                                   style="display: inline-block; background: linear-gradient(135deg, #5fb3ac, #4a9b94); 
+                                          color: white; padding: 15px 30px; text-decoration: none; 
+                                          border-radius: 8px; font-weight: bold; font-size: 16px;
+                                          box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                                    ✉️ VALIDER MON EMAIL
+                                </a>
+                            </div>
+                            
+                            <p style="color: #856404; font-size: 12px; margin-bottom: 0;">
+                                ⏰ Ce lien expire dans <strong>24 heures</strong>.<br>
+                                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+                                <span style="font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 3px;">${validationUrl}</span>
+                            </p>
+                        </div>
+                        
+                        <div style="background-color: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #2d5a2d; margin-top: 0;">📋 Prochaines étapes :</h3>
+                            <ol style="color: #2d5a2d; margin: 0; padding-left: 20px;">
+                                <li style="margin-bottom: 5px;">Cliquez sur le lien de validation ci-dessus</li>
+                                <li style="margin-bottom: 5px;">Votre demande sera automatiquement transmise à la direction</li>
+                                <li style="margin-bottom: 5px;">Vous recevrez une réponse par email sous 48h</li>
+                            </ol>
+                        </div>
+                        
+                        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 30px 0;">
+                        
+                        <div style="text-align: center; color: #666; font-size: 12px;">
+                            <p style="margin: 5px 0;">
+                                <strong>École Saint-Mathieu</strong><br>
+                                📧 ${process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr'}<br>
+                                🌐 ${baseUrl}
+                            </p>
+                            <p style="margin: 10px 0; color: #999;">
+                                Si vous n'avez pas fait cette demande d'inscription, vous pouvez ignorer cet email.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email de validation envoyé:', info.messageId, 'à', parentEmail);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur envoi validation email:', error);
             return { success: false, error: error.message };
         }
     }

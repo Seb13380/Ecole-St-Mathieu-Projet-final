@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto'); // Pour générer le token de validation
 const emailService = require('../services/emailService');
 
 const prisma = new PrismaClient();
@@ -31,6 +32,100 @@ const inscriptionEleveController = {
                 title: 'Erreur',
                 message: 'Une erreur est survenue lors du chargement de la page.',
                 user: req.session.user || null
+            });
+        }
+    },
+
+    // ✉️ NOUVELLE FONCTION - Validation de l'email parent
+    validateEmail: async (req, res) => {
+        try {
+            const { token } = req.params;
+
+            if (!token) {
+                return res.status(400).render('pages/email-validation-error', {
+                    title: 'Erreur de Validation',
+                    user: req.session.user || null,
+                    message: 'Token de validation manquant.',
+                    currentUrl: req.originalUrl
+                });
+            }
+
+            // Chercher la demande avec ce token
+            const request = await prisma.preInscriptionRequest.findUnique({
+                where: { validationToken: token }
+            });
+
+            if (!request) {
+                return res.status(404).render('pages/email-validation-error', {
+                    title: 'Lien Invalide',
+                    user: req.session.user || null,
+                    message: 'Lien de validation invalide ou expiré.',
+                    currentUrl: req.originalUrl
+                });
+            }
+
+            // Vérifier si le token n'est pas expiré
+            if (new Date() > request.tokenExpiresAt) {
+                return res.status(400).render('pages/email-validation-error', {
+                    title: 'Lien Expiré',
+                    user: req.session.user || null,
+                    message: 'Le lien de validation a expiré (24h maximum). Veuillez refaire une demande d\'inscription.',
+                    currentUrl: req.originalUrl
+                });
+            }
+
+            // Vérifier si l'email n'est pas déjà validé
+            if (request.emailValidated) {
+                return res.render('pages/email-validated', {
+                    title: 'Email Déjà Validé',
+                    user: req.session.user || null,
+                    message: 'Votre email a déjà été validé. Votre demande est en cours de traitement.',
+                    currentUrl: req.originalUrl
+                });
+            }
+
+            // ✅ VALIDER LA DEMANDE
+            await prisma.preInscriptionRequest.update({
+                where: { id: request.id },
+                data: {
+                    emailValidated: true,
+                    validationToken: null, // Supprimer le token utilisé
+                    status: 'PENDING' // Maintenant en attente de traitement
+                }
+            });
+
+            console.log(`✅ Email validé pour la demande ${request.id} - ${request.parentEmail}`);
+
+            // 📧 MAINTENANT envoyer notification au directeur
+            try {
+                const childrenData = JSON.parse(request.children);
+                await emailService.sendInscriptionNotificationToDirector({
+                    parentFirstName: request.parentFirstName,
+                    parentLastName: request.parentLastName,
+                    parentEmail: request.parentEmail,
+                    children: childrenData,
+                    requestId: request.id
+                });
+                console.log('📧 Notification envoyée au directeur après validation email');
+            } catch (emailError) {
+                console.error('❌ Erreur envoi notification directeur après validation:', emailError);
+            }
+
+            // Afficher page de succès
+            res.render('pages/email-validated', {
+                title: 'Email Validé',
+                user: req.session.user || null,
+                message: 'Email validé avec succès ! Votre demande d\'inscription est maintenant transmise à la direction. Vous recevrez une réponse sous 48h.',
+                currentUrl: req.originalUrl
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la validation email:', error);
+            res.status(500).render('pages/email-validation-error', {
+                title: 'Erreur',
+                user: req.session.user || null,
+                message: 'Une erreur est survenue lors de la validation. Veuillez contacter l\'école.',
+                currentUrl: req.originalUrl
             });
         }
     },
@@ -129,6 +224,10 @@ const inscriptionEleveController = {
             // Hasher le mot de passe fourni par l'utilisateur
             const hashedPassword = await bcrypt.hash(parentPassword, 12);
 
+            // Générer token de validation email
+            const validationToken = crypto.randomBytes(32).toString('hex');
+            const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 heures
+
             // Création de la demande d'inscription avec plusieurs enfants
             const inscriptionRequest = await prisma.preInscriptionRequest.create({
                 data: {
@@ -150,43 +249,41 @@ const inscriptionEleveController = {
                     specialNeeds: specialNeeds || null,
                     message: message || null,
 
-                    // Statut
-                    status: 'PENDING',
+                    // ✉️ VALIDATION EMAIL - NOUVEAUX CHAMPS
+                    emailValidated: false,
+                    validationToken: validationToken,
+                    tokenExpiresAt: tokenExpiresAt,
+
+                    // Statut - EN ATTENTE DE VALIDATION EMAIL
+                    status: 'EMAIL_PENDING',
                     submittedAt: new Date()
                 }
             });
 
             console.log(`Nouvelle demande d'inscription créée pour ${childrenData.length} enfant(s):`, inscriptionRequest.id);
 
-            // Envoyer email de confirmation au parent
+            // ✉️ ENVOYER EMAIL DE VALIDATION (au lieu de confirmation)
             try {
-                await emailService.sendInscriptionConfirmation({
+                await emailService.sendValidationEmail({
                     parentEmail,
                     parentFirstName,
+                    validationToken: validationToken,
                     children: childrenData
                 });
+                console.log('📧 Email de validation envoyé à:', parentEmail);
             } catch (emailError) {
-                console.error('Erreur envoi email de confirmation:', emailError);
+                console.error('❌ Erreur envoi email de validation:', emailError);
+                // Ne pas arrêter le processus, juste logguer l'erreur
             }
 
-            // Envoyer notification au directeur
-            try {
-                await emailService.sendInscriptionNotificationToDirector({
-                    parentFirstName,
-                    parentLastName,
-                    parentEmail,
-                    children: childrenData,
-                    requestId: inscriptionRequest.id
-                });
-            } catch (emailError) {
-                console.error('Erreur envoi notification directeur:', emailError);
-            }
+            // ⚠️ PAS D'ENVOI AU DIRECTEUR MAINTENANT
+            // L'email au directeur sera envoyé APRÈS validation du parent
 
             const successMessage = childrenData.length === 1
-                ? 'Votre demande d\'inscription a été envoyée avec succès !'
-                : `Votre demande d'inscription pour ${childrenData.length} enfants a été envoyée avec succès !`;
+                ? 'Votre demande d\'inscription a été enregistrée !'
+                : `Votre demande d'inscription pour ${childrenData.length} enfants a été enregistrée !`;
 
-            req.flash('success', successMessage + ' Vous recevrez une réponse par email sous 48h.');
+            req.flash('success', successMessage + ' 📧 Vérifiez votre email et cliquez sur le lien de validation pour finaliser votre demande.');
             res.redirect('/inscription-eleve');
 
         } catch (error) {

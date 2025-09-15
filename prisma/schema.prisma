@@ -122,6 +122,7 @@ model Actualite {
   lienTexte       String? // Texte d'affichage du lien (optionnel)
   datePublication DateTime @default(now())
   visible         Boolean  @default(true)
+  public          Boolean  @default(false) // true = visible au public, false = réservé aux connectés
   important       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -447,8 +448,13 @@ model PreInscriptionRequest {
   specialNeeds String? // Besoins particuliers
   message      String? // Message libre des parents
 
+  // ✉️ VALIDATION EMAIL - NOUVEAUX CHAMPS
+  emailValidated  Boolean   @default(false) // Email validé ou non
+  validationToken String?   @unique // Token unique pour validation
+  tokenExpiresAt  DateTime? // Expiration du token (24h)
+
   // Statut et suivi
-  status      PreInscriptionStatus @default(PENDING)
+  status      PreInscriptionStatus @default(EMAIL_PENDING) // Nouveau statut par défaut
   submittedAt DateTime             @default(now())
   processedAt DateTime?
   processedBy Int? // ID de l'utilisateur qui a traité
@@ -460,6 +466,8 @@ model PreInscriptionRequest {
   @@index([status])
   @@index([submittedAt])
   @@index([parentEmail])
+  @@index([emailValidated])
+  @@index([validationToken])
 }
 
 model CredentialsRequest {
@@ -498,6 +506,7 @@ model CredentialsRequest {
 }
 
 enum PreInscriptionStatus {
+  EMAIL_PENDING // En attente de validation email
   PENDING // En attente
   REVIEWING // En cours d'examen
   ACCEPTED // Acceptée
