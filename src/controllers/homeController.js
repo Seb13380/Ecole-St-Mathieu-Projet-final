@@ -19,9 +19,20 @@ const homeController = {
         orderBy: { dateDebut: 'desc' }
       });
 
-      // Récupérer les actualités récentes visibles pour la page d'accueil
+      // Récupérer les actualités récentes pour la page d'accueil
+      // Filtrer selon l'état de connexion de l'utilisateur
+      let actualitesWhereClause = { visible: true };
+
+      if (req.session && req.session.user) {
+        // Utilisateur connecté : voir toutes les actualités visibles
+        actualitesWhereClause = { visible: true };
+      } else {
+        // Utilisateur non connecté : voir seulement les actualités publiques
+        actualitesWhereClause = { visible: true, public: true };
+      }
+
       const actualites = await prisma.actualite.findMany({
-        where: { visible: true },
+        where: actualitesWhereClause,
         include: {
           auteur: {
             select: { firstName: true, lastName: true }

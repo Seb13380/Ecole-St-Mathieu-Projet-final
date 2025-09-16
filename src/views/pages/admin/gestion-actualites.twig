@@ -71,10 +71,10 @@
 
 							<div class="md:col-span-2">
 								<label for="media" class="block text-sm font-medium text-slate-700 mb-2">
-									Image ou Vidéo (optionnel)
+									Image, Vidéo ou Document PDF (optionnel)
 								</label>
-								<input type="file" id="media" name="media" accept="image/*,video/*" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-								<p class="text-xs text-slate-500 mt-1">Formats acceptés : JPEG, PNG, GIF, WebP, MP4, WebM, OGG (Max 50MB)</p>
+								<input type="file" id="media" name="media" accept="image/*,video/*,.pdf" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+								<p class="text-xs text-slate-500 mt-1">Formats acceptés : JPEG, PNG, GIF, WebP, MP4, WebM, OGG, PDF (Max 50MB)</p>
 							</div>
 
 							<!-- Section Lien externe -->
@@ -255,16 +255,28 @@
 
 									{% if actualite.mediaUrl %}
 										<div class="mb-4 flex justify-start">
-											<div class="w-48 h-32 overflow-hidden rounded-lg border border-slate-200 shadow-sm bg-gray-100 flex-shrink-0">
-												{% if actualite.mediaType == 'image' %}
-													<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" class="w-full h-full object-cover">
-												{% elseif actualite.mediaType == 'video' %}
-													<video controls class="w-full h-full object-cover">
-														<source src="{{ actualite.mediaUrl }}" type="video/mp4">
-														Votre navigateur ne supporte pas les vidéos.
-													</video>
-												{% endif %}
-											</div>
+											{% if actualite.mediaType == 'pdf' %}
+												<div class="w-48 h-32 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center p-4">
+													<div class="text-center">
+														<svg class="w-8 h-8 text-red-600 mx-auto mb-2" fill="currentColor" viewbox="0 0 20 20">
+															<path d="M4 18h12V6h-4V2H4v16zm8-14v4h4l-4-4z"/>
+														</svg>
+														<p class="text-xs text-red-800 font-medium">Document PDF</p>
+														<a href="{{ actualite.mediaUrl }}" target="_blank" class="text-xs text-red-600 hover:text-red-800 underline">Télécharger</a>
+													</div>
+												</div>
+											{% else %}
+												<div class="w-48 h-32 overflow-hidden rounded-lg border border-slate-200 shadow-sm bg-gray-100 flex-shrink-0">
+													{% if actualite.mediaType == 'image' %}
+														<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" class="w-full h-full object-cover">
+													{% elseif actualite.mediaType == 'video' %}
+														<video controls class="w-full h-full object-cover">
+															<source src="{{ actualite.mediaUrl }}" type="video/mp4">
+															Votre navigateur ne supporte pas les vidéos.
+														</video>
+													{% endif %}
+												</div>
+											{% endif %}
 										</div>
 									{% endif %}
 
@@ -358,9 +370,9 @@
 						<textarea id="editContenu" name="contenu" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" required></textarea>
 					</div>
 					<div>
-						<label for="editMedia" class="block text-sm font-medium text-slate-700 mb-2">Nouvelle Image ou Vidéo (optionnel)</label>
-						<input type="file" id="editMedia" name="media" accept="image/*,video/*" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-						<p class="text-xs text-slate-500 mt-1">Laissez vide pour garder le média actuel. Formats : JPEG, PNG, GIF, WebP, MP4, WebM, OGG (Max 50MB)</p>
+						<label for="editMedia" class="block text-sm font-medium text-slate-700 mb-2">Nouvelle Image, Vidéo ou Document PDF (optionnel)</label>
+						<input type="file" id="editMedia" name="media" accept="image/*,video/*,.pdf" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+						<p class="text-xs text-slate-500 mt-1">Laissez vide pour garder le média actuel. Formats : JPEG, PNG, GIF, WebP, MP4, WebM, OGG, PDF (Max 50MB)</p>
 					</div>
 
 					<!-- Section Lien externe dans l'édition -->
