@@ -181,18 +181,37 @@ const inscriptionEleveController = {
             // Traitement des enfants - le nouveau format envoie children comme objet
             let childrenData = [];
             if (children) {
+                console.log('🔍 Données children reçues:', JSON.stringify(children, null, 2));
+
                 // Convertir l'objet children en tableau
                 childrenData = Object.keys(children).map(key => {
                     const child = children[key];
+
+                    console.log(`📝 Traitement enfant ${key}:`, {
+                        firstName: child.firstName,
+                        lastName: child.lastName,
+                        requestedClass: child.requestedClass,
+                        hasRequestedClass: !!child.requestedClass
+                    });
+
                     return {
                         firstName: child.firstName,
                         lastName: child.lastName,
                         birthDate: child.birthDate,
                         currentClass: child.currentClass || null,
-                        requestedClass: child.requestedClass,
+                        requestedClass: child.requestedClass || null, // Ne pas exclure si null
                         previousSchool: child.previousSchool || null
                     };
-                }).filter(child => child.firstName && child.lastName && child.birthDate && child.requestedClass);
+                }).filter(child => {
+                    // Ne PAS filtrer sur requestedClass car on veut la conserver même si elle est manquante
+                    const isValid = child.firstName && child.lastName && child.birthDate;
+                    if (!isValid) {
+                        console.log('❌ Enfant exclu (données de base manquantes):', child);
+                    }
+                    return isValid;
+                });
+
+                console.log('✅ Enfants traités:', childrenData);
             }
 
             // Vérifier qu'au moins un enfant est présent et valide
