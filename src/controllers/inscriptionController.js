@@ -63,18 +63,20 @@ const inscriptionController = {
                 childrenData = [{
                     firstName: req.body.childFirstName,
                     lastName: req.body.childLastName,
-                    birthDate: req.body.childBirthDate
+                    birthDate: req.body.childBirthDate,
+                    classId: req.body.requestedClass
                 }];
             } else {
                 // Enfants envoyés en tableau séparé
                 const firstNames = Array.isArray(req.body.childFirstName) ? req.body.childFirstName : [req.body.childFirstName];
                 const lastNames = Array.isArray(req.body.childLastName) ? req.body.childLastName : [req.body.childLastName];
                 const birthDates = Array.isArray(req.body.childBirthDate) ? req.body.childBirthDate : [req.body.childBirthDate];
-
+                const classIds = Array.isArray(req.body.requestedClass) ? req.body.requestedClass : [req.body.requestedClass];
                 childrenData = firstNames.map((firstName, index) => ({
                     firstName,
                     lastName: lastNames[index],
-                    birthDate: birthDates[index]
+                    birthDate: birthDates[index],
+                    classId: classIds[index]
                 })).filter(child => child.firstName && child.lastName && child.birthDate);
             }
 
