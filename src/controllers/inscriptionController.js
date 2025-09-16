@@ -263,44 +263,76 @@ const inscriptionController = {
                 console.log('👶 Création des enfants...');
 
                 for (const childData of childrenData) {
+                    console.log('🔍 Traitement enfant pour création:', {
+                        firstName: childData.firstName,
+                        lastName: childData.lastName,
+                        requestedClass: childData.requestedClass,
+                        schoolLevel: childData.schoolLevel
+                    });
+
                     if (childData.firstName && childData.lastName && childData.birthDate) {
-                        // 🎯 Attribution dynamique de la classe selon le niveau scolaire
+                        // 🎯 Attribution dynamique de la classe selon le niveau scolaire ou requestedClass
                         let classeId = 1; // CP A par défaut
 
-                        if (childData.schoolLevel) {
-                            switch (childData.schoolLevel.toLowerCase()) {
-                                case 'cp':
-                                    classeId = 1; // CP A
-                                    break;
-                                case 'ce1':
-                                    classeId = 2; // CE1 A
-                                    break;
-                                case 'ce2':
-                                    classeId = 3; // CE2 A
-                                    break;
-                                case 'cm1':
-                                    classeId = 4; // CM1 A
-                                    break;
-                                case 'cm2':
-                                    classeId = 5; // CM2 A
-                                    break;
-                                default:
-                                    classeId = 1; // CP A par défaut
+                        // Priorité 1: requestedClass si présente et valide
+                        if (childData.requestedClass) {
+                            const requestedClassObj = await prisma.classe.findFirst({
+                                where: { nom: childData.requestedClass }
+                            });
+
+                            if (requestedClassObj) {
+                                classeId = requestedClassObj.id;
+                                console.log(`   ✅ Classe assignée via requestedClass: ${childData.requestedClass} (ID: ${classeId})`);
+                            } else {
+                                console.log(`   ⚠️ Classe demandée "${childData.requestedClass}" non trouvée, utilisation du niveau scolaire`);
+                            }
+                        } else {
+                            console.log(`   ⚠️ Aucune classe demandée pour ${childData.firstName}, utilisation du niveau scolaire`);
+                        }
+
+                        // Priorité 2: schoolLevel si requestedClass n'est pas utilisable
+                        if (!childData.requestedClass || classeId === 1) {
+                            if (childData.schoolLevel) {
+                                switch (childData.schoolLevel.toLowerCase()) {
+                                    case 'cp':
+                                        classeId = 1; // CP A
+                                        break;
+                                    case 'ce1':
+                                        classeId = 2; // CE1 A
+                                        break;
+                                    case 'ce2':
+                                        classeId = 3; // CE2 A
+                                        break;
+                                    case 'cm1':
+                                        classeId = 4; // CM1 A
+                                        break;
+                                    case 'cm2':
+                                        classeId = 5; // CM2 A
+                                        break;
+                                    default:
+                                        classeId = 1; // CP A par défaut
+                                }
+                                console.log(`   ✅ Classe assignée via schoolLevel: ${childData.schoolLevel} (ID: ${classeId})`);
                             }
                         }
 
-                        const student = await prisma.student.create({
-                            data: {
-                                firstName: childData.firstName,
-                                lastName: childData.lastName,
-                                dateNaissance: new Date(childData.birthDate),
-                                parentId: parentUser.id,
-                                classeId: classeId
-                            }
-                        });
+                        try {
+                            const student = await prisma.student.create({
+                                data: {
+                                    firstName: childData.firstName,
+                                    lastName: childData.lastName,
+                                    dateNaissance: new Date(childData.birthDate),
+                                    parentId: parentUser.id,
+                                    classeId: classeId
+                                }
+                            });
 
-                        createdStudents.push(student);
-                        console.log(`   ✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id})`);
+                            createdStudents.push(student);
+                            console.log(`   ✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id}, Classe: ${classeId})`);
+                        } catch (error) {
+                            console.error(`   ❌ Erreur création enfant ${childData.firstName} ${childData.lastName}:`, error);
+                            throw new Error(`Erreur lors de la création de l'étudiant ${childData.firstName} ${childData.lastName}: ${error.message}`);
+                        }
                     }
                 }
 
