@@ -7,7 +7,7 @@ async function fixUndefinedRequestedClass() {
     try {
         // 1. Identifier les demandes avec des problèmes de requestedClass
         console.log('🔍 Recherche des demandes avec requestedClass undefined...');
-        
+
         const allRequests = await prisma.preInscriptionRequest.findMany({
             where: {
                 OR: [
@@ -26,10 +26,10 @@ async function fixUndefinedRequestedClass() {
             try {
                 if (request.children) {
                     const children = JSON.parse(request.children);
-                    const hasUndefinedClass = children.some(child => 
+                    const hasUndefinedClass = children.some(child =>
                         !child.requestedClass || child.requestedClass === 'undefined' || child.requestedClass === ''
                     );
-                    
+
                     if (hasUndefinedClass) {
                         problematicRequests.push({
                             id: request.id,
@@ -49,7 +49,7 @@ async function fixUndefinedRequestedClass() {
         }
 
         console.log(`\n⚠️  ${problematicRequests.length} demande(s) avec requestedClass problématique:`);
-        
+
         if (problematicRequests.length > 0) {
             console.table(problematicRequests.map(req => ({
                 ID: req.id,
@@ -59,7 +59,7 @@ async function fixUndefinedRequestedClass() {
 
             // 2. Proposer des corrections automatiques
             console.log('\n🔧 Application des corrections...');
-            
+
             for (const problemRequest of problematicRequests) {
                 if (problemRequest.children !== 'PARSING_ERROR') {
                     const correctedChildren = problemRequest.children.map(child => {
@@ -68,9 +68,9 @@ async function fixUndefinedRequestedClass() {
                             const birthYear = child.birthDate ? new Date(child.birthDate).getFullYear() : null;
                             const currentYear = new Date().getFullYear();
                             const age = birthYear ? currentYear - birthYear : null;
-                            
+
                             let defaultClass = 'CP'; // Classe par défaut
-                            
+
                             if (age) {
                                 if (age <= 3) defaultClass = 'TPS';
                                 else if (age === 4) defaultClass = 'PS';
@@ -82,9 +82,9 @@ async function fixUndefinedRequestedClass() {
                                 else if (age === 10) defaultClass = 'CM1';
                                 else if (age >= 11) defaultClass = 'CM2';
                             }
-                            
+
                             console.log(`   🔧 ${child.firstName} ${child.lastName} (âge: ${age || 'inconnu'}) -> ${defaultClass}`);
-                            
+
                             return {
                                 ...child,
                                 requestedClass: defaultClass
@@ -110,7 +110,7 @@ async function fixUndefinedRequestedClass() {
 
         // 3. Créer un mapping des classes disponibles pour éviter les futures erreurs
         console.log('\n📚 Vérification des classes disponibles...');
-        
+
         const availableClasses = await prisma.classe.findMany({
             select: { nom: true, niveau: true },
             orderBy: { id: 'asc' }
@@ -121,7 +121,7 @@ async function fixUndefinedRequestedClass() {
 
         // 4. Vérifier que les classes demandées correspondent aux classes disponibles
         console.log('\n🔍 Vérification correspondance classes demandées/disponibles...');
-        
+
         const updatedRequests = await prisma.preInscriptionRequest.findMany({
             where: {
                 OR: [
@@ -139,12 +139,12 @@ async function fixUndefinedRequestedClass() {
                     const children = JSON.parse(request.children);
                     children.forEach(child => {
                         if (child.requestedClass) {
-                            const classExists = availableClasses.some(cls => 
-                                cls.nom === child.requestedClass || 
+                            const classExists = availableClasses.some(cls =>
+                                cls.nom === child.requestedClass ||
                                 cls.nom.includes(child.requestedClass) ||
                                 cls.niveau === child.requestedClass
                             );
-                            
+
                             if (!classExists) {
                                 missingClasses.add(child.requestedClass);
                             }
@@ -159,7 +159,7 @@ async function fixUndefinedRequestedClass() {
         if (missingClasses.size > 0) {
             console.log('\n⚠️  Classes demandées mais non disponibles en base :');
             console.log(Array.from(missingClasses));
-            
+
             console.log('\n🏗️  Création des classes manquantes...');
             for (const className of missingClasses) {
                 try {
@@ -182,7 +182,7 @@ async function fixUndefinedRequestedClass() {
         // 5. Résumé final
         console.log('\n📋 RÉSUMÉ DE LA CORRECTION :');
         console.log('='.repeat(50));
-        
+
         const finalRequests = await prisma.preInscriptionRequest.findMany({
             where: {
                 OR: [
@@ -197,7 +197,7 @@ async function fixUndefinedRequestedClass() {
             try {
                 if (request.children) {
                     const children = JSON.parse(request.children);
-                    const hasUndefinedClass = children.some(child => 
+                    const hasUndefinedClass = children.some(child =>
                         !child.requestedClass || child.requestedClass === 'undefined' || child.requestedClass === ''
                     );
                     if (hasUndefinedClass) finalProblematicCount++;

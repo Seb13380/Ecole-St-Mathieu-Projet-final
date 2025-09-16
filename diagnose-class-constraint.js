@@ -17,7 +17,7 @@ async function diagnoseClassConstraint() {
             WHERE table_name = 'Student' 
             AND column_name IN ('classeId', 'classId')
         `;
-        
+
         console.log('📋 Schéma des colonnes classe :');
         console.table(studentSchema);
 
@@ -92,13 +92,13 @@ async function diagnoseClassConstraint() {
         try {
             // Trouver une classe existante
             const firstClass = await prisma.classe.findFirst();
-            
+
             if (!firstClass) {
                 console.log('❌ Impossible de faire le test : aucune classe disponible');
                 console.log('💡 Créez au moins une classe avec: node create-basic-classes.js');
             } else {
                 console.log(`✅ Utilisation de la classe : ${firstClass.nom} (ID: ${firstClass.id})`);
-                
+
                 // Simulation sans création réelle
                 console.log('📝 Les données qui seraient utilisées :');
                 console.log(`   - firstName: "Test"`);
@@ -106,13 +106,13 @@ async function diagnoseClassConstraint() {
                 console.log(`   - dateNaissance: new Date('2015-01-01')`);
                 console.log(`   - classeId: ${firstClass.id}`);
                 console.log(`   - parentId: [ID d'un parent existant]`);
-                
+
                 // Vérifier si un parent existe
                 const parentCount = await prisma.user.count({
                     where: { role: 'PARENT' }
                 });
                 console.log(`📊 Nombre de parents dans la base : ${parentCount}`);
-                
+
                 if (parentCount === 0) {
                     console.log('⚠️  ATTENTION : Aucun parent dans la base !');
                     console.log('💡 Il faut créer des comptes parents avant de pouvoir créer des étudiants');
@@ -126,14 +126,14 @@ async function diagnoseClassConstraint() {
         // 6. Résumé et recommandations
         console.log('\n📋 RÉSUMÉ DU DIAGNOSTIC :');
         console.log('='.repeat(50));
-        
+
         if (classCount === 0) {
             console.log('🚨 PROBLÈME MAJEUR : Aucune classe dans la base de données');
             console.log('💡 SOLUTION : Exécuter "node create-basic-classes.js"');
         } else {
             console.log('✅ Classes disponibles dans la base');
         }
-        
+
         const parentCount = await prisma.user.count({ where: { role: 'PARENT' } });
         if (parentCount === 0) {
             console.log('⚠️  ATTENTION : Aucun parent dans la base');
@@ -143,7 +143,7 @@ async function diagnoseClassConstraint() {
 
     } catch (error) {
         console.error('❌ Erreur lors du diagnostic :', error);
-        
+
         // Analyser le type d'erreur
         if (error.message.includes('does not exist')) {
             console.log('💡 La table semble ne pas exister. Vérifiez les migrations Prisma.');

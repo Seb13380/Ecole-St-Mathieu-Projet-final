@@ -7,11 +7,11 @@ async function fixClassConstraint() {
     try {
         // 1. Analyser la situation actuelle
         console.log('📊 Analyse de la situation actuelle...');
-        
+
         const classCount = await prisma.classe.count();
         const studentCount = await prisma.student.count();
         const parentCount = await prisma.user.count({ where: { role: 'PARENT' } });
-        
+
         console.log(`📚 Classes : ${classCount}`);
         console.log(`👶 Étudiants : ${studentCount}`);
         console.log(`👨‍👩‍👧‍👦 Parents : ${parentCount}`);
@@ -19,7 +19,7 @@ async function fixClassConstraint() {
         // 2. Créer des classes de base si elles n'existent pas
         if (classCount === 0) {
             console.log('\n🏗️  Création des classes de base...');
-            
+
             const classesToCreate = [
                 { nom: 'TPS', niveau: 'Toute Petite Section', anneeScolaire: '2025-2026' },
                 { nom: 'PS', niveau: 'Petite Section', anneeScolaire: '2025-2026' },
@@ -46,7 +46,7 @@ async function fixClassConstraint() {
 
         // 3. Vérifier les étudiants et leurs classes
         console.log('\n🔍 Vérification des étudiants...');
-        
+
         const allStudents = await prisma.student.findMany({
             include: {
                 parent: {
@@ -59,7 +59,7 @@ async function fixClassConstraint() {
         });
 
         console.log(`📊 Total étudiants : ${allStudents.length}`);
-        
+
         // Vérifier s'il y a des étudiants avec des classeId invalides
         const studentsWithInvalidClass = [];
         for (const student of allStudents) {
@@ -76,7 +76,7 @@ async function fixClassConstraint() {
 
         if (studentsWithInvalidClass.length > 0) {
             console.log(`⚠️  ${studentsWithInvalidClass.length} étudiant(s) avec classe invalide trouvé(s)`);
-            
+
             // Assigner une classe par défaut (CP)
             const defaultClass = await prisma.classe.findFirst({
                 where: { nom: 'CP' }
@@ -101,7 +101,7 @@ async function fixClassConstraint() {
 
         // 4. Test de création d'étudiant pour vérifier que tout fonctionne
         console.log('\n🧪 Test de création d\'étudiant...');
-        
+
         try {
             // Trouver un parent de test ou en créer un
             let testParent = await prisma.user.findFirst({
@@ -154,7 +154,7 @@ async function fixClassConstraint() {
                 const otherChildren = await prisma.student.count({
                     where: { parentId: testParent.id }
                 });
-                
+
                 if (otherChildren === 0) {
                     await prisma.user.delete({ where: { id: testParent.id } });
                     console.log('🧹 Parent de test supprimé');
@@ -166,7 +166,7 @@ async function fixClassConstraint() {
 
         } catch (error) {
             console.log('❌ Erreur lors du test de création :', error.message);
-            
+
             if (error.message.includes('Foreign key constraint')) {
                 console.log('🚨 PROBLÈME PERSISTANT : Contrainte de clé étrangère');
                 console.log('💡 Vérifiez que la base de données est correctement migrée');
@@ -177,7 +177,7 @@ async function fixClassConstraint() {
         // 5. Résumé final
         console.log('\n📋 RÉSUMÉ DE LA CORRECTION :');
         console.log('='.repeat(50));
-        
+
         const finalClassCount = await prisma.classe.count();
         const finalStudentCount = await prisma.student.count();
         const studentsWithValidClass = await prisma.student.count({
@@ -202,7 +202,7 @@ async function fixClassConstraint() {
 
     } catch (error) {
         console.error('❌ Erreur lors de la correction :', error);
-        
+
         // Suggestions selon le type d'erreur
         if (error.message.includes('does not exist')) {
             console.log('💡 SOLUTION : Exécuter les migrations Prisma');
