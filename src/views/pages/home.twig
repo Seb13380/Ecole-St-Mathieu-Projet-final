@@ -7,33 +7,11 @@
 
 {% block main %}
 
-	<!-- Bandeau de d										<!-- Media optionnel -->
-	{% if actualite.mediaUrl %}
-		<div style="flex-shrink: 0; width: 256px; height: 192px;">
-			{% if actualite.mediaType == 'image' %}
-				<img src="{{ actualite.mediaUrl }}" alt="{{ actualite.titre }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: box-shadow 0.3s ease;">
-			{% elseif actualite.mediaType == 'pdf' %}
-				<div
-					style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; background: linear-gradient(45deg, #f8fafc, #e2e8f0); border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 16px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
-					<!-- Icône PDF -->
-					<svg style="width: 48px; height: 48px; color: #dc2626; margin-bottom: 8px;" fill="currentColor" viewbox="0 0 20 20">
-						<path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
-					</svg>
-					<div style="text-align: center; color: #374151;">
-						<div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Document PDF</div>
-						<a href="{{ actualite.mediaUrl }}" target="_blank" style="display: inline-block; padding: 6px 12px; background: linear-gradient(to right, #dc2626, #b91c1c); color: white; font-size: 12px; font-weight: 500; border-radius: 6px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.background='linear-gradient(to right, #b91c1c, #991b1b)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='linear-gradient(to right, #dc2626, #b91c1c)'; this.style.transform='scale(1)'">
-							Télécharger
-						</a>
-					</div>
-				</div>
-			{% endif %}
-		</div>
-	{% endif %}
+	<!-- Bandeau de défilement -->
 	<div style="background: linear-gradient(45deg, #0d9488, #14b8a6, #5eead4); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #0f766e;">
 		<div style="animation: marquee 20s linear infinite;">
 			✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
 		</div>
-
 	</div>
 
 	<style>
@@ -63,7 +41,7 @@
 	<div class="w-full">
 		{% if heroCarouselImages and heroCarouselImages|length > 0 %}
 			<!-- Hero Carousel DaisyUI avec images uploadées -->
-			<div class="carousel w-full h-[600px] hero-carousel">
+			<div class="carousel w-full hero-carousel" style="height: 70rem !important;">
 				{% for image in heroCarouselImages %}
 					<div id="hero-slide{{ loop.index }}" class="carousel-item relative w-full">
 						<img src="/uploads/hero-carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'École Saint-Mathieu' }}">
@@ -88,7 +66,7 @@
 			</div>
 		{% else %}
 			<!-- Fallback: Hero Carousel DaisyUI avec images par défaut -->
-			<div class="carousel w-full h-[600px] hero-carousel">
+			<div class="carousel w-full hero-carousel" style="height: 70rem !important;">
 				<div id="hero-fallback-slide1" class="carousel-item relative w-full">
 					<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="École Saint-Mathieu">
 					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
