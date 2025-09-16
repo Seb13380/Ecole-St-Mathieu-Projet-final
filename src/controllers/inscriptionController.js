@@ -214,32 +214,40 @@ const inscriptionController = {
             }
 
             // Vérifier si un compte parent existe déjà
-            const existingUser = await prisma.user.findUnique({
+            let existingUser = await prisma.user.findUnique({
                 where: { email: request.parentEmail }
             });
 
-            if (existingUser) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Un compte avec cet email existe déjà'
-                });
-            }
-
-            // Créer le compte parent avec un mot de passe temporaire
-            const tempPassword = 'TempEcole' + Math.floor(Math.random() * 1000) + '!';
+            let parentUser;
+            let tempPassword = 'TempEcole' + Math.floor(Math.random() * 1000) + '!';
             const hashedTempPassword = await bcrypt.hash(tempPassword, 12);
 
-            const parentUser = await prisma.user.create({
-                data: {
-                    firstName: request.parentFirstName,
-                    lastName: request.parentLastName,
-                    email: request.parentEmail,
-                    password: hashedTempPassword, // Mot de passe temporaire sécurisé
-                    role: 'PARENT',
-                    phone: request.parentPhone,
-                    adress: request.parentAddress
-                }
-            });
+            if (existingUser) {
+                // Si le parent existe déjà, l'utiliser et mettre à jour son mot de passe
+                parentUser = await prisma.user.update({
+                    where: { id: existingUser.id },
+                    data: {
+                        password: hashedTempPassword,
+                        phone: request.parentPhone || existingUser.phone,
+                        adress: request.parentAddress || existingUser.adress
+                    }
+                });
+                console.log('✅ Compte parent existant mis à jour:', request.parentEmail);
+            } else {
+                // Créer le compte parent avec un mot de passe temporaire
+                parentUser = await prisma.user.create({
+                    data: {
+                        firstName: request.parentFirstName,
+                        lastName: request.parentLastName,
+                        email: request.parentEmail,
+                        password: hashedTempPassword, // Mot de passe temporaire sécurisé
+                        role: 'PARENT',
+                        phone: request.parentPhone,
+                        adress: request.parentAddress
+                    }
+                });
+                console.log('✅ Nouveau compte parent créé:', request.parentEmail);
+            }
 
             console.log('✅ Compte parent créé:', request.parentEmail);
 
