@@ -86,14 +86,14 @@ model Student {
   firstName     String
   lastName      String
   dateNaissance DateTime
-  classeId      Int
+  classeId      Int? // 👈 Ajout du ? pour rendre optionnel
   parentId      Int
   photoUrl      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   parent          User              @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
-  classe          Classe            @relation("ClasseEleves", fields: [classeId], references: [id])
+  classe          Classe?           @relation("ClasseEleves", fields: [classeId], references: [id]) // 👈 Ajout du ?
   TicketBooklet   TicketBooklet[]
   MealReservation MealReservation[]
   TicketPurchase  TicketPurchase[]
