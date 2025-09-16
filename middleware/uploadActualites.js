@@ -11,7 +11,25 @@ if (!fs.existsSync(uploadsDir)) {
 // Configuration du storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadsDir);
+        // Déterminer le dossier selon le type de fichier
+        let uploadPath;
+
+        if (file.mimetype.startsWith('image/')) {
+            uploadPath = path.join(__dirname, '..', 'public', 'uploads', 'actualites');
+        } else if (file.mimetype.startsWith('video/')) {
+            uploadPath = path.join(__dirname, '..', 'public', 'uploads', 'actualites');
+        } else if (file.mimetype === 'application/pdf') {
+            uploadPath = path.join(__dirname, '..', 'public', 'assets', 'documents', 'actualites');
+        } else {
+            uploadPath = uploadsDir; // fallback
+        }
+
+        // Créer le dossier s'il n'existe pas
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+
+        cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
         // Génère un nom unique avec timestamp
@@ -21,7 +39,7 @@ const storage = multer.diskStorage({
     }
 });
 
-// Filtre pour accepter seulement images et vidéos
+// Filtre pour accepter images, vidéos et PDF
 const fileFilter = (req, file, cb) => {
     const allowedMimes = [
         'image/jpeg',
@@ -31,13 +49,14 @@ const fileFilter = (req, file, cb) => {
         'image/webp',
         'video/mp4',
         'video/webm',
-        'video/ogg'
+        'video/ogg',
+        'application/pdf'  // Support PDF ajouté
     ];
 
     if (allowedMimes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Type de fichier non autorisé. Utilisez des images (JPEG, PNG, GIF, WebP) ou des vidéos (MP4, WebM, OGG).'), false);
+        cb(new Error('Type de fichier non autorisé. Utilisez des images (JPEG, PNG, GIF, WebP), des vidéos (MP4, WebM, OGG) ou des documents PDF.'), false);
     }
 };
 

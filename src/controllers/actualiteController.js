@@ -6,16 +6,23 @@ const prisma = new PrismaClient();
 const actualiteController = {
   async getActualites(req, res) {
     try {
+      console.log('🔍 getActualites appelé');
+      console.log('Session utilisateur:', req.session && req.session.user ? 'Connecté' : 'Non connecté');
+
       // Déterminer quelles actualités afficher selon l'état de connexion
       let whereClause = { visible: true };
 
       if (req.session && req.session.user) {
         // Utilisateur connecté : voir toutes les actualités visibles (publiques ET privées)
         whereClause = { visible: true };
+        console.log('👤 Mode connecté : actualités visibles (publiques + privées)');
       } else {
         // Utilisateur non connecté : voir seulement les actualités publiques
         whereClause = { visible: true, public: true };
+        console.log('🌍 Mode public : actualités visibles ET publiques seulement');
       }
+
+      console.log('📋 Clause WHERE:', whereClause);
 
       const actualites = await prisma.actualite.findMany({
         where: whereClause,
@@ -28,6 +35,13 @@ const actualiteController = {
           { important: 'desc' },
           { datePublication: 'desc' }
         ]
+      });
+
+      console.log(`📊 ${actualites.length} actualité(s) trouvée(s)`);
+
+      // Log détaillé pour debug
+      actualites.forEach(act => {
+        console.log(`   - ${act.titre}: visible=${act.visible}, public=${act.public}, important=${act.important}`);
       });
 
       res.render('pages/actualites', {
@@ -85,9 +99,18 @@ const actualiteController = {
       let mediaUrl = null;
       let mediaType = null;
       if (req.file) {
-        mediaUrl = `/uploads/actualites/${req.file.filename}`;
-        mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
-        console.log('📁 Média ajouté:', { mediaUrl, mediaType });
+        // Déterminer le type de média selon le MIME type
+        if (req.file.mimetype.startsWith('image/')) {
+          mediaType = 'image';
+          mediaUrl = `/uploads/actualites/${req.file.filename}`;
+        } else if (req.file.mimetype.startsWith('video/')) {
+          mediaType = 'video';
+          mediaUrl = `/uploads/actualites/${req.file.filename}`;
+        } else if (req.file.mimetype === 'application/pdf') {
+          mediaType = 'pdf';
+          mediaUrl = `/assets/documents/actualites/${req.file.filename}`;
+        }
+        console.log('📁 Média ajouté:', { mediaUrl, mediaType, mimetype: req.file.mimetype });
       }
 
       const actualite = await prisma.actualite.create({
@@ -188,9 +211,18 @@ const actualiteController = {
 
       // Gestion du nouveau fichier média
       if (req.file) {
-        updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;
-        updateData.mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
-        console.log('📁 Nouveau média ajouté:', { mediaUrl: updateData.mediaUrl, mediaType: updateData.mediaType });
+        // Déterminer le type de média selon le MIME type
+        if (req.file.mimetype.startsWith('image/')) {
+          updateData.mediaType = 'image';
+          updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;
+        } else if (req.file.mimetype.startsWith('video/')) {
+          updateData.mediaType = 'video';
+          updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;
+        } else if (req.file.mimetype === 'application/pdf') {
+          updateData.mediaType = 'pdf';
+          updateData.mediaUrl = `/assets/documents/actualites/${req.file.filename}`;
+        }
+        console.log('📁 Nouveau média ajouté:', { mediaUrl: updateData.mediaUrl, mediaType: updateData.mediaType, mimetype: req.file.mimetype });
       }
 
       const actualite = await prisma.actualite.update({
