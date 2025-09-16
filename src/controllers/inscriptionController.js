@@ -272,51 +272,81 @@ const inscriptionController = {
 
                     if (childData.firstName && childData.lastName && childData.birthDate) {
                         // 🎯 Attribution dynamique de la classe selon le niveau scolaire ou requestedClass
-                        let classeId = 1; // CP A par défaut
+                        let classeId = null;
+                        let assignmentMethod = '';
 
                         // Priorité 1: requestedClass si présente et valide
                         if (childData.requestedClass) {
-                            const requestedClassObj = await prisma.classe.findFirst({
-                                where: { nom: childData.requestedClass }
+                            // Essayer d'abord par niveau (PS, MS, GS, CP, etc.)
+                            let requestedClassObj = await prisma.classe.findFirst({
+                                where: { niveau: childData.requestedClass }
                             });
+
+                            // Si pas trouvé par niveau, essayer par nom
+                            if (!requestedClassObj) {
+                                requestedClassObj = await prisma.classe.findFirst({
+                                    where: { nom: childData.requestedClass }
+                                });
+                            }
 
                             if (requestedClassObj) {
                                 classeId = requestedClassObj.id;
-                                console.log(`   ✅ Classe assignée via requestedClass: ${childData.requestedClass} (ID: ${classeId})`);
+                                assignmentMethod = `requestedClass "${childData.requestedClass}" → ${requestedClassObj.nom}`;
+                                console.log(`   ✅ Classe trouvée via requestedClass: ${assignmentMethod} (ID: ${classeId})`);
                             } else {
-                                console.log(`   ⚠️ Classe demandée "${childData.requestedClass}" non trouvée, utilisation du niveau scolaire`);
+                                console.log(`   ⚠️ Classe demandée "${childData.requestedClass}" non trouvée par niveau ni par nom`);
+
+                                // Lister les classes disponibles pour debug
+                                const availableClasses = await prisma.classe.findMany({
+                                    select: { id: true, nom: true, niveau: true }
+                                });
+                                console.log('   📋 Classes disponibles:', availableClasses.map(c => `${c.niveau || 'null'} - ${c.nom} (ID: ${c.id})`));
                             }
                         } else {
-                            console.log(`   ⚠️ Aucune classe demandée pour ${childData.firstName}, utilisation du niveau scolaire`);
+                            console.log(`   ⚠️ Aucune classe demandée pour ${childData.firstName}, recherche par niveau scolaire`);
                         }
 
                         // Priorité 2: schoolLevel si requestedClass n'est pas utilisable
-                        if (!childData.requestedClass || classeId === 1) {
-                            if (childData.schoolLevel) {
-                                switch (childData.schoolLevel.toLowerCase()) {
-                                    case 'cp':
-                                        classeId = 1; // CP A
-                                        break;
-                                    case 'ce1':
-                                        classeId = 2; // CE1 A
-                                        break;
-                                    case 'ce2':
-                                        classeId = 3; // CE2 A
-                                        break;
-                                    case 'cm1':
-                                        classeId = 4; // CM1 A
-                                        break;
-                                    case 'cm2':
-                                        classeId = 5; // CM2 A
-                                        break;
-                                    default:
-                                        classeId = 1; // CP A par défaut
+                        if (!classeId && childData.schoolLevel) {
+                            const schoolLevelObj = await prisma.classe.findFirst({
+                                where: { niveau: childData.schoolLevel.toUpperCase() }
+                            });
+
+                            if (schoolLevelObj) {
+                                classeId = schoolLevelObj.id;
+                                assignmentMethod = `schoolLevel "${childData.schoolLevel}" → ${schoolLevelObj.nom}`;
+                                console.log(`   ✅ Classe trouvée via schoolLevel: ${assignmentMethod} (ID: ${classeId})`);
+                            } else {
+                                console.log(`   ⚠️ Niveau scolaire "${childData.schoolLevel}" non trouvé`);
+                            }
+                        }
+
+                        // Priorité 3: Classe par défaut si rien n'est trouvé
+                        if (!classeId) {
+                            const defaultClass = await prisma.classe.findFirst({
+                                where: { niveau: 'PS' }
+                            });
+
+                            if (defaultClass) {
+                                classeId = defaultClass.id;
+                                assignmentMethod = `défaut → ${defaultClass.nom}`;
+                                console.log(`   ⚠️ Classe par défaut utilisée: ${assignmentMethod} (ID: ${classeId})`);
+                            } else {
+                                // En dernier recours, prendre la première classe disponible
+                                const firstClass = await prisma.classe.findFirst();
+                                if (firstClass) {
+                                    classeId = firstClass.id;
+                                    assignmentMethod = `première disponible → ${firstClass.nom}`;
+                                    console.log(`   ⚠️ Première classe disponible utilisée: ${assignmentMethod} (ID: ${classeId})`);
+                                } else {
+                                    throw new Error('Aucune classe disponible dans la base de données');
                                 }
-                                console.log(`   ✅ Classe assignée via schoolLevel: ${childData.schoolLevel} (ID: ${classeId})`);
                             }
                         }
 
                         try {
+                            console.log(`   🎯 Création étudiant: ${childData.firstName} ${childData.lastName} avec classeId=${classeId} (${assignmentMethod})`);
+
                             const student = await prisma.student.create({
                                 data: {
                                     firstName: childData.firstName,
@@ -328,10 +358,16 @@ const inscriptionController = {
                             });
 
                             createdStudents.push(student);
-                            console.log(`   ✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id}, Classe: ${classeId})`);
+                            console.log(`   ✅ Enfant créé avec succès: ${student.firstName} ${student.lastName} (ID: ${student.id}, Classe: ${classeId})`);
                         } catch (error) {
-                            console.error(`   ❌ Erreur création enfant ${childData.firstName} ${childData.lastName}:`, error);
-                            throw new Error(`Erreur lors de la création de l'étudiant ${childData.firstName} ${childData.lastName}: ${error.message}`);
+                            console.error(`   ❌ Erreur création enfant ${childData.firstName} ${childData.lastName}:`, {
+                                error: error.message,
+                                classeId: classeId,
+                                assignmentMethod: assignmentMethod,
+                                requestedClass: childData.requestedClass,
+                                schoolLevel: childData.schoolLevel
+                            });
+                            throw new Error(`Erreur lors de la création de l'étudiant ${childData.firstName} ${childData.lastName}: ${error.message} (classeId: ${classeId}, méthode: ${assignmentMethod})`);
                         }
                     }
                 }
