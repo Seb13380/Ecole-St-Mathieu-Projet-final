@@ -23,11 +23,7 @@ router.put('/:id', requireAuth, requireHeroCarouselPermission, heroCarouselContr
 router.delete('/:id', requireAuth, requireHeroCarouselPermission, heroCarouselController.deleteImage);
 router.patch('/:id/toggle-status', requireAuth, requireHeroCarouselPermission, heroCarouselController.toggleStatus);
 
-module.exports = router;
-router.put('/:id', requireAuth, requireHeroCarouselPermission, heroCarouselController.updateImage);
-router.delete('/:id', requireAuth, requireHeroCarouselPermission, heroCarouselController.deleteImage);
 // Alias pour le toggle du statut: certaines vues utilisent /:id/toggle
-router.patch('/:id/toggle-status', requireAuth, requireHeroCarouselPermission, heroCarouselController.toggleStatus);
 router.post('/:id/toggle', requireAuth, requireHeroCarouselPermission, heroCarouselController.toggleStatus);
 
 module.exports = router;
