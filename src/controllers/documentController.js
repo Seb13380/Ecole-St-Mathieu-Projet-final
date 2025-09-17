@@ -457,6 +457,14 @@ const documentController = {
                     'PASTORALE_ENSEMBLE'
                 ];
                 pageTitle = 'Documents Pastorale';
+            } else if (category === 'apel') {
+                documentTypes = [
+                    'APEL_COMPTES_RENDUS',
+                    'APEL_PROJETS',
+                    'APEL_INFORMATIONS',
+                    'APEL_EVENEMENTS'
+                ];
+                pageTitle = 'Documents APEL';
             } else {
                 return res.status(404).render('errors/404.twig');
             }
