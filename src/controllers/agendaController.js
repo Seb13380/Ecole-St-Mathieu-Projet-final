@@ -320,18 +320,50 @@ const getEventsAPI = async (req, res) => {
         });
 
         // Formater pour FullCalendar
-        const formattedEvents = events.map(event => ({
-            id: event.id,
-            title: event.titre,
-            start: event.dateDebut,
-            end: event.dateFin,
-            backgroundColor: event.couleur,
-            borderColor: event.couleur,
-            description: event.description,
-            lieu: event.lieu,
-            important: event.important,
-            auteur: `${event.auteur.firstName} ${event.auteur.lastName}`
-        }));
+        const formattedEvents = events.map(event => {
+            const eventData = {
+                id: event.id,
+                title: event.titre,
+                backgroundColor: event.couleur,
+                borderColor: event.couleur,
+                description: event.description,
+                lieu: event.lieu,
+                important: event.important,
+                auteur: `${event.auteur.firstName} ${event.auteur.lastName}`
+            };
+
+            // Si l'événement a une heure précise, on l'inclut
+            if (event.heureDebut) {
+                // Créer une date complète avec l'heure
+                const startDate = new Date(event.dateDebut);
+                const [heureDebut, minuteDebut] = event.heureDebut.split(':');
+                startDate.setHours(parseInt(heureDebut), parseInt(minuteDebut || '0'), 0, 0);
+
+                eventData.start = startDate;
+
+                if (event.heureFin && event.dateFin) {
+                    const endDate = new Date(event.dateFin);
+                    const [heureFin, minuteFin] = event.heureFin.split(':');
+                    endDate.setHours(parseInt(heureFin), parseInt(minuteFin || '0'), 0, 0);
+                    eventData.end = endDate;
+                } else if (event.heureFin) {
+                    const endDate = new Date(event.dateDebut);
+                    const [heureFin, minuteFin] = event.heureFin.split(':');
+                    endDate.setHours(parseInt(heureFin), parseInt(minuteFin || '0'), 0, 0);
+                    eventData.end = endDate;
+                }
+            } else {
+                // Événement "toute la journée" - on utilise seulement la date
+                eventData.start = event.dateDebut.toISOString().split('T')[0]; // Format YYYY-MM-DD
+                eventData.allDay = true;
+
+                if (event.dateFin) {
+                    eventData.end = event.dateFin.toISOString().split('T')[0];
+                }
+            }
+
+            return eventData;
+        });
 
         res.json(formattedEvents);
 

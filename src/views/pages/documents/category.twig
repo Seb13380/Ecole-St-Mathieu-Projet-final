@@ -12,8 +12,10 @@
 		<h1 class="text-4xl md:text-5xl font-bold mb-6 text-[#304a4d]" style="font-size: 2.8rem !important;">
 			{% if category == 'ecole' %}
 				📄 Documents Officiels de l'École
-			{% else %}
+			{% elseif category == 'pastorale' %}
 				✝️ Documents Pastorale
+			{% elseif category == 'apel' %}
+				🤝 Documents APEL
 			{% endif %}
 		</h1>
 
@@ -26,15 +28,19 @@
 				<h3 class="font-bold text-lg" style="font-size: 1.2rem !important;">
 					{% if category == 'ecole' %}
 						Documents pédagogiques et administratifs
-					{% else %}
+					{% elseif category == 'pastorale' %}
 						Documents spirituels et pastoraux
+					{% elseif category == 'apel' %}
+						Documents de l'Association de Parents d'Élèves
 					{% endif %}
 				</h3>
 				<div class="text-base" style="font-size: 1rem !important;">
 					{% if category == 'ecole' %}
 						Retrouvez tous les documents officiels, projets éducatifs et chartes de l'école
-					{% else %}
+					{% elseif category == 'pastorale' %}
 						Découvrez les documents relatifs à la pastorale et à la spiritualité de l'école
+					{% elseif category == 'apel' %}
+						Comptes-rendus, projets et informations de l'APEL de l'école
 					{% endif %}
 				</div>
 			</div>
@@ -298,7 +304,6 @@
 				{# Documents pastorale (toujours publics) #}
 				{% for type, documents in documentsByType %}
 					{% if type starts with 'PASTORALE_' %}
-						{% set document = documents[0] %}
 						<div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 border-l-4 border-purple-500">
 							<div class="card-body">
 								<div class="flex items-start justify-between mb-3">
@@ -311,51 +316,183 @@
 										{% endif %}
 									</h3>
 
-									{% if document.active %}
-										<div class="badge badge-success badge-sm">✅ Disponible</div>
-									{% else %}
-										<div class="badge badge-warning badge-sm">⏳ En préparation</div>
-									{% endif %}
-								</div>
-
-								{% if document.description %}
-									<p class="text-slate-600 text-base mb-4 leading-relaxed" style="font-size: 1rem !important;">
-										{{ document.description }}
-									</p>
-								{% endif %}
-
-								<div class="text-sm text-slate-500 mb-4" style="font-size: 0.9rem !important;">
-									<div class="flex items-center">
-										<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-										</svg>
-										Mis à jour le
-										{{ document.updatedAt|date('d/m/Y') }}
+									<div class="flex flex-col gap-1">
+										<div class="badge badge-success badge-sm">📁
+											{{ documents|length }}
+											document{{ documents|length > 1 ? 's' : '' }}</div>
+										<div class="badge badge-success badge-sm">🌍 Accès public</div>
 									</div>
 								</div>
 
-								<div class="card-actions justify-end mt-auto">
-									{% if document.contenu %}
-										<a href="/documents/show/{{ document.id }}" class="btn btn-primary btn-sm">
-											<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-											</svg>
-											Consulter
-										</a>
+								<p class="text-slate-600 text-base mb-4 leading-relaxed" style="font-size: 1rem !important;">
+									{% if type == 'PASTORALE_AXE' %}
+										Documents relatifs à l'axe pastoral de l'école
+									{% elseif type == 'PASTORALE_TEMPS_PRIANT' %}
+										Documents pour les temps de prière et de recueillement
+									{% elseif type == 'PASTORALE_ENSEMBLE' %}
+										Documents de l'ensemble pastoral
+									{% else %}
+										Documents spirituels et pastoraux
 									{% endif %}
+								</p>
 
-									{% if document.pdfUrl %}
-										<a href="{{ document.pdfUrl }}" target="_blank" class="btn btn-secondary btn-sm">
-											<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-											</svg>
-											PDF
-										</a>
-									{% endif %}
+								{# Liste des documents #}
+								<div class="space-y-2 mb-4">
+									{% for document in documents %}
+										<div class="flex items-center justify-between p-2 bg-slate-50 rounded">
+											<div class="flex-1">
+												<span class="text-base font-medium" style="font-size: 1rem !important;">{{ document.titre }}</span>
+												{% if document.description %}
+													<div class="text-sm text-slate-600 mt-1" style="font-size: 0.85rem !important;">{{ document.description }}</div>
+												{% endif %}
+												<div class="text-sm text-slate-500" style="font-size: 0.9rem !important;">
+													Mis à jour le
+													{{ document.updatedAt|date('d/m/Y') }}
+													{% if document.auteur %}
+														par
+														{{ document.auteur.firstName }}
+														{{ document.auteur.lastName }}
+													{% endif %}
+												</div>
+											</div>
+											<div class="flex gap-1">
+												{% if document.contenu %}
+													<a href="/documents/show/{{ document.id }}" class="btn btn-xs btn-primary" title="Consulter">
+														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+														</svg>
+													</a>
+												{% endif %}
+												{% if document.pdfUrl %}
+													<a href="{{ document.pdfUrl }}" target="_blank" class="btn btn-xs btn-secondary" title="Télécharger PDF">
+														📄
+													</a>
+												{% endif %}
+												{% if document.isExternalLink and document.externalUrl %}
+													<a href="{{ document.externalUrl }}" target="_blank" class="btn btn-xs btn-accent" title="Lien externe">
+														🔗
+													</a>
+												{% endif %}
+											</div>
+										</div>
+									{% endfor %}
 								</div>
 							</div>
 						</div>
+					{% endif %}
+				{% endfor %}
+
+				{# Documents APEL (accès restreint aux connectés) #}
+				{% for type, documents in documentsByType %}
+					{% if type starts with 'APEL_' %}
+						{% if isAuthenticated %}
+							<div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 border-l-4 border-orange-500">
+								<div class="card-body">
+									<div class="flex items-start justify-between mb-3">
+										<h3 class="card-title text-[#304a4d] text-xl" style="font-size: 1.3rem !important;">
+											{% if type == 'APEL_COMPTES_RENDUS' %}📋 Comptes-rendus APEL
+												{% elseif type == 'APEL_PROJETS' %}🎯 Projets APEL
+												{% elseif type == 'APEL_INFORMATIONS' %}ℹ️ Informations APEL
+												{% elseif type == 'APEL_EVENEMENTS' %}🎉 Événements APEL
+												{% else %}📄
+												{{ type|replace('_', ' ')|title }}
+											{% endif %}
+										</h3>
+
+										<div class="flex flex-col gap-1">
+											<div class="badge badge-warning badge-sm">📁
+												{{ documents|length }}
+												document{{ documents|length > 1 ? 's' : '' }}</div>
+											<div class="badge badge-warning badge-sm">🔒 Accès restreint</div>
+										</div>
+									</div>
+
+									<p class="text-slate-600 text-base mb-4 leading-relaxed" style="font-size: 1rem !important;">
+										{% if type == 'APEL_COMPTES_RENDUS' %}
+											Comptes-rendus des réunions et assemblées de l'APEL
+										{% elseif type == 'APEL_PROJETS' %}
+											Projets et initiatives portés par l'APEL
+										{% elseif type == 'APEL_INFORMATIONS' %}
+											Informations générales et communications de l'APEL
+										{% elseif type == 'APEL_EVENEMENTS' %}
+											Événements organisés par l'APEL
+										{% else %}
+											Documents de l'Association de Parents d'Élèves
+										{% endif %}
+									</p>
+
+									{# Liste des documents #}
+									<div class="space-y-2 mb-4">
+										{% for document in documents %}
+											<div class="flex items-center justify-between p-2 bg-slate-50 rounded">
+												<div class="flex-1">
+													<span class="text-base font-medium" style="font-size: 1rem !important;">{{ document.titre }}</span>
+													{% if document.description %}
+														<div class="text-sm text-slate-600 mt-1" style="font-size: 0.85rem !important;">{{ document.description }}</div>
+													{% endif %}
+													<div class="text-sm text-slate-500" style="font-size: 0.9rem !important;">
+														Mis à jour le
+														{{ document.updatedAt|date('d/m/Y') }}
+														{% if document.auteur %}
+															par
+															{{ document.auteur.firstName }}
+															{{ document.auteur.lastName }}
+														{% endif %}
+													</div>
+												</div>
+												<div class="flex gap-1">
+													{% if document.contenu %}
+														<a href="/documents/show/{{ document.id }}" class="btn btn-xs btn-primary" title="Consulter">
+															<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+															</svg>
+														</a>
+													{% endif %}
+													{% if document.pdfUrl %}
+														<a href="{{ document.pdfUrl }}" target="_blank" class="btn btn-xs btn-secondary" title="Télécharger PDF">
+															📄
+														</a>
+													{% endif %}
+													{% if document.isExternalLink and document.externalUrl %}
+														<a href="{{ document.externalUrl }}" target="_blank" class="btn btn-xs btn-accent" title="Lien externe">
+															🔗
+														</a>
+													{% endif %}
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+						{% else %}
+							{# Affichage pour les visiteurs non connectés #}
+							<div class="card bg-slate-100 shadow-lg border-l-4 border-slate-400">
+								<div class="card-body">
+									<div class="flex items-start justify-between mb-3">
+										<h3 class="card-title text-slate-500 text-xl" style="font-size: 1.3rem !important;">
+											{% if type == 'APEL_COMPTES_RENDUS' %}📋 Comptes-rendus APEL
+												{% elseif type == 'APEL_PROJETS' %}🎯 Projets APEL
+												{% elseif type == 'APEL_INFORMATIONS' %}ℹ️ Informations APEL
+												{% elseif type == 'APEL_EVENEMENTS' %}🎉 Événements APEL
+												{% else %}📄
+												{{ type|replace('_', ' ')|title }}
+											{% endif %}
+										</h3>
+										<div class="badge badge-warning badge-sm">🔒 Connexion requise</div>
+									</div>
+
+									<p class="text-slate-500 text-base mb-4" style="font-size: 1rem !important;">
+										Ces documents sont réservés aux membres de la communauté éducative.
+									</p>
+
+									<div class="card-actions justify-center">
+										<a href="/auth/login" class="btn btn-outline btn-sm">
+											🔐 Se connecter pour accéder
+										</a>
+									</div>
+								</div>
+							</div>
+						{% endif %}
 					{% endif %}
 				{% endfor %}
 			</div>
@@ -369,8 +506,10 @@
 					<div class="text-base" style="font-size: 1rem !important;">
 						{% if category == 'ecole' %}
 							Les documents de l'école seront bientôt disponibles.
-						{% else %}
+						{% elseif category == 'pastorale' %}
 							Les documents de la pastorale seront bientôt disponibles.
+						{% elseif category == 'apel' %}
+							Les documents de l'APEL seront bientôt disponibles.
 						{% endif %}
 					</div>
 				</div>

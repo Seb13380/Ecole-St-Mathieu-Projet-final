@@ -218,7 +218,7 @@
 										<div
 											class="flex flex-col gap-2">
 											<!-- Bouton Modifier -->
-											<button onclick="editImage({{ image.id }}, '{{ (image.titre|default(''))|e('js') }}', '{{ (image.description|default(''))|e('js') }}', {{ image.ordre }}, {{ image.active ? 1 : 0 }})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center justify-center">
+											<button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center justify-center edit-btn" data-id="{{ image.id }}" data-titre="{{ image.titre|default('') }}" data-description="{{ image.description|default('') }}" data-ordre="{{ image.ordre }}" data-active="{{ image.active ? 1 : 0 }}">
 												<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
 												</svg>
@@ -372,7 +372,7 @@ document.getElementById('editTitre').value = titre || '';
 document.getElementById('editDescription').value = description || '';
 document.getElementById('editOrdre').value = ordre || 0;
 document.getElementById('editActive').checked = active === 1;
-document.getElementById('editForm').action = `/hero-carousel/${id}`;
+document.getElementById('editForm').action = `/hero-carousel/${id}/update`;
 document.getElementById('editModal').classList.remove('hidden');
 }
 
@@ -396,6 +396,27 @@ document.getElementById('deleteModal').classList.add('hidden');
 document.addEventListener('DOMContentLoaded', function () {
 const editModal = document.getElementById('editModal');
 const deleteModal = document.getElementById('deleteModal');
+
+// Ajout des event listeners pour les boutons d'édition
+document.querySelectorAll('.edit-btn').forEach(button => {
+button.addEventListener('click', function () {
+const id = this.getAttribute('data-id');
+const titre = this.getAttribute('data-titre');
+const description = this.getAttribute('data-description');
+const ordre = this.getAttribute('data-ordre');
+const active = this.getAttribute('data-active');
+
+console.log('🎯 Données récupérées:', {
+id,
+titre,
+description,
+ordre,
+active
+});
+
+editImage(id, titre, description, ordre, active);
+});
+});
 
 editModal.addEventListener('click', function (e) {
 if (e.target === this) 
