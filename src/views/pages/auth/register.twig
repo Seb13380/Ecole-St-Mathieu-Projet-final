@@ -78,7 +78,8 @@
 				<!-- Section Enfants -->
 				<div class="bg-white rounded-xl shadow-lg p-8">
 					<h2 class="text-3xl font-bold text-[#304a4d] text-center mb-8 font-poppins flex items-center justify-center gap-3">
-						👶 Informations du/des enfant(s) inscrits à l'école <br>
+						👶 Informations du/des enfant(s) inscrits à l'école
+						<br>
 						Saint Mathieu
 					</h2>
 
@@ -140,6 +141,12 @@
 							<input type="password" id="confirmPassword" name="confirmPassword" required class="input input-bordered w-full" style="background-color: #f8fdfc !important;" placeholder="Ressaisissez le mot de passe">
 						</div>
 					</div>
+				</div>
+
+				<!-- Champ anti-spam caché (honeypot) -->
+				<div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+					<label for="floflo">Ne pas remplir ce champ</label>
+					<input type="text" id="floflo" name="floflo" tabindex="-1" autocomplete="off">
 				</div>
 
 				<!-- Bouton de soumission -->
