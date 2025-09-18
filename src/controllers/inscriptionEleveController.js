@@ -18,13 +18,26 @@ const inscriptionEleveController = {
                 };
             }
 
+            // 📄 Récupérer les documents du dossier d'inscription
+            const inscriptionDocuments = await prisma.document.findMany({
+                where: {
+                    type: 'DOSSIER_INSCRIPTION',
+                    active: true
+                },
+                orderBy: [
+                    { ordre: 'asc' },
+                    { titre: 'asc' }
+                ]
+            });
+
             res.render('pages/inscription-eleve', {
                 title: 'Inscription Élève - École Saint Mathieu',
                 user: req.session.user || null,
                 currentUrl: req.originalUrl,
                 success: req.flash('success'),
                 error: req.flash('error'),
-                config: config
+                config: config,
+                inscriptionDocuments: inscriptionDocuments // Nouveau : documents d'inscription
             });
         } catch (error) {
             console.error('Erreur lors du chargement de la page inscription élève:', error);
@@ -139,8 +152,6 @@ const inscriptionEleveController = {
                 parentEmail,
                 parentPhone,
                 parentAddress,
-                parentPassword,
-                confirmPassword,
                 anneeScolaire,
                 children,
                 specialNeeds,
@@ -148,27 +159,8 @@ const inscriptionEleveController = {
             } = req.body;
 
             // Validation des champs obligatoires du parent
-            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone ||
-                !parentPassword || !confirmPassword) {
+            if (!parentFirstName || !parentLastName || !parentEmail || !parentPhone) {
                 req.flash('error', 'Veuillez remplir tous les champs obligatoires du parent.');
-                return res.redirect('/inscription-eleve');
-            }
-
-            // Validation du mot de passe
-            if (parentPassword !== confirmPassword) {
-                req.flash('error', 'Les mots de passe ne correspondent pas.');
-                return res.redirect('/inscription-eleve');
-            }
-
-            if (parentPassword.length < 6) {
-                req.flash('error', 'Le mot de passe doit contenir au moins 6 caractères.');
-                return res.redirect('/inscription-eleve');
-            }
-
-            // Validation format mot de passe (majuscule, minuscule, chiffre)
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-            if (!passwordRegex.test(parentPassword)) {
-                req.flash('error', 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.');
                 return res.redirect('/inscription-eleve');
             }
 
@@ -220,16 +212,6 @@ const inscriptionEleveController = {
                 return res.redirect('/inscription-eleve');
             }
 
-            // Vérifier si l'email parent existe déjà
-            const existingParent = await prisma.user.findUnique({
-                where: { email: parentEmail }
-            });
-
-            if (existingParent) {
-                req.flash('error', 'Un compte parent existe déjà avec cette adresse email.');
-                return res.redirect('/inscription-eleve');
-            }
-
             // Vérifier s'il existe déjà une demande avec cet email
             const existingRequest = await prisma.preInscriptionRequest.findFirst({
                 where: { parentEmail: parentEmail }
@@ -239,9 +221,6 @@ const inscriptionEleveController = {
                 req.flash('error', 'Une demande d\'inscription existe déjà pour cette adresse email.');
                 return res.redirect('/inscription-eleve');
             }
-
-            // Hasher le mot de passe fourni par l'utilisateur
-            const hashedPassword = await bcrypt.hash(parentPassword, 12);
 
             // Générer token de validation email
             const validationToken = crypto.randomBytes(32).toString('hex');
@@ -256,7 +235,6 @@ const inscriptionEleveController = {
                     parentEmail,
                     parentPhone,
                     parentAddress,
-                    parentPassword: hashedPassword, // Mot de passe haché fourni par l'utilisateur
 
                     // Année scolaire
                     anneeScolaire,
