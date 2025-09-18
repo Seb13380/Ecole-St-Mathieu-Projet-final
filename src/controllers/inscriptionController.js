@@ -17,6 +17,16 @@ const inscriptionController = {
     // Traiter l'inscription depuis le formulaire  
     processRegistration: async (req, res) => {
         try {
+            // 🛡️ PROTECTION ANTI-SPAM (Honeypot) - PREMIÈRE VÉRIFICATION
+            // Si le champ caché "floflo" est rempli, c'est probablement un bot
+            if (req.body.floflo && req.body.floflo.trim() !== '') {
+                console.log('🚫 Tentative de spam détectée - champ honeypot rempli:', req.body.floflo);
+                console.log('🔍 IP source:', req.ip || req.connection.remoteAddress);
+                console.log('🔍 User-Agent:', req.get('User-Agent'));
+                // Faire semblant que tout s'est bien passé pour tromper les bots
+                return res.redirect('/auth/register?success=Votre demande d\'inscription a été envoyée avec succès. Vous recevrez une réponse sous 48h.');
+            }
+
             const {
                 parentFirstName,
                 parentLastName,
@@ -124,7 +134,7 @@ const inscriptionController = {
                 // Ne pas faire échouer l'inscription si l'email échoue
             }
 
-            // 📧 ENVOI EMAIL CONFIRMATION PARENT
+            //  ENVOI EMAIL CONFIRMATION PARENT
             try {
                 const parentConfirmationData = {
                     parentFirstName,
