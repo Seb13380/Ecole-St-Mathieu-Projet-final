@@ -1,174 +1,312 @@
 {% extends "layouts/main.twig" %}
 
 {% block content %}
-	<div class="min-h-screen bg-gradient-to-br from-[#a7e3dd] to-[#8dd3cc] py-12">
-		<div class="container mx-auto px-4">
+	<style>
+		@keyframes fade-in {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes fade-in-up {
+			from {
+				opacity: 0;
+				transform: translateY(40px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes slide-up {
+			from {
+				opacity: 0;
+				transform: translateY(60px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes slide-down {
+			from {
+				opacity: 0;
+				transform: translateY(-30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.animate-fade-in {
+			animation: fade-in 0.8s ease-out;
+		}
+
+		.animate-fade-in-up {
+			animation: fade-in-up 1s ease-out;
+		}
+
+		.animate-slide-up {
+			animation: slide-up 0.9s ease-out;
+		}
+
+		.animate-slide-down {
+			animation: slide-down 0.6s ease-out;
+		}
+
+		.hover\:shadow-3xl:hover {
+			box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+		}
+
+		.group:hover .group-hover\:animate-bounce {
+			animation: bounce 1s infinite;
+		}
+
+		.group:hover .group-hover\:animate-pulse {
+			animation: pulse 2s infinite;
+		}
+
+		/* Effet glassmorphism */
+		.backdrop-blur-md {
+			backdrop-filter: blur(12px);
+		}
+
+		/* Transition douce pour les inputs */
+		.form-control input:focus,
+		.form-control textarea:focus,
+		.form-control select:focus {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 25px -5px rgba(48, 74, 77, 0.25);
+		}
+
+		/* Animation pour les boutons */
+		.btn {
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.btn:hover {
+			transform: translateY(-2px);
+		}
+	</style>
+
+	<div
+		class="min-h-screen bg-gradient-to-br from-[#a7e3dd] via-[#8dd3cc] to-[#7bc4bd] py-12 relative overflow-hidden">
+		<!-- Éléments décoratifs animés -->
+		<div class="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+		<div class="absolute top-40 right-20 w-16 h-16 bg-white/20 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+		<div class="absolute bottom-20 left-20 w-12 h-12 bg-white/15 rounded-full animate-bounce" style="animation-delay: 2s;"></div>
+		<div class="absolute bottom-40 right-10 w-14 h-14 bg-white/10 rounded-full animate-pulse" style="animation-delay: 0.5s;"></div>
+
+		<div class="container mx-auto px-4 relative z-10">
 			<div
 				class="max-w-4xl mx-auto">
 				<!-- En-tête -->
-				<div class="text-center mb-8">
-					<h1 class="text-4xl font-bold text-[#304a4d] mb-4">
-						🎓 Demande d'inscription Élève(s)
-					</h1>
-					<p class="text-lg text-[#304a4d]/80" id="inscriptionSubtitle">
-						Demande d'inscription pour l'année scolaire 2025-2026
-					</p>
+				<div class="text-center mb-8 animate-fade-in">
+					<div class="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/30">
+						<div class="mb-6">
+							<div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#304a4d] to-[#2a3f42] rounded-2xl shadow-lg mb-4 transform hover:scale-110 transition-transform duration-300">
+								<span class="text-3xl">📋</span>
+							</div>
+						</div>
+						<h1 class="text-5xl font-bold text-[#304a4d] mb-4 drop-shadow-lg">
+							Demande de Pré-inscription Élève(s)
+						</h1>
+
+						<div class="flex justify-center mt-4">
+							<div class="w-24 h-1 bg-gradient-to-r from-[#304a4d] to-[#8dd3cc] rounded-full"></div>
+						</div>
+					</div>
 				</div>
 
-				<!-- Annonce Petite Section 2026 -->
-				{% if config and config.afficherAnnoncePS2026 %}
-					<div id="annoncePS2026" class="mb-8">
-						<div
-							class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
-							<!-- Icône décorative -->
-							<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
-								🎓
-							</div>
+				{# <!-- Annonce Petite Section 2026 -->
+																{% if config and config.afficherAnnoncePS2026 %}
+																	<div id="annoncePS2026" class="mb-8">
+																		<div
+																			class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
+																			<!-- Icône décorative -->
+																			<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
+																				🎓
+																			</div>
+												
+																			<div class="relative z-10">
+																				<div class="flex items-center mb-4">
+																					<span class="text-3xl mr-3">🌟</span>
+																					<h2 class="text-2xl font-bold text-orange-700">
+																						Inscription Petite Section - Rentrée 2026
+																					</h2>
+																				</div>
+												
+																				<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
+																					<p class="text-lg text-orange-800 mb-3 font-medium">
+																						📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
+																					</p>
+																					<p class="text-orange-700 mb-4">
+																						Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
+																					</p>
+												
+																					<div class="text-center">
+																						<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
+																							<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+																								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+																							</svg>
+																							Accéder au formulaire d'inscription PS 2026
+																						</a>
+																					</div>
+																				</div>
+												
+																				<div class="text-center">
+																					<p class="text-sm text-orange-600 italic">
+																						⏰ Ce formulaire est spécialement conçu pour les futures petites sections
+																					</p>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																{% endif %} #}
 
-							<div class="relative z-10">
-								<div class="flex items-center mb-4">
-									<span class="text-3xl mr-3">🌟</span>
-									<h2 class="text-2xl font-bold text-orange-700">
-										Inscription Petite Section - Rentrée 2026
+				<!-- Documents à télécharger -->
+				{% if inscriptionDocuments and inscriptionDocuments|length > 0 %}
+					<div id="documentsSection" class="mb-8 animate-slide-up">
+						<div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/50 hover:shadow-3xl transition-all duration-300">
+							<div class="flex items-center mb-6">
+								<div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+									<span class="text-2xl">📁</span>
+								</div>
+								<div>
+									<h2 class="text-3xl font-bold text-[#304a4d] mb-2">
+										Documents nécessaires pour l'inscription
 									</h2>
+									<p class="text-[#304a4d]/70">
+										Téléchargez et consultez les documents requis pour votre dossier d'inscription
+									</p>
 								</div>
-
-								<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
-									<p class="text-lg text-orange-800 mb-3 font-medium">
-										📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
-									</p>
-									<p class="text-orange-700 mb-4">
-										Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
-									</p>
-
-									<div class="text-center">
-										<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
-											<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
-											</svg>
-											Accéder au formulaire d'inscription PS 2026
-										</a>
+							</div>
+							<div class="grid gap-4">
+								{% for document in inscriptionDocuments %}
+									<div class="group bg-gradient-to-r from-slate-50 to-gray-50 p-6 rounded-xl border border-slate-200 hover:border-[#304a4d]/30 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+										<div class="flex items-center justify-between">
+											<div class="flex items-center space-x-4">
+												<div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+													<span class="text-2xl">📄</span>
+												</div>
+												<div>
+													<h3 class="text-xl font-bold text-[#304a4d] group-hover:text-[#2a3f42] transition-colors">{{ document.titre }}</h3>
+													{% if document.description %}
+														<p class="text-sm text-[#304a4d]/70 mt-1">{{ document.description }}</p>
+													{% endif %}
+													{% if document.pdfUrl %}
+														<span class="inline-block bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full mt-2 font-medium">PDF</span>
+													{% endif %}
+												</div>
+											</div>
+											{% if document.pdfUrl %}
+												<a href="/documents/{{ document.id }}/download" class="group bg-gradient-to-r from-[#304a4d] to-[#2a3f42] hover:from-[#2a3f42] hover:to-[#1e2d30] text-white px-6 py-3 rounded-xl transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+													<svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+													</svg>
+													<span class="font-semibold">Télécharger</span>
+												</a>
+											{% elseif document.externalUrl %}
+												<a href="{{ document.externalUrl }}" target="_blank" rel="noopener" class="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+													<svg class="w-5 h-5 mr-2 group-hover:animate-pulse" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+													</svg>
+													<span class="font-semibold">Consulter</span>
+												</a>
+											{% endif %}
+										</div>
 									</div>
-								</div>
-
-								<div class="text-center">
-									<p class="text-sm text-orange-600 italic">
-										⏰ Ce formulaire est spécialement conçu pour les futures petites sections
-									</p>
-								</div>
+								{% endfor %}
 							</div>
 						</div>
 					</div>
 				{% endif %}
 
-				<!-- Documents à télécharger -->
-				<div id="documentsSection" class="mb-8" style="display: none;">
-					<div class="bg-white rounded-xl shadow-lg p-6">
-						<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
-							📁 Documents à télécharger
-						</h2>
-						<p class="text-[#304a4d]/80 mb-4">
-							Téléchargez et consultez les documents nécessaires pour l'inscription :
-						</p>
-						<div
-							id="documentsList" class="space-y-3"><!-- Les documents seront ajoutés ici par JavaScript -->
-						</div>
-					</div>
-				</div>
-
 				<!-- Messages flash -->
 				{% if success %}
-					<div class="alert alert-success mb-6">
-						<span>✅
-							{{ success }}</span>
+					<div class="animate-slide-down mb-6">
+						<div class="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-6 rounded-2xl shadow-xl border border-green-300/50 backdrop-blur-sm">
+							<div class="flex items-center">
+								<div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+									<span class="text-xl">✅</span>
+								</div>
+								<span class="font-semibold text-lg">{{ success }}</span>
+							</div>
+						</div>
 					</div>
 				{% endif %}
 
 				{% if error %}
-					<div class="alert alert-error mb-6">
-						<span>❌
-							{{ error }}</span>
+					<div class="animate-slide-down mb-6">
+						<div class="bg-gradient-to-r from-red-500 to-rose-500 text-white p-6 rounded-2xl shadow-xl border border-red-300/50 backdrop-blur-sm">
+							<div class="flex items-center">
+								<div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+									<span class="text-xl">❌</span>
+								</div>
+								<span class="font-semibold text-lg">{{ error }}</span>
+							</div>
+						</div>
 					</div>
 				{% endif %}
 
 				<!-- Formulaire -->
-				<div class="bg-white rounded-xl shadow-lg p-8">
+				<div class="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-10 border border-white/50 animate-fade-in-up">
 					<form
-						action="/inscription-eleve" method="POST" class="space-y-6">
+						action="/inscription-eleve" method="POST" class="space-y-8">
 
 						<!-- Section Parent/Responsable -->
-						<div class="border-b border-gray-200 pb-6">
-							<h2 class="text-2xl font-semibold text-[#304a4d] text-center mb-4">
-								👤 Informations du Parent/Responsable
-							</h2>
-
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Prénom *</span>
-									</label>
-									<input type="text" name="parentFirstName" class="input input-bordered w-full" required>
+						<div class="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 rounded-2xl p-8 border border-blue-100/50">
+							<div class="flex items-center justify-center mb-6">
+								<div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg mr-4">
+									<span class="text-3xl">👤</span>
 								</div>
-
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Nom *</span>
-									</label>
-									<input type="text" name="parentLastName" class="input input-bordered w-full" required>
-								</div>
-
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Email *</span>
-									</label>
-									<input type="email" name="parentEmail" class="input input-bordered w-full" required>
-								</div>
-
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text font-medium">Téléphone *</span>
-									</label>
-									<input type="tel" name="parentPhone" class="input input-bordered w-full" required>
-								</div>
-
-								<div class="form-control md:col-span-2">
-									<label class="label">
-										<span class="label-text font-medium">Adresse complète *</span>
-									</label>
-									<textarea name="parentAddress" class="textarea textarea-bordered w-full" rows="3" required placeholder="Adresse, code postal, ville"></textarea>
-								</div>
-							</div>
-						</div>
-
-						<!-- Section Mot de passe -->
-						<div class="border-b border-gray-200 pb-6">
-							<div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
-								<h2 class="text-2xl font-semibold text-orange-800 text-center mb-4">
-									🔒 Mot de passe pour votre compte
+								<h2 class="text-3xl font-bold text-[#304a4d]">
+									Informations du Parent/Responsable
 								</h2>
-								<p class="text-center text-orange-700 mb-4">
-									Choisissez un mot de passe sécurisé pour accéder à votre espace parent
-								</p>
-								
-								<div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-									<div class="form-control">
-										<label class="label">
-											<span class="label-text font-medium">Mot de passe *</span>
-										</label>
-										<input type="password" name="parentPassword" class="input input-bordered w-full" 
-											   placeholder="Minimum 6 caractères" minlength="6" required>
-										<label class="label">
-											<span class="label-text-alt text-gray-500">Au moins 6 caractères avec majuscule, minuscule et chiffre</span>
-										</label>
-									</div>
+							</div>
 
-									<div class="form-control">
-										<label class="label">
-											<span class="label-text font-medium">Confirmer le mot de passe *</span>
-										</label>
-										<input type="password" name="confirmPassword" class="input input-bordered w-full" 
-											   placeholder="Ressaisissez le mot de passe" minlength="6" required>
-									</div>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div class="form-control group">
+									<label class="label">
+										<span class="label-text font-semibold text-[#304a4d] text-lg">Prénom *</span>
+									</label>
+									<input type="text" name="parentFirstName" class="input input-bordered w-full h-14 text-lg bg-white/80 border-2 border-gray-200 focus:border-[#304a4d] focus:bg-white transition-all duration-300 rounded-xl shadow-sm hover:shadow-md" required placeholder="Votre prénom">
+								</div>
+
+								<div class="form-control group">
+									<label class="label">
+										<span class="label-text font-semibold text-[#304a4d] text-lg">Nom *</span>
+									</label>
+									<input type="text" name="parentLastName" class="input input-bordered w-full h-14 text-lg bg-white/80 border-2 border-gray-200 focus:border-[#304a4d] focus:bg-white transition-all duration-300 rounded-xl shadow-sm hover:shadow-md" required placeholder="Votre nom de famille">
+								</div>
+
+								<div class="form-control group">
+									<label class="label">
+										<span class="label-text font-semibold text-[#304a4d] text-lg">Email *</span>
+									</label>
+									<input type="email" name="parentEmail" class="input input-bordered w-full h-14 text-lg bg-white/80 border-2 border-gray-200 focus:border-[#304a4d] focus:bg-white transition-all duration-300 rounded-xl shadow-sm hover:shadow-md" required placeholder="votre.email@exemple.com">
+								</div>
+
+								<div class="form-control group">
+									<label class="label">
+										<span class="label-text font-semibold text-[#304a4d] text-lg">Téléphone *</span>
+									</label>
+									<input type="tel" name="parentPhone" class="input input-bordered w-full h-14 text-lg bg-white/80 border-2 border-gray-200 focus:border-[#304a4d] focus:bg-white transition-all duration-300 rounded-xl shadow-sm hover:shadow-md" required placeholder="06 12 34 56 78">
+								</div>
+
+								<div class="form-control md:col-span-2 group">
+									<label class="label">
+										<span class="label-text font-semibold text-[#304a4d] text-lg">Adresse complète *</span>
+									</label>
+									<textarea name="parentAddress" class="textarea textarea-bordered w-full text-lg bg-white/80 border-2 border-gray-200 focus:border-[#304a4d] focus:bg-white transition-all duration-300 rounded-xl shadow-sm hover:shadow-md" rows="3" required placeholder="Adresse, code postal, ville"></textarea>
 								</div>
 							</div>
 						</div>
@@ -319,35 +457,65 @@
 								ℹ️ Informations importantes
 							</h3>
 							<ul class="list-disc list-inside space-y-2 text-[#304a4d]/80">
-								<li>Cette demande sera examinée par l'équipe de direction</li>
-								<li>Vous recevrez une réponse par email sous 48h</li>
-								<li>En cas d'acceptation, les identifiants de connexion vous seront envoyés</li>
+								<li>Cette demande de pré-inscription sera examinée par l'équipe de direction</li>
+								<li>Vous recevrez d'abord un email de validation à confirmer</li>
+								<li>Après validation, la direction recevra votre demande et vous répondra sous 48h</li>
+								<li>En cas d'acceptation, vous recevrez un lien pour créer votre compte parent avec mot de passe</li>
 								<li>Les places sont limitées et attribuées selon l'ordre d'arrivée et les critères de l'école</li>
 								<li>Un entretien peut être demandé avant l'inscription définitive</li>
 							</ul>
 						</div>
 
 						<!-- Bouton de soumission -->
-						<div class="text-center pt-6">
-							<button type="submit" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white text-lg px-8 py-3 shadow-xl font-bold border border-white/30 transition-all duration-200 hover:shadow-2xl">
-								📤 Envoyer la demande d'inscription
-							</button>
+						<div class="text-center pt-8">
+							<div class="relative">
+								<button
+									type="submit" class="group relative bg-gradient-to-r from-[#304a4d] via-[#2a3f42] to-[#304a4d] hover:from-[#2a3f42] hover:via-[#1e2d30] hover:to-[#2a3f42] text-white text-xl px-12 py-4 rounded-2xl font-bold border-2 border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 overflow-hidden">
+									<!-- Effet brillant animé -->
+									<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+									<div class="relative flex items-center justify-center">
+										<span class="text-2xl mr-3 group-hover:animate-bounce">📤</span>
+										<span class="font-black tracking-wide">Envoyer la demande de pré-inscription</span>
+									</div>
+								</button>
+
+								<!-- Particules décoratives autour du bouton -->
+								<div class="absolute -top-2 -left-2 w-4 h-4 bg-[#8dd3cc] rounded-full animate-ping"></div>
+								<div class="absolute -bottom-2 -right-2 w-3 h-3 bg-[#a7e3dd] rounded-full animate-pulse"></div>
+							</div>
+
+							<!-- Message encourageant -->
+							<p class="mt-4 text-[#304a4d]/80 font-medium animate-fade-in" style="animation-delay: 0.5s;">
+								✨ Votre demande sera traitée avec attention
+							</p>
 						</div>
 					</form>
 				</div>
 
 				<!-- Informations de contact -->
-				<div class="mt-8 text-center">
-					<div class="bg-white/50 rounded-lg p-6">
-						<h3 class="text-lg font-semibold text-[#304a4d] mb-2">
-							Besoin d'aide ?
-						</h3>
-						<p class="text-[#304a4d]/80">
-							Contactez le secrétariat au
-							<strong>04 91 05 05 89</strong><br>
-							ou par email :
-							<strong>secretariat@ecole-saint-mathieu.fr</strong>
-						</p>
+				<div class="mt-8 text-center animate-fade-in-up" style="animation-delay: 1s;">
+					<div class="bg-white/60 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/30">
+						<div class="flex items-center justify-center mb-4">
+							<div class="w-12 h-12 bg-gradient-to-br from-[#304a4d] to-[#2a3f42] rounded-xl flex items-center justify-center mr-4 shadow-lg">
+								<span class="text-2xl">📞</span>
+							</div>
+							<h3 class="text-2xl font-bold text-[#304a4d]">
+								Besoin d'aide ?
+							</h3>
+						</div>
+						<div class="space-y-2">
+							<p class="text-[#304a4d] font-semibold text-lg">
+								Contactez le secrétariat
+							</p>
+							<div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
+								<div class="bg-[#304a4d]/10 px-6 py-3 rounded-xl">
+									<span class="text-[#304a4d] font-bold text-lg">📞 04 91 07 07 18</span>
+								</div>
+								<div class="bg-[#304a4d]/10 px-6 py-3 rounded-xl">
+									<span class="text-[#304a4d] font-bold text-lg">✉️ ecole-saint-mathieu@wanadoo.fr</span>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -590,58 +758,6 @@ removeChild(button);
 
 // Initialiser l'affichage des boutons
 updateRemoveButtons();
-
-// === VALIDATION DES MOTS DE PASSE ===
-const passwordInput = document.querySelector('input[name="parentPassword"]');
-const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
-const form = document.querySelector('form');
-
-function validatePassword() {
-	const password = passwordInput.value;
-	const confirmPassword = confirmPasswordInput.value;
-	
-	// Validation de la force du mot de passe
-	const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-	
-	if (password.length > 0) {
-		if (!passwordRegex.test(password)) {
-			passwordInput.classList.add('input-error');
-		} else {
-			passwordInput.classList.remove('input-error');
-		}
-	}
-
-	// Validation de la correspondance
-	if (confirmPassword.length > 0) {
-		if (password !== confirmPassword) {
-			confirmPasswordInput.classList.add('input-error');
-		} else {
-			confirmPasswordInput.classList.remove('input-error');
-		}
-	}
-}
-
-passwordInput.addEventListener('input', validatePassword);
-confirmPasswordInput.addEventListener('input', validatePassword);
-
-// Validation au moment de la soumission
-form.addEventListener('submit', function(e) {
-	const password = passwordInput.value;
-	const confirmPassword = confirmPasswordInput.value;
-	const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-
-	if (!passwordRegex.test(password)) {
-		e.preventDefault();
-		alert('Le mot de passe doit contenir au moins 6 caractères avec une majuscule, une minuscule et un chiffre.');
-		return;
-	}
-
-	if (password !== confirmPassword) {
-		e.preventDefault();
-		alert('Les mots de passe ne correspondent pas.');
-		return;
-	}
-});
 
 });
 	</script>

@@ -64,11 +64,11 @@ const inscriptionManagementController = {
                 }
             });
 
-            // Si aucune config n'existe, en crÃ©er une par dÃ©faut
+            // Si aucune config n'existe, en crér une par dÃ©faut
             if (!config) {
                 config = await prisma.inscriptionConfig.create({
                     data: {
-                        soustitre: "Demande d'inscription pour l'annÃ©e scolaire 2025-2026",
+                        soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
                         actif: true,
                         modifiePar: req.session.user.id
                     },
@@ -78,7 +78,7 @@ const inscriptionManagementController = {
                         }
                     }
                 });
-                console.log('âœ… Configuration par dÃ©faut crÃ©Ã©e');
+                console.log('âœ… Configuration par défaut créée');
             }
 
             // RÃ©cupÃ©rer les documents d'inscription
@@ -92,7 +92,7 @@ const inscriptionManagementController = {
                 orderBy: { ordre: 'asc' }
             });
 
-            console.log('ðŸ“Š DonnÃ©es rÃ©cupÃ©rÃ©es:');
+            console.log('ðŸ“Š Donnés rÃ©cupÃ©rés:');
             console.log('   - Configuration:', config.soustitre);
             console.log('   - Documents actifs:', documents.length);
 
@@ -136,7 +136,7 @@ const inscriptionManagementController = {
                 data: { actif: false }
             });
 
-            // CrÃ©er la nouvelle configuration
+            // Crér la nouvelle configuration
             const newConfig = await prisma.inscriptionConfig.create({
                 data: {
                     soustitre: soustitre.trim(),
@@ -211,7 +211,7 @@ const inscriptionManagementController = {
                 });
             }
 
-            // CrÃ©er l'entrÃ©e en base de donnÃ©es
+            // Crér l'entré en base de donnés
             const documentData = {
                 nom: nom.trim(),
                 description: description?.trim() || null,
@@ -297,7 +297,7 @@ const inscriptionManagementController = {
                 }
             }
 
-            // Supprimer l'entrÃ©e en base de donnÃ©es
+            // Supprimer l'entré en base de donnés
             await prisma.inscriptionDocument.delete({
                 where: { id: parseInt(id) }
             });
@@ -332,7 +332,7 @@ const inscriptionManagementController = {
             if (!Array.isArray(documents)) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Format de donnÃ©es invalide'
+                    message: 'Format de donnés invalide'
                 });
             }
 
@@ -366,7 +366,7 @@ const inscriptionManagementController = {
 
     async getInscriptionData(req, res) {
         try {
-            console.log('ðŸ“„ RÃ©cupÃ©ration donnÃ©es inscription publiques');
+            console.log('ðŸ“„ RÃ©cupÃ©ration donnés inscription publiques');
 
             // RÃ©cupÃ©rer la configuration active
             const config = await prisma.inscriptionConfig.findFirst({
@@ -392,17 +392,17 @@ const inscriptionManagementController = {
             res.json({
                 success: true,
                 config: config || {
-                    soustitre: "Demande d'inscription pour l'annÃ©e scolaire 2025-2026",
+                    soustitre: "Demande d'inscription pour l'année scolaire 2025-2026",
                     afficherAnnoncePS2026: false
                 },
                 documents
             });
 
         } catch (error) {
-            console.error('âŒ Erreur lors de la rÃ©cupÃ©ration des donnÃ©es d\'inscription:', error);
+            console.error('âŒ Erreur lors de la rÃ©cupÃ©ration des donnés d\'inscription:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors du chargement des donnÃ©es'
+                message: 'Erreur lors du chargement des donnés'
             });
         }
     },
