@@ -127,50 +127,50 @@
 				</div>
 
 				{# <!-- Annonce Petite Section 2026 -->
-																{% if config and config.afficherAnnoncePS2026 %}
-																	<div id="annoncePS2026" class="mb-8">
-																		<div
-																			class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
-																			<!-- Icône décorative -->
-																			<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
-																				🎓
-																			</div>
-												
-																			<div class="relative z-10">
-																				<div class="flex items-center mb-4">
-																					<span class="text-3xl mr-3">🌟</span>
-																					<h2 class="text-2xl font-bold text-orange-700">
-																						Inscription Petite Section - Rentrée 2026
-																					</h2>
-																				</div>
-												
-																				<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
-																					<p class="text-lg text-orange-800 mb-3 font-medium">
-																						📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
-																					</p>
-																					<p class="text-orange-700 mb-4">
-																						Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
-																					</p>
-												
-																					<div class="text-center">
-																						<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
-																							<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-																								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
-																							</svg>
-																							Accéder au formulaire d'inscription PS 2026
-																						</a>
+																				{% if config and config.afficherAnnoncePS2026 %}
+																					<div id="annoncePS2026" class="mb-8">
+																						<div
+																							class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
+																							<!-- Icône décorative -->
+																							<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
+																								🎓
+																							</div>
+																
+																							<div class="relative z-10">
+																								<div class="flex items-center mb-4">
+																									<span class="text-3xl mr-3">🌟</span>
+																									<h2 class="text-2xl font-bold text-orange-700">
+																										Inscription Petite Section - Rentrée 2026
+																									</h2>
+																								</div>
+																
+																								<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
+																									<p class="text-lg text-orange-800 mb-3 font-medium">
+																										📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
+																									</p>
+																									<p class="text-orange-700 mb-4">
+																										Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
+																									</p>
+																
+																									<div class="text-center">
+																										<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
+																											<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+																												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+																											</svg>
+																											Accéder au formulaire d'inscription PS 2026
+																										</a>
+																									</div>
+																								</div>
+																
+																								<div class="text-center">
+																									<p class="text-sm text-orange-600 italic">
+																										⏰ Ce formulaire est spécialement conçu pour les futures petites sections
+																									</p>
+																								</div>
+																							</div>
+																						</div>
 																					</div>
-																				</div>
-												
-																				<div class="text-center">
-																					<p class="text-sm text-orange-600 italic">
-																						⏰ Ce formulaire est spécialement conçu pour les futures petites sections
-																					</p>
-																				</div>
-																			</div>
-																		</div>
-																	</div>
-																{% endif %} #}
+																				{% endif %} #}
 
 				<!-- Documents à télécharger -->
 				{% if inscriptionDocuments and inscriptionDocuments|length > 0 %}
@@ -208,7 +208,7 @@
 												</div>
 											</div>
 											{% if document.pdfUrl %}
-												<a href="/documents/{{ document.id }}/download" class="group bg-gradient-to-r from-[#304a4d] to-[#2a3f42] hover:from-[#2a3f42] hover:to-[#1e2d30] text-white px-6 py-3 rounded-xl transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+												<a href="{{ document.pdfUrl }}" target="_blank" class="group bg-gradient-to-r from-[#304a4d] to-[#2a3f42] hover:from-[#2a3f42] hover:to-[#1e2d30] text-white px-6 py-3 rounded-xl transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
 													<svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 													</svg>
@@ -459,10 +459,10 @@
 							<ul class="list-disc list-inside space-y-2 text-[#304a4d]/80">
 								<li>Cette demande de pré-inscription sera examinée par l'équipe de direction</li>
 								<li>Vous recevrez d'abord un email de validation à confirmer</li>
-								<li>Après validation, la direction recevra votre demande et vous répondra sous 48h</li>
-								<li>En cas d'acceptation, vous recevrez un lien pour créer votre compte parent avec mot de passe</li>
-								<li>Les places sont limitées et attribuées selon l'ordre d'arrivée et les critères de l'école</li>
-								<li>Un entretien peut être demandé avant l'inscription définitive</li>
+								<li>Après validation, la direction recevra votre demande et reviendra vers vous pour une prise de rendez-vous</li>
+								<li>En cas d'acceptation, vous complèterez le dossier d'inscription avec la secrétaire</li>
+								<li>Vous pourrez ensuite faire une demande d'identifiants sur notre site: https://www.stmathieu.org</li>
+								
 							</ul>
 						</div>
 

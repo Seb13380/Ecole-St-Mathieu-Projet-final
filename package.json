@@ -39,6 +39,7 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.2",
+    "flowbite": "^3.1.2",
     "geoip-lite": "^1.4.10",
     "helmet": "^8.1.0",
     "method-override": "^3.0.0",
