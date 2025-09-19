@@ -18,10 +18,10 @@ const inscriptionEleveController = {
                 };
             }
 
-            // 📄 Récupérer les documents du dossier d'inscription
+            // 📄 Récupérer les documents du dossier d'inscription  
+            // Temporaire : récupérer tous les documents actifs pour test
             const inscriptionDocuments = await prisma.document.findMany({
                 where: {
-                    type: 'DOSSIER_INSCRIPTION',
                     active: true
                 },
                 orderBy: [
