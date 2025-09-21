@@ -1,0 +1,290 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<div
+		class="container mx-auto px-4 py-8">
+		<!-- En-tête -->
+		<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<h1 class="text-3xl font-bold text-[#304a4d] mb-2">
+						📋 Dossier #{{ dossier.id }}
+					</h1>
+					<p class="text-gray-600">{{ dossier.enfantPrenom }}
+						{{ dossier.enfantNom }}
+						-
+						{{ dossier.enfantClasseDemandee }}</p>
+				</div>
+				<div class="space-x-2">
+					<a href="/dossier-inscription/admin" class="btn btn-outline">
+						← Retour à la liste
+					</a>
+					<a href="/dossier-inscription/admin/{{ dossier.id }}/pdf" class="btn bg-[#304a4d] text-white">
+						📄 Télécharger PDF
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Informations du dossier -->
+		<div
+			class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+			<!-- Colonne principale -->
+			<div
+				class="lg:col-span-2 space-y-6">
+				<!-- Enfant -->
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<h2 class="text-xl font-bold text-[#304a4d] mb-4 flex items-center">
+						👶 Enfant à inscrire
+					</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label class="font-semibold text-gray-700">Nom :</label>
+							<p>{{ dossier.enfantNom }}</p>
+						</div>
+						<div>
+							<label class="font-semibold text-gray-700">Prénom :</label>
+							<p>{{ dossier.enfantPrenom }}</p>
+						</div>
+						<div>
+							<label class="font-semibold text-gray-700">Date de naissance :</label>
+							<p>{{ dossier.enfantDateNaissance|date('d/m/Y') }}</p>
+						</div>
+						<div>
+							<label class="font-semibold text-gray-700">Sexe :</label>
+							<p>{{ dossier.enfantSexe == 'M' ? 'Masculin' : 'Féminin' }}</p>
+						</div>
+						<div>
+							<label class="font-semibold text-gray-700">Classe demandée :</label>
+							<p>
+								<span class="badge badge-primary">{{ dossier.enfantClasseDemandee }}</span>
+							</p>
+						</div>
+						{% if dossier.enfantLieuNaissance %}
+							<div>
+								<label class="font-semibold text-gray-700">Lieu de naissance :</label>
+								<p>{{ dossier.enfantLieuNaissance }}
+									{% if dossier.enfantDepartementNaissance %}
+										({{ dossier.enfantDepartementNaissance }})
+									{% endif %}
+								</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<!-- Responsables -->
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<h2 class="text-xl font-bold text-[#304a4d] mb-4 flex items-center">
+						👨‍👩‍👧‍👦 Responsables
+					</h2>
+					<div
+						class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<!-- Père -->
+						<div class="border-r md:border-r-gray-200 pr-4">
+							<h3 class="font-semibold text-blue-600 mb-2">👨 Père</h3>
+							<div class="space-y-2">
+								<div>
+									<label class="font-semibold text-gray-700">Nom :</label>
+									<p>{{ dossier.pereNom }}</p>
+								</div>
+								<div>
+									<label class="font-semibold text-gray-700">Prénom :</label>
+									<p>{{ dossier.perePrenom }}</p>
+								</div>
+								<div>
+									<label class="font-semibold text-gray-700">Téléphone :</label>
+									<p>
+										<a href="tel:{{ dossier.pereTelephone }}" class="text-blue-600">{{ dossier.pereTelephone }}</a>
+									</p>
+								</div>
+								<div>
+									<label class="font-semibold text-gray-700">Email :</label>
+									<p>
+										<a href="mailto:{{ dossier.pereEmail }}" class="text-blue-600">{{ dossier.pereEmail }}</a>
+									</p>
+								</div>
+								{% if dossier.pereProfession %}
+									<div>
+										<label class="font-semibold text-gray-700">Profession :</label>
+										<p>{{ dossier.pereProfession }}</p>
+									</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<!-- Mère -->
+						<div class="pl-4">
+							<h3 class="font-semibold text-pink-600 mb-2">👩 Mère</h3>
+							<div class="space-y-2">
+								<div>
+									<label class="font-semibold text-gray-700">Nom :</label>
+									<p>{{ dossier.mereNom }}</p>
+								</div>
+								<div>
+									<label class="font-semibold text-gray-700">Prénom :</label>
+									<p>{{ dossier.merePrenom }}</p>
+								</div>
+								<div>
+									<label class="font-semibold text-gray-700">Téléphone :</label>
+									<p>
+										<a href="tel:{{ dossier.mereTelephone }}" class="text-blue-600">{{ dossier.mereTelephone }}</a>
+									</p>
+								</div>
+								<div>
+									<label class="font-semibold text-gray-700">Email :</label>
+									<p>
+										<a href="mailto:{{ dossier.mereEmail }}" class="text-blue-600">{{ dossier.mereEmail }}</a>
+									</p>
+								</div>
+								{% if dossier.mereProfession %}
+									<div>
+										<label class="font-semibold text-gray-700">Profession :</label>
+										<p>{{ dossier.mereProfession }}</p>
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Adresse -->
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<h2 class="text-xl font-bold text-[#304a4d] mb-4 flex items-center">
+						🏠 Adresse familiale
+					</h2>
+					<div class="whitespace-pre-line">{{ dossier.adresseComplete }}</div>
+					{% if dossier.telephoneDomicile %}
+						<div class="mt-2">
+							<label class="font-semibold text-gray-700">Téléphone fixe :</label>
+							<a href="tel:{{ dossier.telephoneDomicile }}" class="text-blue-600">{{ dossier.telephoneDomicile }}</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Colonne latérale -->
+			<div
+				class="space-y-6">
+				<!-- Statut et actions -->
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<h2 class="text-xl font-bold text-[#304a4d] mb-4">📊 Statut du dossier</h2>
+
+					<!-- Statut actuel -->
+					<div class="mb-4">
+						{% set statusClass = 'bg-gray-100 text-gray-800' %}
+						{% set statusIcon = '⏳' %}
+						{% if dossier.statut == 'EN_ATTENTE' %}
+							{% set statusClass = 'bg-yellow-100 text-yellow-800' %}
+							{% set statusIcon = '⏳' %}
+						{% elseif dossier.statut == 'EN_COURS' %}
+							{% set statusClass = 'bg-orange-100 text-orange-800' %}
+							{% set statusIcon = '🔄' %}
+						{% elseif dossier.statut == 'VALIDE' %}
+							{% set statusClass = 'bg-green-100 text-green-800' %}
+							{% set statusIcon = '✅' %}
+						{% elseif dossier.statut == 'REFUSE' %}
+							{% set statusClass = 'bg-red-100 text-red-800' %}
+							{% set statusIcon = '❌' %}
+						{% endif %}
+
+						<div class="text-center p-4 rounded-lg {{ statusClass }}">
+							<div class="text-2xl">{{ statusIcon }}</div>
+							<div class="font-semibold mt-2">{{ dossier.statut|replace({'_': ' '}) }}</div>
+						</div>
+					</div>
+
+					<!-- Formulaire de changement de statut -->
+					<form id="statusForm" class="space-y-3">
+						<input type="hidden" name="dossierId" value="{{ dossier.id }}">
+
+						<div>
+							<label class="label">
+								<span class="label-text font-semibold">Changer le statut :</span>
+							</label>
+							<select name="statut" class="select select-bordered w-full">
+								<option value="EN_ATTENTE" {{ dossier.statut == 'EN_ATTENTE' ? 'selected' : '' }}>En attente</option>
+								<option value="EN_COURS" {{ dossier.statut == 'EN_COURS' ? 'selected' : '' }}>En cours d'examen</option>
+								<option value="VALIDE" {{ dossier.statut == 'VALIDE' ? 'selected' : '' }}>Validé</option>
+								<option value="REFUSE" {{ dossier.statut == 'REFUSE' ? 'selected' : '' }}>Refusé</option>
+								<option value="FINALISE" {{ dossier.statut == 'FINALISE' ? 'selected' : '' }}>Finalisé</option>
+							</select>
+						</div>
+
+						<div>
+							<label class="label">
+								<span class="label-text font-semibold">Notes administratives :</span>
+							</label>
+							<textarea name="notes" class="textarea textarea-bordered w-full" rows="3" placeholder="Notes internes...">{{ dossier.notesAdministratives }}</textarea>
+						</div>
+
+						<button type="submit" class="btn bg-[#304a4d] text-white w-full">
+							💾 Sauvegarder
+						</button>
+					</form>
+				</div>
+
+				<!-- Informations système -->
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<h2 class="text-xl font-bold text-[#304a4d] mb-4">ℹ️ Informations</h2>
+					<div class="space-y-3 text-sm">
+						<div>
+							<label class="font-semibold text-gray-700">Date de dépôt :</label>
+							<p>{{ dossier.dateDepot|date('d/m/Y à H:i') }}</p>
+						</div>
+						<div>
+							<label class="font-semibold text-gray-700">Année scolaire :</label>
+							<p>{{ dossier.anneeScolaire }}</p>
+						</div>
+						{% if dossier.traitant %}
+							<div>
+								<label class="font-semibold text-gray-700">Traité par :</label>
+								<p>{{ dossier.traitant.firstName }}
+									{{ dossier.traitant.lastName }}</p>
+							</div>
+						{% endif %}
+						{% if dossier.dateTraitement %}
+							<div>
+								<label class="font-semibold text-gray-700">Date de traitement :</label>
+								<p>{{ dossier.dateTraitement|date('d/m/Y à H:i') }}</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		document.getElementById('statusForm').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const formData = new FormData(this);
+const dossierId = formData.get('dossierId');
+
+try {
+const response = await fetch (`/dossier-inscription/admin/${dossierId}/status`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{statut: formData.get('statut'), notes: formData.get('notes')}
+)
+});
+
+const result = await response.json();
+
+if (result.success) { // Afficher un message de succès et recharger la page
+alert('✅ Statut mis à jour avec succès !');
+window.location.reload();
+} else {
+alert('❌ Erreur : ' + result.message);
+}
+} catch (error) {
+console.error('Erreur:', error);
+alert('❌ Erreur lors de la mise à jour');
+}
+});
+	</script>
+{% endblock %}

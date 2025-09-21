@@ -1,0 +1,193 @@
+{% extends "layouts/base.twig" %}
+
+{% block main %}
+	<div class="min-h-screen bg-gradient-to-br from-slate-50 to-green-400">
+		<div
+			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+			<!-- En-tête -->
+			<div class="mb-6 sm:mb-8">
+				<div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
+					<div class="text-center">
+						<h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 mb-2">
+							📅 Rendez-vous Inscriptions
+						</h1>
+						<p class="text-lg sm:text-xl text-slate-600">
+							Demandes acceptées en attente de rendez-vous
+						</p>
+						<div class="text-3xl mt-4">🤝</div>
+						<p class="text-sm text-slate-500">Étape 2 du processus d'inscription</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Actions rapides -->
+			<div class="mb-6">
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+					<div class="flex flex-wrap gap-4">
+						<a href="/directeur/dashboard" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors">
+							← Retour au Dashboard
+						</a>
+						<a href="/directeur/inscriptions" class="inline-flex items-center px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors">
+							📋 Voir toutes les demandes
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Liste des rendez-vous -->
+			{% if requests and requests|length > 0 %}
+				<div class="space-y-6">
+					{% for request in requests %}
+						<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+							<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+								<div
+									class="flex-1 mb-4 lg:mb-0">
+									<!-- Informations parents -->
+									<div class="flex items-center mb-3">
+										<div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+											<span class="text-green-600 font-bold">👨‍👩‍👧‍👦</span>
+										</div>
+										<div class="flex-1">
+											<h3 class="text-lg font-semibold text-slate-800">
+												{{ request.parentFirstName }}
+												{{ request.parentLastName }}
+											</h3>
+											<p class="text-sm text-slate-600">{{ request.parentEmail }}</p>
+
+											<!-- Affichage détaillé des parents si disponible -->
+											{% if request.parentsInfo.pere or request.parentsInfo.mere %}
+												<div class="mt-2 text-xs text-slate-500 space-y-1">
+													{% if request.parentsInfo.pere %}
+														<div>👨 Père:
+															{{ request.parentsInfo.pere }}</div>
+													{% endif %}
+													{% if request.parentsInfo.mere %}
+														<div>👩 Mère:
+															{{ request.parentsInfo.mere }}</div>
+													{% endif %}
+												</div>
+											{% endif %}
+										</div>
+									</div>
+
+									<!-- Informations enfants -->
+									{% if request.parsedChildren and request.parsedChildren|length > 0 %}
+										<div class="bg-slate-50 rounded-lg p-4 mb-3">
+											<h4 class="font-medium text-slate-700 mb-2">Enfant(s) à inscrire:</h4>
+											<div class="space-y-2">
+												{% for child in request.parsedChildren %}
+													<div class="flex items-center text-sm">
+														<span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+														<span class="font-medium">{{ child.firstName }}
+															{{ child.lastName }}</span>
+														{% if child.birthDate %}
+															<span class="text-slate-500 ml-2">({{ child.birthDate }})</span>
+														{% endif %}
+														{% if child.requestedClass %}
+															<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs ml-2">{{ child.requestedClass }}</span>
+														{% endif %}
+													</div>
+												{% endfor %}
+											</div>
+										</div>
+									{% endif %}
+
+									<!-- Métadonnées -->
+									<div class="flex flex-wrap gap-4 text-sm text-slate-600">
+										<div class="flex items-center">
+											<span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+											Accepté le
+											{{ request.processedAt ? request.processedAt|date('d/m/Y') : request.createdAt|date('d/m/Y') }}
+										</div>
+										{% if request.processedByUser %}
+											<div class="flex items-center">
+												<span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+												Par
+												{{ request.processedByUser.firstName }}
+												{{ request.processedByUser.lastName }}
+											</div>
+										{% endif %}
+									</div>
+								</div>
+
+								<!-- Actions -->
+								<div
+									class="flex flex-col sm:flex-row gap-3">
+									<!-- Bouton PDF -->
+									<button onclick="openPDF({{ request.id }})" class="inline-flex items-center px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-lg transition-colors">
+										📄 PDF Dossier
+									</button>
+
+									<!-- Bouton Finaliser -->
+									<button onclick="finalizeInscription({{ request.id }}, '{{ request.parentFirstName }} {{ request.parentLastName }}')" class="inline-flex items-center px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 font-medium rounded-lg transition-colors">
+										✅ Finaliser inscription
+									</button>
+								</div>
+							</div>
+
+							{% if request.adminNotes %}
+								<div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+									<p class="text-sm text-yellow-800">
+										<strong>Notes:</strong>
+										{{ request.adminNotes }}
+									</p>
+								</div>
+							{% endif %}
+						</div>
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+					<div class="text-6xl mb-4">📅</div>
+					<h3 class="text-xl font-semibold text-slate-800 mb-2">Aucun rendez-vous en attente</h3>
+					<p class="text-slate-600 mb-6">
+						Toutes les demandes d'inscription acceptées ont été traitées.
+					</p>
+					<a href="/directeur/inscriptions" class="inline-flex items-center px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors">
+						📋 Voir toutes les demandes
+					</a>
+				</div>
+			{% endif %}
+
+		</div>
+	</div>
+
+	<!-- JavaScript pour les actions -->
+	<script>
+		// Ouvrir le PDF dans une nouvelle fenêtre
+function openPDF(requestId) {
+const url = `/directeur/rendez-vous-inscriptions/${requestId}/pdf`;
+window.open(url, '_blank', 'width=800,height=900,scrollbars=yes,resizable=yes');
+}
+
+// Finaliser l'inscription après le rendez-vous
+function finalizeInscription(requestId, parentName) {
+if (confirm (`Êtes-vous sûr de vouloir finaliser l'inscription de ${parentName} ?\n\nCette action va créer les comptes parent et enfant(s) et envoyer les identifiants par email.`)) {
+const comment = prompt('Commentaire optionnel (par exemple: classe attribuée, observations...):');
+
+fetch (`/directeur/rendez-vous-inscriptions/${requestId}/finalize`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{
+comment: comment || ''
+}
+)
+}).then(response => response.json()).then(data => {
+if (data.success) {
+alert('✅ Inscription finalisée avec succès !\n\nLes comptes ont été créés et les identifiants envoyés par email.');
+location.reload();
+} else {
+alert('❌ Erreur: ' + data.message);
+}
+}).catch(error => {
+console.error('Erreur:', error);
+alert('❌ Erreur lors de la finalisation de l\'inscription');
+});
+}
+}
+	</script>
+{% endblock %}

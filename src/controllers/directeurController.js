@@ -25,7 +25,8 @@ const directeurController = {
                 prisma.actualite.count(),
                 prisma.travaux.count(),
                 prisma.preInscriptionRequest.count({ where: { status: 'PENDING' } }),
-                prisma.credentialsRequest.count({ where: { status: { in: ['PENDING', 'PROCESSING'] } } })
+                prisma.credentialsRequest.count({ where: { status: { in: ['PENDING', 'PROCESSING'] } } }),
+                prisma.preInscriptionRequest.count({ where: { status: 'ACCEPTED' } }) // Rendez-vous en attente
             ]);
 
             // Créer l'objet stats
@@ -37,12 +38,14 @@ const directeurController = {
                 totalActualites: statsArray[4],
                 totalTravaux: statsArray[5],
                 pendingInscriptions: statsArray[6],
-                pendingCredentials: statsArray[7]
+                pendingCredentials: statsArray[7],
+                acceptedInscriptions: statsArray[8] // Rendez-vous en attente
             };
 
             // Debug - vérification des valeurs
             console.log('🔍 DEBUG STATS DASHBOARD:');
             console.log('  - pendingInscriptions:', stats.pendingInscriptions);
+            console.log('  - acceptedInscriptions:', stats.acceptedInscriptions);
             console.log('  - pendingCredentials:', stats.pendingCredentials);
 
             // Récupérer les utilisateurs récents
@@ -902,6 +905,523 @@ const directeurController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de la suppression de la demande'
+            });
+        }
+    },
+
+    // === NOUVELLES FONCTIONS POUR RENDEZ-VOUS INSCRIPTIONS ===
+
+    // Afficher la liste des rendez-vous d'inscription (statut ACCEPTED)
+    getRendezVousInscriptions: async (req, res) => {
+        try {
+            // Récupérer toutes les demandes acceptées (en attente de rendez-vous)
+            const acceptedRequests = await prisma.preInscriptionRequest.findMany({
+                where: {
+                    status: 'ACCEPTED'
+                },
+                orderBy: {
+                    submittedAt: 'desc'
+                },
+                include: {
+                    processor: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            });
+
+            // Parser les données enfants et parents pour l'affichage
+            const requestsWithParsedChildren = acceptedRequests.map(request => {
+                let children = [];
+                if (request.children) {
+                    try {
+                        children = typeof request.children === 'string'
+                            ? JSON.parse(request.children)
+                            : request.children;
+                    } catch (e) {
+                        console.error('Erreur parsing children:', e);
+                        children = [];
+                    }
+                }
+
+                // Parser les informations des parents
+                let parentsInfo = {};
+                if (request.message) {
+                    try {
+                        parentsInfo = typeof request.message === 'string'
+                            ? JSON.parse(request.message)
+                            : request.message;
+                    } catch (e) {
+                        console.error('Erreur parsing parents info:', e);
+                        parentsInfo = {};
+                    }
+                }
+
+                return {
+                    ...request,
+                    parsedChildren: children,
+                    parentsInfo
+                };
+            });
+
+            res.render('pages/directeur/rendez-vous-inscriptions', {
+                title: 'Rendez-vous d\'inscription - École Saint-Mathieu',
+                user: req.session.user,
+                requests: requestsWithParsedChildren
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur récupération rendez-vous inscriptions:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors de la récupération des rendez-vous',
+                user: req.session.user
+            });
+        }
+    },
+
+    // Générer et afficher le PDF d'inscription dans une nouvelle fenêtre selon le format officiel
+    generateInscriptionPDF: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // DEBUG: Message très visible pour confirmer l'exécution
+            console.log('🔥🔥🔥 GÉNÉRATION PDF DÉMARRÉE - ID:', id, '🔥🔥🔥');
+
+            // Récupérer la demande d'inscription
+            const request = await prisma.preInscriptionRequest.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!request) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Demande d\'inscription non trouvée'
+                });
+            }
+
+            // Parser les données enfants
+            let children = [];
+            if (request.children) {
+                try {
+                    children = typeof request.children === 'string'
+                        ? JSON.parse(request.children)
+                        : request.children;
+                } catch (e) {
+                    console.error('Erreur parsing children pour PDF:', e);
+                    children = [];
+                }
+            }
+
+            // Parser les informations des parents
+            let parentsInfo = {};
+            if (request.message) {
+                try {
+                    parentsInfo = typeof request.message === 'string'
+                        ? JSON.parse(request.message)
+                        : request.message;
+                } catch (e) {
+                    console.error('Erreur parsing parents info pour PDF:', e);
+                    parentsInfo = {};
+                }
+            }
+
+            // Créer le PDF avec PDFKit selon le format officiel
+            const PDFDocument = require('pdfkit');
+            const path = require('path');
+            const fs = require('fs');
+
+            // Fonction pour formater les dates en français (dd/mm/yyyy)
+            const formatDateFrench = (dateString) => {
+                if (!dateString) return '__________';
+                try {
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return '__________';
+
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const year = date.getFullYear();
+
+                    return `${day}/${month}/${year}`;
+                } catch (error) {
+                    console.error('Erreur formatage date:', error);
+                    return '__________';
+                }
+            };
+
+            // Créer le dossier d'archivage s'il n'existe pas
+            const archiveDir = path.join(__dirname, '../../public/pdf_archive');
+            if (!fs.existsSync(archiveDir)) {
+                fs.mkdirSync(archiveDir, { recursive: true });
+                console.log('📁 Dossier d\'archivage PDF créé:', archiveDir);
+            }
+
+            const doc = new PDFDocument({
+                size: 'A4',
+                margin: 60
+            });
+
+            // Configuration des en-têtes pour affichage dans le navigateur
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'inline; filename="demande-inscription-' + request.parentLastName + '.pdf"');
+
+            // NE PAS pipe maintenant - on le fera à la fin
+
+            let yPos = 30;
+
+            // === EN-TÊTE MODERNE AVEC LOGOS ===
+            try {
+                // Logo École Saint-Mathieu
+                const logoEcolePath = path.join(__dirname, '../../public/assets/images/testimage.jpg');
+                if (fs.existsSync(logoEcolePath)) {
+                    doc.image(logoEcolePath, 60, yPos, { width: 55, height: 55 });
+                }
+
+                // Logo Enseignement Catholique
+                const logoEnseignPath = path.join(__dirname, '../../public/assets/images/enseigncatho.png');
+                if (fs.existsSync(logoEnseignPath)) {
+                    doc.image(logoEnseignPath, 130, yPos, { width: 55, height: 55 });
+                }
+            } catch (error) {
+                console.log('Erreur chargement logos:', error);
+            }
+
+            // Titre élégant à droite
+            doc.fontSize(18).font('Helvetica-Bold')
+                .text('DEMANDE D\'INSCRIPTION', 200, yPos + 8);
+            doc.fontSize(11).font('Helvetica')
+                .text('Année scolaire ' + (request.anneeScolaire || '2025-2026'), 200, yPos + 32);
+
+            yPos += 70;
+
+            // === LIGNE DE SÉPARATION ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 15;
+
+            // === SECTION PARENTS (STRUCTURE VERTICALE) ===
+
+            // === SECTION PÈRE ===
+            doc.fontSize(12).font('Helvetica-Bold')
+                .text('RESPONSABLE 1 - PÈRE', 60, yPos, { align: 'center', width: 475 });
+
+            yPos += 18;
+
+            // Extraire les infos du père depuis les champs de base ET message JSON
+            let pereInfo = {
+                firstName: request.parentFirstName || '',
+                lastName: request.parentLastName || '',
+                email: request.parentEmail || '',
+                phone: request.parentPhone || ''
+            };
+
+            // Si on a des infos dans le message JSON, on les utilise pour compléter
+            if (parentsInfo.pere) {
+                const pereMatch = parentsInfo.pere.match(/^(.+?)\s+(.+?)\s*-\s*(.+)$/);
+                if (pereMatch) {
+                    pereInfo.firstName = pereMatch[1].trim();
+                    pereInfo.lastName = pereMatch[2].trim();
+                    pereInfo.email = pereMatch[3].trim();
+                }
+            }
+
+            doc.fontSize(10).font('Helvetica');
+
+            // Informations père en colonnes
+            doc.text('Civilité: M.', 60, yPos);
+            doc.text('Nom: ' + (pereInfo.lastName || '______________'), 200, yPos);
+            doc.text('Prénom: ' + (pereInfo.firstName || '______________'), 350, yPos);
+            yPos += 15;
+
+            doc.text('Téléphone: ' + (pereInfo.phone || '______________'), 60, yPos);
+            doc.text('Email: ' + (pereInfo.email || '______________'), 280, yPos);
+            yPos += 15;
+
+            // Adresse du père
+            const fullAddress = request.parentAddress || '';
+            const addressLines = fullAddress.split('\n').filter(line => line.trim());
+            let codePostal = '';
+            let ville = '';
+            let adresseRue = '';
+
+            if (addressLines.length > 0) {
+                adresseRue = addressLines[0];
+                if (addressLines.length > 1) {
+                    const lastLine = addressLines[addressLines.length - 1];
+                    const codePostalMatch = lastLine.match(/(\d{5})\s+(.+)/);
+                    if (codePostalMatch) {
+                        codePostal = codePostalMatch[1];
+                        ville = codePostalMatch[2];
+                    } else {
+                        ville = lastLine;
+                    }
+                }
+            }
+
+            doc.text('Adresse: ' + (adresseRue || '_________________________________'), 60, yPos);
+            yPos += 15;
+            doc.text('Code postal: ' + (codePostal || '________'), 60, yPos);
+            doc.text('Ville: ' + (ville || '____________________'), 220, yPos);
+
+            yPos += 25;
+
+            // === SECTION MÈRE ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+
+            doc.fontSize(12).font('Helvetica-Bold')
+                .text('RESPONSABLE 2 - MÈRE', 60, yPos, { align: 'center', width: 475 });
+
+            yPos += 18;
+
+            // Extraire les infos de la mère depuis parentsInfo et champs directs
+            let mereInfo = {};
+
+            // Essayer d'abord les champs directs
+            if (request.motherFirstName || request.motherLastName || request.motherEmail || request.motherPhone) {
+                mereInfo = {
+                    firstName: request.motherFirstName || '',
+                    lastName: request.motherLastName || '',
+                    email: request.motherEmail || '',
+                    phone: request.motherPhone || ''
+                };
+            }
+
+            // Compléter avec parentsInfo si disponible
+            if (parentsInfo.mere) {
+                const mereMatch = parentsInfo.mere.match(/^(.+?)\s+(.+?)\s*-\s*(.+)$/);
+                if (mereMatch) {
+                    mereInfo = {
+                        firstName: mereInfo.firstName || mereMatch[1].trim(),
+                        lastName: mereInfo.lastName || mereMatch[2].trim(),
+                        email: mereInfo.email || mereMatch[3].trim(),
+                        phone: mereInfo.phone || ''
+                    };
+                }
+            }
+
+            // Chercher le téléphone dans le message JSON global (parfois plus d'informations y sont stockées)
+            if (!mereInfo.phone && request.message) {
+                try {
+                    const messageData = typeof request.message === 'string' ? JSON.parse(request.message) : request.message;
+                    if (messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone) {
+                        mereInfo.phone = messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone || '';
+                    }
+                } catch (e) {
+                    console.error('Erreur parsing message pour téléphone mère:', e);
+                }
+            }
+
+            // DEBUG: Voir ce qu'on a dans mereInfo
+            console.log('📄 PDF - mereInfo:', JSON.stringify(mereInfo, null, 2));
+
+            doc.fontSize(10).font('Helvetica');
+
+            // Informations mère en colonnes
+            doc.text('Civilité: Mme', 60, yPos);
+            doc.text('Nom: ' + (mereInfo.lastName || '______________'), 200, yPos);
+            doc.text('Prénom: ' + (mereInfo.firstName || '______________'), 350, yPos);
+            yPos += 15;
+
+            doc.text('Téléphone: ' + (mereInfo.phone || '______________'), 60, yPos);
+            doc.text('Email: ' + (mereInfo.email || '______________'), 280, yPos);
+            yPos += 15;
+
+            // Adresse de la mère (même que père pour l'instant, géré intelligemment selon situation familiale)
+            doc.text('Adresse: ' + (adresseRue || '_________________________________'), 60, yPos);
+            yPos += 15;
+            doc.text('Code postal: ' + (codePostal || '________'), 60, yPos);
+            doc.text('Ville: ' + (ville || '____________________'), 220, yPos);
+
+            yPos += 25;
+
+            // === SITUATION DE FAMILLE ===
+            console.log('📄 PDF - Position SITUATION DE FAMILLE - yPos:', yPos);
+
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+
+            doc.fontSize(12).font('Helvetica-Bold')
+                .text('SITUATION DE FAMILLE', 60, yPos, { align: 'center', width: 475 });
+
+            yPos += 18;
+            doc.fontSize(10).font('Helvetica');
+
+            // Déterminer la situation familiale depuis les données
+            let situationFamiliale = request.familySituation || request.situationFamiliale || '';
+
+            // Créer les cases avec la bonne cochée selon la situation
+            let mariés = '☐';
+            let pacsés = '☐';
+            let unionLibre = '☐';
+            let divorcés = '☐';
+            let séparés = '☐';
+            let autre = '☐';
+
+            const situation = situationFamiliale.toLowerCase();
+            if (situation.includes('marié')) mariés = '☑';
+            else if (situation.includes('pacs')) pacsés = '☑';
+            else if (situation.includes('union libre') || situation.includes('concubinage')) unionLibre = '☑';
+            else if (situation.includes('divorcé')) divorcés = '☑';
+            else if (situation.includes('séparé')) séparés = '☑';
+            else if (situationFamiliale && !situation.includes('marié')) autre = '☑';
+
+            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${situationFamiliale && autre === '☑' ? situationFamiliale : '___________'}`, 60, yPos);
+
+            // DEBUG: Ajout d'une ligne pour vérifier que le code s'exécute
+            console.log('📄 PDF - Section Situation de famille générée avec situation:', situationFamiliale);
+
+            yPos += 25;
+
+            // === SECTION ENFANT (TRÈS COMPACTE) ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+
+            doc.fontSize(11).font('Helvetica-Bold')
+                .text('RENSEIGNEMENTS ENFANT', 60, yPos, { align: 'center', width: 475 });
+
+            yPos += 15;
+            doc.fontSize(9).font('Helvetica');
+
+            if (children.length > 0) {
+                const child = children[0];
+
+                // Ligne 1: Informations de base (tout sur une ligne)
+                doc.text('Nom: ' + (child.lastName || '________'), 60, yPos);
+                doc.text('Prénom: ' + (child.firstName || '________'), 180, yPos);
+
+                // DEBUG: Vérifier le formatage de date
+                const formattedDate = formatDateFrench(child.birthDate);
+                console.log('📄 PDF - Date originale:', child.birthDate, '-> Formatée:', formattedDate);
+
+                doc.text('Date de naissance: ' + formattedDate, 300, yPos);
+                yPos += 15;
+
+                // Ligne 2: Lieu de naissance et Nationalité  
+                doc.text('Lieu de naissance: ' + (child.birthPlace || child.lieuNaissance || '________________'), 60, yPos);
+                doc.text('Nationalité: ' + (child.nationality || child.nationalite || '________________'), 300, yPos);
+                yPos += 15;
+
+                // Ligne 3: Classe demandée (plus proéminente)
+                doc.fontSize(10).font('Helvetica-Bold')
+                    .text('CLASSE DEMANDÉE: ' + (child.requestedClass || child.schoolLevel || '________________'), 60, yPos);
+                yPos += 20;
+
+                // École actuelle sur une ligne
+                doc.fontSize(9).font('Helvetica')
+                    .text('École actuelle: ' + (child.currentSchool || child.previousSchool || '________________'), 60, yPos);
+                doc.text('Classe actuelle: ' + (child.currentClass || '________'), 350, yPos);
+            } else {
+                doc.text('Aucun enfant renseigné', 60, yPos);
+                yPos += 15;
+            }
+
+            yPos += 25;
+
+            // === ÉTABLISSEMENT EN COURS ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+
+            doc.fontSize(11).font('Helvetica-Bold')
+                .text('ÉTABLISSEMENT EN COURS', 60, yPos, { align: 'center', width: 475 });
+
+            yPos += 15;
+            doc.fontSize(9).font('Helvetica');
+
+            if (children.length > 0 && children[0]) {
+                doc.text('École actuelle: ' + (children[0].currentSchool || children[0].previousSchool || '________________________'), 60, yPos);
+                yPos += 15;
+                doc.text('Classe actuelle: ' + (children[0].currentClass || '________'), 60, yPos);
+                doc.text('Directeur/Directrice: ________________', 250, yPos);
+                yPos += 15;
+                doc.text('Adresse de l\'établissement: _________________________________', 60, yPos);
+            } else {
+                doc.text('École actuelle: ________________________', 60, yPos);
+                yPos += 15;
+                doc.text('Classe actuelle: ________', 60, yPos);
+                doc.text('Directeur/Directrice: ________________', 250, yPos);
+                yPos += 15;
+                doc.text('Adresse de l\'établissement: _________________________________', 60, yPos);
+            }
+
+            yPos += 25;
+
+            // === BESOINS PARTICULIERS ===
+            if (request.specialNeeds) {
+                doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+                yPos += 12;
+                doc.fontSize(10).font('Helvetica-Bold')
+                    .text('BESOINS PARTICULIERS', 60, yPos, { align: 'center', width: 475 });
+                yPos += 15;
+                doc.fontSize(9).font('Helvetica')
+                    .text(request.specialNeeds, 60, yPos, { width: 475 });
+                yPos += 20;
+            }
+
+            // === INFORMATIONS ADMINISTRATIVES (COMPACT) ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+
+            doc.fontSize(10).font('Helvetica-Bold')
+                .text('INFORMATIONS ADMINISTRATIVES', 60, yPos, { align: 'center', width: 475 });
+
+            yPos += 15;
+            doc.fontSize(8).font('Helvetica');
+
+            const dateInscription = request.submittedAt ? new Date(request.submittedAt).toLocaleDateString('fr-FR') : 'Non définie';
+            let statusText = 'En attente';
+            if (request.status === 'ACCEPTED') statusText = 'Accepté pour rendez-vous';
+            else if (request.status === 'COMPLETED') statusText = 'Inscription finalisée';
+            else if (request.status === 'REJECTED') statusText = 'Refusée';
+
+            doc.text('Date de demande: ' + dateInscription, 60, yPos);
+            doc.text('Statut: ' + statusText, 300, yPos);
+
+            if (request.adminNotes) {
+                yPos += 12;
+                doc.text('Notes: ' + request.adminNotes, 60, yPos, { width: 400 });
+            }
+
+            // === SIGNATURES (BAS DE PAGE) ===
+            yPos = 750; // Position fixe en bas
+            doc.fontSize(9).font('Helvetica')
+                .text('Signature du père: _______________', 60, yPos)
+                .text('Date: ________', 220, yPos)
+                .text('Signature de la mère: _______________', 320, yPos)
+                .text('Date: ________', 480, yPos);
+
+            // Envoyer le PDF directement au navigateur (archivage temporairement désactivé)
+            console.log('📄 PDF - Début du pipe vers le navigateur');
+
+            // Attacher les événements AVANT la finalisation
+            doc.on('end', () => {
+                console.log('✅ Événement END du PDF déclenché');
+            });
+
+            res.on('finish', () => {
+                console.log('✅ Réponse HTTP terminée');
+            });
+
+            res.on('close', () => {
+                console.log('🔒 Connexion fermée');
+            });
+
+            doc.pipe(res);
+
+            console.log('📄 PDF - Pipe configuré, finalisation...');
+
+            // Finaliser le PDF avec plus de debug
+            console.log('🔚 Début finalisation PDF...');
+            doc.end();
+            console.log('🔥🔥🔥 PDF FINALISÉ ET ENVOYÉ 🔥🔥🔥');
+
+            console.log('📄 PDF - doc.end() appelé, PDF envoyé');
+
+        } catch (error) {
+            console.error('❌ Erreur génération PDF:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la génération du PDF'
             });
         }
     },

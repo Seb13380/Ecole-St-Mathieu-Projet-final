@@ -174,7 +174,7 @@ const inscriptionController = {
                 }
             });
 
-            // Parser les enfants pour chaque demande
+            // Parser les enfants et les parents pour chaque demande
             const requestsWithParsedChildren = requests.map(request => {
                 let children = [];
                 if (request.children) {
@@ -187,9 +187,24 @@ const inscriptionController = {
                         children = [];
                     }
                 }
+
+                // Parser les informations des parents
+                let parentsInfo = {};
+                if (request.message) {
+                    try {
+                        parentsInfo = typeof request.message === 'string'
+                            ? JSON.parse(request.message)
+                            : request.message;
+                    } catch (e) {
+                        console.error('Erreur parsing parents info pour request', request.id, ':', e);
+                        parentsInfo = {};
+                    }
+                }
+
                 return {
                     ...request,
-                    children
+                    children,
+                    parentsInfo
                 };
             });
 
@@ -207,7 +222,7 @@ const inscriptionController = {
         }
     },
 
-    // Pour l'admin : approuver une demande
+    // ÉTAPE 1 : Approuver la demande pour un rendez-vous (sans créer les comptes)
     approveRequest: async (req, res) => {
         try {
             const { id } = req.params;
@@ -225,43 +240,176 @@ const inscriptionController = {
                 });
             }
 
-            // Vérifier si un compte parent existe déjà
-            let existingUser = await prisma.user.findUnique({
-                where: { email: request.parentEmail }
+            // Mettre à jour le statut pour indiquer qu'un rendez-vous est accepté
+            await prisma.preInscriptionRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    status: 'ACCEPTED', // Accepté pour rendez-vous
+                    processedAt: new Date(),
+                    processedBy: req.session.user.id,
+                    adminNotes: comment || 'Demande acceptée - Rendez-vous d\'inscription à programmer'
+                }
             });
 
-            let parentUser;
+            // Envoyer email pour confirmer le rendez-vous
+            try {
+                await emailService.sendAppointmentAcceptanceEmail({
+                    parentFirstName: request.parentFirstName,
+                    parentLastName: request.parentLastName,
+                    parentEmail: request.parentEmail,
+                    children: request.children
+                }, comment);
+                console.log('✅ Email de confirmation de rendez-vous envoyé');
+            } catch (emailError) {
+                console.error('❌ Erreur envoi email rendez-vous:', emailError);
+            }
+
+            res.json({
+                success: true,
+                message: 'Demande approuvée pour rendez-vous',
+                parentEmail: request.parentEmail
+            });
+
+        } catch (error) {
+            console.error('Erreur lors de l\'approbation:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de l\'approbation: ' + error.message
+            });
+        }
+    },
+
+    // ÉTAPE 2 : Finaliser l'inscription après le rendez-vous (créer les comptes)
+    finalizeInscription: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { comment } = req.body;
+
+            // Récupérer la demande d'inscription
+            const request = await prisma.preInscriptionRequest.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (!request) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Demande d\'inscription non trouvée'
+                });
+            }
+
+            if (request.status !== 'ACCEPTED') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Cette demande n\'est pas au statut accepté pour rendez-vous'
+                });
+            }
+
+            // Parser les informations des parents depuis le champ message
+            let parentsInfo = {};
+            if (request.message) {
+                try {
+                    parentsInfo = typeof request.message === 'string'
+                        ? JSON.parse(request.message)
+                        : request.message;
+                } catch (e) {
+                    console.error('Erreur parsing parents info:', e);
+                    parentsInfo = {};
+                }
+            }
+
+            // Préparer les données des parents à créer
+            const parentsToCreate = [];
+
+            // PÈRE - extraire informations du format "Prénom Nom - email"
+            if (parentsInfo.pere) {
+                const pereData = parentsInfo.pere.split(' - ');
+                if (pereData.length >= 2) {
+                    const nomPrenom = pereData[0].trim().split(' ');
+                    const prenom = nomPrenom[0];
+                    const nom = nomPrenom.slice(1).join(' ');
+                    const email = pereData[1].trim();
+
+                    parentsToCreate.push({
+                        firstName: prenom,
+                        lastName: nom,
+                        email: email,
+                        role: 'PARENT',
+                        phone: request.parentPhone,
+                        adress: parentsInfo.adresse || request.parentAddress
+                    });
+                }
+            }
+
+            // MÈRE - extraire informations du format "Prénom Nom - email"
+            if (parentsInfo.mere) {
+                const mereData = parentsInfo.mere.split(' - ');
+                if (mereData.length >= 2) {
+                    const nomPrenom = mereData[0].trim().split(' ');
+                    const prenom = nomPrenom[0];
+                    const nom = nomPrenom.slice(1).join(' ');
+                    const email = mereData[1].trim();
+
+                    parentsToCreate.push({
+                        firstName: prenom,
+                        lastName: nom,
+                        email: email,
+                        role: 'PARENT',
+                        phone: request.parentPhone,
+                        adress: parentsInfo.adresse || request.parentAddress
+                    });
+                }
+            }
+
+            // Fallback : créer au moins le parent principal si aucun parent extrait
+            if (parentsToCreate.length === 0) {
+                parentsToCreate.push({
+                    firstName: request.parentFirstName,
+                    lastName: request.parentLastName,
+                    email: request.parentEmail,
+                    role: 'PARENT',
+                    phone: request.parentPhone,
+                    adress: request.parentAddress
+                });
+            }
+
+            // Créer ou mettre à jour les comptes parents
+            const createdParents = [];
             let tempPassword = 'TempEcole' + Math.floor(Math.random() * 1000) + '!';
             const hashedTempPassword = await bcrypt.hash(tempPassword, 12);
 
-            if (existingUser) {
-                // Si le parent existe déjà, l'utiliser et mettre à jour son mot de passe
-                parentUser = await prisma.user.update({
-                    where: { id: existingUser.id },
-                    data: {
-                        password: hashedTempPassword,
-                        phone: request.parentPhone || existingUser.phone,
-                        adress: request.parentAddress || existingUser.adress
-                    }
+            for (const parentData of parentsToCreate) {
+                let existingUser = await prisma.user.findUnique({
+                    where: { email: parentData.email }
                 });
-                console.log('✅ Compte parent existant mis à jour:', request.parentEmail);
-            } else {
-                // Créer le compte parent avec un mot de passe temporaire
-                parentUser = await prisma.user.create({
-                    data: {
-                        firstName: request.parentFirstName,
-                        lastName: request.parentLastName,
-                        email: request.parentEmail,
-                        password: hashedTempPassword, // Mot de passe temporaire sécurisé
-                        role: 'PARENT',
-                        phone: request.parentPhone,
-                        adress: request.parentAddress
-                    }
-                });
-                console.log('✅ Nouveau compte parent créé:', request.parentEmail);
+
+                let parentUser;
+                if (existingUser) {
+                    // Si le parent existe déjà, l'utiliser et mettre à jour
+                    parentUser = await prisma.user.update({
+                        where: { id: existingUser.id },
+                        data: {
+                            password: hashedTempPassword,
+                            phone: parentData.phone || existingUser.phone,
+                            adress: parentData.adress || existingUser.adress
+                        }
+                    });
+                    console.log('✅ Compte parent existant mis à jour:', parentData.email);
+                } else {
+                    // Créer le nouveau compte parent
+                    parentUser = await prisma.user.create({
+                        data: {
+                            ...parentData,
+                            password: hashedTempPassword
+                        }
+                    });
+                    console.log('✅ Nouveau compte parent créé:', parentData.email);
+                }
+
+                createdParents.push(parentUser);
             }
 
-            console.log('✅ Compte parent créé:', request.parentEmail);
+            // Utiliser le premier parent créé pour les enfants (parent principal)
+            const parentUser = createdParents[0];
 
             // 👶 CRÉER LES ENFANTS
             let createdStudents = [];
@@ -273,26 +421,17 @@ const inscriptionController = {
                 console.log('👶 Création des enfants...');
 
                 for (const childData of childrenData) {
-                    console.log('🔍 Traitement enfant pour création:', {
-                        firstName: childData.firstName,
-                        lastName: childData.lastName,
-                        requestedClass: childData.requestedClass,
-                        schoolLevel: childData.schoolLevel
-                    });
-
                     if (childData.firstName && childData.lastName && childData.birthDate) {
-                        // 🎯 Attribution dynamique de la classe selon le niveau scolaire ou requestedClass
+                        // Attribution dynamique de la classe
                         let classeId = null;
                         let assignmentMethod = '';
 
-                        // Priorité 1: requestedClass si présente et valide
+                        // Recherche par requestedClass d'abord
                         if (childData.requestedClass) {
-                            // Essayer d'abord par niveau (PS, MS, GS, CP, etc.)
                             let requestedClassObj = await prisma.classe.findFirst({
                                 where: { niveau: childData.requestedClass }
                             });
 
-                            // Si pas trouvé par niveau, essayer par nom
                             if (!requestedClassObj) {
                                 requestedClassObj = await prisma.classe.findFirst({
                                     where: { nom: childData.requestedClass }
@@ -302,21 +441,10 @@ const inscriptionController = {
                             if (requestedClassObj) {
                                 classeId = requestedClassObj.id;
                                 assignmentMethod = `requestedClass "${childData.requestedClass}" → ${requestedClassObj.nom}`;
-                                console.log(`   ✅ Classe trouvée via requestedClass: ${assignmentMethod} (ID: ${classeId})`);
-                            } else {
-                                console.log(`   ⚠️ Classe demandée "${childData.requestedClass}" non trouvée par niveau ni par nom`);
-
-                                // Lister les classes disponibles pour debug
-                                const availableClasses = await prisma.classe.findMany({
-                                    select: { id: true, nom: true, niveau: true }
-                                });
-                                console.log('   📋 Classes disponibles:', availableClasses.map(c => `${c.niveau || 'null'} - ${c.nom} (ID: ${c.id})`));
                             }
-                        } else {
-                            console.log(`   ⚠️ Aucune classe demandée pour ${childData.firstName}, recherche par niveau scolaire`);
                         }
 
-                        // Priorité 2: schoolLevel si requestedClass n'est pas utilisable
+                        // Recherche par schoolLevel si pas trouvé
                         if (!classeId && childData.schoolLevel) {
                             const schoolLevelObj = await prisma.classe.findFirst({
                                 where: { niveau: childData.schoolLevel.toUpperCase() }
@@ -325,13 +453,10 @@ const inscriptionController = {
                             if (schoolLevelObj) {
                                 classeId = schoolLevelObj.id;
                                 assignmentMethod = `schoolLevel "${childData.schoolLevel}" → ${schoolLevelObj.nom}`;
-                                console.log(`   ✅ Classe trouvée via schoolLevel: ${assignmentMethod} (ID: ${classeId})`);
-                            } else {
-                                console.log(`   ⚠️ Niveau scolaire "${childData.schoolLevel}" non trouvé`);
                             }
                         }
 
-                        // Priorité 3: Classe par défaut si rien n'est trouvé
+                        // Classe par défaut si rien trouvé
                         if (!classeId) {
                             const defaultClass = await prisma.classe.findFirst({
                                 where: { niveau: 'PS' }
@@ -340,23 +465,16 @@ const inscriptionController = {
                             if (defaultClass) {
                                 classeId = defaultClass.id;
                                 assignmentMethod = `défaut → ${defaultClass.nom}`;
-                                console.log(`   ⚠️ Classe par défaut utilisée: ${assignmentMethod} (ID: ${classeId})`);
                             } else {
-                                // En dernier recours, prendre la première classe disponible
                                 const firstClass = await prisma.classe.findFirst();
                                 if (firstClass) {
                                     classeId = firstClass.id;
                                     assignmentMethod = `première disponible → ${firstClass.nom}`;
-                                    console.log(`   ⚠️ Première classe disponible utilisée: ${assignmentMethod} (ID: ${classeId})`);
-                                } else {
-                                    throw new Error('Aucune classe disponible dans la base de données');
                                 }
                             }
                         }
 
-                        try {
-                            console.log(`   🎯 Création étudiant: ${childData.firstName} ${childData.lastName} avec classeId=${classeId} (${assignmentMethod})`);
-
+                        if (classeId) {
                             const student = await prisma.student.create({
                                 data: {
                                     firstName: childData.firstName,
@@ -368,59 +486,54 @@ const inscriptionController = {
                             });
 
                             createdStudents.push(student);
-                            console.log(`   ✅ Enfant créé avec succès: ${student.firstName} ${student.lastName} (ID: ${student.id}, Classe: ${classeId})`);
-                        } catch (error) {
-                            console.error(`   ❌ Erreur création enfant ${childData.firstName} ${childData.lastName}:`, {
-                                error: error.message,
-                                classeId: classeId,
-                                assignmentMethod: assignmentMethod,
-                                requestedClass: childData.requestedClass,
-                                schoolLevel: childData.schoolLevel
-                            });
-                            throw new Error(`Erreur lors de la création de l'étudiant ${childData.firstName} ${childData.lastName}: ${error.message} (classeId: ${classeId}, méthode: ${assignmentMethod})`);
+                            console.log(`✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id})`);
                         }
                     }
                 }
 
-                console.log(`✅ ${createdStudents.length} enfant(s) créé(s) pour le parent ${request.parentEmail}`);
+                console.log(`✅ ${createdStudents.length} enfant(s) créé(s) pour les parents`);
             }
 
-            // Mettre à jour le statut de la demande
+            // Mettre à jour le statut à COMPLETED
             await prisma.preInscriptionRequest.update({
                 where: { id: parseInt(id) },
                 data: {
-                    status: 'ACCEPTED',
+                    status: 'COMPLETED',
                     processedAt: new Date(),
                     processedBy: req.session.user.id,
-                    adminNotes: comment || `Demande approuvée - Compte parent et ${createdStudents.length} enfant(s) créés`
+                    adminNotes: comment || `Inscription finalisée - ${createdParents.length} compte(s) parent(s) et ${createdStudents.length} enfant(s) créés`
                 }
             });
 
-            // Envoyer email d'approbation avec identifiants
-            try {
-                await emailService.sendApprovalEmailWithCredentials({
-                    parentFirstName: request.parentFirstName,
-                    parentLastName: request.parentLastName,
-                    parentEmail: request.parentEmail,
-                    children: request.children,
-                    createdStudents: createdStudents
-                }, comment);
-                console.log('✅ Email d\'approbation avec identifiants envoyé');
-            } catch (emailError) {
-                console.error('❌ Erreur envoi approbation:', emailError);
+            // Envoyer email avec les identifiants à tous les parents créés
+            for (const parent of createdParents) {
+                try {
+                    await emailService.sendApprovalEmailWithCredentials({
+                        parentFirstName: parent.firstName,
+                        parentLastName: parent.lastName,
+                        parentEmail: parent.email,
+                        children: request.children,
+                        createdStudents: createdStudents,
+                        tempPassword: tempPassword
+                    }, comment);
+                    console.log(`✅ Email avec identifiants envoyé à: ${parent.email}`);
+                } catch (emailError) {
+                    console.error(`❌ Erreur envoi email identifiants à ${parent.email}:`, emailError);
+                }
             }
 
             res.json({
                 success: true,
-                message: 'Demande approuvée avec succès et compte parent créé',
-                parentEmail: request.parentEmail
+                message: `Inscription finalisée avec succès - Comptes créés pour ${createdParents.length} parent(s) et ${createdStudents.length} enfant(s)`,
+                parentsCreated: createdParents.length,
+                studentsCreated: createdStudents.length
             });
 
         } catch (error) {
-            console.error('Erreur lors de l\'approbation:', error);
+            console.error('Erreur lors de la finalisation:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de l\'approbation: ' + error.message
+                message: 'Erreur lors de la finalisation: ' + error.message
             });
         }
     },

@@ -39,6 +39,7 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.2",
+    "express-validator": "^7.2.1",
     "flowbite": "^3.1.2",
     "geoip-lite": "^1.4.10",
     "helmet": "^8.1.0",
@@ -52,7 +53,8 @@
     "puppeteer": "^24.12.0",
     "session-file-store": "^1.5.0",
     "tailwindcss": "^3.4.15",
-    "twig": "^1.17.1"
+    "twig": "^1.17.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
