@@ -1,0 +1,392 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+	<div
+		class="container mx-auto px-4 max-w-7xl">
+
+		<!-- En-tête -->
+		<div class="mb-8">
+			<div class="bg-white rounded-xl shadow-lg p-6">
+				<div class="flex items-center justify-between">
+					<div class="flex items-center">
+						<div class="w-16 h-16 bg-gradient-to-br from-[#304a4d] to-[#2a3f42] rounded-xl flex items-center justify-center mr-4">
+							<span class="text-3xl">📋</span>
+						</div>
+						<div>
+							<h1 class="text-3xl font-bold text-[#304a4d]">Gestion des Dossiers d'Inscription</h1>
+							<p class="text-[#304a4d]/70">Consultation et validation des dossiers d'inscription</p>
+						</div>
+					</div>
+					<div class="text-right">
+						<p class="text-sm text-gray-500">Connecté en tant que</p>
+						<p class="font-semibold text-[#304a4d]">{{ user.firstName }}
+							{{ user.lastName }}</p>
+						<p class="text-xs text-gray-500">{{ user.role }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Statistiques -->
+		<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+			<div class="bg-white rounded-lg shadow p-4 text-center">
+				<div class="text-2xl font-bold text-[#304a4d]">{{ stats.total }}</div>
+				<div class="text-sm text-gray-600">Total</div>
+			</div>
+			<div class="bg-white rounded-lg shadow p-4 text-center border-l-4 border-yellow-500">
+				<div class="text-2xl font-bold text-yellow-600">{{ stats.enAttente }}</div>
+				<div class="text-sm text-gray-600">En attente</div>
+			</div>
+			<div class="bg-white rounded-lg shadow p-4 text-center border-l-4 border-blue-500">
+				<div class="text-2xl font-bold text-blue-600">{{ stats.enCours }}</div>
+				<div class="text-sm text-gray-600">En cours</div>
+			</div>
+			<div class="bg-white rounded-lg shadow p-4 text-center border-l-4 border-green-500">
+				<div class="text-2xl font-bold text-green-600">{{ stats.valides }}</div>
+				<div class="text-sm text-gray-600">Validés</div>
+			</div>
+			<div class="bg-white rounded-lg shadow p-4 text-center border-l-4 border-red-500">
+				<div class="text-2xl font-bold text-red-600">{{ stats.refuses }}</div>
+				<div class="text-sm text-gray-600">Refusés</div>
+			</div>
+		</div>
+
+		<!-- Filtres -->
+		<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+			<div class="flex flex-wrap items-center gap-4">
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Filtrer par statut</span>
+					</label>
+					<select id="filterStatut" class="select select-bordered select-sm">
+						<option value="">Tous les statuts</option>
+						<option value="EN_ATTENTE">En attente</option>
+						<option value="EN_COURS">En cours</option>
+						<option value="VALIDE">Validé</option>
+						<option value="REFUSE">Refusé</option>
+						<option value="FINALISE">Finalisé</option>
+					</select>
+				</div>
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Filtrer par classe</span>
+					</label>
+					<select id="filterClasse" class="select select-bordered select-sm">
+						<option value="">Toutes les classes</option>
+						<option value="PS">PS (Petite Section)</option>
+						<option value="MS">MS (Moyenne Section)</option>
+						<option value="GS">GS (Grande Section)</option>
+						<option value="CP">CP</option>
+						<option value="CE1">CE1</option>
+						<option value="CE2">CE2</option>
+						<option value="CM1">CM1</option>
+						<option value="CM2">CM2</option>
+					</select>
+				</div>
+				<div class="form-control">
+					<label class="label">
+						<span class="label-text">Rechercher</span>
+					</label>
+					<input type="text" id="searchInput" class="input input-bordered input-sm" placeholder="Nom de l'enfant ou parent...">
+				</div>
+			</div>
+		</div>
+
+		<!-- Liste des dossiers -->
+		<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+			<div class="overflow-x-auto">
+				<table class="table table-zebra w-full">
+					<thead>
+						<tr class="bg-[#304a4d] text-white">
+							<th>Date de dépôt</th>
+							<th>Enfant</th>
+							<th>Classe demandée</th>
+							<th>Parents</th>
+							<th>Statut</th>
+							<th>Traité par</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for dossier in dossiers %}
+							<tr class="dossier-row" data-statut="{{ dossier.statut }}" data-classe="{{ dossier.enfantClasseDemandee }}" data-search="{{ dossier.enfantNom|lower }} {{ dossier.enfantPrenom|lower }} {{ dossier.pereNom|lower }} {{ dossier.mereNom|lower }}">
+								<td>
+									<div class="text-sm">
+										{{ dossier.dateDepot|date('d/m/Y') }}<br>
+										<span class="text-xs text-gray-500">{{ dossier.dateDepot|date('H:i') }}</span>
+									</div>
+								</td>
+								<td>
+									<div class="font-semibold">{{ dossier.enfantPrenom }}
+										{{ dossier.enfantNom }}</div>
+									<div class="text-sm text-gray-500">
+										{{ dossier.enfantDateNaissance|date('d/m/Y') }}
+										({{ dossier.enfantSexe == 'M' ? 'Garçon' : 'Fille' }})
+									</div>
+								</td>
+								<td>
+									<div class="badge badge-primary">{{ dossier.enfantClasseDemandee }}</div>
+									<div class="text-xs text-gray-500">{{ dossier.anneeScolaire }}</div>
+								</td>
+								<td>
+									<div class="text-sm">
+										<div>
+											<strong>Père:</strong>
+											{{ dossier.perePrenom }}
+											{{ dossier.pereNom }}</div>
+										<div>
+											<strong>Mère:</strong>
+											{{ dossier.merePrenom }}
+											{{ dossier.mereNom }}</div>
+										<div class="text-xs text-gray-500">{{ dossier.pereEmail }}</div>
+									</div>
+								</td>
+								<td>
+									{% set statusColors = {
+											'EN_ATTENTE': 'badge-warning',
+											'EN_COURS': 'badge-info',
+											'VALIDE': 'badge-success',
+											'REFUSE': 'badge-error',
+											'FINALISE': 'badge-accent'
+										} %}
+									<div class="badge {{ statusColors[dossier.statut] }}">
+										{% if dossier.statut == 'EN_ATTENTE' %}
+											En attente
+										{% elseif dossier.statut == 'EN_COURS' %}
+											En cours
+										{% elseif dossier.statut == 'VALIDE' %}
+											Validé
+										{% elseif dossier.statut == 'REFUSE' %}
+											Refusé
+										{% elseif dossier.statut == 'FINALISE' %}
+											Finalisé
+										{% endif %}
+									</div>
+								</td>
+								<td>
+									{% if dossier.traitant %}
+										<div class="text-sm">{{ dossier.traitant.firstName }}
+											{{ dossier.traitant.lastName }}</div>
+										<div class="text-xs text-gray-500">{{ dossier.dateTraitement|date('d/m/Y H:i') }}</div>
+									{% else %}
+										<span class="text-gray-400">Non traité</span>
+									{% endif %}
+								</td>
+								<td>
+									<div class="flex space-x-2">
+										<button class="btn btn-sm btn-outline" onclick="voirDossier({{ dossier.id }})">
+											👁️ Voir
+										</button>
+										{% if dossier.documentPdfGenere %}
+											<a href="{{ dossier.documentPdfGenere }}" target="_blank" class="btn btn-sm btn-outline">
+												📄 PDF
+											</a>
+										{% endif %}
+										<div class="dropdown dropdown-end">
+											<label tabindex="0" class="btn btn-sm btn-primary">Statut</label>
+											<ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+												<li>
+													<a onclick="changerStatut({{ dossier.id }}, 'EN_ATTENTE')">⏳ En attente</a>
+												</li>
+												<li>
+													<a onclick="changerStatut({{ dossier.id }}, 'EN_COURS')">🔄 En cours</a>
+												</li>
+												<li>
+													<a onclick="changerStatut({{ dossier.id }}, 'VALIDE')">✅ Valider</a>
+												</li>
+												<li>
+													<a onclick="changerStatut({{ dossier.id }}, 'REFUSE')">❌ Refuser</a>
+												</li>
+												<li>
+													<a onclick="changerStatut({{ dossier.id }}, 'FINALISE')">🎯 Finaliser</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<!-- Modal pour voir les détails d'un dossier -->
+<dialog id="modalDossier" class="modal">
+	<div class="modal-box max-w-4xl">
+		<h3 class="font-bold text-lg mb-4">Détails du dossier d'inscription</h3>
+		<div
+			id="contenuDossier"><!-- Le contenu sera chargé dynamiquement -->
+		</div>
+		<div class="modal-action">
+			<form method="dialog">
+				<button class="btn">Fermer</button>
+			</form>
+		</div>
+	</div>
+</dialog>
+
+<script>
+	// Filtrage des dossiers
+	document.addEventListener('DOMContentLoaded', function () {
+	const filterStatut = document.getElementById('filterStatut');
+	const filterClasse = document.getElementById('filterClasse');
+	const searchInput = document.getElementById('searchInput');
+	const rows = document.querySelectorAll('.dossier-row');
+	
+	function filterDossiers() {
+	const statutFilter = filterStatut.value;
+	const classeFilter = filterClasse.value;
+	const searchTerm = searchInput.value.toLowerCase();
+	
+	rows.forEach(row => {
+	const statut = row.dataset.statut;
+	const classe = row.dataset.classe;
+	const searchData = row.dataset.search;
+	
+	const matchStatut = ! statutFilter || statut === statutFilter;
+	const matchClasse = ! classeFilter || classe === classeFilter;
+	const matchSearch = ! searchTerm || searchData.includes(searchTerm);
+	
+	row.style.display = matchStatut && matchClasse && matchSearch ? '' : 'none';
+	});
+	}
+	
+	filterStatut.addEventListener('change', filterDossiers);
+	filterClasse.addEventListener('change', filterDossiers);
+	searchInput.addEventListener('input', filterDossiers);
+	});
+	
+	// Voir les détails d'un dossier
+	function voirDossier(id) {
+		// Afficher le loader
+		document.getElementById('contenuDossier').innerHTML = `
+			<div class="flex items-center justify-center py-8">
+				<div class="loading loading-spinner loading-lg"></div>
+				<p class="ml-4">Chargement des détails du dossier ${id}...</p>
+			</div>
+		`;
+		document.getElementById('modalDossier').showModal();
+		
+		// Charger les détails via AJAX
+		fetch(`/dossier-inscription/admin/${id}`)
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+				}
+				return response.json();
+			})
+			.then(data => {
+				if (data.success) {
+					const dossier = data.dossier;
+					document.getElementById('contenuDossier').innerHTML = `
+						<div class="space-y-6">
+							<!-- En-tête du dossier -->
+							<div class="bg-gray-50 p-4 rounded-lg">
+								<h4 class="font-semibold text-lg">👶 ${dossier.enfantPrenom} ${dossier.enfantNom}</h4>
+								<p class="text-sm text-gray-600">Dossier #${dossier.id} - Déposé le ${new Date(dossier.dateDepot).toLocaleDateString('fr-FR')}</p>
+							</div>
+							
+							<!-- Informations enfant -->
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="bg-blue-50 p-4 rounded-lg">
+									<h5 class="font-semibold mb-2">👶 Enfant</h5>
+									<p><strong>Nom:</strong> ${dossier.enfantNom}</p>
+									<p><strong>Prénom:</strong> ${dossier.enfantPrenom}</p>
+									<p><strong>Date de naissance:</strong> ${new Date(dossier.enfantDateNaissance).toLocaleDateString('fr-FR')}</p>
+									<p><strong>Sexe:</strong> ${dossier.enfantSexe === 'M' ? 'Masculin' : 'Féminin'}</p>
+									<p><strong>Classe demandée:</strong> ${dossier.enfantClasseDemandee}</p>
+								</div>
+								
+								<div class="bg-green-50 p-4 rounded-lg">
+									<h5 class="font-semibold mb-2">📅 Scolarité</h5>
+									<p><strong>Année scolaire:</strong> ${dossier.anneeScolaire}</p>
+									<p><strong>École actuelle:</strong> ${dossier.enfantEcoleActuelle || 'Non renseignée'}</p>
+									<p><strong>Classe actuelle:</strong> ${dossier.enfantClasseActuelle || 'Non renseignée'}</p>
+								</div>
+							</div>
+							
+							<!-- Informations parents -->
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="bg-blue-50 p-4 rounded-lg">
+									<h5 class="font-semibold mb-2">👨 Père</h5>
+									<p><strong>Nom:</strong> ${dossier.pereNom}</p>
+									<p><strong>Prénom:</strong> ${dossier.perePrenom}</p>
+									<p><strong>Email:</strong> ${dossier.pereEmail}</p>
+									<p><strong>Téléphone:</strong> ${dossier.pereTelephone}</p>
+									<p><strong>Profession:</strong> ${dossier.pereProfession || 'Non renseignée'}</p>
+								</div>
+								
+								<div class="bg-pink-50 p-4 rounded-lg">
+									<h5 class="font-semibold mb-2">👩 Mère</h5>
+									<p><strong>Nom de jeune fille:</strong> ${dossier.mereNom}</p>
+									<p><strong>Prénom:</strong> ${dossier.merePrenom}</p>
+									<p><strong>Email:</strong> ${dossier.mereEmail}</p>
+									<p><strong>Téléphone:</strong> ${dossier.mereTelephone}</p>
+									<p><strong>Profession:</strong> ${dossier.mereProfession || 'Non renseignée'}</p>
+								</div>
+							</div>
+							
+							<!-- Adresse familiale -->
+							<div class="bg-orange-50 p-4 rounded-lg">
+								<h5 class="font-semibold mb-2">🏠 Adresse familiale</h5>
+								<p>${dossier.adresseComplete || dossier.adresseRue + ', ' + dossier.adresseCodePostal + ' ' + dossier.adresseVille}</p>
+							</div>
+							
+							<!-- Statut et notes -->
+							<div class="bg-gray-50 p-4 rounded-lg">
+								<h5 class="font-semibold mb-2">📋 Statut administratif</h5>
+								<p><strong>Statut:</strong> <span class="badge badge-${dossier.statut === 'VALIDE' ? 'success' : dossier.statut === 'REFUSE' ? 'error' : 'warning'}">${dossier.statut}</span></p>
+								${dossier.notesAdministratives ? `<p><strong>Notes:</strong> ${dossier.notesAdministratives}</p>` : ''}
+								${dossier.traitant ? `<p><strong>Traité par:</strong> ${dossier.traitant.firstName} ${dossier.traitant.lastName}</p>` : ''}
+							</div>
+						</div>
+					`;
+				} else {
+					throw new Error(data.message || 'Erreur lors du chargement des détails');
+				}
+			})
+			.catch(error => {
+				console.error('Erreur lors du chargement du dossier:', error);
+				document.getElementById('contenuDossier').innerHTML = `
+					<div class="text-center py-8">
+						<div class="text-red-500 text-6xl mb-4">⚠️</div>
+						<h4 class="text-lg font-semibold mb-2">Erreur de chargement</h4>
+						<p class="text-gray-600">${error.message}</p>
+						<button class="btn btn-primary mt-4" onclick="voirDossier(${id})">Réessayer</button>
+					</div>
+				`;
+			});
+	}
+	
+	// Changer le statut d'un dossier
+	function changerStatut(id, nouveauStatut) {
+	const notes = prompt('Notes administratives (optionnel):');
+	
+	fetch (`/dossier-inscription/admin/${id}/status`, {
+	method: 'POST',
+	headers: {
+	'Content-Type': 'application/json'
+	},
+	body: JSON.stringify(
+	{statut: nouveauStatut, notes: notes}
+	)
+	}).then(response => response.json()).then(data => {
+	if (data.success) {
+	alert('Statut mis à jour avec succès');
+	location.reload();
+	} else {
+	alert('Erreur: ' + data.message);
+	}
+	}).catch(error => {
+	console.error('Erreur:', error);
+	alert('Erreur lors de la mise à jour');
+	});
+	}
+		</script>
+	
+	{% endblock %}

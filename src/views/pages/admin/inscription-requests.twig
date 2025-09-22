@@ -94,26 +94,60 @@
 							</div>
 						</div>
 
-						<!-- Informations du parent -->
+						<!-- Informations des parents -->
 						<div class="grid md:grid-cols-2 gap-6 mb-6">
 							<div class="bg-blue-50 p-4 rounded-lg">
 								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
-									👨‍👩‍👧‍👦 Informations parent
+									👨‍👩‍👧‍👦 Informations des parents
 								</h3>
-								<div class="space-y-2 text-sm">
-									<p>
-										<strong>Nom :</strong>
-										{{ request.parentFirstName }}
-										{{ request.parentLastName }}</p>
-									<p>
-										<strong>Email :</strong>
-										{{ request.parentEmail }}</p>
-									<p>
-										<strong>Téléphone :</strong>
-										{{ request.parentPhone }}</p>
-									<p>
-										<strong>Adresse :</strong>
-										{{ request.parentAddress }}</p>
+								<div class="space-y-3 text-sm">
+									{% if request.parentsInfo.pere %}
+										<div class="border-l-4 border-blue-400 pl-3">
+											<p class="font-semibold text-blue-700">👨 Père</p>
+											<p>{{ request.parentsInfo.pere }}</p>
+										</div>
+									{% endif %}
+
+									{% if request.parentsInfo.mere %}
+										<div class="border-l-4 border-pink-400 pl-3">
+											<p class="font-semibold text-pink-700">👩 Mère</p>
+											<p>{{ request.parentsInfo.mere }}</p>
+										</div>
+									{% endif %}
+
+									{% if request.parentsInfo.adresse %}
+										<div class="border-l-4 border-green-400 pl-3">
+											<p class="font-semibold text-green-700">🏠 Adresse</p>
+											<p>{{ request.parentsInfo.adresse }}</p>
+										</div>
+									{% endif %}
+
+									{% if request.parentsInfo.tel %}
+										<div class="border-l-4 border-yellow-400 pl-3">
+											<p class="font-semibold text-yellow-700">📞 Téléphone domicile</p>
+											<p>{{ request.parentsInfo.tel }}</p>
+										</div>
+									{% endif %}
+
+									<!-- Fallback sur les données de base -->
+									{% if not request.parentsInfo.pere and not request.parentsInfo.mere %}
+										<div class="border-l-4 border-gray-400 pl-3">
+											<p class="font-semibold text-gray-700">📝 Contact principal</p>
+											<p>
+												<strong>Nom :</strong>
+												{{ request.parentFirstName }}
+												{{ request.parentLastName }}</p>
+											<p>
+												<strong>Email :</strong>
+												{{ request.parentEmail }}</p>
+											<p>
+												<strong>Téléphone :</strong>
+												{{ request.parentPhone }}</p>
+											<p>
+												<strong>Adresse :</strong>
+												{{ request.parentAddress }}</p>
+										</div>
+									{% endif %}
 								</div>
 							</div>
 

@@ -43,6 +43,14 @@ router.post('/inscriptions/:id/reject', inscriptionController.rejectRequest);
 router.post('/inscriptions/:id/delete', inscriptionController.deleteRequest);
 router.get('/inscriptions/:id/details', inscriptionController.showRequestDetails);
 
+// Nouvelles routes pour les rendez-vous d'inscription
+router.get('/rendez-vous-inscriptions', directeurController.getRendezVousInscriptions);
+router.get('/rendez-vous-inscriptions/:id/pdf', directeurController.generateInscriptionPDF);
+router.post('/rendez-vous-inscriptions/:id/finalize', inscriptionController.finalizeInscription);
+
+// Route PDF accessible depuis les inscriptions finalisées également
+router.get('/inscriptions/:id/pdf', directeurController.generateInscriptionPDF);
+
 // API routes for inscriptions
 router.get('/api/classes', inscriptionController.getAvailableClasses);
 router.post('/notify-yamina', inscriptionController.notifyYamina);

@@ -20,6 +20,16 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// DEBUG: Logger pour toutes les requêtes POST
+app.use((req, res, next) => {
+  if (req.method === 'POST') {
+    console.log('🔍 POST REQUEST:', req.originalUrl);
+    console.log('📝 Body keys:', req.body ? Object.keys(req.body) : 'undefined');
+    console.log('📝 Body size:', req.body ? Object.keys(req.body).length : 0);
+  }
+  next();
+});
 app.use(methodOverride('_method'));
 
 app.use((req, res, next) => {
@@ -160,6 +170,7 @@ const galleryRoutes = require('./src/routes/galleryRoutes');
 const credentialsController = require('./src/controllers/credentialsController');
 const documentRoutes = require('./src/routes/documentRoutes');
 const preInscriptionRoutes = require('./src/routes/preInscriptionRoutes');
+const dossierInscriptionRoutes = require('./src/routes/dossierInscriptionRoutes');
 const userManagementRoutes = require('./src/routes/userManagementRoutes');
 const agendaRoutes = require('./src/routes/agendaRoutes');
 const inscriptionManagementRoutes = require('./src/routes/inscriptionManagementRoutes');
@@ -188,6 +199,7 @@ app.use('/inscriptions', inscriptionsRoutes);
 app.use('/gallery', galleryRoutes);
 app.use('/documents', documentRoutes);
 app.use('/pre-inscription', preInscriptionRoutes);
+app.use('/dossier-inscription', dossierInscriptionRoutes);
 app.use('/user-management', userManagementRoutes);
 app.use('/agenda', agendaRoutes);
 app.use('/inscription-management', inscriptionManagementRoutes);

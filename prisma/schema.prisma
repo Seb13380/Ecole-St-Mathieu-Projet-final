@@ -450,7 +450,7 @@ model PreInscriptionRequest {
   // Informations des enfants (stockées en JSON)
   children     Json // Tableau des enfants avec firstName, lastName, birthDate, currentClass, requestedClass, previousSchool
   specialNeeds String? // Besoins particuliers
-  message      String? // Message libre des parents
+  message      String? @db.Text // Message libre des parents (augmenté pour JSON volumineux)
 
   // ✉️ VALIDATION EMAIL - NOUVEAUX CHAMPS
   emailValidated  Boolean   @default(false) // Email validé ou non

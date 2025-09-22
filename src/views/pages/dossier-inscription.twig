@@ -1,0 +1,690 @@
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+	<style>
+		@keyframes fade-in-up {
+			from {
+				opacity: 0;
+				transform: translateY(40px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.animate-fade-in-up {
+			animation: fade-in-up 0.8s ease-out;
+		}
+
+		.form-section {
+			background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+			border: 1px solid #e2e8f0;
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+			border-left: 4px solid #304a4d;
+		}
+
+		.required {
+			color: #dc2626;
+		}
+	</style>
+
+	<div class="min-h-screen bg-gradient-to-br from-[#a7e3dd] via-[#8dd3cc] to-[#6bbfb3] py-8">
+		<div
+			class="container mx-auto px-4 max-w-6xl">
+
+			<!-- En-tête principal -->
+			<div class="text-center mb-8 animate-fade-in-up">
+				<div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#304a4d] to-[#2a3f42] rounded-2xl shadow-lg mb-4">
+					<span class="text-4xl">📋</span>
+				</div>
+				<h1 class="text-5xl font-bold text-[#304a4d] mb-4">
+					Demande d'Inscription Elève
+				</h1>
+				<p class="text-xl text-[#304a4d]/80 mb-2">
+					École Saint-Mathieu - Année scolaire 2026/2027
+				</p>
+				<p class="text-lg text-[#304a4d]/70">
+					Veuillez remplir ce formulaire complet pour finaliser la demande d'inscription de votre enfant
+				</p>
+			</div>
+
+			<!-- Documents à télécharger -->
+			{% if documentsRequis and documentsRequis|length > 0 %}
+				<div id="documentsSection" class="mb-8 animate-fade-in-up">
+					<div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/50 hover:shadow-3xl transition-all duration-300">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+								<span class="text-2xl">📁</span>
+							</div>
+							<div>
+								<h2 class="text-3xl font-bold text-[#304a4d] mb-2">
+									Documents nécessaires pour l'inscription
+								</h2>
+								<p class="text-[#304a4d]/70">
+									Téléchargez et consultez les documents requis pour votre dossier d'inscription
+								</p>
+							</div>
+						</div>
+						<div class="grid gap-4">
+							{% for document in documentsRequis %}
+								<div class="group bg-gradient-to-r from-slate-50 to-gray-50 p-6 rounded-xl border border-slate-200 hover:border-[#304a4d]/30 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+									<div class="flex items-center justify-between">
+										<div class="flex items-center space-x-4">
+											<div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+												<span class="text-2xl">📄</span>
+											</div>
+											<div>
+												<h3 class="text-xl font-bold text-[#304a4d] group-hover:text-[#2a3f42] transition-colors">{{ document.titre }}</h3>
+												{% if document.description %}
+													<p class="text-sm text-[#304a4d]/70 mt-1">{{ document.description }}</p>
+												{% endif %}
+												{% if document.pdfUrl %}
+													<span class="inline-block bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full mt-2 font-medium">PDF</span>
+												{% endif %}
+											</div>
+										</div>
+										{% if document.pdfUrl %}
+											<a href="{{ document.pdfUrl }}" target="_blank" class="group bg-gradient-to-r from-[#304a4d] to-[#2a3f42] hover:from-[#2a3f42] hover:to-[#1e2d30] text-white px-6 py-3 rounded-xl transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+												<svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+												</svg>
+												<span class="font-semibold">Télécharger</span>
+											</a>
+										{% elseif document.externalUrl %}
+											<a href="{{ document.externalUrl }}" target="_blank" rel="noopener" class="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105">
+												<svg class="w-5 h-5 mr-2 group-hover:animate-pulse" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+												</svg>
+												<span class="font-semibold">Consulter</span>
+											</a>
+										{% endif %}
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Messages d'erreur/succès -->
+			{% if error %}
+				<div class="alert alert-error mb-6 animate-fade-in-up">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+					</svg>
+					<span>{{ error|first }}</span>
+				</div>
+			{% endif %}
+
+			{% if success %}
+				<div class="alert alert-success mb-6 animate-fade-in-up">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+					</svg>
+					<span>{{ success|first }}</span>
+				</div>
+			{% endif %}
+
+			<!-- Formulaire principal -->
+			<div class="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/50 animate-fade-in-up">
+				<form
+					id="dossier-form" action="/dossier-inscription" method="POST" class="space-y-8">
+
+					<!-- 📅 ANNÉE SCOLAIRE -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">📅</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Année Scolaire</h2>
+						</div>
+						<div class="max-w-md">
+							<label class="label">
+								<span class="label-text font-semibold text-[#304a4d]">Année scolaire demandée
+									<span class="required">*</span>
+								</span>
+							</label>
+							<select name="anneeScolaire" class="select select-bordered w-full" required>
+								<option value="2025/2026" selected>2025/2026 (En cours)</option>
+								<option value="2026/2027">2026/2027 (Prochaine)</option>
+								<option value="2027/2028">2027/2028</option>
+							</select>
+						</div>
+					</div>
+
+					<!-- 👶 ENFANT À INSCRIRE -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">👶</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Enfant à inscrire</h2>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Nom
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="enfantNom" class="input input-bordered" required placeholder="Nom de famille">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Prénom
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="enfantPrenom" class="input input-bordered" required placeholder="Prénom">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Date de naissance
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="date" name="enfantDateNaissance" class="input input-bordered" required>
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Lieu de naissance
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="enfantLieuNaissance" class="input input-bordered" required placeholder="Ville de naissance">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Département de naissance (2 chiffres)
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="enfantDepartementNaissance" class="input input-bordered" required placeholder="Ex: 13, 75, 69..." maxlength="2">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Nationalité
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="enfantNationalite" class="input input-bordered" required placeholder="Nationalité">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Sexe
+										<span class="required">*</span>
+									</span>
+								</label>
+								<select name="enfantSexe" class="select select-bordered" required>
+									<option value="">Sélectionner...</option>
+									<option value="M">Masculin</option>
+									<option value="F">Féminin</option>
+								</select>
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Classe demandée
+										<span class="required">*</span>
+									</span>
+								</label>
+								<select name="enfantClasseDemandee" class="select select-bordered" required>
+									<option value="">Sélectionner...</option>
+									<option value="PS">PS (Petite Section)</option>
+									<option value="MS">MS (Moyenne Section)</option>
+									<option value="GS">GS (Grande Section)</option>
+									<option value="CP">CP</option>
+									<option value="CE1">CE1</option>
+									<option value="CE2">CE2</option>
+									<option value="CM1">CM1</option>
+									<option value="CM2">CM2</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- 🏢 ÉTABLISSEMENT EN COURS -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">🏢</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Établissement en cours</h2>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">École/Établissement actuel</span>
+								</label>
+								<input type="text" name="enfantEcoleActuelle" class="input input-bordered" placeholder="Nom de l'établissement">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Ville de l'établissement</span>
+								</label>
+								<input type="text" name="enfantVilleEtablissement" class="input input-bordered" placeholder="Ville">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Classe actuelle</span>
+								</label>
+								<input type="text" name="enfantClasseActuelle" class="input input-bordered" placeholder="Ex: CP, CE1...">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Dernière scolarité</span>
+								</label>
+								<textarea name="enfantDerniereScolarite" class="textarea textarea-bordered" placeholder="Informations complémentaires sur la scolarité"></textarea>
+							</div>
+						</div>
+					</div>
+
+					<!-- 👨‍👩‍👧‍👦 SITUATION DE FAMILLE -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">👨‍👩‍👧‍👦</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Situation de famille</h2>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Situation familiale
+										<span class="required">*</span>
+									</span>
+								</label>
+								<select name="situationFamiliale" class="select select-bordered" required>
+									<option value="">Sélectionner...</option>
+									<option value="marie">Marié(e)</option>
+									<option value="pacse">Pacsé(e)</option>
+									<option value="concubinage">Concubinage</option>
+									<option value="divorce">Divorcé(e)</option>
+									<option value="separe">Séparé(e)</option>
+									<option value="veuf">Veuf/Veuve</option>
+									<option value="celibataire">Célibataire</option>
+								</select>
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Nombre d'enfants au foyer</span>
+								</label>
+								<input type="number" name="nombreEnfantsFoyer" class="input input-bordered" placeholder="Nombre total d'enfants" min="1">
+							</div>
+							<div class="form-control md:col-span-2">
+								<label class="label">
+									<span class="label-text font-medium">Informations complémentaires</span>
+								</label>
+								<textarea name="informationsFamille" class="textarea textarea-bordered" placeholder="Garde alternée, fratrie scolarisée, etc."></textarea>
+							</div>
+						</div>
+					</div>
+
+					<!-- 👨 RESPONSABLE 1 (PÈRE) -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">👨</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Responsable 1 (Père)</h2>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Civilité
+										<span class="required">*</span>
+									</span>
+								</label>
+								<select name="pereCivilite" class="select select-bordered" required>
+									<option value="">Sélectionner...</option>
+									<option value="M">Monsieur</option>
+									<option value="Dr">Docteur</option>
+								</select>
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Nom
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="pereNom" class="input input-bordered" required placeholder="Nom de famille">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Prénom
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="perePrenom" class="input input-bordered" required placeholder="Prénom">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Profession</span>
+								</label>
+								<input type="text" name="pereProfession" class="input input-bordered" placeholder="Profession">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Société</span>
+								</label>
+								<input type="text" name="pereSociete" class="input input-bordered" placeholder="Société">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Téléphone portable
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="tel" name="pereTelephone" class="input input-bordered" required placeholder="06 12 34 56 78">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Téléphone travail</span>
+								</label>
+								<input type="tel" name="pereTelephoneTravail" class="input input-bordered" placeholder="04 12 34 56 78">
+							</div>
+							<div class="form-control md:col-span-2">
+								<label class="label">
+									<span class="label-text font-medium">Email
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="email" name="pereEmail" class="input input-bordered" required placeholder="email@exemple.com">
+							</div>
+						</div>
+					</div>
+
+					<!-- 👩 RESPONSABLE 2 (MÈRE) -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">👩</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Responsable 2 (Mère)</h2>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Civilité
+										<span class="required">*</span>
+									</span>
+								</label>
+								<select name="mereCivilite" class="select select-bordered" required>
+									<option value="">Sélectionner...</option>
+									<option value="Mme">Madame</option>
+									<option value="Mlle">Mademoiselle</option>
+									<option value="Dr">Docteur</option>
+								</select>
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Nom de jeune fille
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="mereNomJeuneFille" class="input input-bordered" required placeholder="Nom de jeune fille">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Nom marital</span>
+								</label>
+								<input type="text" name="mereNomMarital" class="input input-bordered" placeholder="Nom marital">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Prénom
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="merePrenom" class="input input-bordered" required placeholder="Prénom">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Profession</span>
+								</label>
+								<input type="text" name="mereProfession" class="input input-bordered" placeholder="Profession">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Société</span>
+								</label>
+								<input type="text" name="mereSociete" class="input input-bordered" placeholder="Société">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Téléphone portable
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="tel" name="mereTelephone" class="input input-bordered" required placeholder="06 12 34 56 78">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Téléphone travail</span>
+								</label>
+								<input type="tel" name="mereTelephoneTravail" class="input input-bordered" placeholder="04 12 34 56 78">
+							</div>
+							<div class="form-control md:col-span-2">
+								<label class="label">
+									<span class="label-text font-medium">Email
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="email" name="mereEmail" class="input input-bordered" required placeholder="email@exemple.com">
+							</div>
+						</div>
+					</div>
+
+					<!-- 🏠 ADRESSE FAMILIALE -->
+					<div class="form-section rounded-2xl p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mr-4">
+								<span class="text-2xl">🏠</span>
+							</div>
+							<h2 class="text-2xl font-bold text-[#304a4d]">Adresse familiale</h2>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+							<div class="form-control md:col-span-2">
+								<label class="label">
+									<span class="label-text font-medium">Numéro et nom de rue
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="adresseRue" class="input input-bordered" required placeholder="Ex: 123 avenue des Palmiers">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Complément d'adresse</span>
+								</label>
+								<input type="text" name="adresseComplement" class="input input-bordered" placeholder="Bâtiment, étage, appartement...">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Code postal
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="adresseCodePostal" class="input input-bordered" required placeholder="13000" maxlength="5">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Ville
+										<span class="required">*</span>
+									</span>
+								</label>
+								<input type="text" name="adresseVille" class="input input-bordered" required placeholder="Marseille">
+							</div>
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-medium">Téléphone fixe du domicile</span>
+								</label>
+								<input type="tel" name="telephoneDomicile" class="input input-bordered" placeholder="04 12 34 56 78">
+							</div>
+						</div>
+					</div>
+
+					<!-- Bouton de soumission -->
+					<div class="text-center pt-6">
+						<button type="button" id="submit-btn" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white text-xl px-12 py-4 h-auto shadow-xl font-bold border border-white/30 transition-all duration-200 hover:shadow-2xl transform hover:scale-105">
+							📋 Envoyer le dossier d'inscription
+						</button>
+						<p class="text-sm text-[#304a4d]/70 mt-4">
+							En soumettant ce formulaire, vous acceptez que vos données soient traitées par l'école à des fins d'inscription.
+						</p>
+					</div>
+
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Modale de confirmation -->
+	<div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" style="display: none; align-items: center; justify-content: center; padding: 1rem;">
+		<div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in-up">
+			<div class="p-6">
+				<div class="text-center mb-6">
+					<div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<span class="text-3xl">✅</span>
+					</div>
+					<h3 class="text-xl font-bold text-[#304a4d] mb-2">Confirmer l'envoi</h3>
+					<p class="text-gray-600">
+						Êtes-vous sûr de vouloir envoyer ce dossier d'inscription ? 
+												Vérifiez bien que toutes les informations sont correctes.
+					</p>
+				</div>
+				<div class="flex gap-3">
+					<button id="cancel-btn" class="flex-1 btn bg-gray-200 hover:bg-gray-300 text-gray-700">
+						❌ Annuler
+					</button>
+					<button id="confirm-btn" class="flex-1 btn bg-[#304a4d] hover:bg-[#2a3f42] text-white">
+						✅ Confirmer l'envoi
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modale de succès -->
+	<div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" style="display: none; align-items: center; justify-content: center; padding: 1rem;">
+		<div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in-up">
+			<div class="p-6 text-center">
+				<div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+					<span class="text-4xl">🎉</span>
+				</div>
+				<h3 class="text-2xl font-bold text-green-600 mb-2">Dossier envoyé !</h3>
+				<p class="text-gray-600 mb-4">
+					Votre dossier d'inscription a été enregistré avec succès. 
+										L'équipe administrative le traitera prochainement.
+				</p>
+				<p class="text-sm text-gray-500 mb-6">
+					Vous recevrez un email de confirmation dans quelques minutes.
+				</p>
+				<button id="close-success" class="btn bg-[#304a4d] hover:bg-[#2a3f42] text-white">
+					🏠 Retour à l'accueil
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Script pour améliorer l'expérience utilisateur
+document.addEventListener('DOMContentLoaded', function () { // Animation des sections
+const sections = document.querySelectorAll('.form-section');
+sections.forEach((section, index) => {
+section.style.animationDelay = `${
+index * 0.1
+}s`;
+});
+
+// Validation en temps réel des emails
+const emailInputs = document.querySelectorAll('input[type="email"]');
+emailInputs.forEach(input => {
+input.addEventListener('blur', function () {
+if (this.value && !this.checkValidity()) {
+this.classList.add('input-error');
+} else {
+this.classList.remove('input-error');
+}
+});
+});
+
+// Gestion des modales
+const submitBtn = document.getElementById('submit-btn');
+const confirmationModal = document.getElementById('confirmation-modal');
+const successModal = document.getElementById('success-modal');
+const cancelBtn = document.getElementById('cancel-btn');
+const confirmBtn = document.getElementById('confirm-btn');
+const closeSuccessBtn = document.getElementById('close-success');
+const form = document.getElementById('dossier-form');
+
+// Fonction pour afficher une modale
+function showModal(modal) {
+modal.style.display = 'flex';
+modal.classList.remove('hidden');
+}
+
+// Fonction pour cacher une modale
+function hideModal(modal) {
+modal.style.display = 'none';
+modal.classList.add('hidden');
+}
+
+// Ouvrir la modale de confirmation
+submitBtn.addEventListener('click', function (e) {
+e.preventDefault();
+
+// Vérifier que les champs obligatoires sont remplis
+const requiredFields = form.querySelectorAll('[required]');
+let allValid = true;
+
+requiredFields.forEach(field => {
+if (!field.value.trim()) {
+allValid = false;
+field.classList.add('border-red-500');
+} else {
+field.classList.remove('border-red-500');
+}
+});
+
+if (! allValid) {
+alert('Veuillez remplir tous les champs obligatoires (marqués par *)');
+return;
+}
+
+showModal(confirmationModal);
+});
+
+// Annuler la soumission
+cancelBtn.addEventListener('click', function () {
+hideModal(confirmationModal);
+});
+
+// Confirmer la soumission
+confirmBtn.addEventListener('click', function () {
+console.log('🚀 Tentative de soumission du formulaire...');
+
+hideModal(confirmationModal);
+
+// Afficher un loader
+confirmBtn.innerHTML = '⏳ Envoi en cours...';
+confirmBtn.disabled = true;
+
+// Soumettre le formulaire de manière classique
+console.log('� Soumission classique du formulaire...');
+form.submit();
+});
+
+// Fermer la modale de succès
+closeSuccessBtn.addEventListener('click', function () {
+window.location.href = '/';
+});
+
+// Afficher la modale de succès si message de succès
+{% if success %}
+setTimeout(() => {
+showModal(successModal);
+}, 500);{% endif %}
+});
+	</script>
+{% endblock %}
