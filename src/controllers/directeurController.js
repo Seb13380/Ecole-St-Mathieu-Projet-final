@@ -1432,7 +1432,7 @@ const directeurController = {
             console.error('Type d\'erreur:', error.constructor.name);
             console.error('Message:', error.message);
             console.error('Stack:', error.stack);
-            
+
             // Si les headers n'ont pas encore été envoyés, envoyer une réponse d'erreur
             if (!res.headersSent) {
                 res.status(500).json({
