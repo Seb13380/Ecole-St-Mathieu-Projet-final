@@ -288,10 +288,11 @@
 					<div class="bg-white p-8 h-full rounded-r-lg">
 						<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-8 text-center">"Les Echos liés de St Mathieu"</h3>
 
-						<div class="carousel w-full h-[700px] rounded-lg">
+						<!-- Nouveau carousel avec transitions fade -->
+						<div id="main-carousel" class="relative w-full h-[700px] rounded-lg overflow-hidden">
 							{% if carouselImages and carouselImages|length > 0 %}
 								{% for image in carouselImages %}
-									<div id="slide{{ loop.index }}" class="carousel-item relative w-full">
+									<div class="carousel-slide {% if loop.first %}active{% endif %} absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="{{ loop.index }}">
 										<img src="/uploads/carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'Image carrousel' }}">
 										{% if image.titre or image.description %}
 											<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-8">
@@ -303,57 +304,64 @@
 												{% endif %}
 											</div>
 										{% endif %}
-										<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-											<a href="#slide{{ loop.index == 1 ? carouselImages|length : loop.index - 1 }}" class="btn btn-circle pointer-events-auto">❮</a>
-											<a href="#slide{{ loop.index == carouselImages|length ? 1 : loop.index + 1 }}" class="btn btn-circle pointer-events-auto">❯</a>
-										</div>
 									</div>
 								{% endfor %}
+
+								<!-- Boutons de navigation -->
+								<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+									<button class="btn btn-circle pointer-events-auto carousel-prev-btn">❮</button>
+									<button class="btn btn-circle pointer-events-auto carousel-next-btn">❯</button>
+								</div>
+
+								<!-- Indicateurs de slides -->
+								<div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+									{% for image in carouselImages %}
+										<button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors carousel-indicator {% if loop.first %}bg-white{% endif %}" data-slide="{{ loop.index }}"></button>
+									{% endfor %}
+								</div>
 							{% else %}
 								<!-- Images par défaut si aucune image n'est uploadée -->
-								<div id="slide1" class="carousel-item relative w-full">
+								<div class="carousel-slide active absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="1">
 									<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="Actualités école">
 									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
 										<h4 class="font-bold">Rentrée scolaire 2025</h4>
 										<p class="text-sm">Préparatifs en cours pour accueillir nos élèves</p>
 									</div>
-									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-										<a href="#slide4" class="btn btn-circle pointer-events-auto">❮</a>
-										<a href="#slide2" class="btn btn-circle pointer-events-auto">❯</a>
-									</div>
 								</div>
-								<div id="slide2" class="carousel-item relative w-full">
+								<div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="2">
 									<img src="/assets/images/20250710_123601.jpg" class="w-full h-full object-cover" alt="Travaux école">
 									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
 										<h4 class="font-bold">Rénovation en cours</h4>
 										<p class="text-sm">Amélioration des espaces de vie scolaire</p>
 									</div>
-									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-										<a href="#slide1" class="btn btn-circle pointer-events-auto">❮</a>
-										<a href="#slide3" class="btn btn-circle pointer-events-auto">❯</a>
-									</div>
 								</div>
-								<div id="slide3" class="carousel-item relative w-full">
+								<div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="3">
 									<img src="/assets/images/entreePrincipale.jpg" class="w-full h-full object-cover" alt="Vie scolaire">
 									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
 										<h4 class="font-bold">Vie de l'école</h4>
 										<p class="text-sm">Moments de partage et d'apprentissage</p>
 									</div>
-									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-										<a href="#slide2" class="btn btn-circle pointer-events-auto">❮</a>
-										<a href="#slide4" class="btn btn-circle pointer-events-auto">❯</a>
-									</div>
 								</div>
-								<div id="slide4" class="carousel-item relative w-full">
+								<div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="4">
 									<img src="/assets/images/20250710_123943.jpg" class="w-full h-full object-cover" alt="Projets école">
 									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
 										<h4 class="font-bold">Nouveaux projets</h4>
 										<p class="text-sm">Innovation et modernisation continue</p>
 									</div>
-									<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-										<a href="#slide3" class="btn btn-circle pointer-events-auto">❮</a>
-										<a href="#slide1" class="btn btn-circle pointer-events-auto">❯</a>
-									</div>
+								</div>
+
+								<!-- Boutons de navigation -->
+								<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+									<button class="btn btn-circle pointer-events-auto carousel-prev-btn">❮</button>
+									<button class="btn btn-circle pointer-events-auto carousel-next-btn">❯</button>
+								</div>
+
+								<!-- Indicateurs de slides -->
+								<div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+									<button class="w-3 h-3 rounded-full bg-white transition-colors carousel-indicator" data-slide="1"></button>
+									<button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors carousel-indicator" data-slide="2"></button>
+									<button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors carousel-indicator" data-slide="3"></button>
+									<button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors carousel-indicator" data-slide="4"></button>
 								</div>
 							{% endif %}
 						</div>
@@ -514,18 +522,17 @@
 			width: 50% !important;
 		}
 
-		/* Styles pour les carousels */
-		.carousel {
-			scroll-behavior: smooth;
-			scroll-snap-type: x mandatory;
+		/* Nouveau carousel fade */
+		.carousel-slide {
+			transition: opacity 0.7s ease-in-out;
 		}
 
-		.carousel-item {
-			scroll-snap-align: start;
+		.carousel-slide.active {
+			opacity: 1 !important;
 		}
 
 		/* Amélioration des boutons de carousel */
-		.carousel .btn-circle {
+		.btn-circle {
 			background-color: rgba(48, 74, 77, 0.9) !important;
 			border: 3px solid rgba(167, 227, 221, 0.8) !important;
 			color: white !important;
@@ -544,35 +551,21 @@
 			position: relative !important;
 		}
 
-		.carousel .btn-circle:hover {
+		.btn-circle:hover {
 			background-color: rgba(48, 74, 77, 1) !important;
 			border-color: rgba(167, 227, 221, 1) !important;
 			transform: scale(1.1) !important;
 			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
 		}
 
-		/* Positionnement spécifique des boutons */
-		.carousel .carousel-prev {
-			margin-right: auto !important;
-		}
-
-		.carousel .carousel-next {
-			margin-left: auto !important;
-		}
-
-		/* S'assurer que les conteneurs de boutons sont visibles et symétriques */
-		.carousel-item .absolute {
-			z-index: 998 !important;
-		}
-
-		.carousel-item .absolute .btn-circle {
-			pointer-events: auto !important;
-			flex-shrink: 0 !important;
+		/* Indicateurs de carousel */
+		.carousel-indicator.active {
+			background-color: white !important;
 		}
 
 		/* Forcer la visibilité des boutons même sur petits écrans */
 		@media(max-width: 768px) {
-			.carousel .btn-circle {
+			.btn-circle {
 				width: 3rem !important;
 				height: 3rem !important;
 				font-size: 18px !important;
@@ -606,77 +599,170 @@
 {% block scripts %}
 	{{ parent() }}
 	<script>
-		// Auto-défilement pour les carousels DaisyUI
+		// Nouveau carousel avec transitions fade (comme l'exemple Flowbite)
 document.addEventListener('DOMContentLoaded', function () {
-console.log('✅ Initialisation des carousels DaisyUI avec auto-défilement');
+console.log('✅ Initialisation du nouveau carousel fade');
 
-// Gestion des clics sur les boutons de carousel sans scroll de page
-function setupCarouselNavigation() {
-const carouselButtons = document.querySelectorAll('.carousel-prev, .carousel-next');
+const carousel = document.getElementById('main-carousel');
+if (! carousel) 
+return;
 
-carouselButtons.forEach(button => {
+
+const slides = carousel.querySelectorAll('.carousel-slide');
+const prevBtn = carousel.querySelector('.carousel-prev-btn');
+const nextBtn = carousel.querySelector('.carousel-next-btn');
+const indicators = carousel.querySelectorAll('.carousel-indicator');
+
+if (slides.length === 0) 
+return;
+
+
+let currentSlide = 0;
+let autoSlideInterval;
+
+// Fonction pour afficher une slide spécifique
+function showSlide(index) { // Masquer toutes les slides
+slides.forEach(slide => {
+slide.classList.remove('active');
+});
+
+// Mettre à jour les indicateurs
+indicators.forEach(indicator => {
+indicator.classList.remove('active');
+indicator.classList.add('bg-white/50');
+indicator.classList.remove('bg-white');
+});
+
+// Afficher la slide active
+slides[index].classList.add('active');
+
+// Mettre à jour l'indicateur actif
+if (indicators[index]) {
+indicators[index].classList.add('active');
+indicators[index].classList.remove('bg-white/50');
+indicators[index].classList.add('bg-white');
+}
+
+currentSlide = index;
+}
+
+// Fonction pour passer à la slide suivante
+function nextSlide() {
+const nextIndex = (currentSlide + 1) % slides.length;
+showSlide(nextIndex);
+}
+
+// Fonction pour passer à la slide précédente
+function prevSlide() {
+const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+showSlide(prevIndex);
+}
+
+// Gestion des boutons
+if (nextBtn) {
+nextBtn.addEventListener('click', function (e) {
+e.preventDefault();
+nextSlide();
+resetAutoSlide();
+});
+}
+
+if (prevBtn) {
+prevBtn.addEventListener('click', function (e) {
+e.preventDefault();
+prevSlide();
+resetAutoSlide();
+});
+}
+
+// Gestion des indicateurs
+indicators.forEach((indicator, index) => {
+indicator.addEventListener('click', function (e) {
+e.preventDefault();
+showSlide(index);
+resetAutoSlide();
+});
+});
+
+// Auto-défilement
+function startAutoSlide() {
+autoSlideInterval = setInterval(nextSlide, 5000);
+}
+
+function resetAutoSlide() {
+clearInterval(autoSlideInterval);
+startAutoSlide();
+}
+
+// Pause auto-défilement au hover
+carousel.addEventListener('mouseenter', function () {
+clearInterval(autoSlideInterval);
+});
+
+carousel.addEventListener('mouseleave', function () {
+startAutoSlide();
+});
+
+// Initialisation
+showSlide(0);
+startAutoSlide();
+
+console.log('🚀 Nouveau carousel fade initialisé avec', slides.length, 'slides');
+});
+
+// Auto-défilement pour le hero carousel (si il existe)
+document.addEventListener('DOMContentLoaded', function () {
+const heroCarousel = document.querySelector('.hero-carousel');
+if (! heroCarousel) 
+return;
+
+
+const heroSlides = heroCarousel.querySelectorAll('.carousel-item');
+const heroButtons = heroCarousel.querySelectorAll('.carousel-prev, .carousel-next');
+
+if (heroSlides.length<= 1) return;
+
+			let currentHeroSlide = 0;
+
+			function autoScrollHero() {
+				setInterval(function () {
+					const nextSlide = (currentHeroSlide + 1) % heroSlides.length;
+					const targetSlide = heroSlides[nextSlide];
+					if (targetSlide) {
+						const slideWidth = targetSlide.offsetWidth;
+						heroCarousel.scrollTo({
+							left: slideWidth * nextSlide, behavior: 'smooth'
+						});
+						currentHeroSlide = nextSlide;
+					}
+				}, 6000);
+			}
+
+			// Gestion des clics sur les boutons hero
+			heroButtons.forEach(button => {
 button.addEventListener('click', function (e) {
 e.preventDefault();
 e.stopPropagation();
 
 const targetId = this.getAttribute('data-target');
 const targetSlide = document.getElementById(targetId);
-const carousel = this.closest('.carousel');
 
-if (targetSlide && carousel) {
-const allSlides = Array.from(carousel.querySelectorAll('.carousel-item'));
+if (targetSlide && heroCarousel) {
+const allSlides = Array.from(heroCarousel.querySelectorAll('.carousel-item'));
 const targetIndex = allSlides.indexOf(targetSlide);
 const slideWidth = targetSlide.offsetWidth;
 
-carousel.scrollTo({
+heroCarousel.scrollTo({
 left: slideWidth * targetIndex,
 behavior: 'smooth'
 });
+currentHeroSlide = targetIndex;
 }
 });
-});
-}
-
-// Auto-défilement pour tous les carousels
-function autoScrollCarousels() {
-const carousels = document.querySelectorAll('.carousel');
-if (! carousels || carousels.length === 0) 
-return;
+}) 
 
 
-
-carousels.forEach((carousel, index) => {
-const slides = carousel.querySelectorAll('.carousel-item');
-if (slides.length <= 1) 
-return;
-
-
-
-let currentSlide = 0;
-const intervalId = setInterval(function () {
-const nextSlide = (currentSlide + 1) % slides.length;
-const targetSlide = slides[nextSlide];
-if (targetSlide) {
-const slideWidth = targetSlide.offsetWidth;
-carousel.scrollTo({
-left: slideWidth * nextSlide,
-behavior: 'smooth'
-});
-currentSlide = nextSlide;
-}
-}, 5000 + (index * 1000)); // Décalage de 1s entre les carousels
-
-console.log (`✅ Auto-scroll activé pour carousel ${
-index + 1
-}`);
-});
-}
-
-// Démarrer les fonctionnalités
-setupCarouselNavigation();
-setTimeout(autoScrollCarousels, 1000);
-
-console.log('🚀 Carousels avec auto-défilement démarrés');
+setTimeout(autoScrollHero, 1000);
 });
 
 // Fonction pour afficher/masquer le texte complet des actualités
