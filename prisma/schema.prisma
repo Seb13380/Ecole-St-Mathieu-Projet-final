@@ -462,7 +462,7 @@ model PreInscriptionRequest {
   submittedAt DateTime             @default(now())
   processedAt DateTime?
   processedBy Int? // ID de l'utilisateur qui a traité
-  adminNotes  String? @db.Text // Notes administratives
+  adminNotes  String?              @db.Text // Notes administratives
 
   // Relations
   processor User? @relation("ProcessedPreInscriptions", fields: [processedBy], references: [id])
