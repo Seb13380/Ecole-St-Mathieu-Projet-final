@@ -314,12 +314,13 @@ body: JSON.stringify({comment})
 const result = await response.json();
 
 if (result.success) {
-location.reload();
+modalSystem.success('Demande approuvée avec succès !', 'Approbation réussie');
+setTimeout(() => location.reload(), 1500);
 } else {
-alert('Erreur : ' + result.message);
+modalSystem.error('Erreur : ' + result.message, 'Erreur d\'approbation');
 }
 } catch (error) {
-alert('Erreur lors de l\'approbation');
+modalSystem.error('Erreur lors de l\'approbation', 'Erreur réseau');
 }
 }
 
@@ -328,7 +329,7 @@ async function processRejection() {
 const comment = document.getElementById('reject_comment').value;
 
 if (! comment.trim()) {
-alert('Veuillez indiquer un motif de refus');
+modalSystem.warning('Veuillez indiquer un motif de refus', 'Motif requis');
 return;
 }
 
@@ -346,12 +347,13 @@ body: JSON.stringify(
 const result = await response.json();
 
 if (result.success) {
-location.reload();
+modalSystem.success('Demande refusée', 'Refus enregistré');
+setTimeout(() => location.reload(), 1500);
 } else {
-alert('Erreur : ' + result.message);
+modalSystem.error('Erreur : ' + result.message, 'Erreur de refus');
 }
 } catch (error) {
-alert('Erreur lors du refus');
+modalSystem.error('Erreur lors du refus', 'Erreur réseau');
 }
 }
 
@@ -369,12 +371,13 @@ credentials: 'include'
 const result = await response.json();
 
 if (result.success) {
-location.reload();
+modalSystem.success('Demande supprimée', 'Suppression réussie');
+setTimeout(() => location.reload(), 1500);
 } else {
-alert('Erreur : ' + result.message);
+modalSystem.error('Erreur : ' + result.message, 'Erreur de suppression');
 }
 } catch (error) {
-alert('Erreur lors de la suppression');
+modalSystem.error('Erreur lors de la suppression', 'Erreur réseau');
 }
 }
 

@@ -1262,6 +1262,8 @@ const directeurController = {
             // Déterminer la situation familiale depuis les données
             let situationFamiliale = request.familySituation || request.situationFamiliale || '';
 
+            console.log('📄 PDF - situationFamiliale trouvée:', situationFamiliale);
+
             // Créer les cases avec la bonne cochée selon la situation
             let mariés = '☐';
             let pacsés = '☐';
@@ -1270,15 +1272,17 @@ const directeurController = {
             let séparés = '☐';
             let autre = '☐';
 
-            const situation = situationFamiliale.toLowerCase();
-            if (situation.includes('marié')) mariés = '☑';
-            else if (situation.includes('pacs')) pacsés = '☑';
-            else if (situation.includes('union libre') || situation.includes('concubinage')) unionLibre = '☑';
-            else if (situation.includes('divorcé')) divorcés = '☑';
-            else if (situation.includes('séparé')) séparés = '☑';
-            else if (situationFamiliale && !situation.includes('marié')) autre = '☑';
+            if (situationFamiliale) {
+                const situation = situationFamiliale.toLowerCase();
+                if (situation.includes('marié') || situation === 'marie') mariés = '☑';
+                else if (situation.includes('pacs') || situation === 'pacse') pacsés = '☑';
+                else if (situation.includes('union libre') || situation.includes('concubinage') || situation === 'concubinage') unionLibre = '☑';
+                else if (situation.includes('divorcé') || situation === 'divorce') divorcés = '☑';
+                else if (situation.includes('séparé') || situation === 'separe') séparés = '☑';
+                else autre = '☑';
+            }
 
-            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${situationFamiliale && autre === '☑' ? situationFamiliale : '___________'}`, 60, yPos);
+            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${autre === '☑' ? situationFamiliale : '___________'}`, 60, yPos);
 
             // DEBUG: Ajout d'une ligne pour vérifier que le code s'exécute
             console.log('📄 PDF - Section Situation de famille générée avec situation:', situationFamiliale);
@@ -1315,8 +1319,10 @@ const directeurController = {
                 yPos += 15;
 
                 // Ligne 3: Classe demandée (plus proéminente)
+                console.log('📄 PDF - Classe enfant:', child.requestedClass);
+                const classeDemandee = child.requestedClass || child.schoolLevel || 'Non spécifiée';
                 doc.fontSize(10).font('Helvetica-Bold')
-                    .text('CLASSE DEMANDÉE: ' + (child.requestedClass || child.schoolLevel || '________________'), 60, yPos);
+                    .text('CLASSE DEMANDÉE: ' + classeDemandee, 60, yPos);
                 yPos += 20;
 
                 // École actuelle sur une ligne
