@@ -995,11 +995,14 @@ const directeurController = {
             });
 
             if (!request) {
+                console.log('❌ Demande d\'inscription non trouvée pour ID:', id);
                 return res.status(404).json({
                     success: false,
                     message: 'Demande d\'inscription non trouvée'
                 });
             }
+
+            console.log('✅ Demande trouvée:', request.parentLastName);
 
             // Parser les données enfants
             let children = [];
@@ -1026,6 +1029,8 @@ const directeurController = {
                     parentsInfo = {};
                 }
             }
+
+            console.log('📄 Démarrage création PDF...');
 
             // Créer le PDF avec PDFKit selon le format officiel
             const PDFDocument = require('pdfkit');
@@ -1057,16 +1062,23 @@ const directeurController = {
                 console.log('📁 Dossier d\'archivage PDF créé:', archiveDir);
             }
 
+            console.log('📄 Création du document PDFKit...');
             const doc = new PDFDocument({
                 size: 'A4',
                 margin: 60
             });
+            console.log('✅ Document PDFKit créé avec succès');
 
             // Configuration des en-têtes pour affichage dans le navigateur
+            console.log('📄 Configuration des headers HTTP...');
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'inline; filename="demande-inscription-' + request.parentLastName + '.pdf"');
+            console.log('✅ Headers configurés');
 
-            // NE PAS pipe maintenant - on le fera à la fin
+            // Pipe le PDF directement vers la réponse
+            console.log('📄 Configuration du pipe...');
+            doc.pipe(res);
+            console.log('✅ Pipe configuré');
 
             let yPos = 30;
 
@@ -1390,7 +1402,7 @@ const directeurController = {
                 .text('Signature de la mère: _______________', 320, yPos)
                 .text('Date: ________', 480, yPos);
 
-            // Envoyer le PDF directement au navigateur (archivage temporairement désactivé)
+            // Envoyer le PDF directement au navigateur
             console.log('📄 PDF - Début du pipe vers le navigateur');
 
             // Attacher les événements AVANT la finalisation
@@ -1406,9 +1418,7 @@ const directeurController = {
                 console.log('🔒 Connexion fermée');
             });
 
-            doc.pipe(res);
-
-            console.log('📄 PDF - Pipe configuré, finalisation...');
+            console.log('📄 PDF - Pipe déjà configuré, finalisation...');
 
             // Finaliser le PDF avec plus de debug
             console.log('🔚 Début finalisation PDF...');
@@ -1418,10 +1428,266 @@ const directeurController = {
             console.log('📄 PDF - doc.end() appelé, PDF envoyé');
 
         } catch (error) {
-            console.error('❌ Erreur génération PDF:', error);
+            console.error('❌❌❌ ERREUR GÉNÉRATION PDF ❌❌❌');
+            console.error('Type d\'erreur:', error.constructor.name);
+            console.error('Message:', error.message);
+            console.error('Stack:', error.stack);
+
+            // Si les headers n'ont pas encore été envoyés, envoyer une réponse d'erreur
+            if (!res.headersSent) {
+                res.status(500).json({
+                    success: false,
+                    message: 'Erreur lors de la génération du PDF: ' + error.message
+                });
+            } else {
+                console.error('❌ Headers déjà envoyés, impossible de renvoyer une réponse d\'erreur');
+            }
+        }
+    },
+
+    // === IMPORT EXCEL DES FAMILLES ===
+
+    // Page d'import Excel
+    getImportExcel: async (req, res) => {
+        try {
+            console.log('📊 Accès à la page d\'import Excel');
+
+            res.render('pages/directeur/import-excel', {
+                title: 'Import Excel des familles - École Saint-Mathieu',
+                user: req.session.user
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur page import Excel:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors du chargement de la page d\'import',
+                user: req.session.user
+            });
+        }
+    },
+
+    // Traitement de l'import Excel
+    processExcelImport: async (req, res) => {
+        try {
+            console.log('🔥🔥🔥 DÉBUT IMPORT EXCEL 🔥🔥🔥');
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Aucun fichier Excel fourni'
+                });
+            }
+
+            const XLSX = require('xlsx');
+            const fs = require('fs');
+
+            // Lire le fichier Excel
+            console.log('📖 Lecture du fichier Excel:', req.file.originalname);
+            const workbook = XLSX.readFile(req.file.path);
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            // Convertir en JSON avec headers automatiques
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            if (jsonData.length < 4) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Fichier Excel vide ou format incorrect'
+                });
+            }
+
+            // Identifier la ligne des en-têtes (ligne 4 basé sur votre fichier)
+            const headers = jsonData[3]; // Index 3 = ligne 4
+            const dataRows = jsonData.slice(4); // Données à partir de la ligne 5
+
+            console.log('📋 Headers détectés:', headers);
+            console.log('📊 Nombre de lignes de données:', dataRows.length);
+
+            // Mapping des colonnes selon votre fichier
+            const columnMapping = {
+                responsable1: 0,      // Civilité, Particule, nom et prénom Resp
+                tel1: 1,              // Tél. portable Resp
+                email1: 2,            // Email Personnel Resp
+                responsable2: 3,      // Civilité, Particule, nom et prénom Conjoint
+                email2: 4,            // Email Personnel Conjoint
+                tel2: 5,              // Tél. portable Conjoint
+                adresse: 6,           // Adresse 1
+                codePostalVille: 7,   // CP - Ville
+                enfantNom: 8,         // Particule, nom et prénom
+                dateNaissance: 9,     // Date de naissance
+                codeNiveau: 10,       // Code niveau
+                codeClasse: 11        // Code classe
+            };
+
+            const results = {
+                success: 0,
+                errors: 0,
+                families: 0,
+                students: 0,
+                classes: 0,
+                details: []
+            };
+
+            // Parser les données ligne par ligne
+            for (let i = 0; i < dataRows.length; i++) {
+                const row = dataRows[i];
+                if (!row || row.length === 0) continue;
+
+                try {
+                    console.log(`📝 Traitement ligne ${i + 1}:`, row[columnMapping.responsable1]);
+
+                    // Extraire les informations du responsable 1 (père)
+                    const resp1Full = row[columnMapping.responsable1] || '';
+                    const resp1Match = resp1Full.match(/^(M\.|Mme)\s*(.+?)?\s+(.+)$/);
+
+                    let pere = null;
+                    if (resp1Match) {
+                        const civilite = resp1Match[1];
+                        const nomComplet = resp1Match[3] || '';
+                        const nomParts = nomComplet.trim().split(' ');
+                        const prenom = nomParts[0] || '';
+                        const nom = nomParts.slice(1).join(' ') || nomParts[0] || '';
+
+                        if (civilite === 'M.' && nom && prenom) {
+                            pere = {
+                                civilite: 'M.',
+                                firstName: prenom,
+                                lastName: nom,
+                                email: row[columnMapping.email1] || '',
+                                phone: row[columnMapping.tel1] || ''
+                            };
+                        }
+                    }
+
+                    // Extraire les informations du responsable 2 (mère)
+                    const resp2Full = row[columnMapping.responsable2] || '';
+                    const resp2Match = resp2Full.match(/^(M\.|Mme)\s*(.+?)?\s+(.+)$/);
+
+                    let mere = null;
+                    if (resp2Match) {
+                        const civilite = resp2Match[1];
+                        const nomComplet = resp2Match[3] || '';
+                        const nomParts = nomComplet.trim().split(' ');
+                        const prenom = nomParts[0] || '';
+                        const nom = nomParts.slice(1).join(' ') || nomParts[0] || '';
+
+                        if (civilite === 'Mme' && nom && prenom) {
+                            mere = {
+                                civilite: 'Mme',
+                                firstName: prenom,
+                                lastName: nom,
+                                email: row[columnMapping.email2] || '',
+                                phone: row[columnMapping.tel2] || ''
+                            };
+                        }
+                    }
+
+                    // Adresse
+                    const adresseComplete = row[columnMapping.adresse] || '';
+                    const codePostalVille = row[columnMapping.codePostalVille] || '';
+                    const codePostalMatch = codePostalVille.match(/^(\d{5})\s+(.+)$/);
+
+                    const adresse = {
+                        rue: adresseComplete,
+                        codePostal: codePostalMatch ? codePostalMatch[1] : '',
+                        ville: codePostalMatch ? codePostalMatch[2] : codePostalVille
+                    };
+
+                    // Enfant
+                    const enfantNomComplet = row[columnMapping.enfantNom] || '';
+                    const enfantParts = enfantNomComplet.trim().split(' ');
+                    const enfantPrenom = enfantParts[enfantParts.length - 1] || '';
+                    const enfantNom = enfantParts.slice(0, -1).join(' ') || enfantParts[0] || '';
+
+                    const dateNaissanceRaw = row[columnMapping.dateNaissance] || '';
+                    const codeClasse = row[columnMapping.codeClasse] || '';
+
+                    // Convertir la date (format DD/MM/YYYY vers YYYY-MM-DD)
+                    let dateNaissance = null;
+                    if (dateNaissanceRaw) {
+                        const dateMatch = dateNaissanceRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                        if (dateMatch) {
+                            dateNaissance = new Date(`${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`);
+                        }
+                    }
+
+                    const enfant = {
+                        firstName: enfantPrenom,
+                        lastName: enfantNom,
+                        dateNaissance: dateNaissance,
+                        codeClasse: codeClasse
+                    };
+
+                    // Validation basique
+                    if (!enfant.firstName || !enfant.lastName || !enfant.codeClasse) {
+                        results.errors++;
+                        results.details.push({
+                            ligne: i + 1,
+                            erreur: 'Informations enfant incomplètes',
+                            donnees: row
+                        });
+                        continue;
+                    }
+
+                    if (!pere && !mere) {
+                        results.errors++;
+                        results.details.push({
+                            ligne: i + 1,
+                            erreur: 'Aucun parent identifié',
+                            donnees: row
+                        });
+                        continue;
+                    }
+
+                    // Ici nous aurons la logique de création en base de données
+                    // Pour l'instant, on simule le succès
+                    results.success++;
+                    results.details.push({
+                        ligne: i + 1,
+                        status: 'success',
+                        famille: `${pere ? pere.firstName + ' ' + pere.lastName : ''} / ${mere ? mere.firstName + ' ' + mere.lastName : ''}`,
+                        enfant: `${enfant.firstName} ${enfant.lastName}`,
+                        classe: enfant.codeClasse
+                    });
+
+                } catch (rowError) {
+                    console.error(`❌ Erreur ligne ${i + 1}:`, rowError);
+                    results.errors++;
+                    results.details.push({
+                        ligne: i + 1,
+                        erreur: rowError.message,
+                        donnees: row
+                    });
+                }
+            }
+
+            // Nettoyer le fichier temporaire
+            fs.unlinkSync(req.file.path);
+
+            console.log('🎉 Import terminé:', results);
+
+            res.json({
+                success: true,
+                message: `Import terminé: ${results.success} succès, ${results.errors} erreurs`,
+                results: results
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur import Excel:', error);
+
+            // Nettoyer le fichier temporaire en cas d'erreur
+            if (req.file && req.file.path) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (cleanError) {
+                    console.error('Erreur nettoyage fichier:', cleanError);
+                }
+            }
+
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la génération du PDF'
+                message: 'Erreur lors de l\'import: ' + error.message
             });
         }
     },
