@@ -462,7 +462,7 @@ model PreInscriptionRequest {
   submittedAt DateTime             @default(now())
   processedAt DateTime?
   processedBy Int? // ID de l'utilisateur qui a traité
-  adminNotes  String? // Notes administratives
+  adminNotes  String? @db.Text // Notes administratives
 
   // Relations
   processor User? @relation("ProcessedPreInscriptions", fields: [processedBy], references: [id])
@@ -494,7 +494,7 @@ model CredentialsRequest {
   // Résultat
   identifiersSent Boolean @default(false) // Identifiants envoyés ou non
   errorMessage    String? // Message d'erreur si échec
-  adminNotes      String? // Notes de l'admin
+  adminNotes      String? @db.Text // Notes de l'admin
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
