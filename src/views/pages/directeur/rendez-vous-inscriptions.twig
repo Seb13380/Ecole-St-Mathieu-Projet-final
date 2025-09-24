@@ -161,25 +161,25 @@ const url = `/directeur/rendez-vous-inscriptions/${requestId}/pdf`;
 window.open(url, '_blank', 'width=800,height=900,scrollbars=yes,resizable=yes');
 }
 
-// Finaliser l'inscription après le rendez-vous
+// Finaliser l'inscription après le rendez-vous (SANS ALERTES)
 function finalizeInscription(requestId, parentName) {
-if (confirm (`Êtes-vous sûr de vouloir finaliser l'inscription de ${parentName} ?\n\nCette action va créer les comptes parent et enfant(s) et envoyer les identifiants par email.`)) {
-const comment = prompt('Commentaire optionnel (par exemple: classe attribuée, observations...):');
+// 🔧 CORRECTION: Suppression de TOUTES les alertes indésirables
+// const comment = prompt('Commentaire optionnel (par exemple: classe attribuée, observations...):');
+const comment = ''; // Pas de commentaire pour éviter l'alerte
 
 fetch (`/directeur/rendez-vous-inscriptions/${requestId}/finalize`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
-body: JSON.stringify(
-{
-comment: comment || ''
-}
-)
+body: JSON.stringify({
+comment: comment
+})
 }).then(response => response.json()).then(data => {
 if (data.success) {
-modalSystem.success('Inscription finalisée avec succès !\n\nLes comptes ont été créés et les identifiants envoyés par email.', 'Finalisation réussie');
-location.reload();
+// 🔧 CORRECTION: Rechargement immédiat sans modal
+console.log('✅ Inscription finalisée avec succès');
+window.location.reload(true); // Force le rechargement
 } else {
 modalSystem.error('Erreur: ' + data.message, 'Erreur de finalisation');
 }
@@ -187,7 +187,6 @@ modalSystem.error('Erreur: ' + data.message, 'Erreur de finalisation');
 console.error('Erreur:', error);
 modalSystem.error('Erreur lors de la finalisation de l\'inscription', 'Erreur réseau');
 });
-}
 }
 	</script>
 {% endblock %}

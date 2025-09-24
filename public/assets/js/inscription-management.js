@@ -161,11 +161,12 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     }
 });
 
-// Suppression de document
+// Suppression de document (SANS CONFIRMATION)
 async function deleteDocument(id, nom) {
-    if (!confirm(`ÃŠtes-vous sÃ»r de vouloir supprimer le document "${nom}" ?\n\nCette action est irrÃ©versible.`)) {
-        return;
-    }
+    // 🔧 CORRECTION: Suppression des alertes de confirmation indésirables
+    // if (!confirm(`Êtes-vous sûr de vouloir supprimer le document "${nom}" ?\n\nCette action est irréversible.`)) {
+    //     return;
+    // }
 
     try {
         showLoading('Suppression en cours...');

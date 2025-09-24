@@ -962,8 +962,10 @@ const directeurController = {
     // Afficher la liste des rendez-vous d'inscription (statut ACCEPTED)
     getRendezVousInscriptions: async (req, res) => {
         try {
-            // Récupérer toutes les demandes acceptées (en attente de rendez-vous)
-            const acceptedRequests = await prisma.preInscriptionRequest.findMany({
+            // 🔄 RÉCUPÉRATION UNIFIÉE DES DEMANDES PRÊTES POUR RENDEZ-VOUS
+            
+            // 1. Pré-inscriptions acceptées
+            const acceptedPreInscriptions = await prisma.preInscriptionRequest.findMany({
                 where: {
                     status: 'ACCEPTED'
                 },
@@ -979,6 +981,59 @@ const directeurController = {
                     }
                 }
             });
+
+            // 2. Dossiers validés (prêts pour rendez-vous)
+            const validatedDossiers = await prisma.dossierInscription.findMany({
+                where: {
+                    statut: 'VALIDE'
+                },
+                orderBy: {
+                    dateDepot: 'desc'
+                },
+                include: {
+                    traitant: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            });
+
+            // 3. Normaliser les dossiers vers le format des pré-inscriptions
+            const normalizedDossiers = validatedDossiers.map(dossier => ({
+                id: dossier.id,
+                type: 'DOSSIER_INSCRIPTION',
+                parentFirstName: dossier.perePrenom || dossier.merePrenom,
+                parentLastName: dossier.pereNom || dossier.mereNom,
+                parentEmail: dossier.pereEmail || dossier.mereEmail,
+                parentPhone: dossier.pereTelephone || dossier.mereTelephone,
+                parentAddress: dossier.adresseComplete,
+                status: dossier.statut,
+                submittedAt: dossier.dateDepot,
+                children: JSON.stringify([{
+                    firstName: dossier.enfantPrenom,
+                    lastName: dossier.enfantNom,
+                    birthDate: dossier.enfantDateNaissance,
+                    requestedClass: dossier.enfantClasseDemandee
+                }]),
+                message: JSON.stringify({
+                    pere: `${dossier.perePrenom} ${dossier.pereNom} - ${dossier.pereEmail}`,
+                    mere: `${dossier.merePrenom} ${dossier.mereNom} - ${dossier.mereEmail}`,
+                    adresse: dossier.adresseComplete
+                }),
+                processor: dossier.traitant
+            }));
+
+            // 4. Ajouter le type aux pré-inscriptions
+            const normalizedPreInscriptions = acceptedPreInscriptions.map(req => ({
+                ...req,
+                type: 'PRE_INSCRIPTION'
+            }));
+
+            // 5. Combiner et trier
+            const acceptedRequests = [...normalizedPreInscriptions, ...normalizedDossiers]
+                .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
             // Parser les données enfants et parents pour l'affichage
             const requestsWithParsedChildren = acceptedRequests.map(request => {
