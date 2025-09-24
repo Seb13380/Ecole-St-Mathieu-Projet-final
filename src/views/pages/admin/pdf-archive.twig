@@ -1,0 +1,246 @@
+{% extends "layouts/admin.twig" %}
+
+{% block title %}Archive PDF des Inscriptions - École Saint-Mathieu
+{% endblock %}
+
+{% block extra_css %}
+	<style>
+		.pdf-card {
+			@apply bg-white rounded-lg shadow-md p-6 hover: shadow-lg transition-shadow;
+		}
+		.pdf-card:hover {
+			transform: translateY(-2px);
+		}
+		.status-badge {
+			@apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+		}
+		.status-recent {
+			@apply bg-green-100 text-green-800;
+		}
+		.status-old {
+			@apply bg-gray-100 text-gray-800;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+		<div
+			class="max-w-7xl mx-auto">
+			<!-- En-tête -->
+			<div class="flex justify-between items-center mb-8">
+				<div>
+					<h1 class="text-3xl font-bold text-gray-900 mb-2">
+						📄 Archive PDF des Inscriptions
+					</h1>
+					<p class="text-gray-600">
+						Tous les dossiers PDF générés sont archivés automatiquement ici
+					</p>
+				</div>
+				<div class="flex items-center space-x-4">
+					<div class="text-right">
+						<div class="text-2xl font-bold text-blue-600">{{ pdfFiles|length }}</div>
+						<div class="text-sm text-gray-600">PDF archivés</div>
+					</div>
+				</div>
+			</div>
+
+			{% if pdfFiles|length > 0 %}
+				<!-- Statistiques -->
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+					<div class="bg-white rounded-lg p-4 text-center">
+						<div class="text-2xl font-bold text-blue-600">{{ pdfFiles|length }}</div>
+						<div class="text-sm text-gray-600">Total PDF</div>
+					</div>
+					<div class="bg-white rounded-lg p-4 text-center">
+						{% set recentFiles = pdfFiles|filter(file => (date().timestamp - file.modified.timestamp) < 86400) %}
+						<div class="text-2xl font-bold text-green-600">{{ recentFiles|length }}</div>
+						<div class="text-sm text-gray-600">Aujourd'hui</div>
+					</div>
+					<div class="bg-white rounded-lg p-4 text-center">
+						{% set totalSize = 0 %}
+						{% for file in pdfFiles %}
+							{% set totalSize = totalSize + file.size %}
+						{% endfor %}
+						<div class="text-2xl font-bold text-orange-600">{{ (totalSize/1024)|round(1) }}</div>
+						<div class="text-sm text-gray-600">MB utilisés</div>
+					</div>
+					<div class="bg-white rounded-lg p-4 text-center">
+						{% set anneesUniques = pdfFiles|map(f => f.anneeScolaire)|unique %}
+						<div class="text-2xl font-bold text-purple-600">{{ anneesUniques|length }}</div>
+						<div class="text-sm text-gray-600">Années scolaires</div>
+					</div>
+				</div>
+
+				<!-- Filtres -->
+				<div class="bg-white rounded-lg p-4 mb-6">
+					<div class="flex flex-wrap items-center gap-4">
+						<div>
+							<label class="text-sm font-medium text-gray-700">Rechercher:</label>
+							<input type="text" id="searchInput" placeholder="Nom, enfant, année..." class="ml-2 px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500">
+						</div>
+						<div>
+							<label class="text-sm font-medium text-gray-700">Année scolaire:</label>
+							<select id="yearFilter" class="ml-2 px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500">
+								<option value="">Toutes</option>
+								{% for annee in anneesUniques %}
+									<option value="{{ annee }}">{{ annee }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div>
+							<label class="text-sm font-medium text-gray-700">Période:</label>
+							<select id="periodFilter" class="ml-2 px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500">
+								<option value="">Toutes</option>
+								<option value="today">Aujourd'hui</option>
+								<option value="week">Cette semaine</option>
+								<option value="month">Ce mois</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- Liste des PDF -->
+				<div class="grid gap-6" id="pdfGrid">
+					{% for file in pdfFiles %}
+						<div class="pdf-card pdf-item" data-parent-name="{{ file.parentName|lower }}" data-child-name="{{ file.childName|lower }}" data-annee="{{ file.anneeScolaire }}" data-date="{{ file.modified.timestamp }}">
+
+							<div class="flex items-center justify-between">
+								<div
+									class="flex items-center space-x-4">
+									<!-- Icône PDF -->
+									<div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+										<svg class="w-6 h-6 text-red-600" fill="currentColor" viewbox="0 0 20 20">
+											<path d="M4 18h12V6l-4-4H4v16zm4-12V3l4 4h-4z"/>
+										</svg>
+									</div>
+
+									<!-- Informations -->
+									<div>
+										<h3 class="text-lg font-semibold text-gray-900">
+											{{ file.parentName }}
+											{% if file.childName != 'N/A' %}
+												-
+												{{ file.childName }}
+											{% endif %}
+										</h3>
+
+										<div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+											<span>📅
+												{{ file.created|date('d/m/Y à H:i') }}</span>
+											<span>📊
+												{{ file.size }}
+												KB</span>
+											<span>🎓
+												{{ file.anneeScolaire }}</span>
+											{% if file.inscriptionId != 'N/A' %}
+												<span>🆔 ID:
+													{{ file.inscriptionId }}</span>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+
+								<!-- Actions -->
+								<div
+									class="flex items-center space-x-3">
+									<!-- Badge récent/ancien -->
+									{% set daysDiff = (date().timestamp - file.modified.timestamp) / 86400 %}
+									{% if daysDiff < 1 %}
+										<span class="status-badge status-recent">Récent</span>
+									{% elseif daysDiff < 7 %}
+										<span class="status-badge bg-blue-100 text-blue-800">Cette semaine</span>
+									{% else %}
+										<span class="status-badge status-old">{{ daysDiff|round }}
+											jours</span>
+									{% endif %}
+
+									<!-- Boutons d'action -->
+									<div class="flex space-x-2">
+										<a href="{{ file.fullPath }}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+											👁️ Ouvrir
+										</a>
+
+										<a href="{{ file.fullPath }}" download="{{ file.filename }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+											💾 Télécharger
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+
+			{% else %}
+				<!-- Aucun PDF -->
+				<div class="text-center py-16">
+					<div class="text-6xl mb-4">📄</div>
+					<h3 class="text-xl font-bold text-gray-800 mb-2">Aucun PDF archivé</h3>
+					<p class="text-gray-600 mb-6">
+						Les PDF des dossiers d'inscription seront automatiquement archivés ici
+					</p>
+					<a href="/directeur/inscriptions" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+						Voir les inscriptions
+					</a>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const searchInput = document.getElementById('searchInput');
+const yearFilter = document.getElementById('yearFilter');
+const periodFilter = document.getElementById('periodFilter');
+const pdfItems = document.querySelectorAll('.pdf-item');
+
+function filterPDFs() {
+const searchTerm = searchInput.value.toLowerCase();
+const selectedYear = yearFilter.value;
+const selectedPeriod = periodFilter.value;
+
+const now = Date.now() / 1000; // timestamp en secondes
+
+pdfItems.forEach(item => {
+const parentName = item.dataset.parentName;
+const childName = item.dataset.childName;
+const annee = item.dataset.annee;
+const fileDate = parseInt(item.dataset.date);
+
+// Filtre de recherche
+const matchesSearch = ! searchTerm || parentName.includes(searchTerm) || childName.includes(searchTerm) || annee.includes(searchTerm);
+
+// Filtre d'année
+const matchesYear = ! selectedYear || annee === selectedYear;
+
+// Filtre de période
+let matchesPeriod = true;
+if (selectedPeriod) {
+const daysDiff = (now - fileDate) / 86400;
+switch (selectedPeriod) {
+case 'today': matchesPeriod = daysDiff < 1;
+break;
+case 'week': matchesPeriod = daysDiff < 7;
+break;
+case 'month': matchesPeriod = daysDiff < 30;
+break;
+}
+}
+
+// Afficher ou masquer
+if (matchesSearch && matchesYear && matchesPeriod) {
+item.style.display = 'block';
+} else {
+item.style.display = 'none';
+}
+});
+}
+
+// Événements de filtrage
+searchInput.addEventListener('input', filterPDFs);
+yearFilter.addEventListener('change', filterPDFs);
+periodFilter.addEventListener('change', filterPDFs);
+});
+	</script>
+
+{% endblock %}

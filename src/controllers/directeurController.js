@@ -1037,17 +1037,72 @@ const directeurController = {
             // DEBUG: Message très visible pour confirmer l'exécution
             console.log('🔥🔥🔥 GÉNÉRATION PDF DÉMARRÉE - ID:', id, '🔥🔥🔥');
 
-            // Récupérer la demande d'inscription
-            const request = await prisma.preInscriptionRequest.findUnique({
-                where: { id: parseInt(id) }
-            });
+            // Essayer d'abord de récupérer depuis DossierInscription (données détaillées)
+            let dossierDetaille = null;
+            let request = null;
 
-            if (!request) {
-                console.log('❌ Demande d\'inscription non trouvée pour ID:', id);
-                return res.status(404).json({
-                    success: false,
-                    message: 'Demande d\'inscription non trouvée'
+            try {
+                dossierDetaille = await prisma.dossierInscription.findUnique({
+                    where: { id: parseInt(id) }
                 });
+            } catch (error) {
+                console.log('ℹ️ Pas de dossier détaillé trouvé, utilisation des données de pré-inscription');
+            }
+
+            if (dossierDetaille) {
+                console.log('✅ Dossier détaillé trouvé:', dossierDetaille.enfantNom);
+
+                // Convertir les données du dossier détaillé au format attendu par le PDF
+                request = {
+                    id: dossierDetaille.id,
+                    parentFirstName: dossierDetaille.perePrenom || dossierDetaille.merePrenom,
+                    parentLastName: dossierDetaille.pereNom || dossierDetaille.mereNom,
+                    parentEmail: dossierDetaille.pereEmail || dossierDetaille.mereEmail,
+                    parentPhone: dossierDetaille.pereTelephone || dossierDetaille.mereTelephone,
+                    parentAddress: dossierDetaille.adresseComplete,
+                    anneeScolaire: dossierDetaille.anneeScolaire,
+                    specialNeeds: dossierDetaille.besoinsPArticuliers,
+                    situationFamiliale: dossierDetaille.situationFamiliale,
+                    familySituation: dossierDetaille.situationFamiliale,
+                    // Convertir les données enfant au format JSON attendu
+                    children: JSON.stringify([{
+                        firstName: dossierDetaille.enfantPrenom,
+                        lastName: dossierDetaille.enfantNom,
+                        birthDate: dossierDetaille.enfantDateNaissance,
+                        currentClass: dossierDetaille.enfantClasseActuelle,
+                        requestedClass: dossierDetaille.enfantClasseDemandee,
+                        previousSchool: dossierDetaille.enfantEcoleActuelle,
+                        currentSchool: dossierDetaille.enfantEcoleActuelle,
+                        villeEtablissement: dossierDetaille.enfantVilleEtablissement,
+                        derniereScolarite: dossierDetaille.enfantDerniereScolarite,
+                        lieuNaissance: dossierDetaille.enfantLieuNaissance,
+                        departementNaissance: '',
+                        nationalite: dossierDetaille.enfantNationalite,
+                        sexe: dossierDetaille.enfantSexe
+                    }]),
+                    message: JSON.stringify({
+                        pere: dossierDetaille.perePrenom ? `${dossierDetaille.perePrenom} ${dossierDetaille.pereNom} - ${dossierDetaille.pereEmail}` : null,
+                        mere: dossierDetaille.merePrenom ? `${dossierDetaille.merePrenom} ${dossierDetaille.mereNom} - ${dossierDetaille.mereEmail}` : null,
+                        adresse: dossierDetaille.adresseComplete,
+                        tel: dossierDetaille.telephoneDomicile || dossierDetaille.pereTelephone || dossierDetaille.mereTelephone
+                    }),
+                    submittedAt: dossierDetaille.dateDepot,
+                    status: 'PENDING'
+                };
+            } else {
+                // Fallback vers PreInscriptionRequest
+                request = await prisma.preInscriptionRequest.findUnique({
+                    where: { id: parseInt(id) }
+                });
+
+                if (!request) {
+                    console.log('❌ Aucune demande d\'inscription trouvée pour ID:', id);
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Demande d\'inscription non trouvée'
+                    });
+                }
+                console.log('✅ Demande de pré-inscription trouvée:', request.parentLastName);
             }
 
             console.log('✅ Demande trouvée:', request.parentLastName);
@@ -1110,6 +1165,21 @@ const directeurController = {
                 console.log('📁 Dossier d\'archivage PDF créé:', archiveDir);
             }
 
+            // AMÉLIORATION: Créer un nom de fichier plus descriptif pour l'archivage
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+            // Fonction pour nettoyer les noms de fichiers
+            const sanitizeFilename = (str) => {
+                return str ? str.replace(/[\/\\:*?"<>|]/g, '-').replace(/\s+/g, '_') : '';
+            };
+
+            const childName = children.length > 0 ? `-${sanitizeFilename(children[0].firstName)}-${sanitizeFilename(children[0].lastName)}` : '';
+            const parentNameSafe = sanitizeFilename(request.parentLastName);
+            const anneeScolaireSafe = sanitizeFilename(request.anneeScolaire || '2025-2026');
+
+            const archiveFilename = `inscription-${id}-${parentNameSafe}${childName}-${anneeScolaireSafe}-${timestamp}.pdf`;
+            const archivePath = path.join(archiveDir, archiveFilename);
+
             console.log('📄 Création du document PDFKit...');
             const doc = new PDFDocument({
                 size: 'A4',
@@ -1123,10 +1193,14 @@ const directeurController = {
             res.setHeader('Content-Disposition', 'inline; filename="demande-inscription-' + request.parentLastName + '.pdf"');
             console.log('✅ Headers configurés');
 
-            // Pipe le PDF directement vers la réponse
+            // AMÉLIORATION: Pipe vers la réponse ET sauvegarde en archive
             console.log('📄 Configuration du pipe...');
             doc.pipe(res);
-            console.log('✅ Pipe configuré');
+
+            // Sauvegarder aussi dans les archives
+            const archiveStream = fs.createWriteStream(archivePath);
+            doc.pipe(archiveStream);
+            console.log('✅ Pipe configuré vers navigateur ET archive:', archiveFilename);
 
             let yPos = 30;
 
@@ -1193,7 +1267,13 @@ const directeurController = {
             doc.text('Prénom: ' + (pereInfo.firstName || '______________'), 350, yPos);
             yPos += 15;
 
-            doc.text('Téléphone: ' + (pereInfo.phone || '______________'), 60, yPos);
+            // AMÉLIORATION: Afficher téléphone + téléphone alternatif si disponible
+            let phoneDisplay = pereInfo.phone || '______________';
+            if (parentsInfo.tel && parentsInfo.tel !== pereInfo.phone) {
+                phoneDisplay += ` / ${parentsInfo.tel}`;
+            }
+
+            doc.text('Téléphone: ' + phoneDisplay, 60, yPos);
             doc.text('Email: ' + (pereInfo.email || '______________'), 280, yPos);
             yPos += 15;
 
@@ -1247,7 +1327,7 @@ const directeurController = {
                 };
             }
 
-            // Compléter avec parentsInfo si disponible
+            // Compléter avec parentsInfo si disponible (AMÉLIORATION: meilleure extraction)
             if (parentsInfo.mere) {
                 const mereMatch = parentsInfo.mere.match(/^(.+?)\s+(.+?)\s*-\s*(.+)$/);
                 if (mereMatch) {
@@ -1260,15 +1340,31 @@ const directeurController = {
                 }
             }
 
-            // Chercher le téléphone dans le message JSON global (parfois plus d'informations y sont stockées)
-            if (!mereInfo.phone && request.message) {
+            // AMÉLIORATION: Chercher le téléphone alternatif dans le message JSON global
+            if (request.message) {
                 try {
                     const messageData = typeof request.message === 'string' ? JSON.parse(request.message) : request.message;
+
+                    // Téléphone alternatif depuis le champ 'tel' - l'affecter à la mère si pas d'autre téléphone
+                    if (messageData.tel) {
+                        // Si la mère n'a pas de téléphone et qu'il y a un téléphone alternatif
+                        if (!mereInfo.phone) {
+                            mereInfo.phone = messageData.tel;
+                            console.log('📄 PDF - Téléphone alternatif attribué à la mère:', messageData.tel);
+                        }
+                        // Si le père n'a pas de téléphone principal
+                        if (!pereInfo.phone) {
+                            pereInfo.phone = messageData.tel;
+                            console.log('📄 PDF - Téléphone alternatif attribué au père:', messageData.tel);
+                        }
+                    }
+
+                    // Téléphone mère depuis différentes sources possibles
                     if (messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone) {
-                        mereInfo.phone = messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone || '';
+                        mereInfo.phone = mereInfo.phone || messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone || '';
                     }
                 } catch (e) {
-                    console.error('Erreur parsing message pour téléphone mère:', e);
+                    console.error('Erreur parsing message pour téléphone:', e);
                 }
             }
 
@@ -1310,27 +1406,49 @@ const directeurController = {
             // Déterminer la situation familiale depuis les données
             let situationFamiliale = request.familySituation || request.situationFamiliale || '';
 
-            console.log('📄 PDF - situationFamiliale trouvée:', situationFamiliale);
+            // AMÉLIORATION: Si aucune situation n'est renseignée, tenter de déduire
+            if (!situationFamiliale) {
+                // Si on a des informations sur les deux parents (père et mère)
+                if (mereInfo.firstName && mereInfo.lastName && pereInfo.firstName && pereInfo.lastName) {
+                    // Vérifier si même nom de famille
+                    const memeNom = mereInfo.lastName.toLowerCase() === pereInfo.lastName.toLowerCase();
+                    if (memeNom) {
+                        situationFamiliale = 'marie'; // Par défaut si même nom
+                        console.log('📄 PDF - Situation déduite: Mariés (même nom de famille)');
+                    } else {
+                        situationFamiliale = 'concubinage'; // Union libre si noms différents
+                        console.log('📄 PDF - Situation déduite: Union libre (noms différents)');
+                    }
+                } else if (pereInfo.firstName && pereInfo.lastName && (!mereInfo.firstName || !mereInfo.lastName)) {
+                    situationFamiliale = 'autre'; // Parent seul
+                    console.log('📄 PDF - Situation déduite: Autre (parent seul - père)');
+                } else if (mereInfo.firstName && mereInfo.lastName && (!pereInfo.firstName || !pereInfo.lastName)) {
+                    situationFamiliale = 'autre'; // Parent seul
+                    console.log('📄 PDF - Situation déduite: Autre (parent seule - mère)');
+                }
+            }
 
-            // Créer les cases avec la bonne cochée selon la situation
-            let mariés = '☐';
-            let pacsés = '☐';
-            let unionLibre = '☐';
-            let divorcés = '☐';
-            let séparés = '☐';
-            let autre = '☐';
+            console.log('📄 PDF - situationFamiliale finale:', situationFamiliale);
+
+            // Solution simple avec caractères compatibles
+            let mariés = 'O';
+            let pacsés = 'O';
+            let unionLibre = 'O';
+            let divorcés = 'O';
+            let séparés = 'O';
+            let autre = 'O';
 
             if (situationFamiliale) {
                 const situation = situationFamiliale.toLowerCase();
-                if (situation.includes('marié') || situation === 'marie') mariés = '☑';
-                else if (situation.includes('pacs') || situation === 'pacse') pacsés = '☑';
-                else if (situation.includes('union libre') || situation.includes('concubinage') || situation === 'concubinage') unionLibre = '☑';
-                else if (situation.includes('divorcé') || situation === 'divorce') divorcés = '☑';
-                else if (situation.includes('séparé') || situation === 'separe') séparés = '☑';
-                else autre = '☑';
+                if (situation.includes('marié') || situation === 'marie') mariés = 'X';
+                else if (situation.includes('pacs') || situation === 'pacse') pacsés = 'X';
+                else if (situation.includes('union libre') || situation.includes('concubinage') || situation === 'concubinage') unionLibre = 'X';
+                else if (situation.includes('divorcé') || situation === 'divorce') divorcés = 'X';
+                else if (situation.includes('séparé') || situation === 'separe') séparés = 'X';
+                else autre = 'X';
             }
 
-            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${autre === '☑' ? situationFamiliale : '___________'}`, 60, yPos);
+            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${autre === 'X' ? situationFamiliale : '___________'}`, 60, yPos);
 
             // DEBUG: Ajout d'une ligne pour vérifier que le code s'exécute
             console.log('📄 PDF - Section Situation de famille générée avec situation:', situationFamiliale);
@@ -1395,11 +1513,31 @@ const directeurController = {
             doc.fontSize(9).font('Helvetica');
 
             if (children.length > 0 && children[0]) {
-                doc.text('École actuelle: ' + (children[0].currentSchool || children[0].previousSchool || '________________________'), 60, yPos);
+                const child = children[0];
+
+                // Utiliser les données détaillées si disponibles (depuis DossierInscription)
+                const ecoleActuelle = child.currentSchool || child.previousSchool || '________________________';
+                const villeEtablissement = child.villeEtablissement || '';
+                const derniereScolarite = child.derniereScolarite || '';
+
+                // Affichage enrichi avec les données détaillées
+                doc.text('École actuelle: ' + ecoleActuelle, 60, yPos);
                 yPos += 15;
-                doc.text('Classe actuelle: ' + (children[0].currentClass || '________'), 60, yPos);
+
+                if (villeEtablissement) {
+                    doc.text('Ville de l\'établissement: ' + villeEtablissement, 60, yPos);
+                    yPos += 15;
+                }
+
+                doc.text('Classe actuelle: ' + (child.currentClass || '________'), 60, yPos);
                 doc.text('Directeur/Directrice: ________________', 250, yPos);
                 yPos += 15;
+
+                if (derniereScolarite) {
+                    doc.text('Dernière scolarité: ' + derniereScolarite, 60, yPos);
+                    yPos += 15;
+                }
+
                 doc.text('Adresse de l\'établissement: _________________________________', 60, yPos);
             } else {
                 doc.text('École actuelle: ________________________', 60, yPos);
@@ -1413,16 +1551,48 @@ const directeurController = {
             yPos += 25;
 
             // === BESOINS PARTICULIERS ===
-            if (request.specialNeeds) {
-                doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
-                yPos += 12;
-                doc.fontSize(10).font('Helvetica-Bold')
-                    .text('BESOINS PARTICULIERS', 60, yPos, { align: 'center', width: 475 });
-                yPos += 15;
-                doc.fontSize(9).font('Helvetica')
-                    .text(request.specialNeeds, 60, yPos, { width: 475 });
-                yPos += 20;
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+            doc.fontSize(10).font('Helvetica-Bold')
+                .text('BESOINS PARTICULIERS', 60, yPos, { align: 'center', width: 475 });
+            yPos += 15;
+            doc.fontSize(9).font('Helvetica');
+
+            if (request.specialNeeds && request.specialNeeds.trim()) {
+                doc.text(request.specialNeeds, 60, yPos, { width: 475 });
+            } else {
+                doc.text('Aucun besoin particulier signalé', 60, yPos, { width: 475 });
             }
+            yPos += 20;
+
+            // === INFORMATIONS COMPLÉMENTAIRES (AMÉLIORATION) ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+            doc.fontSize(10).font('Helvetica-Bold')
+                .text('INFORMATIONS COMPLÉMENTAIRES', 60, yPos, { align: 'center', width: 475 });
+            yPos += 15;
+            doc.fontSize(9).font('Helvetica');
+
+            // Afficher les informations JSON supplémentaires si disponibles
+            if (request.message) {
+                try {
+                    const messageData = typeof request.message === 'string' ? JSON.parse(request.message) : request.message;
+
+                    if (messageData.adresse) {
+                        doc.text('Adresse complète: ' + messageData.adresse.replace(/\n/g, ', '), 60, yPos, { width: 475 });
+                        yPos += 12;
+                    }
+
+                    if (messageData.tel) {
+                        doc.text('Téléphone alternatif: ' + messageData.tel, 60, yPos);
+                        yPos += 12;
+                    }
+                } catch (e) {
+                    console.error('Erreur parsing message pour infos complémentaires:', e);
+                }
+            }
+
+            yPos += 8;
 
             // === INFORMATIONS ADMINISTRATIVES (COMPACT) ===
             doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
@@ -2192,6 +2362,73 @@ const directeurController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de l\'import: ' + error.message
+            });
+        }
+    },
+
+    // === ARCHIVE PDF ===
+    getPDFArchive: async (req, res) => {
+        try {
+            console.log('📁 Accès à l\'archive PDF');
+
+            // Vérifier les autorisations
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+                return res.status(403).render('pages/error', {
+                    message: 'Accès refusé',
+                    user: req.session.user
+                });
+            }
+
+            const path = require('path');
+            const fs = require('fs');
+
+            // Dossier d'archivage
+            const archiveDir = path.join(__dirname, '../../public/pdf_archive');
+
+            let pdfFiles = [];
+
+            // Vérifier si le dossier existe
+            if (fs.existsSync(archiveDir)) {
+                const files = fs.readdirSync(archiveDir);
+
+                pdfFiles = files
+                    .filter(file => file.endsWith('.pdf'))
+                    .map(file => {
+                        const fullPath = path.join(archiveDir, file);
+                        const stats = fs.statSync(fullPath);
+
+                        // Extraire les informations du nom du fichier
+                        // Format: inscription-{id}-{parentLastName}-{childFirstName}-{childLastName}-{anneeScolaire}-{timestamp}.pdf
+                        const match = file.match(/inscription-(\d+)-([^-]+)-?([^-]*)-?([^-]*)-([^-]+)-(.+)\.pdf/);
+
+                        return {
+                            filename: file,
+                            fullPath: `/pdf_archive/${file}`,
+                            size: Math.round(stats.size / 1024), // en KB
+                            created: stats.birthtime,
+                            modified: stats.mtime,
+                            inscriptionId: match ? match[1] : 'N/A',
+                            parentName: match ? match[2] : 'N/A',
+                            childName: match && match[3] && match[4] ? `${match[3]} ${match[4]}` : (match ? match[3] : 'N/A'),
+                            anneeScolaire: match ? match[5] : 'N/A'
+                        };
+                    })
+                    .sort((a, b) => new Date(b.modified) - new Date(a.modified));
+            }
+
+            console.log(`📋 ${pdfFiles.length} fichiers PDF trouvés dans l'archive`);
+
+            res.render('pages/admin/pdf-archive', {
+                title: 'Archive PDF des Inscriptions',
+                pdfFiles,
+                user: req.session.user
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur accès archive PDF:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors de l\'accès à l\'archive PDF',
+                user: req.session.user
             });
         }
     },

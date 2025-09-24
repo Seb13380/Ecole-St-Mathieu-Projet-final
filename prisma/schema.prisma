@@ -80,6 +80,7 @@ model User {
   inscriptionConfigs       InscriptionConfig[]     @relation("InscriptionConfigModifier")
   inscriptionDocuments     InscriptionDocument[]   @relation("InscriptionDocumentAuteur")
   siteLogs                 SiteLog[]               @relation("UserLogs")
+  dossiersInscription      DossierInscription[]    @relation("DossierInscriptionTraitant")
 }
 
 model Student {
@@ -661,4 +662,125 @@ model SiteLog {
   @@index([route])
   @@index([ip])
   @@index([statusCode])
+}
+
+// Dossiers d'inscription détaillés
+model DossierInscription {
+  id            Int      @id @default(autoincrement())
+  anneeScolaire String   @default("2025/2026")
+  dateDepot     DateTime @default(now())
+
+  // Informations parents
+  pereNom           String
+  perePrenom        String
+  pereProfession    String?
+  pereTelephone     String
+  pereEmail         String
+  mereNom           String
+  merePrenom        String
+  mereProfession    String?
+  mereTelephone     String
+  mereEmail         String
+  adresseComplete   String  @db.Text
+  telephoneDomicile String?
+
+  // Situation de famille
+  situationFamiliale  String?
+  nombreEnfantsFoyer  Int?
+  informationsFamille String? @db.Text
+
+  // Informations enfant
+  enfantNom                String
+  enfantPrenom             String
+  enfantDateNaissance      DateTime
+  enfantLieuNaissance      String?
+  enfantNationalite        String?
+  enfantSexe               String
+  enfantClasseDemandee     String
+  enfantClasseActuelle     String?
+  enfantEcoleActuelle      String?
+  enfantVilleEtablissement String?
+  enfantDerniereScolarite  String?
+
+  // Informations médicales
+  medecinTraitantNom       String?
+  medecinTraitantTelephone String?
+  allergies                String? @db.Text
+  traitementsMedicaux      String? @db.Text
+  regimeAlimentaire        String? @db.Text
+  paiNecessaire            Boolean @default(false)
+  besoinsPArticuliers      String? @db.Text
+
+  // Personnes d'urgence
+  urgence1Nom       String?
+  urgence1Prenom    String?
+  urgence1Lien      String?
+  urgence1Telephone String?
+  urgence2Nom       String?
+  urgence2Prenom    String?
+  urgence2Lien      String?
+  urgence2Telephone String?
+
+  // Autorisations
+  autorisationPhoto    Boolean @default(false)
+  autorisationVideo    Boolean @default(false)
+  autorisationSortie   Boolean @default(false)
+  autorisationInternet Boolean @default(false)
+
+  // Services
+  transportSouhaite     Boolean @default(false)
+  restaurationSouhaitee Boolean @default(false)
+  joursRestauration     String?
+
+  // Personnes autorisées à récupérer l'enfant
+  recuperation1Nom       String?
+  recuperation1Prenom    String?
+  recuperation1Telephone String?
+  recuperation1Lien      String?
+  recuperation2Nom       String?
+  recuperation2Prenom    String?
+  recuperation2Telephone String?
+  recuperation2Lien      String?
+
+  // Documents fournis
+  docCertificatRadiation  Boolean @default(false)
+  docLivretFamille        Boolean @default(false)
+  docJustificatifDomicile Boolean @default(false)
+  docAssuranceScolaire    Boolean @default(false)
+  docCarnetSante          Boolean @default(false)
+  docCertificatMedical    Boolean @default(false)
+
+  // Engagements
+  engagementReglement Boolean   @default(false)
+  engagementFinancier Boolean   @default(false)
+  dateSignature       DateTime?
+
+  // Statut et traitement
+  statut               DossierInscriptionStatus @default(EN_ATTENTE)
+  traitePar            Int?
+  dateTraitement       DateTime?
+  notesAdministratives String?                  @db.Text
+  documentPdfGenere    String?
+  statutImpression     Boolean                  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  traitant User? @relation("DossierInscriptionTraitant", fields: [traitePar], references: [id])
+
+  @@index([statut])
+  @@index([anneeScolaire])
+  @@index([dateDepot])
+  @@index([enfantClasseDemandee])
+  @@index([pereEmail])
+  @@index([mereEmail])
+}
+
+enum DossierInscriptionStatus {
+  EN_ATTENTE
+  EN_COURS
+  VALIDE
+  REFUSE
+  FINALISE
 }
