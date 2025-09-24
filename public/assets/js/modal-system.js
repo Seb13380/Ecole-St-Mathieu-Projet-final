@@ -45,7 +45,7 @@ class ModalSystem {
         const closeBtn = document.getElementById('modal-close');
 
         closeBtn.addEventListener('click', () => this.hideModal());
-        
+
         // Fermer au clic sur l'overlay
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -122,7 +122,7 @@ class ModalSystem {
         titleElement.textContent = title;
         titleElement.className = `font-bold text-lg mb-4 text-center ${titleClass}`;
         messageElement.textContent = message;
-        
+
         // Bouton OK uniquement
         actionsContainer.innerHTML = `
             <button class="btn btn-primary" onclick="modalSystem.hideModal()">OK</button>
@@ -146,7 +146,7 @@ class ModalSystem {
             titleElement.textContent = title;
             titleElement.className = 'font-bold text-lg mb-4 text-center text-blue-800';
             messageElement.textContent = message;
-            
+
             // Boutons Oui/Non
             actionsContainer.innerHTML = `
                 <button class="btn btn-outline mr-2" onclick="modalSystem.resolveConfirm(false)">Annuler</button>
@@ -184,7 +184,7 @@ class ModalSystem {
                 <p class="text-sm text-gray-600 mb-4">${message}</p>
                 <input type="text" id="prompt-input" class="input input-bordered w-full" value="${defaultValue}" placeholder="Votre réponse...">
             `;
-            
+
             actionsContainer.innerHTML = `
                 <button class="btn btn-outline mr-2" onclick="modalSystem.resolvePrompt(null)">Annuler</button>
                 <button class="btn btn-primary" onclick="modalSystem.resolvePrompt(document.getElementById('prompt-input').value)">Valider</button>

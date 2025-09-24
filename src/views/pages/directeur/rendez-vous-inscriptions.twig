@@ -178,14 +178,14 @@ comment: comment || ''
 )
 }).then(response => response.json()).then(data => {
 if (data.success) {
-alert('✅ Inscription finalisée avec succès !\n\nLes comptes ont été créés et les identifiants envoyés par email.');
+modalSystem.success('Inscription finalisée avec succès !\n\nLes comptes ont été créés et les identifiants envoyés par email.', 'Finalisation réussie');
 location.reload();
 } else {
-alert('❌ Erreur: ' + data.message);
+modalSystem.error('Erreur: ' + data.message, 'Erreur de finalisation');
 }
 }).catch(error => {
 console.error('Erreur:', error);
-alert('❌ Erreur lors de la finalisation de l\'inscription');
+modalSystem.error('Erreur lors de la finalisation de l\'inscription', 'Erreur réseau');
 });
 }
 }

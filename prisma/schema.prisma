@@ -59,7 +59,8 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  enfants                  Student[]               @relation("ParentEnfants")
+  students                 Student[]               @relation("StudentParent") // 👈 Ajout de la relation inverse temporaire
+  enfants                  ParentStudent[]         @relation("ParentChildren")
   messages                 Message[]               @relation("UserMessages")
   actualites               Actualite[]             @relation("UserActualites")
   travaux                  Travaux[]               @relation("UserTravaux")
@@ -86,17 +87,31 @@ model Student {
   firstName     String
   lastName      String
   dateNaissance DateTime
+  parentId      Int // 👈 Temporaire: correspond à la base actuelle
   classeId      Int? // 👈 Ajout du ? pour rendre optionnel
-  parentId      Int
   photoUrl      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  parent          User              @relation("ParentEnfants", fields: [parentId], references: [id], onDelete: Cascade)
+  parent          User              @relation("StudentParent", fields: [parentId], references: [id])
   classe          Classe?           @relation("ClasseEleves", fields: [classeId], references: [id]) // 👈 Ajout du ?
+  parents         ParentStudent[]   @relation("StudentParents")
   TicketBooklet   TicketBooklet[]
   MealReservation MealReservation[]
   TicketPurchase  TicketPurchase[]
+}
+
+// Table de liaison pour relation many-to-many entre parents et enfants
+model ParentStudent {
+  id        Int      @id @default(autoincrement())
+  parentId  Int
+  studentId Int
+  createdAt DateTime @default(now())
+
+  parent  User    @relation("ParentChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation("StudentParents", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, studentId]) // Empêche les doublons
 }
 
 model Classe {

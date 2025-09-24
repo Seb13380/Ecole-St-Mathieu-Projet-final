@@ -111,180 +111,180 @@
 <!-- Script JavaScript pour l'upload -->
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
-	    const dropZone = document.getElementById('dropZone');
-	    const fileInput = document.getElementById('fileInput');
-	    const uploadForm = document.getElementById('uploadForm');
-	    const progressSection = document.getElementById('progressSection');
-	    const progressBar = document.getElementById('progressBar');
-	    const progressText = document.getElementById('progressText');
-	    const resultsSection = document.getElementById('resultsSection');
-	    const resultsContent = document.getElementById('resultsContent');
-	
-	    // Drag & Drop
-	    dropZone.addEventListener('dragover', function(e) {
-	        e.preventDefault();
-	        dropZone.classList.add('border-blue-500', 'bg-blue-50');
-	    });
-	
-	    dropZone.addEventListener('dragleave', function(e) {
-	        e.preventDefault();
-	        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
-	    });
-	
-	    dropZone.addEventListener('drop', function(e) {
-	        e.preventDefault();
-	        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
-	        
-	        const files = e.dataTransfer.files;
-	        if (files.length > 0) {
-	            handleFile(files[0]);
-	        }
-	    });
-	
-	    // Sélection de fichier
-	    fileInput.addEventListener('change', function(e) {
-	        if (e.target.files.length > 0) {
-	            handleFile(e.target.files[0]);
-	        }
-	    });
-	
-	    function handleFile(file) {
-	        // Vérification du format
-	        const allowedTypes = [
-	            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-	            'application/vnd.ms-excel'
-	        ];
-	        
-	        if (!allowedTypes.includes(file.type)) {
-	            alert('Format de fichier non supporté. Utilisez .xlsx ou .xls');
-	            return;
-	        }
-	
-	        // Afficher la progression
-	        progressSection.classList.remove('hidden');
-	        resultsSection.classList.add('hidden');
-	
-	        // Préparer le formulaire
-	        const formData = new FormData();
-	        formData.append('excelFile', file);
-	
-	        // Simulation de progression
-	        let progress = 0;
-	        const progressInterval = setInterval(() => {
-	            progress += Math.random() * 20;
-	            if (progress > 90) progress = 90;
-	            updateProgress(progress);
-	        }, 200);
-	
-	        // Upload
-	        fetch('/directeur/import-excel/process', {
-	            method: 'POST',
-	            body: formData
-	        })
-	        .then(response => response.json())
-	        .then(data => {
-	            clearInterval(progressInterval);
-	            updateProgress(100);
-	            
-	            setTimeout(() => {
-	                progressSection.classList.add('hidden');
-	                showResults(data);
-	            }, 500);
-	        })
-	        .catch(error => {
-	            clearInterval(progressInterval);
-	            progressSection.classList.add('hidden');
-	            console.error('Erreur:', error);
-	            alert('Erreur lors de l\'upload: ' + error.message);
-	        });
-	    }
-	
-	    function updateProgress(percent) {
-	        progressBar.style.width = percent + '%';
-	        progressText.textContent = Math.round(percent) + '%';
-	    }
-	
-	    function showResults(data) {
-	        resultsSection.classList.remove('hidden');
-	        
-	        if (data.success) {
-	            const results = data.results;
-	            resultsContent.innerHTML = `
-	                <div class="space-y-4">
-	                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-	                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-	                            <div class="text-2xl font-bold text-green-600">${results.success}</div>
-	                            <div class="text-sm text-green-800">Succès</div>
-	                        </div>
-	                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-	                            <div class="text-2xl font-bold text-red-600">${results.errors}</div>
-	                            <div class="text-sm text-red-800">Erreurs</div>
-	                        </div>
-	                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-	                            <div class="text-2xl font-bold text-blue-600">${results.success + results.errors}</div>
-	                            <div class="text-sm text-blue-800">Total lignes</div>
-	                        </div>
-	                    </div>
-	                    
-	                    ${results.details.length > 0 ? `
-	                        <div class="mt-6">
-	                            <h4 class="font-medium text-gray-900 mb-3">Détails de l'import:</h4>
-	                            <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
-	                                <table class="min-w-full divide-y divide-gray-200">
-	                                    <thead class="bg-gray-50">
-	                                        <tr>
-	                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ligne</th>
-	                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-	                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Famille</th>
-	                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Enfant</th>
-	                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Classe</th>
-	                                        </tr>
-	                                    </thead>
-	                                    <tbody class="bg-white divide-y divide-gray-200">
-	                                        ${results.details.slice(0, 50).map(detail => `
-	                                            <tr class="hover:bg-gray-50">
-	                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.ligne}</td>
-	                                                <td class="px-3 py-2 text-sm">
-	                                                    ${detail.status === 'success' 
-	                                                        ? '<span class="text-green-600">✓ Succès</span>' 
-	                                                        : '<span class="text-red-600">✗ Erreur</span>'
-	                                                    }
-	                                                </td>
-	                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.famille || '-'}</td>
-	                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.enfant || '-'}</td>
-	                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.classe || detail.erreur || '-'}</td>
-	                                            </tr>
-	                                        `).join('')}
-	                                    </tbody>
-	                                </table>
-	                            </div>
-	                            ${results.details.length > 50 ? `
-	                                <p class="text-sm text-gray-500 mt-2">
-	                                    Affichage des 50 premiers résultats sur ${results.details.length} total.
-	                                </p>
-	                            ` : ''}
-	                        </div>
-	                    ` : ''}
-	                </div>
-	            `;
-	        } else {
-	            resultsContent.innerHTML = `
-	                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-	                    <div class="flex">
-	                        <div class="flex-shrink-0">
-	                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-	                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-	                            </svg>
-	                        </div>
-	                        <div class="ml-3">
-	                            <h3 class="text-sm font-medium text-red-800">Erreur d'import</h3>
-	                            <p class="text-sm text-red-700 mt-1">${data.message}</p>
-	                        </div>
-	                    </div>
-	                </div>
-	            `;
-	        }
-	    }
-	});
-	</script>
-	{% endblock %}
+		    const dropZone = document.getElementById('dropZone');
+		    const fileInput = document.getElementById('fileInput');
+		    const uploadForm = document.getElementById('uploadForm');
+		    const progressSection = document.getElementById('progressSection');
+		    const progressBar = document.getElementById('progressBar');
+		    const progressText = document.getElementById('progressText');
+		    const resultsSection = document.getElementById('resultsSection');
+		    const resultsContent = document.getElementById('resultsContent');
+		
+		    // Drag & Drop
+		    dropZone.addEventListener('dragover', function(e) {
+		        e.preventDefault();
+		        dropZone.classList.add('border-blue-500', 'bg-blue-50');
+		    });
+		
+		    dropZone.addEventListener('dragleave', function(e) {
+		        e.preventDefault();
+		        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+		    });
+		
+		    dropZone.addEventListener('drop', function(e) {
+		        e.preventDefault();
+		        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+		        
+		        const files = e.dataTransfer.files;
+		        if (files.length > 0) {
+		            handleFile(files[0]);
+		        }
+		    });
+		
+		    // Sélection de fichier
+		    fileInput.addEventListener('change', function(e) {
+		        if (e.target.files.length > 0) {
+		            handleFile(e.target.files[0]);
+		        }
+		    });
+		
+		    function handleFile(file) {
+		        // Vérification du format
+		        const allowedTypes = [
+		            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		            'application/vnd.ms-excel'
+		        ];
+		        
+		        if (!allowedTypes.includes(file.type)) {
+		            modalSystem.error('Format de fichier non supporté. Utilisez .xlsx ou .xls', 'Format incorrect');
+		            return;
+		        }
+		
+		        // Afficher la progression
+		        progressSection.classList.remove('hidden');
+		        resultsSection.classList.add('hidden');
+		
+		        // Préparer le formulaire
+		        const formData = new FormData();
+		        formData.append('excelFile', file);
+		
+		        // Simulation de progression
+		        let progress = 0;
+		        const progressInterval = setInterval(() => {
+		            progress += Math.random() * 20;
+		            if (progress > 90) progress = 90;
+		            updateProgress(progress);
+		        }, 200);
+		
+		        // Upload
+		        fetch('/directeur/import-excel/process', {
+		            method: 'POST',
+		            body: formData
+		        })
+		        .then(response => response.json())
+		        .then(data => {
+		            clearInterval(progressInterval);
+		            updateProgress(100);
+		            
+		            setTimeout(() => {
+		                progressSection.classList.add('hidden');
+		                showResults(data);
+		            }, 500);
+		        })
+		        .catch(error => {
+		            clearInterval(progressInterval);
+		            progressSection.classList.add('hidden');
+		            console.error('Erreur:', error);
+		            modalSystem.error('Erreur lors de l\'upload: ' + error.message, 'Erreur d\'upload');
+		        });
+		    }
+		
+		    function updateProgress(percent) {
+		        progressBar.style.width = percent + '%';
+		        progressText.textContent = Math.round(percent) + '%';
+		    }
+		
+		    function showResults(data) {
+		        resultsSection.classList.remove('hidden');
+		        
+		        if (data.success) {
+		            const results = data.results;
+		            resultsContent.innerHTML = `
+		                <div class="space-y-4">
+		                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+		                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+		                            <div class="text-2xl font-bold text-green-600">${results.success}</div>
+		                            <div class="text-sm text-green-800">Succès</div>
+		                        </div>
+		                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+		                            <div class="text-2xl font-bold text-red-600">${results.errors}</div>
+		                            <div class="text-sm text-red-800">Erreurs</div>
+		                        </div>
+		                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+		                            <div class="text-2xl font-bold text-blue-600">${results.success + results.errors}</div>
+		                            <div class="text-sm text-blue-800">Total lignes</div>
+		                        </div>
+		                    </div>
+		                    
+		                    ${results.details.length > 0 ? `
+		                        <div class="mt-6">
+		                            <h4 class="font-medium text-gray-900 mb-3">Détails de l'import:</h4>
+		                            <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+		                                <table class="min-w-full divide-y divide-gray-200">
+		                                    <thead class="bg-gray-50">
+		                                        <tr>
+		                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ligne</th>
+		                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+		                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Famille</th>
+		                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Enfant</th>
+		                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Classe</th>
+		                                        </tr>
+		                                    </thead>
+		                                    <tbody class="bg-white divide-y divide-gray-200">
+		                                        ${results.details.slice(0, 50).map(detail => `
+		                                            <tr class="hover:bg-gray-50">
+		                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.ligne}</td>
+		                                                <td class="px-3 py-2 text-sm">
+		                                                    ${detail.status === 'success' 
+		                                                        ? '<span class="text-green-600">✓ Succès</span>' 
+		                                                        : '<span class="text-red-600">✗ Erreur</span>'
+		                                                    }
+		                                                </td>
+		                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.famille || '-'}</td>
+		                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.enfant || '-'}</td>
+		                                                <td class="px-3 py-2 text-sm text-gray-900">${detail.classe || detail.erreur || '-'}</td>
+		                                            </tr>
+		                                        `).join('')}
+		                                    </tbody>
+		                                </table>
+		                            </div>
+		                            ${results.details.length > 50 ? `
+		                                <p class="text-sm text-gray-500 mt-2">
+		                                    Affichage des 50 premiers résultats sur ${results.details.length} total.
+		                                </p>
+		                            ` : ''}
+		                        </div>
+		                    ` : ''}
+		                </div>
+		            `;
+		        } else {
+		            resultsContent.innerHTML = `
+		                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+		                    <div class="flex">
+		                        <div class="flex-shrink-0">
+		                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+		                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+		                            </svg>
+		                        </div>
+		                        <div class="ml-3">
+		                            <h3 class="text-sm font-medium text-red-800">Erreur d'import</h3>
+		                            <p class="text-sm text-red-700 mt-1">${data.message}</p>
+		                        </div>
+		                    </div>
+		                </div>
+		            `;
+		        }
+		    }
+		});
+		</script>
+		{% endblock %}

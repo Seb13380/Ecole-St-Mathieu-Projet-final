@@ -190,3 +190,35 @@ document.addEventListener('keydown', function (e) {
         closeModal();
     }
 });
+
+// Fonction de recherche/filtrage des parents
+function filterParents() {
+    const searchTerm = document.getElementById('searchParents').value.toLowerCase();
+    const tableRows = document.querySelectorAll('tbody tr');
+    let visibleCount = 0;
+
+    tableRows.forEach(row => {
+        const parentName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const parentContact = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        
+        if (parentName.includes(searchTerm) || parentContact.includes(searchTerm)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Mettre à jour le compteur
+    const countElement = document.querySelector('h3');
+    if (countElement) {
+        const originalText = countElement.textContent;
+        const totalCount = originalText.match(/\((\d+)\)/)[1];
+        
+        if (searchTerm === '') {
+            countElement.textContent = `Parents inscrits (${totalCount})`;
+        } else {
+            countElement.textContent = `Parents inscrits (${visibleCount}/${totalCount})`;
+        }
+    }
+}

@@ -396,7 +396,7 @@ const inscriptionEleveController = {
             if (inscriptionRequest.message) {
                 try {
                     const messageData = JSON.parse(inscriptionRequest.message);
-                    
+
                     // Extraire les infos de la mère depuis le message
                     if (messageData.mere) {
                         const mereMatch = messageData.mere.match(/^(.+?)\s+(.+?)\s*-\s*(.+)$/);
@@ -477,8 +477,15 @@ const inscriptionEleveController = {
                         firstName: child.firstName,
                         lastName: child.lastName,
                         dateNaissance: new Date(child.birthDate),
-                        classeId: classe.id,
-                        parentId: parentUser.id
+                        classeId: classe.id
+                    }
+                });
+
+                // Créer la relation parent-étudiant
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parentUser.id,
+                        studentId: student.id
                     }
                 });
 

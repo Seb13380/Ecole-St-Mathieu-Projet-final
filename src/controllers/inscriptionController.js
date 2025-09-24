@@ -480,8 +480,15 @@ const inscriptionController = {
                                     firstName: childData.firstName,
                                     lastName: childData.lastName,
                                     dateNaissance: new Date(childData.birthDate),
-                                    parentId: parentUser.id,
                                     classeId: classeId
+                                }
+                            });
+
+                            // Créer la relation parent-étudiant
+                            await prisma.parentStudent.create({
+                                data: {
+                                    parentId: parentUser.id,
+                                    studentId: student.id
                                 }
                             });
 
@@ -707,12 +714,16 @@ const inscriptionController = {
                 include: {
                     students: {
                         include: {
-                            parent: {
-                                select: {
-                                    firstName: true,
-                                    lastName: true,
-                                    email: true,
-                                    phone: true
+                            parents: {
+                                include: {
+                                    parent: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                            email: true,
+                                            phone: true
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -741,12 +752,19 @@ const inscriptionController = {
                 nom: classe.nom,
                 niveau: classe.niveau,
                 studentCount: classe.students.length,
-                students: classe.students.map(student => ({
-                    nom: `${student.firstName} ${student.lastName}`,
-                    parent: `${student.parent.firstName} ${student.parent.lastName}`,
-                    email: student.parent.email,
-                    telephone: student.parent.phone || 'Non renseigné'
-                }))
+                students: classe.students.map(student => {
+                    const parents = student.parents.map(ps => ps.parent);
+                    const parentNames = parents.map(p => `${p.firstName} ${p.lastName}`).join(' & ');
+                    const parentEmails = parents.map(p => p.email).join(' / ');
+                    const parentPhones = parents.map(p => p.phone || 'Non renseigné').join(' / ');
+
+                    return {
+                        nom: `${student.firstName} ${student.lastName}`,
+                        parent: parentNames || 'Non renseigné',
+                        email: parentEmails || 'Non renseigné',
+                        telephone: parentPhones
+                    };
+                })
             }));
 
             // Envoyer l'email à Yamina
