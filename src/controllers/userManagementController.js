@@ -164,7 +164,7 @@ const userManagementController = {
             // Vérifier si le parent a des enfants (relations directes + ParentStudent)
             const parent = await prisma.user.findUnique({
                 where: { id: parseInt(id) },
-                include: { 
+                include: {
                     students: true,  // Enfants via parentId direct
                     enfants: {       // Relations ParentStudent
                         include: {
@@ -184,7 +184,7 @@ const userManagementController = {
             // Vérifier s'il y a des enfants liés (direct ou via ParentStudent)
             const hasDirectStudents = parent.students.length > 0;
             const hasRelatedStudents = parent.enfants.length > 0;
-            
+
             if (hasDirectStudents || hasRelatedStudents) {
                 const totalStudents = parent.students.length + parent.enfants.length;
                 return res.status(400).json({

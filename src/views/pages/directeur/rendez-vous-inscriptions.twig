@@ -172,12 +172,11 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
-body: JSON.stringify({
-comment: comment
-})
+body: JSON.stringify(
+{comment: comment}
+)
 }).then(response => response.json()).then(data => {
-if (data.success) {
-// 🔧 CORRECTION: Rechargement immédiat sans modal
+if (data.success) { // 🔧 CORRECTION: Rechargement immédiat sans modal
 console.log('✅ Inscription finalisée avec succès');
 window.location.reload(true); // Force le rechargement
 } else {

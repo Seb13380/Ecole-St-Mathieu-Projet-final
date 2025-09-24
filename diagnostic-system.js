@@ -20,7 +20,7 @@ async function testSystemDiagnostics() {
                     return status < 500; // Accepter tous les codes < 500
                 }
             });
-            
+
             if (response.status === 200) {
                 console.log(`   ✅ OK (${response.status})`);
             } else {

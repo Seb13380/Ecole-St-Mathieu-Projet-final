@@ -963,7 +963,7 @@ const directeurController = {
     getRendezVousInscriptions: async (req, res) => {
         try {
             // 🔄 RÉCUPÉRATION UNIFIÉE DES DEMANDES PRÊTES POUR RENDEZ-VOUS
-            
+
             // 1. Pré-inscriptions acceptées
             const acceptedPreInscriptions = await prisma.preInscriptionRequest.findMany({
                 where: {

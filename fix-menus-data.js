@@ -10,24 +10,24 @@ async function fixMenusData() {
         // 1. Supprimer TOUS les menus existants (reset complet)
         console.log('🗑️ Suppression de tous les menus existants...');
         const deletedMenus = await prisma.menu.deleteMany({});
-        
+
         console.log(`   ✅ ${deletedMenus.count} menus supprimés`);
 
         // 2. Analyser les fichiers existants
         console.log('\n📁 Analyse des fichiers existants...');
         const menuDir = path.join(__dirname, 'public', 'assets', 'documents', 'menus');
         const files = fs.readdirSync(menuDir);
-        
+
         // 3. Recréer les menus à partir des fichiers les plus récents
         console.log('\n🔄 Recréation des menus...');
-        
+
         // Filtrer les fichiers récents (septembre 2025)
-        const recentFiles = files.filter(file => 
+        const recentFiles = files.filter(file =>
             file.includes('2025-09') && file.endsWith('.pdf')
         ).sort().reverse(); // Les plus récents en premier
-        
+
         console.log(`   Fichiers récents trouvés: ${recentFiles.length}`);
-        
+
         // Créer des menus pour les fichiers récents
         const menuData = [
             {
@@ -53,7 +53,7 @@ async function fixMenusData() {
         for (const menu of menuData) {
             if (menu.file) {
                 const pdfUrl = `/assets/documents/menus/${menu.file}`;
-                
+
                 const newMenu = await prisma.menu.create({
                     data: {
                         semaine: menu.semaine,
@@ -66,7 +66,7 @@ async function fixMenusData() {
                         actif: true
                     }
                 });
-                
+
                 console.log(`   ✅ Menu créé: ${menu.semaine}`);
                 console.log(`      Fichier: ${pdfUrl}`);
                 console.log(`      ID: ${newMenu.id}`);
@@ -78,13 +78,13 @@ async function fixMenusData() {
         const newMenus = await prisma.menu.findMany({
             orderBy: { dateDebut: 'desc' }
         });
-        
+
         console.log(`   Total menus en base: ${newMenus.length}`);
-        
+
         newMenus.forEach(menu => {
             console.log(`   📄 ${menu.semaine} (ID: ${menu.id})`);
             console.log(`      Fichier: ${menu.pdfUrl}`);
-            
+
             // Vérifier l'existence du fichier
             if (menu.pdfUrl) {
                 const fullPath = path.join(__dirname, 'public', menu.pdfUrl);
