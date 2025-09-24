@@ -442,15 +442,25 @@ const directeurController = {
         try {
             const { firstName, lastName, birthDate, classeId, parentId } = req.body;
 
+            // Créer l'étudiant sans parentId direct
             const student = await prisma.student.create({
                 data: {
                     firstName,
                     lastName,
                     dateNaissance: new Date(birthDate),
-                    classeId: parseInt(classeId),
-                    parentId: parseInt(parentId)
+                    classeId: parseInt(classeId)
                 }
             });
+
+            // Créer la relation parent-étudiant
+            if (parentId) {
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parseInt(parentId),
+                        studentId: student.id
+                    }
+                });
+            }
 
             res.json({
                 success: true,
@@ -471,16 +481,32 @@ const directeurController = {
             const { id } = req.params;
             const { firstName, lastName, birthDate, classeId, parentId } = req.body;
 
+            // Mettre à jour l'étudiant sans parentId direct
             const student = await prisma.student.update({
                 where: { id: parseInt(id) },
                 data: {
                     firstName,
                     lastName,
                     birthDate: new Date(birthDate),
-                    classeId: parseInt(classeId),
-                    parentId: parseInt(parentId)
+                    classeId: parseInt(classeId)
                 }
             });
+
+            // Mettre à jour la relation parent-étudiant
+            if (parentId) {
+                // Supprimer les anciennes relations
+                await prisma.parentStudent.deleteMany({
+                    where: { studentId: parseInt(id) }
+                });
+
+                // Créer la nouvelle relation
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parseInt(parentId),
+                        studentId: parseInt(id)
+                    }
+                });
+            }
 
             res.json({
                 success: true,
@@ -571,12 +597,16 @@ const directeurController = {
                 include: {
                     eleves: {
                         include: {
-                            parent: {
-                                select: {
-                                    firstName: true,
-                                    lastName: true,
-                                    email: true,
-                                    phone: true
+                            parents: {
+                                include: {
+                                    parent: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                            email: true,
+                                            phone: true
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -598,11 +628,14 @@ const directeurController = {
 
             classe.eleves.forEach(student => {
                 const dateNaissance = student.dateNaissance ? new Date(student.dateNaissance).toLocaleDateString('fr-FR') : 'Non renseignée';
-                const parentName = student.parent ? `${student.parent.firstName} ${student.parent.lastName}` : 'Non renseigné';
-                const parentEmail = student.parent ? student.parent.email : 'Non renseigné';
-                const parentPhone = student.parent ? (student.parent.phone || 'Non renseigné') : 'Non renseigné';
 
-                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${parentName};${parentEmail};${parentPhone}\n`;
+                // Récupérer tous les parents de l'étudiant
+                const parents = student.parents.map(ps => ps.parent);
+                const parentNames = parents.map(p => `${p.firstName} ${p.lastName}`).join(' & ');
+                const parentEmails = parents.map(p => p.email).join(' / ');
+                const parentPhones = parents.map(p => p.phone || 'Non renseigné').join(' / ');
+
+                csvContent += `${student.lastName};${student.firstName};${dateNaissance};${parentNames || 'Non renseigné'};${parentEmails || 'Non renseigné'};${parentPhones}\n`;
             });
 
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -624,12 +657,16 @@ const directeurController = {
                 include: {
                     eleves: {
                         include: {
-                            parent: {
-                                select: {
-                                    firstName: true,
-                                    lastName: true,
-                                    email: true,
-                                    phone: true
+                            parents: {
+                                include: {
+                                    parent: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                            email: true,
+                                            phone: true
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -666,11 +703,22 @@ const directeurController = {
                 if (classe.eleves.length > 0) {
                     classe.eleves.forEach((student, index) => {
                         const dateNaissance = new Date(student.dateNaissance).toLocaleDateString('fr-FR');
+                        const parents = student.parents.map(ps => ps.parent);
+
                         rapport += `${index + 1}. ${student.firstName} ${student.lastName}\n`;
                         rapport += `   Né(e) le: ${dateNaissance}\n`;
-                        rapport += `   Parent: ${student.parent.firstName} ${student.parent.lastName}\n`;
-                        rapport += `   Email: ${student.parent.email}\n`;
-                        rapport += `   Téléphone: ${student.parent.phone}\n\n`;
+
+                        if (parents.length > 0) {
+                            parents.forEach((parent, parentIndex) => {
+                                const parentLabel = parents.length > 1 ? `Parent ${parentIndex + 1}` : 'Parent';
+                                rapport += `   ${parentLabel}: ${parent.firstName} ${parent.lastName}\n`;
+                                rapport += `   Email: ${parent.email}\n`;
+                                rapport += `   Téléphone: ${parent.phone}\n`;
+                            });
+                        } else {
+                            rapport += `   Parent: Non renseigné\n`;
+                        }
+                        rapport += `\n`;
                     });
                 } else {
                     rapport += '   Aucun élève inscrit\n\n';
@@ -914,8 +962,10 @@ const directeurController = {
     // Afficher la liste des rendez-vous d'inscription (statut ACCEPTED)
     getRendezVousInscriptions: async (req, res) => {
         try {
-            // Récupérer toutes les demandes acceptées (en attente de rendez-vous)
-            const acceptedRequests = await prisma.preInscriptionRequest.findMany({
+            // 🔄 RÉCUPÉRATION UNIFIÉE DES DEMANDES PRÊTES POUR RENDEZ-VOUS
+
+            // 1. Pré-inscriptions acceptées
+            const acceptedPreInscriptions = await prisma.preInscriptionRequest.findMany({
                 where: {
                     status: 'ACCEPTED'
                 },
@@ -931,6 +981,59 @@ const directeurController = {
                     }
                 }
             });
+
+            // 2. Dossiers validés (prêts pour rendez-vous)
+            const validatedDossiers = await prisma.dossierInscription.findMany({
+                where: {
+                    statut: 'VALIDE'
+                },
+                orderBy: {
+                    dateDepot: 'desc'
+                },
+                include: {
+                    traitant: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            });
+
+            // 3. Normaliser les dossiers vers le format des pré-inscriptions
+            const normalizedDossiers = validatedDossiers.map(dossier => ({
+                id: dossier.id,
+                type: 'DOSSIER_INSCRIPTION',
+                parentFirstName: dossier.perePrenom || dossier.merePrenom,
+                parentLastName: dossier.pereNom || dossier.mereNom,
+                parentEmail: dossier.pereEmail || dossier.mereEmail,
+                parentPhone: dossier.pereTelephone || dossier.mereTelephone,
+                parentAddress: dossier.adresseComplete,
+                status: dossier.statut,
+                submittedAt: dossier.dateDepot,
+                children: JSON.stringify([{
+                    firstName: dossier.enfantPrenom,
+                    lastName: dossier.enfantNom,
+                    birthDate: dossier.enfantDateNaissance,
+                    requestedClass: dossier.enfantClasseDemandee
+                }]),
+                message: JSON.stringify({
+                    pere: `${dossier.perePrenom} ${dossier.pereNom} - ${dossier.pereEmail}`,
+                    mere: `${dossier.merePrenom} ${dossier.mereNom} - ${dossier.mereEmail}`,
+                    adresse: dossier.adresseComplete
+                }),
+                processor: dossier.traitant
+            }));
+
+            // 4. Ajouter le type aux pré-inscriptions
+            const normalizedPreInscriptions = acceptedPreInscriptions.map(req => ({
+                ...req,
+                type: 'PRE_INSCRIPTION'
+            }));
+
+            // 5. Combiner et trier
+            const acceptedRequests = [...normalizedPreInscriptions, ...normalizedDossiers]
+                .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
             // Parser les données enfants et parents pour l'affichage
             const requestsWithParsedChildren = acceptedRequests.map(request => {
@@ -989,17 +1092,72 @@ const directeurController = {
             // DEBUG: Message très visible pour confirmer l'exécution
             console.log('🔥🔥🔥 GÉNÉRATION PDF DÉMARRÉE - ID:', id, '🔥🔥🔥');
 
-            // Récupérer la demande d'inscription
-            const request = await prisma.preInscriptionRequest.findUnique({
-                where: { id: parseInt(id) }
-            });
+            // Essayer d'abord de récupérer depuis DossierInscription (données détaillées)
+            let dossierDetaille = null;
+            let request = null;
 
-            if (!request) {
-                console.log('❌ Demande d\'inscription non trouvée pour ID:', id);
-                return res.status(404).json({
-                    success: false,
-                    message: 'Demande d\'inscription non trouvée'
+            try {
+                dossierDetaille = await prisma.dossierInscription.findUnique({
+                    where: { id: parseInt(id) }
                 });
+            } catch (error) {
+                console.log('ℹ️ Pas de dossier détaillé trouvé, utilisation des données de pré-inscription');
+            }
+
+            if (dossierDetaille) {
+                console.log('✅ Dossier détaillé trouvé:', dossierDetaille.enfantNom);
+
+                // Convertir les données du dossier détaillé au format attendu par le PDF
+                request = {
+                    id: dossierDetaille.id,
+                    parentFirstName: dossierDetaille.perePrenom || dossierDetaille.merePrenom,
+                    parentLastName: dossierDetaille.pereNom || dossierDetaille.mereNom,
+                    parentEmail: dossierDetaille.pereEmail || dossierDetaille.mereEmail,
+                    parentPhone: dossierDetaille.pereTelephone || dossierDetaille.mereTelephone,
+                    parentAddress: dossierDetaille.adresseComplete,
+                    anneeScolaire: dossierDetaille.anneeScolaire,
+                    specialNeeds: dossierDetaille.besoinsPArticuliers,
+                    situationFamiliale: dossierDetaille.situationFamiliale,
+                    familySituation: dossierDetaille.situationFamiliale,
+                    // Convertir les données enfant au format JSON attendu
+                    children: JSON.stringify([{
+                        firstName: dossierDetaille.enfantPrenom,
+                        lastName: dossierDetaille.enfantNom,
+                        birthDate: dossierDetaille.enfantDateNaissance,
+                        currentClass: dossierDetaille.enfantClasseActuelle,
+                        requestedClass: dossierDetaille.enfantClasseDemandee,
+                        previousSchool: dossierDetaille.enfantEcoleActuelle,
+                        currentSchool: dossierDetaille.enfantEcoleActuelle,
+                        villeEtablissement: dossierDetaille.enfantVilleEtablissement,
+                        derniereScolarite: dossierDetaille.enfantDerniereScolarite,
+                        lieuNaissance: dossierDetaille.enfantLieuNaissance,
+                        departementNaissance: '',
+                        nationalite: dossierDetaille.enfantNationalite,
+                        sexe: dossierDetaille.enfantSexe
+                    }]),
+                    message: JSON.stringify({
+                        pere: dossierDetaille.perePrenom ? `${dossierDetaille.perePrenom} ${dossierDetaille.pereNom} - ${dossierDetaille.pereEmail}` : null,
+                        mere: dossierDetaille.merePrenom ? `${dossierDetaille.merePrenom} ${dossierDetaille.mereNom} - ${dossierDetaille.mereEmail}` : null,
+                        adresse: dossierDetaille.adresseComplete,
+                        tel: dossierDetaille.telephoneDomicile || dossierDetaille.pereTelephone || dossierDetaille.mereTelephone
+                    }),
+                    submittedAt: dossierDetaille.dateDepot,
+                    status: 'PENDING'
+                };
+            } else {
+                // Fallback vers PreInscriptionRequest
+                request = await prisma.preInscriptionRequest.findUnique({
+                    where: { id: parseInt(id) }
+                });
+
+                if (!request) {
+                    console.log('❌ Aucune demande d\'inscription trouvée pour ID:', id);
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Demande d\'inscription non trouvée'
+                    });
+                }
+                console.log('✅ Demande de pré-inscription trouvée:', request.parentLastName);
             }
 
             console.log('✅ Demande trouvée:', request.parentLastName);
@@ -1062,6 +1220,21 @@ const directeurController = {
                 console.log('📁 Dossier d\'archivage PDF créé:', archiveDir);
             }
 
+            // AMÉLIORATION: Créer un nom de fichier plus descriptif pour l'archivage
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+            // Fonction pour nettoyer les noms de fichiers
+            const sanitizeFilename = (str) => {
+                return str ? str.replace(/[\/\\:*?"<>|]/g, '-').replace(/\s+/g, '_') : '';
+            };
+
+            const childName = children.length > 0 ? `-${sanitizeFilename(children[0].firstName)}-${sanitizeFilename(children[0].lastName)}` : '';
+            const parentNameSafe = sanitizeFilename(request.parentLastName);
+            const anneeScolaireSafe = sanitizeFilename(request.anneeScolaire || '2025-2026');
+
+            const archiveFilename = `inscription-${id}-${parentNameSafe}${childName}-${anneeScolaireSafe}-${timestamp}.pdf`;
+            const archivePath = path.join(archiveDir, archiveFilename);
+
             console.log('📄 Création du document PDFKit...');
             const doc = new PDFDocument({
                 size: 'A4',
@@ -1075,10 +1248,14 @@ const directeurController = {
             res.setHeader('Content-Disposition', 'inline; filename="demande-inscription-' + request.parentLastName + '.pdf"');
             console.log('✅ Headers configurés');
 
-            // Pipe le PDF directement vers la réponse
+            // AMÉLIORATION: Pipe vers la réponse ET sauvegarde en archive
             console.log('📄 Configuration du pipe...');
             doc.pipe(res);
-            console.log('✅ Pipe configuré');
+
+            // Sauvegarder aussi dans les archives
+            const archiveStream = fs.createWriteStream(archivePath);
+            doc.pipe(archiveStream);
+            console.log('✅ Pipe configuré vers navigateur ET archive:', archiveFilename);
 
             let yPos = 30;
 
@@ -1145,7 +1322,13 @@ const directeurController = {
             doc.text('Prénom: ' + (pereInfo.firstName || '______________'), 350, yPos);
             yPos += 15;
 
-            doc.text('Téléphone: ' + (pereInfo.phone || '______________'), 60, yPos);
+            // AMÉLIORATION: Afficher téléphone + téléphone alternatif si disponible
+            let phoneDisplay = pereInfo.phone || '______________';
+            if (parentsInfo.tel && parentsInfo.tel !== pereInfo.phone) {
+                phoneDisplay += ` / ${parentsInfo.tel}`;
+            }
+
+            doc.text('Téléphone: ' + phoneDisplay, 60, yPos);
             doc.text('Email: ' + (pereInfo.email || '______________'), 280, yPos);
             yPos += 15;
 
@@ -1199,7 +1382,7 @@ const directeurController = {
                 };
             }
 
-            // Compléter avec parentsInfo si disponible
+            // Compléter avec parentsInfo si disponible (AMÉLIORATION: meilleure extraction)
             if (parentsInfo.mere) {
                 const mereMatch = parentsInfo.mere.match(/^(.+?)\s+(.+?)\s*-\s*(.+)$/);
                 if (mereMatch) {
@@ -1212,15 +1395,31 @@ const directeurController = {
                 }
             }
 
-            // Chercher le téléphone dans le message JSON global (parfois plus d'informations y sont stockées)
-            if (!mereInfo.phone && request.message) {
+            // AMÉLIORATION: Chercher le téléphone alternatif dans le message JSON global
+            if (request.message) {
                 try {
                     const messageData = typeof request.message === 'string' ? JSON.parse(request.message) : request.message;
+
+                    // Téléphone alternatif depuis le champ 'tel' - l'affecter à la mère si pas d'autre téléphone
+                    if (messageData.tel) {
+                        // Si la mère n'a pas de téléphone et qu'il y a un téléphone alternatif
+                        if (!mereInfo.phone) {
+                            mereInfo.phone = messageData.tel;
+                            console.log('📄 PDF - Téléphone alternatif attribué à la mère:', messageData.tel);
+                        }
+                        // Si le père n'a pas de téléphone principal
+                        if (!pereInfo.phone) {
+                            pereInfo.phone = messageData.tel;
+                            console.log('📄 PDF - Téléphone alternatif attribué au père:', messageData.tel);
+                        }
+                    }
+
+                    // Téléphone mère depuis différentes sources possibles
                     if (messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone) {
-                        mereInfo.phone = messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone || '';
+                        mereInfo.phone = mereInfo.phone || messageData.motherPhone || messageData.mere?.telephone || messageData.mere?.phone || '';
                     }
                 } catch (e) {
-                    console.error('Erreur parsing message pour téléphone mère:', e);
+                    console.error('Erreur parsing message pour téléphone:', e);
                 }
             }
 
@@ -1262,23 +1461,49 @@ const directeurController = {
             // Déterminer la situation familiale depuis les données
             let situationFamiliale = request.familySituation || request.situationFamiliale || '';
 
-            // Créer les cases avec la bonne cochée selon la situation
-            let mariés = '☐';
-            let pacsés = '☐';
-            let unionLibre = '☐';
-            let divorcés = '☐';
-            let séparés = '☐';
-            let autre = '☐';
+            // AMÉLIORATION: Si aucune situation n'est renseignée, tenter de déduire
+            if (!situationFamiliale) {
+                // Si on a des informations sur les deux parents (père et mère)
+                if (mereInfo.firstName && mereInfo.lastName && pereInfo.firstName && pereInfo.lastName) {
+                    // Vérifier si même nom de famille
+                    const memeNom = mereInfo.lastName.toLowerCase() === pereInfo.lastName.toLowerCase();
+                    if (memeNom) {
+                        situationFamiliale = 'marie'; // Par défaut si même nom
+                        console.log('📄 PDF - Situation déduite: Mariés (même nom de famille)');
+                    } else {
+                        situationFamiliale = 'concubinage'; // Union libre si noms différents
+                        console.log('📄 PDF - Situation déduite: Union libre (noms différents)');
+                    }
+                } else if (pereInfo.firstName && pereInfo.lastName && (!mereInfo.firstName || !mereInfo.lastName)) {
+                    situationFamiliale = 'autre'; // Parent seul
+                    console.log('📄 PDF - Situation déduite: Autre (parent seul - père)');
+                } else if (mereInfo.firstName && mereInfo.lastName && (!pereInfo.firstName || !pereInfo.lastName)) {
+                    situationFamiliale = 'autre'; // Parent seul
+                    console.log('📄 PDF - Situation déduite: Autre (parent seule - mère)');
+                }
+            }
 
-            const situation = situationFamiliale.toLowerCase();
-            if (situation.includes('marié')) mariés = '☑';
-            else if (situation.includes('pacs')) pacsés = '☑';
-            else if (situation.includes('union libre') || situation.includes('concubinage')) unionLibre = '☑';
-            else if (situation.includes('divorcé')) divorcés = '☑';
-            else if (situation.includes('séparé')) séparés = '☑';
-            else if (situationFamiliale && !situation.includes('marié')) autre = '☑';
+            console.log('📄 PDF - situationFamiliale finale:', situationFamiliale);
 
-            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${situationFamiliale && autre === '☑' ? situationFamiliale : '___________'}`, 60, yPos);
+            // Solution simple avec caractères compatibles
+            let mariés = 'O';
+            let pacsés = 'O';
+            let unionLibre = 'O';
+            let divorcés = 'O';
+            let séparés = 'O';
+            let autre = 'O';
+
+            if (situationFamiliale) {
+                const situation = situationFamiliale.toLowerCase();
+                if (situation.includes('marié') || situation === 'marie') mariés = 'X';
+                else if (situation.includes('pacs') || situation === 'pacse') pacsés = 'X';
+                else if (situation.includes('union libre') || situation.includes('concubinage') || situation === 'concubinage') unionLibre = 'X';
+                else if (situation.includes('divorcé') || situation === 'divorce') divorcés = 'X';
+                else if (situation.includes('séparé') || situation === 'separe') séparés = 'X';
+                else autre = 'X';
+            }
+
+            doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${autre === 'X' ? situationFamiliale : '___________'}`, 60, yPos);
 
             // DEBUG: Ajout d'une ligne pour vérifier que le code s'exécute
             console.log('📄 PDF - Section Situation de famille générée avec situation:', situationFamiliale);
@@ -1315,8 +1540,10 @@ const directeurController = {
                 yPos += 15;
 
                 // Ligne 3: Classe demandée (plus proéminente)
+                console.log('📄 PDF - Classe enfant:', child.requestedClass);
+                const classeDemandee = child.requestedClass || child.schoolLevel || 'Non spécifiée';
                 doc.fontSize(10).font('Helvetica-Bold')
-                    .text('CLASSE DEMANDÉE: ' + (child.requestedClass || child.schoolLevel || '________________'), 60, yPos);
+                    .text('CLASSE DEMANDÉE: ' + classeDemandee, 60, yPos);
                 yPos += 20;
 
                 // École actuelle sur une ligne
@@ -1341,11 +1568,31 @@ const directeurController = {
             doc.fontSize(9).font('Helvetica');
 
             if (children.length > 0 && children[0]) {
-                doc.text('École actuelle: ' + (children[0].currentSchool || children[0].previousSchool || '________________________'), 60, yPos);
+                const child = children[0];
+
+                // Utiliser les données détaillées si disponibles (depuis DossierInscription)
+                const ecoleActuelle = child.currentSchool || child.previousSchool || '________________________';
+                const villeEtablissement = child.villeEtablissement || '';
+                const derniereScolarite = child.derniereScolarite || '';
+
+                // Affichage enrichi avec les données détaillées
+                doc.text('École actuelle: ' + ecoleActuelle, 60, yPos);
                 yPos += 15;
-                doc.text('Classe actuelle: ' + (children[0].currentClass || '________'), 60, yPos);
+
+                if (villeEtablissement) {
+                    doc.text('Ville de l\'établissement: ' + villeEtablissement, 60, yPos);
+                    yPos += 15;
+                }
+
+                doc.text('Classe actuelle: ' + (child.currentClass || '________'), 60, yPos);
                 doc.text('Directeur/Directrice: ________________', 250, yPos);
                 yPos += 15;
+
+                if (derniereScolarite) {
+                    doc.text('Dernière scolarité: ' + derniereScolarite, 60, yPos);
+                    yPos += 15;
+                }
+
                 doc.text('Adresse de l\'établissement: _________________________________', 60, yPos);
             } else {
                 doc.text('École actuelle: ________________________', 60, yPos);
@@ -1359,16 +1606,48 @@ const directeurController = {
             yPos += 25;
 
             // === BESOINS PARTICULIERS ===
-            if (request.specialNeeds) {
-                doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
-                yPos += 12;
-                doc.fontSize(10).font('Helvetica-Bold')
-                    .text('BESOINS PARTICULIERS', 60, yPos, { align: 'center', width: 475 });
-                yPos += 15;
-                doc.fontSize(9).font('Helvetica')
-                    .text(request.specialNeeds, 60, yPos, { width: 475 });
-                yPos += 20;
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+            doc.fontSize(10).font('Helvetica-Bold')
+                .text('BESOINS PARTICULIERS', 60, yPos, { align: 'center', width: 475 });
+            yPos += 15;
+            doc.fontSize(9).font('Helvetica');
+
+            if (request.specialNeeds && request.specialNeeds.trim()) {
+                doc.text(request.specialNeeds, 60, yPos, { width: 475 });
+            } else {
+                doc.text('Aucun besoin particulier signalé', 60, yPos, { width: 475 });
             }
+            yPos += 20;
+
+            // === INFORMATIONS COMPLÉMENTAIRES (AMÉLIORATION) ===
+            doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
+            yPos += 12;
+            doc.fontSize(10).font('Helvetica-Bold')
+                .text('INFORMATIONS COMPLÉMENTAIRES', 60, yPos, { align: 'center', width: 475 });
+            yPos += 15;
+            doc.fontSize(9).font('Helvetica');
+
+            // Afficher les informations JSON supplémentaires si disponibles
+            if (request.message) {
+                try {
+                    const messageData = typeof request.message === 'string' ? JSON.parse(request.message) : request.message;
+
+                    if (messageData.adresse) {
+                        doc.text('Adresse complète: ' + messageData.adresse.replace(/\n/g, ', '), 60, yPos, { width: 475 });
+                        yPos += 12;
+                    }
+
+                    if (messageData.tel) {
+                        doc.text('Téléphone alternatif: ' + messageData.tel, 60, yPos);
+                        yPos += 12;
+                    }
+                } catch (e) {
+                    console.error('Erreur parsing message pour infos complémentaires:', e);
+                }
+            }
+
+            yPos += 8;
 
             // === INFORMATIONS ADMINISTRATIVES (COMPACT) ===
             doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
@@ -1469,7 +1748,9 @@ const directeurController = {
     // Traitement de l'import Excel
     processExcelImport: async (req, res) => {
         try {
-            console.log('🔥🔥🔥 DÉBUT IMPORT EXCEL 🔥🔥🔥');
+            console.log('🔥 Import Excel démarré');
+            console.log('Process:', process.pid);
+            console.log('User request file:', req.file ? req.file.originalname : 'No file');
 
             if (!req.file) {
                 return res.status(400).json({
@@ -1526,6 +1807,7 @@ const directeurController = {
                 families: 0,
                 students: 0,
                 classes: 0,
+                relations: 0,
                 details: []
             };
 
@@ -1535,50 +1817,132 @@ const directeurController = {
                 if (!row || row.length === 0) continue;
 
                 try {
-                    console.log(`📝 Traitement ligne ${i + 1}:`, row[columnMapping.responsable1]);
+                    console.log(`📝 Traitement ligne ${i + 1}: ${row[columnMapping.responsable1]}`);
 
                     // Extraire les informations du responsable 1 (père)
                     const resp1Full = row[columnMapping.responsable1] || '';
-                    const resp1Match = resp1Full.match(/^(M\.|Mme)\s*(.+?)?\s+(.+)$/);
+                    const email1 = row[columnMapping.email1] || '';
+                    const tel1 = row[columnMapping.tel1] || '';
+
+                    console.log(`� Traitement ligne ${i + 1}: ${resp1Full}`);
+
+                    const resp1Match = resp1Full.match(/^(M\.|Mme)\s+(.+)$/);
 
                     let pere = null;
                     if (resp1Match) {
                         const civilite = resp1Match[1];
-                        const nomComplet = resp1Match[3] || '';
+                        const nomComplet = resp1Match[2] || '';
                         const nomParts = nomComplet.trim().split(' ');
-                        const prenom = nomParts[0] || '';
-                        const nom = nomParts.slice(1).join(' ') || nomParts[0] || '';
+
+                        // Logique intelligente pour séparer nom et prénom (Responsable 1)
+                        let nom, prenom;
+
+                        // Fonction pour détecter si un mot est entièrement en majuscules
+                        const isAllUpperCase = (word) => word === word.toUpperCase() && word !== word.toLowerCase();
+
+                        if (nomParts.length >= 2) {
+                            // Séparer les mots en MAJUSCULES (nom) vs première lettre majuscule (prénom)
+                            const upperCaseWords = [];
+                            const normalCaseWords = [];
+
+                            nomParts.forEach(word => {
+                                if (isAllUpperCase(word)) {
+                                    upperCaseWords.push(word);
+                                } else {
+                                    normalCaseWords.push(word);
+                                }
+                            });
+
+                            if (upperCaseWords.length > 0 && normalCaseWords.length > 0) {
+                                // Cas idéal: nom en MAJUSCULES et prénom avec majuscule initiale
+                                nom = upperCaseWords.join(' ');
+                                prenom = normalCaseWords.join(' ');
+                            } else if (nomParts.length >= 2) {
+                                // Fallback: dernier mot = prénom, reste = nom
+                                prenom = nomParts[nomParts.length - 1];
+                                nom = nomParts.slice(0, -1).join(' ');
+                            } else {
+                                nom = nomParts[0];
+                                prenom = 'Non renseigné';
+                            }
+                        } else {
+                            // S'il n'y a qu'un mot, on l'utilise comme nom seulement
+                            nom = nomParts[0] || '';
+                            prenom = 'Non renseigné';
+                        }
+
+                        console.log(`👨 Père analysé: "${nomComplet}" → Nom: "${nom}", Prénom: "${prenom}"`);
 
                         if (civilite === 'M.' && nom && prenom) {
                             pere = {
                                 civilite: 'M.',
                                 firstName: prenom,
                                 lastName: nom,
-                                email: row[columnMapping.email1] || '',
-                                phone: row[columnMapping.tel1] || ''
+                                email: email1,
+                                phone: tel1
                             };
                         }
                     }
 
                     // Extraire les informations du responsable 2 (mère)
                     const resp2Full = row[columnMapping.responsable2] || '';
-                    const resp2Match = resp2Full.match(/^(M\.|Mme)\s*(.+?)?\s+(.+)$/);
+                    const email2 = row[columnMapping.email2] || '';
+                    const tel2 = row[columnMapping.tel2] || '';
+
+                    const resp2Match = resp2Full.match(/^(M\.|Mme)\s+(.+)$/);
 
                     let mere = null;
                     if (resp2Match) {
                         const civilite = resp2Match[1];
-                        const nomComplet = resp2Match[3] || '';
+                        const nomComplet = resp2Match[2] || '';
                         const nomParts = nomComplet.trim().split(' ');
-                        const prenom = nomParts[0] || '';
-                        const nom = nomParts.slice(1).join(' ') || nomParts[0] || '';
+
+                        // Logique intelligente pour séparer nom et prénom (Responsable 2)
+                        let nom, prenom;
+
+                        // Fonction pour détecter si un mot est entièrement en majuscules  
+                        const isAllUpperCase = (word) => word === word.toUpperCase() && word !== word.toLowerCase();
+
+                        if (nomParts.length >= 2) {
+                            // Séparer les mots en MAJUSCULES (nom) vs première lettre majuscule (prénom)
+                            const upperCaseWords = [];
+                            const normalCaseWords = [];
+
+                            nomParts.forEach(word => {
+                                if (isAllUpperCase(word)) {
+                                    upperCaseWords.push(word);
+                                } else {
+                                    normalCaseWords.push(word);
+                                }
+                            });
+
+                            if (upperCaseWords.length > 0 && normalCaseWords.length > 0) {
+                                // Cas idéal: nom en MAJUSCULES et prénom avec majuscule initiale
+                                nom = upperCaseWords.join(' ');
+                                prenom = normalCaseWords.join(' ');
+                            } else if (nomParts.length >= 2) {
+                                // Fallback: dernier mot = prénom, reste = nom
+                                prenom = nomParts[nomParts.length - 1];
+                                nom = nomParts.slice(0, -1).join(' ');
+                            } else {
+                                nom = nomParts[0];
+                                prenom = 'Non renseigné';
+                            }
+                        } else {
+                            // S'il n'y a qu'un mot, on l'utilise comme nom seulement
+                            nom = nomParts[0] || '';
+                            prenom = 'Non renseigné';
+                        }
+
+                        console.log(`👩 Mère analysée: "${nomComplet}" → Nom: "${nom}", Prénom: "${prenom}"`);
 
                         if (civilite === 'Mme' && nom && prenom) {
                             mere = {
                                 civilite: 'Mme',
                                 firstName: prenom,
                                 lastName: nom,
-                                email: row[columnMapping.email2] || '',
-                                phone: row[columnMapping.tel2] || ''
+                                email: email2,
+                                phone: tel2
                             };
                         }
                     }
@@ -1597,19 +1961,105 @@ const directeurController = {
                     // Enfant
                     const enfantNomComplet = row[columnMapping.enfantNom] || '';
                     const enfantParts = enfantNomComplet.trim().split(' ');
-                    const enfantPrenom = enfantParts[enfantParts.length - 1] || '';
-                    const enfantNom = enfantParts.slice(0, -1).join(' ') || enfantParts[0] || '';
+
+                    // Logique intelligente pour séparer nom et prénom de l'enfant
+                    let enfantNom, enfantPrenom;
+
+                    // Fonction pour détecter si un mot est entièrement en majuscules
+                    const isAllUpperCase = (word) => word === word.toUpperCase() && word !== word.toLowerCase();
+
+                    if (enfantParts.length >= 2) {
+                        // Séparer les mots en MAJUSCULES (nom) vs première lettre majuscule (prénom)
+                        const upperCaseWords = [];
+                        const normalCaseWords = [];
+
+                        enfantParts.forEach(word => {
+                            if (isAllUpperCase(word)) {
+                                upperCaseWords.push(word);
+                            } else {
+                                normalCaseWords.push(word);
+                            }
+                        });
+
+                        if (upperCaseWords.length > 0 && normalCaseWords.length > 0) {
+                            // Cas idéal: nom en MAJUSCULES et prénom avec majuscule initiale
+                            enfantNom = upperCaseWords.join(' ');
+                            enfantPrenom = normalCaseWords.join(' ');
+                        } else if (enfantParts.length >= 2) {
+                            // Fallback: dernier mot = prénom, reste = nom
+                            enfantPrenom = enfantParts[enfantParts.length - 1] || '';
+                            enfantNom = enfantParts.slice(0, -1).join(' ') || enfantParts[0] || '';
+                        } else {
+                            enfantNom = enfantParts[0] || '';
+                            enfantPrenom = 'Non renseigné';
+                        }
+                    } else {
+                        enfantNom = enfantParts[0] || '';
+                        enfantPrenom = 'Non renseigné';
+                    }
+
+                    console.log(`👶 Enfant analysé: "${enfantNomComplet}" → Nom: "${enfantNom}", Prénom: "${enfantPrenom}"`);
 
                     const dateNaissanceRaw = row[columnMapping.dateNaissance] || '';
                     const codeClasse = row[columnMapping.codeClasse] || '';
 
-                    // Convertir la date (format DD/MM/YYYY vers YYYY-MM-DD)
+                    // Convertir la date (format DD/MM/YYYY vers YYYY-MM-DD ou objet Date Excel)
                     let dateNaissance = null;
                     if (dateNaissanceRaw) {
-                        const dateMatch = dateNaissanceRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-                        if (dateMatch) {
-                            dateNaissance = new Date(`${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`);
+                        console.log('Date brute Excel:', dateNaissanceRaw, 'Type:', typeof dateNaissanceRaw);
+
+                        try {
+                            if (dateNaissanceRaw instanceof Date) {
+                                // Si c'est déjà un objet Date d'Excel
+                                dateNaissance = dateNaissanceRaw;
+                                console.log('→ Objet Date Excel détecté');
+                            } else if (typeof dateNaissanceRaw === 'string') {
+                                // Si c'est une chaîne au format DD/MM/YYYY
+                                const dateMatch = dateNaissanceRaw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                                if (dateMatch) {
+                                    const day = dateMatch[1];
+                                    const month = dateMatch[2];
+                                    const year = dateMatch[3];
+
+                                    // Créer la date en utilisant le constructeur Date(year, month-1, day)
+                                    dateNaissance = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    console.log(`→ Format DD/MM/YYYY détecté: ${day}/${month}/${year}`);
+                                } else {
+                                    // Essayer d'autres formats
+                                    const testDate = new Date(dateNaissanceRaw);
+                                    if (!isNaN(testDate.getTime())) {
+                                        dateNaissance = testDate;
+                                        console.log('→ Format ISO ou autre accepté');
+                                    } else {
+                                        console.log('→ Format de string non reconnu');
+                                    }
+                                }
+                            } else if (typeof dateNaissanceRaw === 'number') {
+                                // Si c'est un nombre de série Excel (jours depuis 1900)
+                                const excelEpoch = new Date(1900, 0, 1);
+                                dateNaissance = new Date(excelEpoch.getTime() + (dateNaissanceRaw - 2) * 24 * 60 * 60 * 1000);
+                                console.log('→ Nombre série Excel détecté');
+                            }
+
+                            // Vérifier que la date est valide
+                            if (dateNaissance && !isNaN(dateNaissance.getTime())) {
+                                console.log('Date convertie:', dateNaissance.toISOString());
+                            } else {
+                                console.log('❌ Date invalide après conversion');
+                                dateNaissance = null;
+                            }
+                        } catch (dateError) {
+                            console.log('❌ Erreur conversion date:', dateError.message);
+                            dateNaissance = null;
                         }
+                    } else {
+                        console.log('⚠️ Date de naissance vide');
+                    }
+
+                    // Si pas de date de naissance, utiliser une date par défaut
+                    if (!dateNaissance) {
+                        console.log('⚠️ Date de naissance manquante, utilisation d\'une date par défaut');
+                        dateNaissance = new Date('2018-01-01'); // Date par défaut pour éviter les erreurs
                     }
 
                     const enfant = {
@@ -1619,8 +2069,15 @@ const directeurController = {
                         codeClasse: codeClasse
                     };
 
+                    console.log(`📋 Données enfant: FirstName="${enfant.firstName}", LastName="${enfant.lastName}", DateNaissance=${enfant.dateNaissance}, CodeClasse="${enfant.codeClasse}"`);
+
                     // Validation basique
                     if (!enfant.firstName || !enfant.lastName || !enfant.codeClasse) {
+                        console.log(`❌ Validation échouée pour enfant ligne ${i + 1}:`);
+                        console.log(`   - firstName: "${enfant.firstName}" ${enfant.firstName ? '✅' : '❌'}`);
+                        console.log(`   - lastName: "${enfant.lastName}" ${enfant.lastName ? '✅' : '❌'}`);
+                        console.log(`   - codeClasse: "${enfant.codeClasse}" ${enfant.codeClasse ? '✅' : '❌'}`);
+
                         results.errors++;
                         results.details.push({
                             ligne: i + 1,
@@ -1630,7 +2087,9 @@ const directeurController = {
                         continue;
                     }
 
+                    // Vérification avant création  
                     if (!pere && !mere) {
+                        console.log(`❌ Aucun parent identifié pour enfant ${enfant.firstName}`);
                         results.errors++;
                         results.details.push({
                             ligne: i + 1,
@@ -1640,16 +2099,286 @@ const directeurController = {
                         continue;
                     }
 
-                    // Ici nous aurons la logique de création en base de données
-                    // Pour l'instant, on simule le succès
-                    results.success++;
-                    results.details.push({
-                        ligne: i + 1,
-                        status: 'success',
-                        famille: `${pere ? pere.firstName + ' ' + pere.lastName : ''} / ${mere ? mere.firstName + ' ' + mere.lastName : ''}`,
-                        enfant: `${enfant.firstName} ${enfant.lastName}`,
-                        classe: enfant.codeClasse
-                    });
+                    // TEMPORAIRE: Continuer même sans email pour voir où ça bloque
+                    const hasValidEmail = (pere && pere.email) || (mere && mere.email);
+
+                    if (!hasValidEmail) {
+                        console.log(`⚠️ ATTENTION: Aucun parent avec email pour enfant ${enfant.firstName} - création avec email temporaire`);
+                    }
+
+                    // === CRÉATION EN BASE DE DONNÉES ===
+
+                    let createdParents = [];
+                    let createdStudent = null;
+
+                    try {
+                        // 👨 CRÉER LE PÈRE s'il existe
+                        if (pere) {
+                            // Vérifier si le parent existe déjà (par email d'abord, puis par nom/prénom)
+                            let existingPere = null;
+                            if (pere.email) {
+                                existingPere = await prisma.user.findUnique({
+                                    where: { email: pere.email }
+                                });
+                            }
+
+                            // Si pas trouvé par email, chercher par nom/prénom
+                            if (!existingPere) {
+                                existingPere = await prisma.user.findFirst({
+                                    where: {
+                                        firstName: pere.firstName,
+                                        lastName: pere.lastName,
+                                        role: 'PARENT'
+                                    }
+                                });
+                            }
+
+                            if (!existingPere) {
+                                const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+                                const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+                                existingPere = await prisma.user.create({
+                                    data: {
+                                        firstName: pere.firstName,
+                                        lastName: pere.lastName,
+                                        email: pere.email || `temp_${Date.now()}_${Math.random().toString(36).slice(-8)}@temporary.local`,
+                                        phone: pere.phone,
+                                        adress: `${adresse.rue}\n${adresse.codePostal} ${adresse.ville}`,
+                                        password: hashedPassword,
+                                        role: 'PARENT'
+                                    }
+                                });
+                                console.log(`✅ Père créé: ${pere.firstName} ${pere.lastName}`);
+                            } else {
+                                console.log(`♻️ Père existant trouvé: ${pere.firstName} ${pere.lastName}`);
+                            }
+
+                            if (existingPere) {
+                                createdParents.push(existingPere);
+                            }
+                        }
+
+                        // 👩 CRÉER LA MÈRE si elle existe
+                        if (mere) {
+                            // Vérifier si le parent existe déjà (par email d'abord, puis par nom/prénom)
+                            let existingMere = null;
+                            if (mere.email) {
+                                existingMere = await prisma.user.findUnique({
+                                    where: { email: mere.email }
+                                });
+                            }
+
+                            // Si pas trouvé par email, chercher par nom/prénom
+                            if (!existingMere) {
+                                existingMere = await prisma.user.findFirst({
+                                    where: {
+                                        firstName: mere.firstName,
+                                        lastName: mere.lastName,
+                                        role: 'PARENT'
+                                    }
+                                });
+                            }
+
+                            if (!existingMere) {
+                                const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+                                const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+                                existingMere = await prisma.user.create({
+                                    data: {
+                                        firstName: mere.firstName,
+                                        lastName: mere.lastName,
+                                        email: mere.email || `temp_${Date.now()}_${Math.random().toString(36).slice(-8)}@temporary.local`,
+                                        phone: mere.phone,
+                                        adress: `${adresse.rue}\n${adresse.codePostal} ${adresse.ville}`,
+                                        password: hashedPassword,
+                                        role: 'PARENT'
+                                    }
+                                });
+                                console.log(`✅ Mère créée: ${mere.firstName} ${mere.lastName}`);
+                            } else {
+                                console.log(`♻️ Mère existante trouvée: ${mere.firstName} ${mere.lastName}`);
+                            }
+
+                            if (existingMere) {
+                                createdParents.push(existingMere);
+                            }
+                        }
+
+                        // 👶 CRÉER L'ENFANT
+                        console.log(`🔍 Vérification conditions pour création enfant ${enfant.firstName} ${enfant.lastName}:`);
+                        console.log(`   - Parents créés: ${createdParents.length} (père: ${pere ? '✅' : '❌'}, mère: ${mere ? '✅' : '❌'})`);
+                        console.log(`   - firstName: "${enfant.firstName}" ${enfant.firstName ? '✅' : '❌'}`);
+                        console.log(`   - lastName: "${enfant.lastName}" ${enfant.lastName ? '✅' : '❌'}`);
+                        console.log(`   - dateNaissance: ${enfant.dateNaissance} ${enfant.dateNaissance ? '✅' : '❌'}`);
+
+                        if ((pere || mere) && enfant.firstName && enfant.lastName && enfant.dateNaissance) {
+                            console.log(`✅ Conditions validées, création de l'enfant ${enfant.firstName} ${enfant.lastName}`);
+                            // Vérifier si l'étudiant existe déjà
+                            const existingStudent = await prisma.student.findFirst({
+                                where: {
+                                    firstName: enfant.firstName,
+                                    lastName: enfant.lastName,
+                                    dateNaissance: enfant.dateNaissance
+                                }
+                            });
+
+                            if (existingStudent) {
+                                console.log(`♻️ Étudiant ${enfant.firstName} ${enfant.lastName} existe déjà - vérification des relations`);
+
+                                // Créer les relations manquantes avec les parents
+                                for (const parent of createdParents) {
+                                    const existingRelation = await prisma.parentStudent.findFirst({
+                                        where: {
+                                            parentId: parent.id,
+                                            studentId: existingStudent.id
+                                        }
+                                    });
+
+                                    if (!existingRelation) {
+                                        await prisma.parentStudent.create({
+                                            data: {
+                                                parentId: parent.id,
+                                                studentId: existingStudent.id
+                                            }
+                                        });
+                                        console.log(`🔗 Relation créée: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
+                                        results.relations++;
+                                    } else {
+                                        console.log(`♻️ Relation déjà existante: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
+                                    }
+                                }
+
+                                results.details.push({
+                                    ligne: i + 1,
+                                    status: 'relations_updated',
+                                    raison: 'Relations parent-enfant vérifiées/créées',
+                                    enfant: `${enfant.firstName} ${enfant.lastName}`
+                                });
+                                continue;
+                            }
+
+                            // Trouver ou créer la classe
+                            console.log(`🏫 Recherche classe: "${enfant.codeClasse}"`);
+                            let classe = await prisma.classe.findFirst({
+                                where: { nom: enfant.codeClasse }
+                            });
+
+                            if (!classe) {
+                                console.log(`🏗️ Classe "${enfant.codeClasse}" non trouvée, création...`);
+                                classe = await prisma.classe.create({
+                                    data: {
+                                        nom: enfant.codeClasse,
+                                        niveau: enfant.codeClasse,
+                                        anneeScolaire: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
+                                    }
+                                });
+                                console.log(`✅ Classe créée: ${enfant.codeClasse} (ID: ${classe.id})`);
+                                results.classes++;
+                            } else {
+                                console.log(`✅ Classe "${enfant.codeClasse}" trouvée (ID: ${classe.id})`);
+                            }
+
+
+
+                            // Créer l'étudiant (sans parentId direct maintenant)
+                            if (createdParents.length > 0) {
+                                console.log(`👶 Tentative de création étudiant avec les données:`);
+                                console.log(`   - firstName: "${enfant.firstName}"`);
+                                console.log(`   - lastName: "${enfant.lastName}"`);
+                                console.log(`   - dateNaissance: ${enfant.dateNaissance}`);
+                                console.log(`   - classeId: ${classe.id}`);
+
+                                try {
+                                    // Utiliser le premier parent créé comme parent principal
+                                    const parentPrincipal = createdParents[0];
+
+                                    createdStudent = await prisma.student.create({
+                                        data: {
+                                            firstName: enfant.firstName,
+                                            lastName: enfant.lastName,
+                                            dateNaissance: enfant.dateNaissance,
+                                            parentId: parentPrincipal.id,  // Utilisation du parentId temporaire
+                                            classeId: classe.id            // Utilisation du classeId
+                                        }
+                                    });
+                                    console.log(`✅ Étudiant créé avec succès (ID: ${createdStudent.id})`);
+                                } catch (studentError) {
+                                    console.log(`❌ ERREUR création étudiant:`, studentError.message);
+                                    console.log(`   Code erreur: ${studentError.code}`);
+                                    console.log(`   Détails:`, studentError);
+                                    throw studentError; // Relancer l'erreur pour le catch externe
+                                }
+
+                                // Créer les relations avec tous les parents créés
+                                for (const parent of createdParents) {
+                                    // Vérifier si la relation existe déjà
+                                    const existingRelation = await prisma.parentStudent.findFirst({
+                                        where: {
+                                            parentId: parent.id,
+                                            studentId: createdStudent.id
+                                        }
+                                    });
+
+                                    if (!existingRelation) {
+                                        await prisma.parentStudent.create({
+                                            data: {
+                                                parentId: parent.id,
+                                                studentId: createdStudent.id
+                                            }
+                                        });
+                                        console.log(`🔗 Relation créée: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
+                                    } else {
+                                        console.log(`♻️ Relation déjà existante: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
+                                    }
+                                }
+
+                                console.log(`✅ Enfant créé: ${enfant.firstName} ${enfant.lastName} - Classe: ${enfant.codeClasse} - Parents: ${createdParents.length}`);
+                                results.students++;
+                            } else {
+                                console.log(`❌ ÉCHEC création enfant: Aucun parent créé (createdParents.length = ${createdParents.length})`);
+                                results.errors++;
+                                results.details.push({
+                                    ligne: i + 1,
+                                    erreur: 'Aucun parent créé pour cet enfant',
+                                    enfant: `${enfant.firstName} ${enfant.lastName}`,
+                                    donnees: row
+                                });
+                            }
+                        } else {
+                            console.log(`❌ Conditions non remplies pour création enfant:`);
+                            console.log(`   - (pere || mere): ${(pere || mere) ? '✅' : '❌'}`);
+                            console.log(`   - enfant.firstName: ${enfant.firstName ? '✅' : '❌'}`);
+                            console.log(`   - enfant.lastName: ${enfant.lastName ? '✅' : '❌'}`);
+                            console.log(`   - enfant.dateNaissance: ${enfant.dateNaissance ? '✅' : '❌'}`);
+
+                            results.errors++;
+                            results.details.push({
+                                ligne: i + 1,
+                                erreur: 'Conditions de création non remplies',
+                                enfant: `${enfant.firstName || 'N/A'} ${enfant.lastName || 'N/A'}`,
+                                donnees: row
+                            });
+                        }
+
+                        results.families++;
+                        results.success++;
+                        results.details.push({
+                            ligne: i + 1,
+                            status: 'success',
+                            famille: `${pere ? pere.firstName + ' ' + pere.lastName : ''} / ${mere ? mere.firstName + ' ' + mere.lastName : ''}`,
+                            enfant: `${enfant.firstName} ${enfant.lastName}`,
+                            classe: enfant.codeClasse
+                        });
+
+                    } catch (createError) {
+                        console.error(`❌ Erreur création ligne ${i + 1}:`, createError);
+                        results.errors++;
+                        results.details.push({
+                            ligne: i + 1,
+                            erreur: `Erreur création: ${createError.message}`,
+                            donnees: row
+                        });
+                    }
 
                 } catch (rowError) {
                     console.error(`❌ Erreur ligne ${i + 1}:`, rowError);
@@ -1688,6 +2417,73 @@ const directeurController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de l\'import: ' + error.message
+            });
+        }
+    },
+
+    // === ARCHIVE PDF ===
+    getPDFArchive: async (req, res) => {
+        try {
+            console.log('📁 Accès à l\'archive PDF');
+
+            // Vérifier les autorisations
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+                return res.status(403).render('pages/error', {
+                    message: 'Accès refusé',
+                    user: req.session.user
+                });
+            }
+
+            const path = require('path');
+            const fs = require('fs');
+
+            // Dossier d'archivage
+            const archiveDir = path.join(__dirname, '../../public/pdf_archive');
+
+            let pdfFiles = [];
+
+            // Vérifier si le dossier existe
+            if (fs.existsSync(archiveDir)) {
+                const files = fs.readdirSync(archiveDir);
+
+                pdfFiles = files
+                    .filter(file => file.endsWith('.pdf'))
+                    .map(file => {
+                        const fullPath = path.join(archiveDir, file);
+                        const stats = fs.statSync(fullPath);
+
+                        // Extraire les informations du nom du fichier
+                        // Format: inscription-{id}-{parentLastName}-{childFirstName}-{childLastName}-{anneeScolaire}-{timestamp}.pdf
+                        const match = file.match(/inscription-(\d+)-([^-]+)-?([^-]*)-?([^-]*)-([^-]+)-(.+)\.pdf/);
+
+                        return {
+                            filename: file,
+                            fullPath: `/pdf_archive/${file}`,
+                            size: Math.round(stats.size / 1024), // en KB
+                            created: stats.birthtime,
+                            modified: stats.mtime,
+                            inscriptionId: match ? match[1] : 'N/A',
+                            parentName: match ? match[2] : 'N/A',
+                            childName: match && match[3] && match[4] ? `${match[3]} ${match[4]}` : (match ? match[3] : 'N/A'),
+                            anneeScolaire: match ? match[5] : 'N/A'
+                        };
+                    })
+                    .sort((a, b) => new Date(b.modified) - new Date(a.modified));
+            }
+
+            console.log(`📋 ${pdfFiles.length} fichiers PDF trouvés dans l'archive`);
+
+            res.render('pages/admin/pdf-archive', {
+                title: 'Archive PDF des Inscriptions',
+                pdfFiles,
+                user: req.session.user
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur accès archive PDF:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors de l\'accès à l\'archive PDF',
+                user: req.session.user
             });
         }
     },

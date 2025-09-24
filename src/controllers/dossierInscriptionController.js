@@ -118,25 +118,101 @@ const dossierInscriptionController = {
                 tel: telephoneDomicile
             };
 
-            // Créer la demande d'inscription
-            const inscription = await prisma.preInscriptionRequest.create({
+            // Créer le dossier d'inscription détaillé
+            const dossier = await prisma.dossierInscription.create({
                 data: {
-                    parentFirstName,
-                    parentLastName,
-                    parentEmail,
-                    parentPhone,
-                    parentAddress: adresseComplete,
-                    parentPassword: 'temp123',
                     anneeScolaire: anneeScolaire || '2026/2027',
-                    children: JSON.stringify(childrenData),
-                    specialNeeds: besoinsPArticuliers || null,
-                    message: JSON.stringify(parentsInfo),
-                    emailValidated: true,
-                    status: 'PENDING'
+
+                    // Informations parents
+                    pereNom: pereNom || '',
+                    perePrenom: perePrenom || '',
+                    pereProfession: pereProfession || null,
+                    pereTelephone: pereTelephone || '',
+                    pereEmail: pereEmail || '',
+                    mereNom: mereNomJeuneFille || mereNomMarital || '',
+                    merePrenom: merePrenom || '',
+                    mereProfession: mereProfession || null,
+                    mereTelephone: mereTelephone || '',
+                    mereEmail: mereEmail || '',
+                    adresseComplete,
+                    telephoneDomicile: telephoneDomicile || null,
+
+                    // Situation de famille
+                    situationFamiliale: situationFamiliale || null,
+                    nombreEnfantsFoyer: nombreEnfantsFoyer ? parseInt(nombreEnfantsFoyer) : null,
+                    informationsFamille: informationsFamille || null,
+
+                    // Informations enfant
+                    enfantNom,
+                    enfantPrenom,
+                    enfantDateNaissance: new Date(enfantDateNaissance),
+                    enfantLieuNaissance: enfantLieuNaissance || null,
+                    enfantNationalite: enfantNationalite || null,
+                    enfantSexe,
+                    enfantClasseDemandee,
+                    enfantClasseActuelle: enfantClasseActuelle || null,
+                    enfantEcoleActuelle: enfantEcoleActuelle || null,
+                    enfantVilleEtablissement: enfantVilleEtablissement || null,
+                    enfantDerniereScolarite: enfantDerniereScolarite || null,
+
+                    // Informations médicales
+                    medecinTraitantNom: medecinTraitantNom || null,
+                    medecinTraitantTelephone: medecinTraitantTelephone || null,
+                    allergies: allergies || null,
+                    traitementsMedicaux: traitementsMedicaux || null,
+                    regimeAlimentaire: regimeAlimentaire || null,
+                    paiNecessaire: paiNecessaire === 'on',
+                    besoinsPArticuliers: besoinsPArticuliers || null,
+
+                    // Personnes d'urgence
+                    urgence1Nom: urgence1Nom || null,
+                    urgence1Prenom: urgence1Prenom || null,
+                    urgence1Lien: urgence1Lien || null,
+                    urgence1Telephone: urgence1Telephone || null,
+                    urgence2Nom: urgence2Nom || null,
+                    urgence2Prenom: urgence2Prenom || null,
+                    urgence2Lien: urgence2Lien || null,
+                    urgence2Telephone: urgence2Telephone || null,
+
+                    // Autorisations
+                    autorisationPhoto: autorisationPhoto === 'on',
+                    autorisationVideo: autorisationVideo === 'on',
+                    autorisationSortie: autorisationSortie === 'on',
+                    autorisationInternet: autorisationInternet === 'on',
+
+                    // Services
+                    transportSouhaite: transportSouhaite === 'on',
+                    restaurationSouhaitee: restaurationSouhaitee === 'on',
+                    joursRestauration: joursRestauration || null,
+
+                    // Personnes autorisées à récupérer
+                    recuperation1Nom: recuperation1Nom || null,
+                    recuperation1Prenom: recuperation1Prenom || null,
+                    recuperation1Telephone: recuperation1Telephone || null,
+                    recuperation1Lien: recuperation1Lien || null,
+                    recuperation2Nom: recuperation2Nom || null,
+                    recuperation2Prenom: recuperation2Prenom || null,
+                    recuperation2Telephone: recuperation2Telephone || null,
+                    recuperation2Lien: recuperation2Lien || null,
+
+                    // Documents
+                    docCertificatRadiation: docCertificatRadiation === 'on',
+                    docLivretFamille: docLivretFamille === 'on',
+                    docJustificatifDomicile: docJustificatifDomicile === 'on',
+                    docAssuranceScolaire: docAssuranceScolaire === 'on',
+                    docCarnetSante: docCarnetSante === 'on',
+                    docCertificatMedical: docCertificatMedical === 'on',
+
+                    // Engagements
+                    engagementReglement: engagementReglement === 'on',
+                    engagementFinancier: engagementFinancier === 'on',
+                    dateSignature: new Date(),
+
+                    statut: 'EN_ATTENTE'
                 }
             });
 
-            console.log('✅ Inscription créée avec ID:', inscription.id);
+            console.log('✅ Dossier d\'inscription créé avec ID:', dossier.id);
 
             // Envoyer les emails de confirmation
             try {
@@ -153,14 +229,14 @@ const dossierInscriptionController = {
             // Notification au directeur
             try {
                 await emailService.sendNewInscriptionNotification('l.camboulives@stmathieu.org', {
-                    requestId: inscription.id,
+                    requestId: dossier.id,
                     parent: `${parentFirstName} ${parentLastName}`,
                     email: parentEmail
                 });
                 console.log('✅ Notification directeur envoyée');
             } catch (emailError) {
                 console.log('✅ Notification directeur simulée pour:', {
-                    requestId: inscription.id,
+                    requestId: dossier.id,
                     parent: `${parentFirstName} ${parentLastName}`,
                     email: parentEmail
                 });

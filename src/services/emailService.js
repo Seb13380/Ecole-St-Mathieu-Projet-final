@@ -669,7 +669,7 @@ class EmailService {
     }
 
     /**
-     * Envoyer un email d'approbation avec identifiants de connexion
+     * Envoyer un email d'approbation avec demande de rendez-vous
      * @param {Object} inscriptionData - Données de la demande d'inscription
      * @param {String} comment - Commentaire du directeur
      */
@@ -683,7 +683,7 @@ class EmailService {
         const mailOptions = {
             from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
-            subject: '🎉 Inscription de votre enfant approuvée - École Saint-Mathieu',
+            subject: '🎉 Demande d\'inscription approuvée - Prise de rendez-vous - École Saint-Mathieu',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f9ff;">
                     <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -693,7 +693,7 @@ class EmailService {
                         
                         <div style="background-color: #dcfce7; padding: 20px; border-radius: 8px; border-left: 4px solid #16a34a; margin-bottom: 30px;">
                             <h2 style="color: #16a34a; margin: 0; font-size: 24px;">
-                                📞 Demande d'inscription - Prise de rendez-vous
+                                ✅ Demande d'inscription approuvée
                             </h2>
                         </div>
                         
@@ -702,7 +702,7 @@ class EmailService {
                         </p>
                         
                         <p style="color: #333; line-height: 1.6;">
-                            Nous sommes ravis de votre démarche de demande d'inscription. Nous revenons vers vous pour convenir d'un rendez-vous selon les places disponibles.
+                            Nous sommes ravis de vous informer que votre demande d'inscription a été approuvée ! Nous allons prendre contact avec vous pour convenir d'un rendez-vous selon les places disponibles.
                         </p>
 
                         ${comment ? `
@@ -713,25 +713,34 @@ class EmailService {
                         ` : ''}
                         
                         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="color: #92400e; margin-top: 0;">👶 Enfant(s) inscrit(s) :</h3>
+                            <h3 style="color: #92400e; margin-top: 0;">👶 Enfant(s) concerné(s) :</h3>
                             <pre style="color: #333; font-family: Arial; white-space: pre-wrap; margin: 0;">${childrenList}</pre>
                         </div>
                         
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="http://localhost:3007/auth/login" 
-                               style="background-color: #16a34a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                                🚀 Se connecter à l'espace parent
-                            </a>
+                        <div style="background-color: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #1e40af; margin-top: 0;">📞 Prochaines étapes :</h3>
+                            <ul style="color: #333; line-height: 1.6; margin: 10px 0; padding-left: 20px;">
+                                <li><strong>Nous vous contacterons</strong> dans les prochains jours pour fixer un rendez-vous</li>
+                                <li><strong>Lors du rendez-vous</strong>, nous finaliserons l'inscription et vous fournirons toutes les informations nécessaires</li>
+                                <li><strong>Vous pourrez à ce moment-là</strong> demander vos identifiants d'accès à l'espace parent</li>
+                                <li><strong>Préparez</strong> les documents requis (nous vous préciserons la liste lors de notre appel)</li>
+                            </ul>
                         </div>
                         
-                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="color: #495057; margin-top: 0;">📋 Prochaines étapes :</h3>
-                            <ul style="color: #333; line-height: 1.6;">
-                                <li>Connectez-vous à votre espace parent avec votre email et le mot de passe que vous avez choisi</li>
-                                <li>Consultez les informations de votre/vos enfant(s)</li>
-                                <li>Vérifiez les coordonnées et mettez-les à jour si nécessaire</li>
-                                <li>Prenez connaissance du calendrier scolaire et des actualités</li>
-                            </ul>
+                        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #856404; margin-top: 0;">� Information importante :</h3>
+                            <p style="color: #856404; margin: 0;">
+                                L'accès à l'espace parent numérique sera configuré lors de votre rendez-vous avec la secrétaire ou la direction de l'école.
+                            </p>
+                        </div>
+                        
+                        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #0c5460; margin-top: 0;">📞 Contact :</h3>
+                            <p style="color: #0c5460; margin: 0;">
+                                Si vous avez des questions en attendant notre appel :<br>
+                                📧 Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                📞 Téléphone : 04 91 07 07 18
+                            </p>
                         </div>
                         
                         <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 30px; text-align: center;">
@@ -739,7 +748,7 @@ class EmailService {
                                 📧 École Saint-Mathieu - ${process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr'}
                             </p>
                             <p style="color: #666; font-size: 14px; margin: 5px 0;">
-                                📍 Adresse de l'école - 📞 Téléphone de l'école
+                                📍 22 Place des Héros, 13013 Marseille - 📞 04 91 07 07 18
                             </p>
                             <p style="color: #16a34a; font-weight: bold; margin-top: 15px;">
                                 Bienvenue dans la famille Saint-Mathieu ! 🎓

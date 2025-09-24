@@ -7,14 +7,21 @@ const parentController = {
     try {
       const parentId = req.session.user.id;
 
-      const enfants = await prisma.student.findMany({
+      // Récupérer les enfants via la table ParentStudent
+      const parentStudentRelations = await prisma.parentStudent.findMany({
         where: { parentId },
         include: {
-          classe: {
-            select: { nom: true, niveau: true }
+          student: {
+            include: {
+              classe: {
+                select: { nom: true, niveau: true }
+              }
+            }
           }
         }
       });
+
+      const enfants = parentStudentRelations.map(relation => relation.student);
 
       const actualites = await prisma.actualite.findMany({
         where: { visible: true },
@@ -53,19 +60,41 @@ const parentController = {
       const parentId = req.session.user.id;
       const { eleveId } = req.params;
 
-      let whereClause = { parentId };
+      let parentStudentRelations;
       if (eleveId) {
-        whereClause.id = parseInt(eleveId);
+        // Si un élève spécifique est demandé, vérifier qu'il appartient au parent
+        parentStudentRelations = await prisma.parentStudent.findMany({
+          where: {
+            parentId,
+            studentId: parseInt(eleveId)
+          },
+          include: {
+            student: {
+              include: {
+                classe: {
+                  select: { nom: true, niveau: true }
+                }
+              }
+            }
+          }
+        });
+      } else {
+        // Récupérer tous les enfants du parent
+        parentStudentRelations = await prisma.parentStudent.findMany({
+          where: { parentId },
+          include: {
+            student: {
+              include: {
+                classe: {
+                  select: { nom: true, niveau: true }
+                }
+              }
+            }
+          }
+        });
       }
 
-      const enfants = await prisma.student.findMany({
-        where: whereClause,
-        include: {
-          classe: {
-            select: { nom: true, niveau: true }
-          }
-        }
-      });
+      const enfants = parentStudentRelations.map(relation => relation.student);
 
       // Pour l'instant, on affiche juste les infos de base des enfants
       // Les notes et absences peuvent être ajoutées plus tard quand les modèles existeront
@@ -92,14 +121,21 @@ const parentController = {
     try {
       const parentId = req.session.user.id;
 
-      const enfants = await prisma.student.findMany({
+      // Récupérer les enfants via la table ParentStudent
+      const parentStudentRelations = await prisma.parentStudent.findMany({
         where: { parentId },
         include: {
-          classe: {
-            select: { nom: true, niveau: true }
+          student: {
+            include: {
+              classe: {
+                select: { nom: true, niveau: true }
+              }
+            }
           }
         }
       });
+
+      const enfants = parentStudentRelations.map(relation => relation.student);
 
       // Pour l'instant, on affiche juste les infos de classe
       // Les horaires peuvent être ajoutés plus tard quand le modèle existera

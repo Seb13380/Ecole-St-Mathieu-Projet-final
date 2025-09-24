@@ -370,11 +370,13 @@ const inscriptionEleveController = {
                 parentAddress
             } = inscriptionRequest;
 
+            console.log('🔄 Création comptes parent(s) et enfant(s)...');
+
             // Générer un mot de passe temporaire
             const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
             const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
-            // Créer le compte parent
+            // Créer le compte parent principal (celui de la demande)
             const parentUser = await prisma.user.create({
                 data: {
                     firstName: parentFirstName,
@@ -386,6 +388,55 @@ const inscriptionEleveController = {
                     role: 'PARENT'
                 }
             });
+
+            console.log('✅ Parent principal créé:', `${parentFirstName} ${parentLastName} (${parentEmail})`);
+
+            // Créer aussi le compte du deuxième parent si les infos sont disponibles
+            let secondParentUser = null;
+            if (inscriptionRequest.message) {
+                try {
+                    const messageData = JSON.parse(inscriptionRequest.message);
+
+                    // Extraire les infos de la mère depuis le message
+                    if (messageData.mere) {
+                        const mereMatch = messageData.mere.match(/^(.+?)\s+(.+?)\s*-\s*(.+)$/);
+                        if (mereMatch && mereMatch[3] !== parentEmail) {
+                            const mereFirstName = mereMatch[1].trim();
+                            const mereLastName = mereMatch[2].trim();
+                            const mereEmail = mereMatch[3].trim();
+
+                            // Vérifier si ce parent n'existe pas déjà
+                            const existingMother = await prisma.user.findUnique({
+                                where: { email: mereEmail }
+                            });
+
+                            if (!existingMother) {
+                                const motherTempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+                                const motherHashedPassword = await bcrypt.hash(motherTempPassword, 12);
+
+                                secondParentUser = await prisma.user.create({
+                                    data: {
+                                        firstName: mereFirstName,
+                                        lastName: mereLastName,
+                                        email: mereEmail,
+                                        phone: messageData.tel || '',
+                                        adress: parentAddress, // Même adresse que le parent principal
+                                        password: motherHashedPassword,
+                                        role: 'PARENT'
+                                    }
+                                });
+
+                                console.log('✅ Deuxième parent créé:', `${mereFirstName} ${mereLastName} (${mereEmail})`);
+                            } else {
+                                console.log('ℹ️ Deuxième parent existe déjà:', mereEmail);
+                                secondParentUser = existingMother;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Erreur parsing message pour deuxième parent:', e);
+                }
+            }
 
             // Parser les enfants depuis le JSON
             let childrenData = [];
@@ -426,8 +477,15 @@ const inscriptionEleveController = {
                         firstName: child.firstName,
                         lastName: child.lastName,
                         dateNaissance: new Date(child.birthDate),
-                        classeId: classe.id,
-                        parentId: parentUser.id
+                        classeId: classe.id
+                    }
+                });
+
+                // Créer la relation parent-étudiant
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parentUser.id,
+                        studentId: student.id
                     }
                 });
 

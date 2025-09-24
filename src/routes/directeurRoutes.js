@@ -84,6 +84,9 @@ router.post('/rendez-vous-inscriptions/:id/finalize', inscriptionController.fina
 // Route PDF accessible depuis les inscriptions finalisées également
 router.get('/inscriptions/:id/pdf', directeurController.generateInscriptionPDF);
 
+// ARCHIVE PDF - Nouvelle route pour gérer les PDF archivés
+router.get('/pdf-archive', directeurController.getPDFArchive);
+
 // API routes for inscriptions
 router.get('/api/classes', inscriptionController.getAvailableClasses);
 router.post('/notify-yamina', inscriptionController.notifyYamina);

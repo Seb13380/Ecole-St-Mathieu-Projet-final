@@ -161,10 +161,17 @@ const userManagementController = {
 
             const { id } = req.params;
 
-            // Vérifier si le parent a des enfants
+            // Vérifier si le parent a des enfants (relations directes + ParentStudent)
             const parent = await prisma.user.findUnique({
                 where: { id: parseInt(id) },
-                include: { enfants: true }
+                include: {
+                    students: true,  // Enfants via parentId direct
+                    enfants: {       // Relations ParentStudent
+                        include: {
+                            student: true
+                        }
+                    }
+                }
             });
 
             if (!parent) {
@@ -174,10 +181,15 @@ const userManagementController = {
                 });
             }
 
-            if (parent.enfants.length > 0) {
+            // Vérifier s'il y a des enfants liés (direct ou via ParentStudent)
+            const hasDirectStudents = parent.students.length > 0;
+            const hasRelatedStudents = parent.enfants.length > 0;
+
+            if (hasDirectStudents || hasRelatedStudents) {
+                const totalStudents = parent.students.length + parent.enfants.length;
                 return res.status(400).json({
                     success: false,
-                    message: 'Impossible de supprimer un parent qui a des enfants inscrits'
+                    message: `Impossible de supprimer un parent qui a ${totalStudents} enfant(s) inscrit(s)`
                 });
             }
 
@@ -219,8 +231,12 @@ const userManagementController = {
             const [eleves, parents, classes] = await Promise.all([
                 prisma.student.findMany({
                     include: {
-                        parent: {
-                            select: { firstName: true, lastName: true, email: true }
+                        parents: {
+                            include: {
+                                parent: {
+                                    select: { firstName: true, lastName: true, email: true }
+                                }
+                            }
                         },
                         classe: {
                             select: { nom: true, niveau: true }

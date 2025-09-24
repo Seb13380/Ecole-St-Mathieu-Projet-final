@@ -281,15 +281,25 @@ const adminController = {
         try {
             const { firstName, lastName, dateNaissance, classeId, parentId } = req.body;
 
+            // Créer l'étudiant sans parentId direct
             const student = await prisma.student.create({
                 data: {
                     firstName,
                     lastName,
                     dateNaissance: new Date(dateNaissance),
-                    classeId: parseInt(classeId),
-                    parentId: parseInt(parentId)
+                    classeId: parseInt(classeId)
                 }
             });
+
+            // Créer la relation parent-étudiant
+            if (parentId) {
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parseInt(parentId),
+                        studentId: student.id
+                    }
+                });
+            }
 
             res.json({
                 success: true,
@@ -310,16 +320,32 @@ const adminController = {
             const { id } = req.params;
             const { firstName, lastName, dateNaissance, classeId, parentId } = req.body;
 
+            // Mettre à jour l'étudiant sans parentId direct
             const student = await prisma.student.update({
                 where: { id: parseInt(id) },
                 data: {
                     firstName,
                     lastName,
                     dateNaissance: new Date(dateNaissance),
-                    classeId: parseInt(classeId),
-                    parentId: parseInt(parentId)
+                    classeId: parseInt(classeId)
                 }
             });
+
+            // Mettre à jour la relation parent-étudiant
+            if (parentId) {
+                // Supprimer les anciennes relations
+                await prisma.parentStudent.deleteMany({
+                    where: { studentId: parseInt(id) }
+                });
+
+                // Créer la nouvelle relation
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parseInt(parentId),
+                        studentId: parseInt(id)
+                    }
+                });
+            }
 
             console.log('✅ Élève mis à jour:', `${student.firstName} ${student.lastName}`);
             res.redirect('/admin/students?success=' + encodeURIComponent('Élève mis à jour avec succès'));

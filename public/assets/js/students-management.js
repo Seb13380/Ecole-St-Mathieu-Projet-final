@@ -185,3 +185,36 @@ document.addEventListener('keydown', function (e) {
         closeModal();
     }
 });
+
+// Fonction de recherche/filtrage des élèves
+function filterStudents() {
+    const searchTerm = document.getElementById('searchStudents').value.toLowerCase();
+    const tableRows = document.querySelectorAll('tbody tr');
+    let visibleCount = 0;
+
+    tableRows.forEach(row => {
+        const studentName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const parentName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const className = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        
+        if (studentName.includes(searchTerm) || parentName.includes(searchTerm) || className.includes(searchTerm)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Mettre à jour le compteur
+    const countElement = document.querySelector('h3');
+    if (countElement) {
+        const originalText = countElement.textContent;
+        const totalCount = originalText.match(/\((\d+)\)/)[1];
+        
+        if (searchTerm === '') {
+            countElement.textContent = `Élèves inscrits (${totalCount})`;
+        } else {
+            countElement.textContent = `Élèves inscrits (${visibleCount}/${totalCount})`;
+        }
+    }
+}

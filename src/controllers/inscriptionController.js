@@ -279,38 +279,115 @@ const inscriptionController = {
         }
     },
 
-    // ÉTAPE 2 : Finaliser l'inscription après le rendez-vous (créer les comptes)
+    // ÉTAPE 2 : Finaliser l'inscription après le rendez-vous (créer les comptes) - VERSION UNIFIÉE
     finalizeInscription: async (req, res) => {
         try {
             const { id } = req.params;
             const { comment } = req.body;
+            const requestId = parseInt(id);
 
-            // Récupérer la demande d'inscription
-            const request = await prisma.preInscriptionRequest.findUnique({
-                where: { id: parseInt(id) }
+            console.log(`🔄 Finalisation de l'inscription ID: ${requestId}`);
+
+            // 🔍 RECHERCHE UNIFIÉE DANS LES DEUX TABLES
+            let request = null;
+            let requestType = null;
+            let requestData = {};
+
+            // 1. Essayer dans PreInscriptionRequest
+            const preInscriptionRequest = await prisma.preInscriptionRequest.findUnique({
+                where: { id: requestId }
             });
 
+            if (preInscriptionRequest && preInscriptionRequest.status === 'ACCEPTED') {
+                request = preInscriptionRequest;
+                requestType = 'PRE_INSCRIPTION';
+
+                // Convertir au format unifié
+                let children = [];
+                if (request.children) {
+                    try {
+                        children = typeof request.children === 'string' ? JSON.parse(request.children) : request.children;
+                    } catch (e) {
+                        console.error('Erreur parsing children:', e);
+                    }
+                }
+
+                requestData = {
+                    parentFirstName: request.parentFirstName,
+                    parentLastName: request.parentLastName,
+                    parentEmail: request.parentEmail,
+                    parentPhone: request.parentPhone,
+                    parentAddress: request.parentAddress,
+                    children: children,
+                    message: request.message
+                };
+                console.log(`✅ Trouvé dans PreInscriptionRequest - Status: ${request.status}`);
+            }
+
+            // 2. Si pas trouvé ou pas au bon statut, essayer DossierInscription
             if (!request) {
+                const dossierInscription = await prisma.dossierInscription.findUnique({
+                    where: { id: requestId }
+                });
+
+                if (dossierInscription && dossierInscription.statut === 'VALIDE') {
+                    request = dossierInscription;
+                    requestType = 'DOSSIER_INSCRIPTION';
+
+                    // Convertir au format unifié
+                    requestData = {
+                        parentFirstName: dossierInscription.perePrenom || dossierInscription.merePrenom,
+                        parentLastName: dossierInscription.pereNom || dossierInscription.mereNom,
+                        parentEmail: dossierInscription.pereEmail || dossierInscription.mereEmail,
+                        parentPhone: dossierInscription.pereTelephone || dossierInscription.mereTelephone,
+                        parentAddress: dossierInscription.adresseComplete,
+                        children: [{
+                            firstName: dossierInscription.enfantPrenom,
+                            lastName: dossierInscription.enfantNom,
+                            birthDate: dossierInscription.enfantDateNaissance,
+                            requestedClass: dossierInscription.enfantClasseDemandee
+                        }],
+                        message: JSON.stringify({
+                            pere: `${dossierInscription.perePrenom} ${dossierInscription.pereNom} - ${dossierInscription.pereEmail}`,
+                            mere: `${dossierInscription.merePrenom} ${dossierInscription.mereNom} - ${dossierInscription.mereEmail}`,
+                            adresse: dossierInscription.adresseComplete
+                        })
+                    };
+                    console.log(`✅ Trouvé dans DossierInscription - Status: ${request.statut}`);
+                }
+            }
+
+            // 3. Vérifications
+            if (!request) {
+                console.log(`❌ Demande ID ${requestId} introuvable dans les deux tables`);
                 return res.status(404).json({
                     success: false,
                     message: 'Demande d\'inscription non trouvée'
                 });
             }
 
-            if (request.status !== 'ACCEPTED') {
+            const status = requestType === 'PRE_INSCRIPTION' ? request.status : request.statut;
+            const expectedStatuses = requestType === 'PRE_INSCRIPTION' ? ['ACCEPTED'] : ['VALIDE'];
+
+            if (!expectedStatuses.includes(status)) {
+                console.log(`❌ Statut incorrect: ${status}, attendu: ${expectedStatuses.join(' ou ')}`);
                 return res.status(400).json({
                     success: false,
-                    message: 'Cette demande n\'est pas au statut accepté pour rendez-vous'
+                    message: `Cette demande n'est pas au bon statut (actuel: ${status})`
                 });
             }
 
-            // Parser les informations des parents depuis le champ message
+            console.log(`🎯 Type de demande: ${requestType}, Status: ${status}`);
+
+            // Maintenant utiliser requestData au lieu de request pour la suite...
+
+            // Parser les informations des parents depuis requestData
             let parentsInfo = {};
-            if (request.message) {
+            if (requestData.message) {
                 try {
-                    parentsInfo = typeof request.message === 'string'
-                        ? JSON.parse(request.message)
-                        : request.message;
+                    parentsInfo = typeof requestData.message === 'string'
+                        ? JSON.parse(requestData.message)
+                        : requestData.message;
                 } catch (e) {
                     console.error('Erreur parsing parents info:', e);
                     parentsInfo = {};
@@ -334,8 +411,8 @@ const inscriptionController = {
                         lastName: nom,
                         email: email,
                         role: 'PARENT',
-                        phone: request.parentPhone,
-                        adress: parentsInfo.adresse || request.parentAddress
+                        phone: requestData.parentPhone,
+                        adress: parentsInfo.adresse || requestData.parentAddress
                     });
                 }
             }
@@ -354,8 +431,8 @@ const inscriptionController = {
                         lastName: nom,
                         email: email,
                         role: 'PARENT',
-                        phone: request.parentPhone,
-                        adress: parentsInfo.adresse || request.parentAddress
+                        phone: requestData.parentPhone,
+                        adress: parentsInfo.adresse || requestData.parentAddress
                     });
                 }
             }
@@ -363,12 +440,12 @@ const inscriptionController = {
             // Fallback : créer au moins le parent principal si aucun parent extrait
             if (parentsToCreate.length === 0) {
                 parentsToCreate.push({
-                    firstName: request.parentFirstName,
-                    lastName: request.parentLastName,
-                    email: request.parentEmail,
+                    firstName: requestData.parentFirstName,
+                    lastName: requestData.parentLastName,
+                    email: requestData.parentEmail,
                     role: 'PARENT',
-                    phone: request.parentPhone,
-                    adress: request.parentAddress
+                    phone: requestData.parentPhone,
+                    adress: requestData.parentAddress
                 });
             }
 
@@ -413,10 +490,8 @@ const inscriptionController = {
 
             // 👶 CRÉER LES ENFANTS
             let createdStudents = [];
-            if (request.children) {
-                const childrenData = typeof request.children === 'string'
-                    ? JSON.parse(request.children)
-                    : request.children;
+            if (requestData.children && requestData.children.length > 0) {
+                const childrenData = requestData.children;
 
                 console.log('👶 Création des enfants...');
 
@@ -480,13 +555,31 @@ const inscriptionController = {
                                     firstName: childData.firstName,
                                     lastName: childData.lastName,
                                     dateNaissance: new Date(childData.birthDate),
-                                    parentId: parentUser.id,
+                                    parentId: parentUser.id,  // 🔧 CORRECTION: Lien direct parent-enfant
                                     classeId: classeId
                                 }
                             });
 
+                            // Créer la relation parent-étudiant (relation many-to-many)
+                            await prisma.parentStudent.create({
+                                data: {
+                                    parentId: parentUser.id,
+                                    studentId: student.id
+                                }
+                            });
+
+                            // 🔧 CORRECTION: Créer relation pour tous les parents créés
+                            for (const additionalParent of createdParents.slice(1)) {
+                                await prisma.parentStudent.create({
+                                    data: {
+                                        parentId: additionalParent.id,
+                                        studentId: student.id
+                                    }
+                                });
+                            }
+
                             createdStudents.push(student);
-                            console.log(`✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id})`);
+                            console.log(`✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id}) - Classe: ${assignmentMethod}`);
                         }
                     }
                 }
@@ -494,16 +587,32 @@ const inscriptionController = {
                 console.log(`✅ ${createdStudents.length} enfant(s) créé(s) pour les parents`);
             }
 
-            // Mettre à jour le statut à COMPLETED
-            await prisma.preInscriptionRequest.update({
-                where: { id: parseInt(id) },
-                data: {
-                    status: 'COMPLETED',
-                    processedAt: new Date(),
-                    processedBy: req.session.user.id,
-                    adminNotes: comment || `Inscription finalisée - ${createdParents.length} compte(s) parent(s) et ${createdStudents.length} enfant(s) créés`
-                }
-            });
+            // 🔄 METTRE À JOUR LE STATUT SELON LE TYPE DE DEMANDE
+            const finalNote = comment || `Inscription finalisée - ${createdParents.length} compte(s) parent(s) et ${createdStudents.length} enfant(s) créés`;
+
+            if (requestType === 'PRE_INSCRIPTION') {
+                await prisma.preInscriptionRequest.update({
+                    where: { id: requestId },
+                    data: {
+                        status: 'COMPLETED',
+                        processedAt: new Date(),
+                        processedBy: req.session.user.id,
+                        adminNotes: finalNote
+                    }
+                });
+                console.log(`✅ PreInscriptionRequest ID ${requestId} marquée comme COMPLETED`);
+            } else if (requestType === 'DOSSIER_INSCRIPTION') {
+                await prisma.dossierInscription.update({
+                    where: { id: requestId },
+                    data: {
+                        statut: 'FINALISE',
+                        dateTraitement: new Date(),
+                        traitePar: req.session.user.id,
+                        notesAdministratives: finalNote
+                    }
+                });
+                console.log(`✅ DossierInscription ID ${requestId} marqué comme FINALISE`);
+            }
 
             // Envoyer email avec les identifiants à tous les parents créés
             for (const parent of createdParents) {
@@ -588,23 +697,76 @@ const inscriptionController = {
         }
     },
 
-    // Pour l'admin : supprimer une demande
+    // Pour l'admin : supprimer une demande (GESTION UNIFIÉE)
     deleteRequest: async (req, res) => {
         try {
             const { id } = req.params;
+            const requestId = parseInt(id);
 
-            // Supprimer la demande
-            await prisma.preInscriptionRequest.delete({
-                where: { id: parseInt(id) }
-            });
+            console.log(`🗑️ Tentative de suppression de la demande ID: ${requestId}`);
 
-            res.json({
-                success: true,
-                message: 'Demande supprimée avec succès'
-            });
+            // 🔍 DÉTECTER DANS QUELLE TABLE SE TROUVE LA DEMANDE
+            let deleteResult = null;
+            let deletedFrom = null;
+
+            // 1. Essayer dans PreInscriptionRequest
+            try {
+                const existsInPreInscription = await prisma.preInscriptionRequest.findUnique({
+                    where: { id: requestId }
+                });
+
+                if (existsInPreInscription) {
+                    await prisma.preInscriptionRequest.delete({
+                        where: { id: requestId }
+                    });
+                    deleteResult = true;
+                    deletedFrom = 'PreInscriptionRequest';
+                    console.log(`✅ Suppression réussie de PreInscriptionRequest ID: ${requestId}`);
+                }
+            } catch (error) {
+                if (error.code !== 'P2025') { // P2025 = Record not found
+                    throw error;
+                }
+            }
+
+            // 2. Si pas trouvé dans PreInscriptionRequest, essayer DossierInscription
+            if (!deleteResult) {
+                try {
+                    const existsInDossierInscription = await prisma.dossierInscription.findUnique({
+                        where: { id: requestId }
+                    });
+
+                    if (existsInDossierInscription) {
+                        await prisma.dossierInscription.delete({
+                            where: { id: requestId }
+                        });
+                        deleteResult = true;
+                        deletedFrom = 'DossierInscription';
+                        console.log(`✅ Suppression réussie de DossierInscription ID: ${requestId}`);
+                    }
+                } catch (error) {
+                    if (error.code !== 'P2025') { // P2025 = Record not found
+                        throw error;
+                    }
+                }
+            }
+
+            // 3. Vérifier si la suppression a réussi
+            if (deleteResult) {
+                res.json({
+                    success: true,
+                    message: `Demande supprimée avec succès depuis ${deletedFrom}`
+                });
+            } else {
+                console.log(`❌ Demande ID ${requestId} introuvable dans les deux tables`);
+                res.status(404).json({
+                    success: false,
+                    message: `Demande ID ${requestId} introuvable`
+                });
+            }
 
         } catch (error) {
-            console.error('Erreur lors de la suppression:', error);
+            console.error('❌ Erreur lors de la suppression:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de la suppression: ' + error.message
@@ -707,12 +869,16 @@ const inscriptionController = {
                 include: {
                     students: {
                         include: {
-                            parent: {
-                                select: {
-                                    firstName: true,
-                                    lastName: true,
-                                    email: true,
-                                    phone: true
+                            parents: {
+                                include: {
+                                    parent: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                            email: true,
+                                            phone: true
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -741,12 +907,19 @@ const inscriptionController = {
                 nom: classe.nom,
                 niveau: classe.niveau,
                 studentCount: classe.students.length,
-                students: classe.students.map(student => ({
-                    nom: `${student.firstName} ${student.lastName}`,
-                    parent: `${student.parent.firstName} ${student.parent.lastName}`,
-                    email: student.parent.email,
-                    telephone: student.parent.phone || 'Non renseigné'
-                }))
+                students: classe.students.map(student => {
+                    const parents = student.parents.map(ps => ps.parent);
+                    const parentNames = parents.map(p => `${p.firstName} ${p.lastName}`).join(' & ');
+                    const parentEmails = parents.map(p => p.email).join(' / ');
+                    const parentPhones = parents.map(p => p.phone || 'Non renseigné').join(' / ');
+
+                    return {
+                        nom: `${student.firstName} ${student.lastName}`,
+                        parent: parentNames || 'Non renseigné',
+                        email: parentEmails || 'Non renseigné',
+                        telephone: parentPhones
+                    };
+                })
             }));
 
             // Envoyer l'email à Yamina
@@ -770,11 +943,13 @@ const inscriptionController = {
         }
     },
 
-    // Page de gestion des inscriptions améliorée
+    // Page de gestion des inscriptions améliorée (VUE UNIFIÉE)
     showManageInscriptions: async (req, res) => {
         try {
-            // Récupérer toutes les demandes avec statistiques
-            const requests = await prisma.preInscriptionRequest.findMany({
+            // 🔄 RÉCUPÉRER LES DEUX TYPES DE DEMANDES
+
+            // 1. Pré-inscriptions (ancienne structure)
+            const preInscriptions = await prisma.preInscriptionRequest.findMany({
                 orderBy: { submittedAt: 'desc' },
                 include: {
                     processor: {
@@ -783,10 +958,80 @@ const inscriptionController = {
                 }
             });
 
-            // Calculer les statistiques
-            const pendingCount = requests.filter(r => r.status === 'PENDING').length;
-            const approvedCount = requests.filter(r => r.status === 'APPROVED').length;
-            const rejectedCount = requests.filter(r => r.status === 'REJECTED').length;
+            // 2. Dossiers d'inscription (nouvelle structure)
+            const dossiersInscriptions = await prisma.dossierInscription.findMany({
+                orderBy: { dateDepot: 'desc' },
+                include: {
+                    traitant: {
+                        select: { firstName: true, lastName: true }
+                    }
+                }
+            });
+
+            // 🔧 NORMALISER LES DONNÉES VERS UN FORMAT UNIFIÉ
+            const normalizedPreInscriptions = preInscriptions.map(req => {
+                let children = [];
+                if (req.children) {
+                    try {
+                        children = typeof req.children === 'string' ? JSON.parse(req.children) : req.children;
+                    } catch (e) {
+                        console.error('Erreur parsing children pour request', req.id, ':', e);
+                        children = [];
+                    }
+                }
+
+                return {
+                    id: req.id,
+                    type: 'PRE_INSCRIPTION',
+                    status: req.status,
+                    submittedAt: req.submittedAt,
+                    parentFirstName: req.parentFirstName,
+                    parentLastName: req.parentLastName,
+                    parentEmail: req.parentEmail,
+                    children: children,
+                    enfantPrenom: children.length > 0 ? children[0].firstName : '',
+                    enfantNom: children.length > 0 ? children[0].lastName : '',
+                    enfantClasseDemandee: children.length > 0 ? children[0].requestedClass : '',
+                    processor: req.processor,
+                    processedAt: req.processedAt,
+                    adminNotes: req.adminNotes
+                };
+            });
+
+            const normalizedDossiers = dossiersInscriptions.map(dossier => ({
+                id: dossier.id,
+                type: 'DOSSIER_INSCRIPTION',
+                status: dossier.statut,
+                submittedAt: dossier.dateDepot,
+                parentFirstName: dossier.perePrenom || dossier.merePrenom,
+                parentLastName: dossier.pereNom || dossier.mereNom,
+                parentEmail: dossier.pereEmail || dossier.mereEmail,
+                children: [], // Pas de structure children dans DossierInscription
+                enfantPrenom: dossier.enfantPrenom,
+                enfantNom: dossier.enfantNom,
+                enfantClasseDemandee: dossier.enfantClasseDemandee,
+                processor: dossier.traitant,
+                processedAt: dossier.dateTraitement,
+                adminNotes: dossier.notesAdministratives
+            }));
+
+            // 🔗 COMBINER ET TRIER LES DEMANDES
+            const requests = [...normalizedPreInscriptions, ...normalizedDossiers]
+                .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+            // 📊 CALCULER LES STATISTIQUES UNIFIÉES
+            const pendingCount = requests.filter(r =>
+                r.status === 'PENDING' || r.status === 'EMAIL_PENDING' || r.status === 'EN_ATTENTE'
+            ).length;
+            const approvedCount = requests.filter(r =>
+                r.status === 'APPROVED' || r.status === 'ACCEPTED' || r.status === 'VALIDE'
+            ).length;
+            const rejectedCount = requests.filter(r =>
+                r.status === 'REJECTED' || r.status === 'REFUSE'
+            ).length;
+            const completedCount = requests.filter(r =>
+                r.status === 'COMPLETED' || r.status === 'EN_COURS'
+            ).length;
             const totalCount = requests.length;
 
             // Récupérer la configuration des inscriptions
@@ -800,24 +1045,8 @@ const inscriptionController = {
                 });
             }
 
-            // Parser les enfants pour chaque demande
-            const requestsWithParsedChildren = requests.map(request => {
-                let children = [];
-                if (request.children) {
-                    try {
-                        children = typeof request.children === 'string'
-                            ? JSON.parse(request.children)
-                            : request.children;
-                    } catch (e) {
-                        console.error('Erreur parsing children pour request', request.id, ':', e);
-                        children = [];
-                    }
-                }
-                return {
-                    ...request,
-                    children
-                };
-            });
+            // Les données sont déjà normalisées, pas besoin de parsing supplémentaire
+            const requestsWithParsedChildren = requests;
 
             res.render('pages/admin/manage-inscriptions', {
                 title: 'Gestion des Inscriptions',
