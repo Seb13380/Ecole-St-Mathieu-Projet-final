@@ -962,9 +962,12 @@ const directeurController = {
     // Afficher la liste des rendez-vous d'inscription (statut ACCEPTED)
     getRendezVousInscriptions: async (req, res) => {
         try {
+            console.log('🔍 Début récupération rendez-vous inscriptions...');
+            
             // 🔄 RÉCUPÉRATION UNIFIÉE DES DEMANDES PRÊTES POUR RENDEZ-VOUS
 
             // 1. Pré-inscriptions acceptées
+            console.log('📝 Recherche des pré-inscriptions acceptées...');
             const acceptedPreInscriptions = await prisma.preInscriptionRequest.findMany({
                 where: {
                     status: 'ACCEPTED'
@@ -981,14 +984,16 @@ const directeurController = {
                     }
                 }
             });
+            console.log(`✅ ${acceptedPreInscriptions.length} pré-inscriptions acceptées trouvées`);
 
             // 2. Dossiers validés (prêts pour rendez-vous)
+            console.log('📂 Recherche des dossiers validés...');
             const validatedDossiers = await prisma.dossierInscription.findMany({
                 where: {
                     statut: 'VALIDE'
                 },
                 orderBy: {
-                    dateDepot: 'desc'
+                    createdAt: 'desc'
                 },
                 include: {
                     traitant: {
@@ -999,6 +1004,7 @@ const directeurController = {
                     }
                 }
             });
+            console.log(`✅ ${validatedDossiers.length} dossiers validés trouvés`);
 
             // 3. Normaliser les dossiers vers le format des pré-inscriptions
             const normalizedDossiers = validatedDossiers.map(dossier => ({
@@ -1010,7 +1016,7 @@ const directeurController = {
                 parentPhone: dossier.pereTelephone || dossier.mereTelephone,
                 parentAddress: dossier.adresseComplete,
                 status: dossier.statut,
-                submittedAt: dossier.dateDepot,
+                submittedAt: dossier.createdAt,
                 children: JSON.stringify([{
                     firstName: dossier.enfantPrenom,
                     lastName: dossier.enfantNom,
@@ -1034,6 +1040,7 @@ const directeurController = {
             // 5. Combiner et trier
             const acceptedRequests = [...normalizedPreInscriptions, ...normalizedDossiers]
                 .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+            console.log(`📋 Total des demandes combinées: ${acceptedRequests.length}`);
 
             // Parser les données enfants et parents pour l'affichage
             const requestsWithParsedChildren = acceptedRequests.map(request => {
@@ -1069,6 +1076,7 @@ const directeurController = {
                 };
             });
 
+            console.log(`🎯 Rendu du template avec ${requestsWithParsedChildren.length} demandes`);
             res.render('pages/directeur/rendez-vous-inscriptions', {
                 title: 'Rendez-vous d\'inscription - École Saint-Mathieu',
                 user: req.session.user,
@@ -1077,8 +1085,10 @@ const directeurController = {
 
         } catch (error) {
             console.error('❌ Erreur récupération rendez-vous inscriptions:', error);
+            console.error('❌ Stack trace complet:', error.stack);
+            console.error('❌ Message d\'erreur:', error.message);
             res.status(500).render('pages/error', {
-                message: 'Erreur lors de la récupération des rendez-vous',
+                message: 'Une erreur est survenue - Erreur lors de la récupération des rendez-vous',
                 user: req.session.user
             });
         }
@@ -1141,7 +1151,7 @@ const directeurController = {
                         adresse: dossierDetaille.adresseComplete,
                         tel: dossierDetaille.telephoneDomicile || dossierDetaille.pereTelephone || dossierDetaille.mereTelephone
                     }),
-                    submittedAt: dossierDetaille.dateDepot,
+                    submittedAt: dossierDetaille.createdAt,
                     status: 'PENDING'
                 };
             } else {
