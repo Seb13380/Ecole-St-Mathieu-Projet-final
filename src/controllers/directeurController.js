@@ -963,7 +963,7 @@ const directeurController = {
     getRendezVousInscriptions: async (req, res) => {
         try {
             console.log('🔍 Début récupération rendez-vous inscriptions...');
-            
+
             // 🔄 RÉCUPÉRATION UNIFIÉE DES DEMANDES PRÊTES POUR RENDEZ-VOUS
 
             // 1. Pré-inscriptions acceptées
@@ -993,7 +993,7 @@ const directeurController = {
                     statut: 'VALIDE'
                 },
                 orderBy: {
-                    createdAt: 'desc'
+                    dateCreation: 'desc'
                 },
                 include: {
                     traitant: {
@@ -1016,7 +1016,7 @@ const directeurController = {
                 parentPhone: dossier.pereTelephone || dossier.mereTelephone,
                 parentAddress: dossier.adresseComplete,
                 status: dossier.statut,
-                submittedAt: dossier.createdAt,
+                submittedAt: dossier.dateCreation,
                 children: JSON.stringify([{
                     firstName: dossier.enfantPrenom,
                     lastName: dossier.enfantNom,
