@@ -66,7 +66,8 @@ const inscriptionController = {
                 childrenData = req.body.children.map(child => ({
                     firstName: child.firstName,
                     lastName: child.lastName,
-                    birthDate: child.birthDate
+                    birthDate: child.birthDate,
+                    requestedClass: child.requestedClass
                 })).filter(child => child.firstName && child.lastName && child.birthDate);
             } else if (req.body.childFirstName) {
                 // Un seul enfant
@@ -74,7 +75,7 @@ const inscriptionController = {
                     firstName: req.body.childFirstName,
                     lastName: req.body.childLastName,
                     birthDate: req.body.childBirthDate,
-                    classId: req.body.requestedClass
+                    requestedClass: req.body.requestedClass
                 }];
             } else {
                 // Enfants envoyés en tableau séparé
@@ -86,7 +87,7 @@ const inscriptionController = {
                     firstName,
                     lastName: lastNames[index],
                     birthDate: birthDates[index],
-                    classId: classIds[index]
+                    requestedClass: classIds[index]
                 })).filter(child => child.firstName && child.lastName && child.birthDate);
             }
 
