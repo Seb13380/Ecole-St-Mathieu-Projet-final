@@ -1,0 +1,40 @@
+[
+    {
+        "id": "test-001",
+        "parentFirstName": "Jean",
+        "parentLastName": "Dupont",
+        "parentEmail": "jean.dupont@test.com",
+        "parentPhone": "0123456789",
+        "parentAddress": "123 Rue de la Paix",
+        "submittedAt": "2025-09-27T12:00:00.000Z",
+        "status": "PENDING",
+        "requestedClass": "CP",
+        "childrenData": [
+            {
+                "firstName": "Pierre",
+                "lastName": "Dupont",
+                "birthDate": "2018-06-15",
+                "requestedClass": "CP"
+            }
+        ]
+    },
+    {
+        "id": "test-002",
+        "parentFirstName": "Marie",
+        "parentLastName": "Martin",
+        "parentEmail": "marie.martin@test.com",
+        "parentPhone": "0987654321",
+        "parentAddress": "456 Avenue des Tests",
+        "submittedAt": "2025-09-27T13:00:00.000Z",
+        "status": "PENDING",
+        "requestedClass": "CE1",
+        "childrenData": [
+            {
+                "firstName": "Julie",
+                "lastName": "Martin",
+                "birthDate": "2017-03-22",
+                "requestedClass": "CE1"
+            }
+        ]
+    }
+]

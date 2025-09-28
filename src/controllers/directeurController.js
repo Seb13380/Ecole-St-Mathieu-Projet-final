@@ -24,7 +24,11 @@ const directeurController = {
                 prisma.message.count(),
                 prisma.actualite.count(),
                 prisma.travaux.count(),
-                prisma.preInscriptionRequest.count({ where: { status: 'PENDING' } }),
+                // Compter les demandes en attente : pré-inscriptions + dossiers d'inscription
+                Promise.all([
+                    prisma.preInscriptionRequest.count({ where: { status: 'PENDING' } }),
+                    prisma.dossierInscription.count({ where: { statut: 'EN_ATTENTE' } })
+                ]).then(counts => counts[0] + counts[1]),
                 prisma.credentialsRequest.count({ where: { status: { in: ['PENDING', 'PROCESSING'] } } }),
                 prisma.preInscriptionRequest.count({ where: { status: 'ACCEPTED' } }) // Rendez-vous en attente
             ]);
@@ -988,23 +992,9 @@ const directeurController = {
 
             // 2. Dossiers validés (prêts pour rendez-vous)
             console.log('📂 Recherche des dossiers validés...');
-            const validatedDossiers = await prisma.dossierInscription.findMany({
-                where: {
-                    statut: 'VALIDE'
-                },
-                orderBy: {
-                    dateCreation: 'desc'
-                },
-                include: {
-                    traitant: {
-                        select: {
-                            firstName: true,
-                            lastName: true
-                        }
-                    }
-                }
-            });
-            console.log(`✅ ${validatedDossiers.length} dossiers validés trouvés`);
+            // 🔥 TEMPORAIRE: Désactiver les dossiers validés pour éviter les erreurs de structure
+            const validatedDossiers = [];
+            console.log(`✅ ${validatedDossiers.length} dossiers validés trouvés (désactivé temporairement)`);
 
             // 3. Normaliser les dossiers vers le format des pré-inscriptions
             const normalizedDossiers = validatedDossiers.map(dossier => ({

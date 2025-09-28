@@ -1549,6 +1549,104 @@ class EmailService {
             return { success: false, error: error.message };
         }
     }
+
+    /**
+     * Envoyer un email de validation de dossier d'inscription
+     * @param {Object} dossierData - Données du dossier validé
+     * @param {string} comment - Commentaire administratif
+     */
+    async sendDossierValidationEmail(dossierData, comment = '') {
+        const { parentFirstName, parentLastName, parentEmail, enfantPrenom, enfantNom, enfantClasseDemandee } = dossierData;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
+            subject: '✅ Dossier d\'inscription validé - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fdfc;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 5px solid #28a745; margin-bottom: 30px;">
+                            <h2 style="color: #155724; margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                                ✅ Dossier d'inscription validé !
+                            </h2>
+                            <p style="color: #155724; margin: 0; font-size: 16px;">
+                                Félicitations ! Le dossier d'inscription de votre enfant a été validé par notre équipe.
+                            </p>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour <strong>${parentFirstName} ${parentLastName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Nous avons le plaisir de vous informer que le dossier d'inscription de <strong>${enfantPrenom} ${enfantNom}</strong> 
+                            pour la classe <strong>${enfantClasseDemandee}</strong> a été <strong>validé</strong> par notre équipe pédagogique.
+                        </p>
+
+                        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #0d47a1; margin-top: 0;">📋 Prochaines étapes :</h3>
+                            <ol style="color: #1565c0; padding-left: 20px;">
+                                <li style="margin-bottom: 10px;">Un rendez-vous sera programmé pour finaliser l'inscription</li>
+                                <li style="margin-bottom: 10px;">Vous recevrez les identifiants d'accès au portail parents</li>
+                                <li style="margin-bottom: 10px;">Les documents administratifs vous seront communiqués</li>
+                                <li>La classe définitive sera confirmée selon les effectifs</li>
+                            </ol>
+                        </div>
+
+                        ${comment ? `
+                        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #856404; margin-top: 0;">💬 Message de l'équipe :</h3>
+                            <p style="color: #856404; margin: 0;">${comment}</p>
+                        </div>
+                        ` : ''}
+
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #304a4d; margin-top: 0;">📞 Contact :</h3>
+                            <p style="color: #333; margin: 5px 0;">
+                                Pour toute question, n'hésitez pas à nous contacter :
+                            </p>
+                            <ul style="color: #333; padding-left: 20px;">
+                                <li>📧 Email : ecole-saint-mathieu@wanadoo.fr</li>
+                                <li>📞 Téléphone : [Numéro de téléphone]</li>
+                                <li>🏫 Secrétariat : [Horaires d'ouverture]</li>
+                            </ul>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Nous sommes ravis d'accueillir <strong>${enfantPrenom}</strong> dans notre établissement et nous réjouissons 
+                            de l'accompagner dans son parcours scolaire.
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Cordialement,<br>
+                            <strong>L'équipe de direction<br>
+                            École Saint-Mathieu</strong>
+                        </p>
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <p style="color: #666; font-size: 12px;">
+                                © École Saint-Mathieu - Notification automatique<br>
+                                Envoyé le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email de validation de dossier envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'envoi de l\'email de validation:', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 module.exports = new EmailService();

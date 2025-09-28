@@ -168,15 +168,54 @@ const inscriptionController = {
     // Pour l'admin : voir toutes les demandes
     showAllRequests: async (req, res) => {
         try {
-            const requests = await prisma.preInscriptionRequest.findMany({
-                orderBy: { submittedAt: 'desc' },
-                include: {
-                    processor: true
-                }
-            });
+            // Récupérer les pré-inscriptions ET les dossiers d'inscription
+            const [preInscriptions, dossierInscriptions] = await Promise.all([
+                prisma.preInscriptionRequest.findMany({
+                    orderBy: { submittedAt: 'desc' },
+                    include: { processor: true }
+                }),
+                prisma.dossierInscription.findMany({
+                    orderBy: { createdAt: 'desc' },
+                    include: { traitant: true }
+                })
+            ]);
+
+            // Normaliser les dossiers d'inscription vers le format des pré-inscriptions
+            const normalizedDossiers = dossierInscriptions.map(dossier => ({
+                id: dossier.id,
+                type: 'DOSSIER_INSCRIPTION',
+                parentFirstName: dossier.perePrenom,
+                parentLastName: dossier.pereNom,
+                parentEmail: dossier.pereEmail,
+                parentPhone: dossier.pereTelephone,
+                status: dossier.statut,
+                submittedAt: dossier.createdAt,
+                children: JSON.stringify([{
+                    firstName: dossier.enfantPrenom,
+                    lastName: dossier.enfantNom,
+                    birthDate: dossier.enfantDateNaissance,
+                    requestedClass: dossier.enfantClasseDemandee
+                }]),
+                message: JSON.stringify({
+                    pere: `${dossier.perePrenom} ${dossier.pereNom}`,
+                    mere: `${dossier.merePrenom} ${dossier.mereNom}`,
+                    adresse: dossier.adresseComplete
+                }),
+                processor: dossier.traitant
+            }));
+
+            // Ajouter le type aux pré-inscriptions
+            const normalizedPreInscriptions = preInscriptions.map(req => ({
+                ...req,
+                type: 'PRE_INSCRIPTION'
+            }));
+
+            // Combiner et trier toutes les demandes
+            const allRequests = [...normalizedPreInscriptions, ...normalizedDossiers]
+                .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
             // Parser les enfants et les parents pour chaque demande
-            const requestsWithParsedChildren = requests.map(request => {
+            const requestsWithParsedChildren = allRequests.map(request => {
                 let children = [];
                 if (request.children) {
                     try {
@@ -219,6 +258,85 @@ const inscriptionController = {
             res.status(500).render('pages/error', {
                 message: 'Erreur lors de la récupération des demandes',
                 user: req.session.user
+            });
+        }
+    },
+
+    // VALIDER UN DOSSIER D'INSCRIPTION COMPLET
+    validateDossier: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { comment } = req.body;
+            const requestId = parseInt(id);
+
+            console.log(`🔍 Validation du dossier ID: ${requestId}`);
+
+            // Chercher dans DossierInscription uniquement
+            const dossier = await prisma.dossierInscription.findUnique({
+                where: { id: requestId }
+            });
+
+            if (!dossier) {
+                console.log(`❌ Dossier ID ${requestId} non trouvé`);
+                return res.status(404).json({
+                    success: false,
+                    message: 'Dossier d\'inscription non trouvé'
+                });
+            }
+
+            if (dossier.statut !== 'EN_ATTENTE') {
+                return res.status(400).json({
+                    success: false,
+                    message: `Ce dossier n'est pas en attente (statut actuel: ${dossier.statut})`
+                });
+            }
+
+            // Mettre à jour le statut vers VALIDE
+            await prisma.dossierInscription.update({
+                where: { id: requestId },
+                data: {
+                    statut: 'VALIDE',
+                    dateTraitement: new Date(),
+                    traitePar: req.session.user.id,
+                    notesAdministratives: comment || 'Dossier validé'
+                }
+            });
+
+            console.log(`✅ Dossier ID ${requestId} validé avec succès`);
+
+            // Envoyer email de validation aux parents
+            try {
+                const parentEmail = dossier.pereEmail || dossier.mereEmail;
+                const parentName = `${dossier.perePrenom || dossier.merePrenom} ${dossier.pereNom || dossier.mereNom}`;
+
+                console.log(`📧 Envoi email validation à: ${parentEmail}`);
+
+                await emailService.sendDossierValidationEmail({
+                    parentFirstName: dossier.perePrenom || dossier.merePrenom,
+                    parentLastName: dossier.pereNom || dossier.mereNom,
+                    parentEmail: parentEmail,
+                    enfantPrenom: dossier.enfantPrenom,
+                    enfantNom: dossier.enfantNom,
+                    enfantClasseDemandee: dossier.enfantClasseDemandee
+                }, comment);
+
+                console.log('✅ Email de validation envoyé');
+            } catch (emailError) {
+                console.error('❌ Erreur envoi email validation:', emailError);
+                // Ne pas faire échouer la validation si l'email échoue
+            }
+
+            res.json({
+                success: true,
+                message: 'Dossier validé avec succès',
+                status: 'VALIDE'
+            });
+
+        } catch (error) {
+            console.error('Erreur lors de la validation du dossier:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la validation: ' + error.message
             });
         }
     },
@@ -775,13 +893,22 @@ const inscriptionController = {
         }
     },
 
-    // Pour l'admin : voir les détails d'une demande
+    // Pour l'admin : voir les détails d'une demande (VERSION UNIFIÉE)
     showRequestDetails: async (req, res) => {
         try {
             const { id } = req.params;
+            const requestId = parseInt(id);
 
-            const request = await prisma.preInscriptionRequest.findUnique({
-                where: { id: parseInt(id) },
+            console.log(`🔍 Recherche des détails pour ID: ${requestId}`);
+
+            // 🔍 RECHERCHE UNIFIÉE DANS LES DEUX TABLES
+            let request = null;
+            let requestType = null;
+            let normalizedRequest = {};
+
+            // 1. Essayer dans PreInscriptionRequest
+            const preInscriptionRequest = await prisma.preInscriptionRequest.findUnique({
+                where: { id: requestId },
                 include: {
                     processor: {
                         select: { firstName: true, lastName: true }
@@ -789,32 +916,114 @@ const inscriptionController = {
                 }
             });
 
+            if (preInscriptionRequest) {
+                request = preInscriptionRequest;
+                requestType = 'PRE_INSCRIPTION';
+                console.log(`✅ Trouvé dans PreInscriptionRequest`);
+
+                // Normaliser vers le format unifié
+                let children = [];
+                if (request.children) {
+                    try {
+                        children = typeof request.children === 'string' ? JSON.parse(request.children) : request.children;
+                    } catch (e) {
+                        console.error('Erreur parsing children:', e);
+                        children = [];
+                    }
+                }
+
+                normalizedRequest = {
+                    id: request.id,
+                    type: 'PRE_INSCRIPTION',
+                    status: request.status,
+                    submittedAt: request.submittedAt,
+                    parentFirstName: request.parentFirstName,
+                    parentLastName: request.parentLastName,
+                    parentEmail: request.parentEmail,
+                    parentPhone: request.parentPhone,
+                    parentAddress: request.parentAddress,
+                    children: children,
+                    processor: request.processor,
+                    processedAt: request.processedAt,
+                    adminNotes: request.adminNotes,
+                    message: request.message
+                };
+            }
+
+            // 2. Si pas trouvé, essayer DossierInscription
             if (!request) {
+                const dossierInscription = await prisma.dossierInscription.findUnique({
+                    where: { id: requestId },
+                    include: {
+                        traitant: {
+                            select: { firstName: true, lastName: true }
+                        }
+                    }
+                });
+
+                if (dossierInscription) {
+                    request = dossierInscription;
+                    requestType = 'DOSSIER_INSCRIPTION';
+                    console.log(`✅ Trouvé dans DossierInscription`);
+
+                    // Normaliser vers le format unifié
+                    const children = [{
+                        firstName: dossierInscription.enfantPrenom,
+                        lastName: dossierInscription.enfantNom,
+                        birthDate: dossierInscription.enfantDateNaissance,
+                        requestedClass: dossierInscription.enfantClasseDemandee
+                    }];
+
+                    normalizedRequest = {
+                        id: request.id,
+                        type: 'DOSSIER_INSCRIPTION',
+                        status: request.statut,
+                        submittedAt: request.createdAt,
+                        parentFirstName: request.perePrenom || request.merePrenom,
+                        parentLastName: request.pereNom || request.mereNom,
+                        parentEmail: request.pereEmail || request.mereEmail,
+                        parentPhone: request.pereTelephone || request.mereTelephone,
+                        parentAddress: request.adresseComplete,
+                        children: children,
+                        processor: request.traitant,
+                        processedAt: request.dateTraitement,
+                        adminNotes: request.notesAdministratives,
+                        // Données spécifiques au dossier complet
+                        pereInfo: {
+                            nom: request.pereNom,
+                            prenom: request.perePrenom,
+                            profession: request.pereProfession,
+                            telephone: request.pereTelephone,
+                            email: request.pereEmail
+                        },
+                        mereInfo: {
+                            nom: request.mereNom,
+                            prenom: request.merePrenom,
+                            profession: request.mereProfession,
+                            telephone: request.mereTelephone,
+                            email: request.mereEmail
+                        },
+                        situationFamiliale: request.situationFamiliale,
+                        nombreEnfantsFoyer: request.nombreEnfantsFoyer
+                    };
+                }
+            }
+
+            // 3. Vérifications
+            if (!request) {
+                console.log(`❌ Demande ID ${requestId} introuvable dans les deux tables`);
                 return res.status(404).render('pages/error', {
                     message: 'Demande non trouvée',
                     user: req.session.user
                 });
             }
 
-            // Parser les enfants
-            let children = [];
-            if (request.children) {
-                try {
-                    children = typeof request.children === 'string'
-                        ? JSON.parse(request.children)
-                        : request.children;
-                } catch (e) {
-                    console.error('Erreur parsing children:', e);
-                    children = [];
-                }
-            }
+            console.log(`📋 Affichage des détails - Type: ${requestType}, Status: ${normalizedRequest.status}`);
 
             res.render('pages/admin/inscription-request-details', {
                 title: 'Détails de la demande',
-                request: {
-                    ...request,
-                    children
-                },
+                request: normalizedRequest,
+                requestType: requestType,
                 user: req.session.user
             });
 
@@ -961,7 +1170,7 @@ const inscriptionController = {
 
             // 2. Dossiers d'inscription (nouvelle structure)
             const dossiersInscriptions = await prisma.dossierInscription.findMany({
-                orderBy: { dateDepot: 'desc' },
+                orderBy: { createdAt: 'desc' },
                 include: {
                     traitant: {
                         select: { firstName: true, lastName: true }
@@ -1003,7 +1212,7 @@ const inscriptionController = {
                 id: dossier.id,
                 type: 'DOSSIER_INSCRIPTION',
                 status: dossier.statut,
-                submittedAt: dossier.dateDepot,
+                submittedAt: dossier.createdAt,
                 parentFirstName: dossier.perePrenom || dossier.merePrenom,
                 parentLastName: dossier.pereNom || dossier.mereNom,
                 parentEmail: dossier.pereEmail || dossier.mereEmail,
