@@ -18,22 +18,6 @@ const userManagementController = {
 
             const parents = await prisma.user.findMany({
                 where: { role: 'PARENT' },
-                include: {
-                    students: true,
-                    enfants: {
-                        include: {
-                            student: {
-                                select: { firstName: true, lastName: true, dateNaissance: true }
-                            }
-                        }
-                    },
-                    _count: {
-                        select: {
-                            students: true,
-                            enfants: true
-                        }
-                    }
-                },
                 orderBy: { createdAt: 'desc' }
             });
 
@@ -241,13 +225,6 @@ const userManagementController = {
                     include: {
                         parent: {
                             select: { firstName: true, lastName: true, email: true }
-                        },
-                        parents: {
-                            include: {
-                                parent: {
-                                    select: { firstName: true, lastName: true, email: true }
-                                }
-                            }
                         },
                         classe: {
                             select: { nom: true, niveau: true }
