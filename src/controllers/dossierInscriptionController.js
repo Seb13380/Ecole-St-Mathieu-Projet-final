@@ -214,32 +214,61 @@ const dossierInscriptionController = {
 
             console.log('✅ Dossier d\'inscription créé avec ID:', dossier.id);
 
-            // Envoyer les emails de confirmation
+            // 📧 ENVOI EMAIL CONFIRMATION PARENT
             try {
-                await emailService.sendInscriptionConfirmation(parentEmail, {
-                    parentName: `${parentFirstName} ${parentLastName}`,
-                    children: childrenData,
-                    anneeScolaire: anneeScolaire || '2026/2027'
-                });
-                console.log('✅ Email de confirmation envoyé au parent:', parentEmail);
+                const parentConfirmationData = {
+                    parentEmail: parentEmail,
+                    parentFirstName: parentFirstName,
+                    children: [{
+                        firstName: data.enfantPrenom,
+                        lastName: data.enfantNom,
+                        birthDate: data.enfantDateNaissance,
+                        requestedClass: data.enfantClasseDemandee
+                    }]
+                };
+
+                console.log('📧 Envoi confirmation parent:', parentEmail);
+                const parentEmailResult = await emailService.sendInscriptionConfirmation(parentConfirmationData);
+
+                if (parentEmailResult.success) {
+                    console.log('✅ Email parent envoyé:', parentEmailResult.messageId);
+                } else {
+                    console.error('❌ Erreur email parent:', parentEmailResult.error);
+                }
             } catch (emailError) {
-                console.log('✅ Email de confirmation simulé envoyé à:', parentEmail);
+                console.error('❌ Erreur lors de l\'envoi de l\'email parent:', emailError);
+                // Ne pas faire échouer l'inscription si l'email échoue
             }
 
-            // Notification au directeur
+            // 🔥 ENVOI EMAIL NOTIFICATION ADMIN
             try {
-                await emailService.sendNewInscriptionNotification('l.camboulives@stmathieu.org', {
+                const adminEmailData = {
                     requestId: dossier.id,
-                    parent: `${parentFirstName} ${parentLastName}`,
-                    email: parentEmail
-                });
-                console.log('✅ Notification directeur envoyée');
+                    parentName: `${parentFirstName} ${parentLastName}`,
+                    parentEmail: parentEmail,
+                    parentPhone: pereTelephone || mereTelephone,
+                    parentAddress: adresseComplete,
+                    children: [{
+                        firstName: data.enfantPrenom,
+                        lastName: data.enfantNom,
+                        birthDate: data.enfantDateNaissance,
+                        requestedClass: data.enfantClasseDemandee
+                    }],
+                    submittedAt: new Date(),
+                    adminEmail: 'sgdigitalweb13@gmail.com'
+                };
+
+                console.log('📧 Envoi notification admin pour dossier ID:', dossier.id);
+                const emailResult = await emailService.sendNewInscriptionNotification(adminEmailData);
+
+                if (emailResult.success) {
+                    console.log('✅ Email admin envoyé:', emailResult.messageId);
+                } else {
+                    console.error('❌ Erreur email admin:', emailResult.error);
+                }
             } catch (emailError) {
-                console.log('✅ Notification directeur simulée pour:', {
-                    requestId: dossier.id,
-                    parent: `${parentFirstName} ${parentLastName}`,
-                    email: parentEmail
-                });
+                console.error('❌ Erreur lors de l\'envoi de l\'email admin:', emailError);
+                // Ne pas faire échouer l'inscription si l'email échoue
             }
 
             // Redirection avec message de succès

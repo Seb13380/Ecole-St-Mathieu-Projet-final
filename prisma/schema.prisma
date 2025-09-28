@@ -666,9 +666,8 @@ model SiteLog {
 
 // Dossiers d'inscription détaillés
 model DossierInscription {
-  id            Int      @id @default(autoincrement())
-  anneeScolaire String   @default("2025/2026")
-  dateDepot     DateTime @default(now())
+  id            Int    @id @default(autoincrement())
+  anneeScolaire String @default("2025/2026")
 
   // Informations parents
   pereNom           String
@@ -771,7 +770,7 @@ model DossierInscription {
 
   @@index([statut])
   @@index([anneeScolaire])
-  @@index([dateDepot])
+  @@index([createdAt])
   @@index([enfantClasseDemandee])
   @@index([pereEmail])
   @@index([mereEmail])

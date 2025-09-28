@@ -12,11 +12,11 @@
 				{% set approvedCount = 0 %}
 				{% set rejectedCount = 0 %}
 				{% for request in requests %}
-					{% if request.status == 'PENDING' %}
+					{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' or request.status == 'EMAIL_PENDING' %}
 						{% set pendingCount = pendingCount + 1 %}
-					{% elseif request.status == 'ACCEPTED' %}
+					{% elseif request.status == 'ACCEPTED' or request.status == 'VALIDE' or request.status == 'APPROVED' %}
 						{% set approvedCount = approvedCount + 1 %}
-					{% elseif request.status == 'REJECTED' %}
+					{% elseif request.status == 'REJECTED' or request.status == 'REFUSE' %}
 						{% set rejectedCount = rejectedCount + 1 %}
 					{% endif %}
 				{% endfor %}
@@ -30,184 +30,170 @@
 		</div>
 
 		<!-- Filtres -->
-		<div class="mb-6">
-			<div
-				class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-				<!-- Filtre par statut -->
-				<div>
-					<label class="text-sm font-medium text-gray-700 mb-2 block">Filtrer par statut :</label>
-					<div class="tabs tabs-boxed">
-						<a class="tab tab-active" data-filter="all">Toutes ({{ requests | length }})</a>
-						<a class="tab" data-filter="PENDING">En attente ({{ pendingCount }})</a>
-						<a class="tab" data-filter="ACCEPTED">Approuvées ({{ approvedCount }})</a>
-						<a class="tab" data-filter="REJECTED">Refusées ({{ rejectedCount }})</a>
-					</div>
-				</div>
+		<div class="mb-8 bg-gray-50 p-4 rounded-lg">
+			<div class="flex flex-wrap gap-3 mb-4 items-center">
+				<span class="text-gray-700 font-medium">Filtrer par statut :</span>
+				<button class="filter-btn btn btn-outline" data-status="all">Toutes ({{ requests|length }})</button>
+				<button class="filter-btn btn btn-warning" data-status="pending">En attente ({{ pendingCount }})</button>
+				<button class="filter-btn btn btn-success" data-status="approved">Approuvées ({{ approvedCount }})</button>
+				<button class="filter-btn btn btn-error" data-status="rejected">Refusées ({{ rejectedCount }})</button>
+			</div>
 
-				<!-- Filtre par année scolaire -->
-				<div>
-					<label class="text-sm font-medium text-gray-700 mb-2 block">Filtrer par année scolaire :</label>
-					<select id="yearFilter" class="select select-bordered w-full">
-						<option value="all">Toutes les années</option>
-						<option value="2025/2026">2025/2026</option>
-						<option value="2026/2027">2026/2027</option>
-						<option value="2027/2028">2027/2028</option>
-					</select>
-				</div>
+			<div class="flex flex-wrap gap-3 items-center">
+				<span class="text-gray-700 font-medium">Filtrer par année scolaire :</span>
+				<select class="select select-bordered" id="yearFilter">
+					<option value="">Toutes les années</option>
+					<option value="2025/2026">2025/2026</option>
+					<option value="2024/2025">2024/2025</option>
+				</select>
 			</div>
 		</div>
 
 		<!-- Liste des demandes -->
-		<div class="space-y-6">
+		<div id="requestsList">
 			{% for request in requests %}
-				<div class="card bg-base-100 shadow-xl request-item" data-status="{{ request.status }}" data-year="{{ request.anneeScolaire|default('2025/2026') }}">
-					<div class="card-body">
-						<div class="flex justify-between items-start mb-4">
-							<div>
-								<h2 class="card-title text-[#304a4d] text-xl">
-									{{ request.parentFirstName }}
-									{{ request.parentLastName }}
-								</h2>
-								<p class="text-gray-600">{{ request.parentEmail }}</p>
-								<p class="text-gray-600">{{ request.parentPhone }}</p>
-								<!-- Année scolaire -->
-								<div class="mt-2">
-									<span class="badge badge-primary">
-										📅
-										{{ request.anneeScolaire|default('2025/2026') }}
-									</span>
-								</div>
-							</div>
+				<div
+					class="request-item bg-white rounded-lg shadow-md p-6 mb-6" data-status="{{ request.status }}" data-year="{{ request.submittedAt|date('Y') }}">
 
-							<div class="text-right">
-								{% if request.status == 'PENDING' %}
-									<span class="badge badge-warning badge-lg">En attente</span>
-								{% elseif request.status == 'ACCEPTED' %}
-									<span class="badge badge-success badge-lg">Approuvée</span>
-								{% else %}
-									<span class="badge badge-error badge-lg">Refusée</span>
+					<!-- En-tête de la demande -->
+					<div class="flex justify-between items-start mb-4">
+						<div>
+							<h2 class="text-xl font-semibold text-[#304a4d]">
+								{{ request.parentFirstName }}
+								{{ request.parentLastName }}
+							</h2>
+							<p class="text-gray-600">{{ request.parentEmail }}</p>
+							<p class="text-gray-600">{{ request.parentPhone }}</p>
+							<span class="badge badge-info">{{ request.submittedAt|date('Y') }}/{{ request.submittedAt|date('Y') + 1 }}</span>
+						</div>
+
+						<div class="text-right">
+							{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' or request.status == 'EMAIL_PENDING' %}
+								<span class="badge badge-warning badge-lg">En attente</span>
+							{% elseif request.status == 'ACCEPTED' or request.status == 'VALIDE' or request.status == 'APPROVED' %}
+								<span class="badge badge-success badge-lg">Approuvée</span>
+							{% elseif request.status == 'REJECTED' or request.status == 'REFUSE' %}
+								<span class="badge badge-error badge-lg">Refusée</span>
+							{% else %}
+								<span class="badge badge-secondary badge-lg">{{ request.status }}</span>
+							{% endif %}
+							<p class="text-sm text-gray-500 mt-1">
+								Demande du
+								{{ request.submittedAt|date('d/m/Y à H:i') }}
+							</p>
+						</div>
+					</div>
+
+					<!-- Informations des parents -->
+					<div class="grid md:grid-cols-2 gap-6 mb-6">
+						<div class="bg-blue-50 p-4 rounded-lg">
+							<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
+								👨‍👩‍👧‍👦 Informations des parents
+							</h3>
+
+							{% if request.type == 'DOSSIER_INSCRIPTION' and request.pereInfo %}
+								<!-- Dossier complet avec père et mère -->
+								<div class="mb-3">
+									<h4 class="font-medium text-blue-700">👨 Père</h4>
+									<p>{{ request.pereInfo.prenom }}
+										{{ request.pereInfo.nom }}</p>
+									<p class="text-sm text-gray-600">{{ request.pereInfo.email }}</p>
+									<p class="text-sm text-gray-600">{{ request.pereInfo.telephone }}</p>
+									{% if request.pereInfo.profession %}
+										<p class="text-sm text-gray-600">{{ request.pereInfo.profession }}</p>
+									{% endif %}
+								</div>
+
+								{% if request.mereInfo %}
+									<div>
+										<h4 class="font-medium text-blue-700">👩 Mère</h4>
+										<p>{{ request.mereInfo.prenom }}
+											{{ request.mereInfo.nom }}</p>
+										<p class="text-sm text-gray-600">{{ request.mereInfo.email }}</p>
+										<p class="text-sm text-gray-600">{{ request.mereInfo.telephone }}</p>
+										{% if request.mereInfo.profession %}
+											<p class="text-sm text-gray-600">{{ request.mereInfo.profession }}</p>
+										{% endif %}
+									</div>
 								{% endif %}
-								<p class="text-sm text-gray-500 mt-1">
-									Demande du
-									{{ request.submittedAt | date('d/m/Y à H:i') }}
+							{% else %}
+								<!-- Pré-inscription simple -->
+								<p>
+									<strong>{{ request.parentFirstName }}
+										{{ request.parentLastName }}</strong>
 								</p>
+								<p class="text-sm text-gray-600">{{ request.parentEmail }}</p>
+								<p class="text-sm text-gray-600">{{ request.parentPhone }}</p>
+							{% endif %}
+
+							<div class="mt-3">
+								<h4 class="font-medium text-blue-700">🏠 Adresse</h4>
+								<p class="text-sm">{{ request.parentAddress }}</p>
 							</div>
 						</div>
 
-						<!-- Informations des parents -->
-						<div class="grid md:grid-cols-2 gap-6 mb-6">
-							<div class="bg-blue-50 p-4 rounded-lg">
-								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
-									👨‍👩‍👧‍👦 Informations des parents
-								</h3>
-								<div class="space-y-3 text-sm">
-									{% if request.parentsInfo.pere %}
-										<div class="border-l-4 border-blue-400 pl-3">
-											<p class="font-semibold text-blue-700">👨 Père</p>
-											<p>{{ request.parentsInfo.pere }}</p>
-										</div>
-									{% endif %}
+						<!-- Informations enfant(s) -->
+						<div class="bg-green-50 p-4 rounded-lg">
+							<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
+								👶 Enfant(s) à inscrire
+							</h3>
 
-									{% if request.parentsInfo.mere %}
-										<div class="border-l-4 border-pink-400 pl-3">
-											<p class="font-semibold text-pink-700">👩 Mère</p>
-											<p>{{ request.parentsInfo.mere }}</p>
-										</div>
-									{% endif %}
-
-									{% if request.parentsInfo.adresse %}
-										<div class="border-l-4 border-green-400 pl-3">
-											<p class="font-semibold text-green-700">🏠 Adresse</p>
-											<p>{{ request.parentsInfo.adresse }}</p>
-										</div>
-									{% endif %}
-
-									{% if request.parentsInfo.tel %}
-										<div class="border-l-4 border-yellow-400 pl-3">
-											<p class="font-semibold text-yellow-700">📞 Téléphone domicile</p>
-											<p>{{ request.parentsInfo.tel }}</p>
-										</div>
-									{% endif %}
-
-									<!-- Fallback sur les données de base -->
-									{% if not request.parentsInfo.pere and not request.parentsInfo.mere %}
-										<div class="border-l-4 border-gray-400 pl-3">
-											<p class="font-semibold text-gray-700">📝 Contact principal</p>
-											<p>
-												<strong>Nom :</strong>
-												{{ request.parentFirstName }}
-												{{ request.parentLastName }}</p>
-											<p>
-												<strong>Email :</strong>
-												{{ request.parentEmail }}</p>
-											<p>
-												<strong>Téléphone :</strong>
-												{{ request.parentPhone }}</p>
-											<p>
-												<strong>Adresse :</strong>
-												{{ request.parentAddress }}</p>
-										</div>
-									{% endif %}
-								</div>
-							</div>
-
-							<div class="bg-green-50 p-4 rounded-lg">
-								<h3 class="font-semibold text-[#304a4d] mb-3 flex items-center gap-2">
-									👶 Enfant(s) à inscrire
-								</h3>
-								<div class="space-y-3">
-									{% for child in request.children %}
-										<div class="border border-green-200 rounded p-3 text-sm">
-											<p>
-												<strong>{{ child.firstName }}
-													{{ child.lastName }}</strong>
+							{% if request.children and request.children|length > 0 %}
+								{% for child in request.children %}
+									<div class="mb-3 {% if not loop.last %}border-b border-green-200 pb-3{% endif %}">
+										<p>
+											<strong>{{ child.firstName }}
+												{{ child.lastName }}</strong>
+										</p>
+										<p class="text-sm text-gray-600">
+											Né(e) le
+											{{ child.birthDate|date('d/m/Y') }}
+										</p>
+										{% if child.requestedClass %}
+											<p class="text-sm">
+												<span class="text-gray-600">Classe demandée :</span>
+												<span class="badge badge-primary">{{ child.requestedClass }}</span>
 											</p>
-											<p class="text-gray-600">Né(e) le
-												{{ child.birthDate | date('d/m/Y') }}</p>
-											<p class="text-gray-600">Âge :
-												{{ 'now' | date('Y') - child.birthDate | date('Y') }}
-												ans</p>
-										</div>
-									{% endfor %}
-								</div>
-							</div>
+										{% endif %}
+									</div>
+								{% endfor %}
+							{% else %}
+								<p class="text-gray-500">Aucune information enfant disponible</p>
+							{% endif %}
 						</div>
+					</div>
 
-						<!-- Commentaire de révision si existe -->
-						{% if request.adminNotes %}
-							<div class="bg-gray-50 p-4 rounded-lg mb-4">
-								<h3 class="font-semibold text-[#304a4d] mb-2">Notes administratives</h3>
-								<p class="text-gray-700">{{ request.adminNotes }}</p>
-								{% if request.processor %}
-									<p class="text-sm text-gray-500 mt-2">
-										Par
-										{{ request.processor.firstName }}
-										{{ request.processor.lastName }}
-										le
-										{{ request.processedAt | date('d/m/Y à H:i') }}
-									</p>
-								{% endif %}
-							</div>
-						{% endif %}
+					<!-- Actions -->
+					<div class="flex gap-2 justify-end">
+						<button class="btn btn-info btn-outline" onclick="viewDetails({{ request.id }})">
+							Voir détails
+						</button>
 
-						<!-- Actions -->
-						<div class="card-actions justify-end">
-							<button class="btn btn-info btn-outline" onclick="viewDetails({{ request.id }})">
-								Voir détails
+						{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' or request.status == 'EMAIL_PENDING' %}
+							<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
+								Refuser
 							</button>
-							{% if request.status == 'PENDING' %}
-								<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
-									Refuser
+							{% if request.type == 'DOSSIER_INSCRIPTION' %}
+								<button class="btn btn-success" onclick="showValidateModal({{ request.id }})">
+									Valider
 								</button>
+							{% else %}
 								<button class="btn btn-success" onclick="showApproveModal({{ request.id }})">
 									Approuver
 								</button>
-							{% else %}
-								<button class="btn btn-outline" onclick="showDeleteModal({{ request.id }})">
-									🗑️ Supprimer
-								</button>
 							{% endif %}
-						</div>
+						{% elseif request.status == 'ACCEPTED' or request.status == 'VALIDE' %}
+							<button class="btn btn-primary" onclick="showFinalizeModal({{ request.id }})">
+								Finaliser inscription
+							</button>
+							<button class="btn btn-outline" onclick="showDeleteModal({{ request.id }})">
+								🗑️ Supprimer
+							</button>
+						{% else %}
+							<button class="btn btn-outline" onclick="showDeleteModal({{ request.id }})">
+								🗑️ Supprimer
+							</button>
+						{% endif %}
 					</div>
 				</div>
 			{% else %}
@@ -218,89 +204,141 @@
 		</div>
 	</div>
 
-	<!-- Modal d'approbation -->
-	<dialog id="approve_modal" class="modal">
+	<!-- Modales -->
+	<!-- Modal Approuver -->
+	<div id="approveModal" class="modal">
 		<div class="modal-box">
-			<h3 class="font-bold text-lg text-green-600">Approuver la demande</h3>
-			<p class="py-4">Êtes-vous sûr de vouloir approuver cette demande d'inscription ?</p>
+			<h3 class="font-bold text-lg">Approuver la demande</h3>
+			<form id="approveForm">
+				<div class="py-4">
+					<label class="label">
+						<span class="label-text">Commentaire (optionnel)</span>
+					</label>
+					<textarea class="textarea textarea-bordered w-full" name="comment" placeholder="Commentaire pour les parents..."></textarea>
+				</div>
+				<div class="modal-action">
+					<button type="button" class="btn" onclick="closeModal('approveModal')">Annuler</button>
+					<button type="submit" class="btn btn-success">Approuver</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
-			<div class="form-control">
-				<label class="label">
-					<span class="label-text">Commentaire (optionnel)</span>
-				</label>
-				<textarea id="approve_comment" class="textarea textarea-bordered" placeholder="Commentaire d'approbation..."></textarea>
-			</div>
+	<!-- Modal Valider -->
+	<div id="validateModal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Valider le dossier</h3>
+			<form id="validateForm">
+				<div class="py-4">
+					<label class="label">
+						<span class="label-text">Commentaire (optionnel)</span>
+					</label>
+					<textarea class="textarea textarea-bordered w-full" name="comment" placeholder="Commentaire pour les parents..."></textarea>
+				</div>
+				<div class="modal-action">
+					<button type="button" class="btn" onclick="closeModal('validateModal')">Annuler</button>
+					<button type="submit" class="btn btn-success">Valider</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
+	<!-- Modal Finaliser -->
+	<div id="finalizeModal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Finaliser l'inscription</h3>
+			<form id="finalizeForm">
+				<div class="py-4">
+					<p class="mb-4">Cette action va créer les comptes utilisateurs et finaliser l'inscription.</p>
+					<label class="label">
+						<span class="label-text">Commentaire (optionnel)</span>
+					</label>
+					<textarea class="textarea textarea-bordered w-full" name="comment" placeholder="Notes administratives..."></textarea>
+				</div>
+				<div class="modal-action">
+					<button type="button" class="btn" onclick="closeModal('finalizeModal')">Annuler</button>
+					<button type="submit" class="btn btn-primary">Finaliser</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modal Refuser -->
+	<div id="rejectModal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Refuser la demande</h3>
+			<form id="rejectForm">
+				<div class="py-4">
+					<label class="label">
+						<span class="label-text">Motif du refus
+							<span class="text-red-500">*</span>
+						</span>
+					</label>
+					<textarea class="textarea textarea-bordered w-full" name="reason" placeholder="Expliquez le motif du refus..." required></textarea>
+				</div>
+				<div class="modal-action">
+					<button type="button" class="btn" onclick="closeModal('rejectModal')">Annuler</button>
+					<button type="submit" class="btn btn-error">Refuser</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modal Supprimer -->
+	<div id="deleteModal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Supprimer la demande</h3>
+			<p class="py-4">Êtes-vous sûr de vouloir supprimer définitivement cette demande ?</p>
 			<div class="modal-action">
-				<button class="btn" onclick="document.getElementById('approve_modal').close()">Annuler</button>
-				<button class="btn btn-success" onclick="processApproval()">Confirmer l'approbation</button>
+				<button type="button" class="btn" onclick="closeModal('deleteModal')">Annuler</button>
+				<button type="button" class="btn btn-error" id="confirmDelete">Supprimer</button>
 			</div>
 		</div>
-	</dialog>
+	</div>
 
-	<!-- Modal de refus -->
-	<dialog id="reject_modal" class="modal">
-		<div class="modal-box">
-			<h3 class="font-bold text-lg text-red-600">Refuser la demande</h3>
-			<p class="py-4">Êtes-vous sûr de vouloir refuser cette demande d'inscription ?</p>
-
-			<div class="form-control">
-				<label class="label">
-					<span class="label-text">Motif du refus *</span>
-				</label>
-				<textarea id="reject_comment" class="textarea textarea-bordered" placeholder="Veuillez indiquer le motif du refus..." required></textarea>
-			</div>
-
-			<div class="modal-action">
-				<button class="btn" onclick="document.getElementById('reject_modal').close()">Annuler</button>
-				<button class="btn btn-error" onclick="processRejection()">Confirmer le refus</button>
-			</div>
-		</div>
-	</dialog>
-
-	<!-- Modal de suppression -->
-	<dialog id="delete_modal" class="modal">
-		<div class="modal-box">
-			<h3 class="font-bold text-lg text-orange-600">Supprimer la demande</h3>
-			<p class="py-4">⚠️ Êtes-vous sûr de vouloir supprimer définitivement cette demande traitée ?</p>
-			<p class="text-sm text-gray-600">Cette action est irréversible.</p>
-
-			<div class="modal-action">
-				<button class="btn" onclick="document.getElementById('delete_modal').close()">Annuler</button>
-				<button class="btn btn-error" onclick="processDelete()">Supprimer définitivement</button>
-			</div>
-		</div>
-	</dialog>
-
+	<script src="/assets/js/modal-system.js"></script>
 	<script>
 		let currentRequestId = null;
 
-// Fonction pour afficher le modal d'approbation
-function showApproveModal(requestId) {
-currentRequestId = requestId;
-document.getElementById('approve_modal').showModal();
+// Fonctions pour ouvrir les modales
+function showApproveModal(id) {
+currentRequestId = id;
+document.getElementById('approveModal').classList.add('modal-open');
 }
 
-// Fonction pour afficher le modal de refus
-function showRejectModal(requestId) {
-currentRequestId = requestId;
-document.getElementById('reject_modal').showModal();
+function showValidateModal(id) {
+currentRequestId = id;
+document.getElementById('validateModal').classList.add('modal-open');
 }
 
-// Fonction pour afficher le modal de suppression
-function showDeleteModal(requestId) {
-currentRequestId = requestId;
-document.getElementById('delete_modal').showModal();
+function showFinalizeModal(id) {
+currentRequestId = id;
+document.getElementById('finalizeModal').classList.add('modal-open');
 }
 
-// Fonction pour voir les détails
-function viewDetails(requestId) {
-window.location.href = `/directeur/inscriptions/${requestId}/details`;
+function showRejectModal(id) {
+currentRequestId = id;
+document.getElementById('rejectModal').classList.add('modal-open');
 }
 
-// Traiter l'approbation
-async function processApproval() {
-const comment = document.getElementById('approve_comment').value;
+function showDeleteModal(id) {
+currentRequestId = id;
+document.getElementById('deleteModal').classList.add('modal-open');
+}
+
+function closeModal(modalId) {
+document.getElementById(modalId).classList.remove('modal-open');
+currentRequestId = null;
+}
+
+function viewDetails(id) {
+window.location.href = `/directeur/inscriptions/${id}/details`;
+}
+
+// Gestionnaires de formulaires
+document.getElementById('approveForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
 
 try {
 const response = await fetch (`/directeur/inscriptions/${currentRequestId}/approve`, {
@@ -308,30 +346,86 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
-credentials: 'include',
-body: JSON.stringify({comment})
+body: JSON.stringify(
+{comment: formData.get('comment')}
+)
 });
-const result = await response.json();
 
+const result = await response.json();
 if (result.success) {
-modalSystem.success('Demande approuvée avec succès !', 'Approbation réussie');
-setTimeout(() => location.reload(), 1500);
+showSuccessModal('Approbation réussie', 'La demande a été approuvée avec succès.');
+setTimeout(() => location.reload(), 2000);
 } else {
-modalSystem.error('Erreur : ' + result.message, 'Erreur d\'approbation');
+showErrorModal('Erreur d\'approbation', result.message);
 }
 } catch (error) {
-modalSystem.error('Erreur lors de l\'approbation', 'Erreur réseau');
-}
+showErrorModal('Erreur d\'approbation', 'Une erreur est survenue lors de l\'approbation.');
 }
 
-// Traiter le refus
-async function processRejection() {
-const comment = document.getElementById('reject_comment').value;
+closeModal('approveModal');
+});
 
-if (! comment.trim()) {
-modalSystem.warning('Veuillez indiquer un motif de refus', 'Motif requis');
-return;
+document.getElementById('validateForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
+
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/validate`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{comment: formData.get('comment')}
+)
+});
+
+const result = await response.json();
+if (result.success) {
+showSuccessModal('Validation réussie', 'Le dossier a été validé avec succès. Un email de confirmation a été envoyé aux parents.');
+setTimeout(() => location.reload(), 2000);
+} else {
+showErrorModal('Erreur de validation', result.message);
 }
+} catch (error) {
+showErrorModal('Erreur de validation', 'Une erreur est survenue lors de la validation du dossier.');
+}
+
+closeModal('validateModal');
+});
+
+document.getElementById('finalizeForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
+
+try {
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/finalize`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{comment: formData.get('comment')}
+)
+});
+
+const result = await response.json();
+if (result.success) {
+showSuccessModal('Finalisation réussie', 'L\'inscription a été finalisée avec succès. Les comptes ont été créés.');
+setTimeout(() => location.reload(), 2000);
+} else {
+showErrorModal('Erreur de finalisation', result.message);
+}
+} catch (error) {
+showErrorModal('Erreur de finalisation', 'Une erreur est survenue lors de la finalisation.');
+}
+
+closeModal('finalizeModal');
+});
+
+document.getElementById('rejectForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
 
 try {
 const response = await fetch (`/directeur/inscriptions/${currentRequestId}/reject`, {
@@ -339,84 +433,135 @@ method: 'POST',
 headers: {
 'Content-Type': 'application/json'
 },
-credentials: 'include',
 body: JSON.stringify(
-{reason: comment}
+{reason: formData.get('reason')}
 )
 });
-const result = await response.json();
 
+const result = await response.json();
 if (result.success) {
-modalSystem.success('Demande refusée', 'Refus enregistré');
-setTimeout(() => location.reload(), 1500);
+showSuccessModal('Demande refusée', 'La demande a été refusée et un email a été envoyé aux parents.');
+setTimeout(() => location.reload(), 2000);
 } else {
-modalSystem.error('Erreur : ' + result.message, 'Erreur de refus');
+showErrorModal('Erreur de refus', result.message);
 }
 } catch (error) {
-modalSystem.error('Erreur lors du refus', 'Erreur réseau');
-}
+showErrorModal('Erreur de refus', 'Une erreur est survenue lors du refus.');
 }
 
-// Traiter la suppression
-async function processDelete() {
+closeModal('rejectModal');
+});
+
+document.getElementById('confirmDelete').addEventListener('click', async () => {
 try {
-const response = await fetch (`/directeur/inscriptions/${currentRequestId}/delete`, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-},
-credentials: 'include'
-});
+const response = await fetch (`/directeur/inscriptions/${currentRequestId}/delete`, {method: 'DELETE'});
 
 const result = await response.json();
-
 if (result.success) {
-modalSystem.success('Demande supprimée', 'Suppression réussie');
-setTimeout(() => location.reload(), 1500);
+showSuccessModal('Suppression réussie', 'La demande a été supprimée définitivement.');
+setTimeout(() => location.reload(), 2000);
 } else {
-modalSystem.error('Erreur : ' + result.message, 'Erreur de suppression');
+showErrorModal('Erreur de suppression', result.message);
 }
 } catch (error) {
-modalSystem.error('Erreur lors de la suppression', 'Erreur réseau');
+showErrorModal('Erreur de suppression', 'Une erreur est survenue lors de la suppression.');
 }
-}
 
-// Filtrage des demandes par statut
-document.querySelectorAll('.tab').forEach(tab => {
-tab.addEventListener('click', function () { // Retirer la classe active de tous les onglets
-document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
-// Ajouter la classe active à l'onglet cliqué
-this.classList.add('tab-active');
+closeModal('deleteModal');
+});
 
-filterRequests();
+// Filtres
+document.querySelectorAll('.filter-btn').forEach(btn => {
+btn.addEventListener('click', (e) => {
+const status = e.target.dataset.status;
+filterByStatus(status);
+
+// Mettre à jour l'apparence des boutons
+document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('btn-active'));
+e.target.classList.add('btn-active');
 });
 });
 
-// Filtrage des demandes par année scolaire
-document.getElementById('yearFilter').addEventListener('change', function () {
-filterRequests();
+document.getElementById('yearFilter').addEventListener('change', (e) => {
+const year = e.target.value;
+filterByYear(year);
 });
 
-// Fonction pour filtrer les demandes selon les critères sélectionnés
-function filterRequests() {
-const statusFilter = document.querySelector('.tab.tab-active').getAttribute('data-filter');
-const yearFilter = document.getElementById('yearFilter').value;
+function filterByStatus(status) {
 const requests = document.querySelectorAll('.request-item');
-
-requests.forEach(request => {
-const requestStatus = request.getAttribute('data-status');
-const requestYear = request.getAttribute('data-year');
-
-const statusMatch = statusFilter === 'all' || requestStatus === statusFilter;
-const yearMatch = yearFilter === 'all' || requestYear === yearFilter;
-
-if (statusMatch && yearMatch) {
-request.style.display = 'block';
+requests.forEach(item => {
+if (status === 'all') {
+item.style.display = 'block';
 } else {
-request.style.display = 'none';
+const itemStatus = item.dataset.status;
+const show = (status === 'pending' && ['PENDING', 'EN_ATTENTE', 'EMAIL_PENDING'].includes(itemStatus)) || (status === 'approved' && ['ACCEPTED', 'VALIDE', 'APPROVED'].includes(itemStatus)) || (status === 'rejected' && ['REJECTED', 'REFUSE'].includes(itemStatus));
+item.style.display = show ? 'block' : 'none';
 }
 });
+}
+
+function filterByYear(year) {
+const requests = document.querySelectorAll('.request-item');
+requests.forEach(item => {
+if (! year) {
+item.style.display = 'block';
+} else {
+const itemYear = item.dataset.year;
+item.style.display = itemYear === year ? 'block' : 'none';
+}
+});
+}
+
+// Modales de succès et d'erreur
+function showSuccessModal(title, message) {
+const modalHtml = `
+<div id="successModal" class="modal modal-open">
+<div class="modal-box">
+<div class="flex items-center gap-3 mb-4">
+<div class="text-4xl">✅</div>
+<h3 class="font-bold text-lg text-green-600">${title}</h3>
+</div>
+<p class="py-4">${message}</p>
+<div class="modal-action">
+<button type="button" class="btn btn-success" onclick="closeSuccessModal()">OK</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function showErrorModal(title, message) {
+const modalHtml = `
+<div id="errorModal" class="modal modal-open">
+<div class="modal-box">
+<div class="flex items-center gap-3 mb-4">
+<div class="text-4xl">❌</div>
+<h3 class="font-bold text-lg text-red-600">${title}</h3>
+</div>
+<p class="py-4">${message}</p>
+<div class="modal-action">
+<button type="button" class="btn btn-error" onclick="closeErrorModal()">OK</button>
+</div>
+</div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeSuccessModal() {
+const modal = document.getElementById('successModal');
+if (modal) 
+modal.remove();
+
+}
+
+function closeErrorModal() {
+const modal = document.getElementById('errorModal');
+if (modal) 
+modal.remove();
+
 }
 	</script>
-	<script src="/js/modal-system.js"></script>
+
 {% endblock %}

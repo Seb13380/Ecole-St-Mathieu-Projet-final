@@ -96,6 +96,12 @@
 									{{ 'now' | date('Y') - child.birthDate | date('Y') }}
 									ans
 								</p>
+								{% if child.requestedClass %}
+									<p class="text-gray-600 mt-2">
+										<span class="font-medium">Classe demandée :</span>
+										<span class="badge badge-primary ml-2">{{ child.requestedClass }}</span>
+									</p>
+								{% endif %}
 							</div>
 						{% endfor %}
 					</div>

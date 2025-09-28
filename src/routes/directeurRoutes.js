@@ -72,8 +72,9 @@ router.post('/students/:id/delete', directeurController.deleteStudent);
 router.get('/inscriptions', inscriptionController.showAllRequests);
 router.get('/inscriptions/manage', inscriptionController.showManageInscriptions);
 router.post('/inscriptions/:id/approve', inscriptionController.approveRequest);
+router.post('/inscriptions/:id/validate', inscriptionController.validateDossier);
 router.post('/inscriptions/:id/reject', inscriptionController.rejectRequest);
-router.post('/inscriptions/:id/delete', inscriptionController.deleteRequest);
+router.delete('/inscriptions/:id/delete', inscriptionController.deleteRequest);
 router.get('/inscriptions/:id/details', inscriptionController.showRequestDetails);
 
 // Nouvelles routes pour les rendez-vous d'inscription
