@@ -71,6 +71,27 @@
 							<p>{{ request.parentAddress }}</p>
 						</div>
 					</div>
+
+					<!-- Affichage détaillé des 2 parents si disponible -->
+					{% if request.parentsInfo.pere or request.parentsInfo.mere %}
+						<div class="mt-6 pt-6 border-t border-gray-200">
+							<h3 class="font-semibold text-[#304a4d] mb-4">👨‍👩‍👧‍👦 Détails des parents</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+								{% if request.parentsInfo.pere %}
+									<div class="bg-blue-50 p-4 rounded-lg">
+										<h4 class="font-medium text-blue-700 mb-2">👨 Père</h4>
+										<p class="text-sm">{{ request.parentsInfo.pere }}</p>
+									</div>
+								{% endif %}
+								{% if request.parentsInfo.mere %}
+									<div class="bg-pink-50 p-4 rounded-lg">
+										<h4 class="font-medium text-pink-700 mb-2">👩 Mère</h4>
+										<p class="text-sm">{{ request.parentsInfo.mere }}</p>
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
 				</div>
 			</div>
 

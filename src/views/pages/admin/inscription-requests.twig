@@ -124,6 +124,24 @@
 								</p>
 								<p class="text-sm text-gray-600">{{ request.parentEmail }}</p>
 								<p class="text-sm text-gray-600">{{ request.parentPhone }}</p>
+
+								<!-- Affichage des 2 parents si disponible -->
+								{% if request.parentsInfo.pere or request.parentsInfo.mere %}
+									<div class="mt-3 pt-3 border-t border-blue-200">
+										{% if request.parentsInfo.pere %}
+											<div class="mb-2">
+												<h4 class="font-medium text-blue-700">👨 Père</h4>
+												<p class="text-sm">{{ request.parentsInfo.pere }}</p>
+											</div>
+										{% endif %}
+										{% if request.parentsInfo.mere %}
+											<div>
+												<h4 class="font-medium text-blue-700">👩 Mère</h4>
+												<p class="text-sm">{{ request.parentsInfo.mere }}</p>
+											</div>
+										{% endif %}
+									</div>
+								{% endif %}
 							{% endif %}
 
 							<div class="mt-3">
@@ -554,12 +572,14 @@ const modal = document.getElementById('successModal');
 if (modal) 
 modal.remove();
 
+
 }
 
 function closeErrorModal() {
 const modal = document.getElementById('errorModal');
 if (modal) 
 modal.remove();
+
 
 }
 	</script>
