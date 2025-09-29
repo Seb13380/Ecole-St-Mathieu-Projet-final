@@ -77,7 +77,7 @@ const processCredentialsRequest = async (req, res) => {
                 }
             });
 
-            return res.redirect('/demande-identifiants?error=Aucun compte parent trouvé avec ces informations. Veuillez vérifier vos données ou contacter l\'école.');
+            return res.redirect('/demande-identifiants?error=Aucun compte parent trouvé avec cette adresse email. Si vous n\'avez pas encore de compte, veuillez d\'abord faire une demande d\'inscription.');
         }
 
         console.log('✅ Parent trouvé:', existingParent.firstName, existingParent.lastName);

@@ -88,14 +88,14 @@ model Student {
   firstName     String
   lastName      String
   dateNaissance DateTime
-  parentId      Int // 👈 Temporaire: correspond à la base actuelle
-  classeId      Int? // 👈 Ajout du ? pour rendre optionnel
+  parentId      Int? // 👈 RENDU OPTIONNEL pour compatibilité migration
+  classeId      Int? // 👈 Optionnel
   photoUrl      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  parent          User              @relation("StudentParent", fields: [parentId], references: [id])
-  classe          Classe?           @relation("ClasseEleves", fields: [classeId], references: [id]) // 👈 Ajout du ?
+  parent          User?             @relation("StudentParent", fields: [parentId], references: [id]) // 👈 RENDU OPTIONNEL
+  classe          Classe?           @relation("ClasseEleves", fields: [classeId], references: [id])
   parents         ParentStudent[]   @relation("StudentParents")
   TicketBooklet   TicketBooklet[]
   MealReservation MealReservation[]
