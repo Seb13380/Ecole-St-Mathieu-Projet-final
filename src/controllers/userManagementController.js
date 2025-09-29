@@ -18,6 +18,18 @@ const userManagementController = {
 
             const parents = await prisma.user.findMany({
                 where: { role: 'PARENT' },
+                include: {
+                    students: {  // Relation directe via parentId
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            classe: { select: { nom: true } }
+                        }
+                    },
+                    _count: {
+                        select: { enfants: true }  // Compter les enfants via la table de jonction
+                    }
+                },
                 orderBy: { createdAt: 'desc' }
             });
 
@@ -225,6 +237,13 @@ const userManagementController = {
                     include: {
                         parent: {
                             select: { firstName: true, lastName: true, email: true }
+                        },
+                        parents: {  // Relation via table de jonction ParentStudent
+                            include: {
+                                parent: {
+                                    select: { firstName: true, lastName: true, email: true }
+                                }
+                            }
                         },
                         classe: {
                             select: { nom: true, niveau: true }
