@@ -241,9 +241,17 @@ const inscriptionController = {
                     }
                 }
 
+                // Debug temporaire
+                if (request.id === 22) {
+                    console.log('🔍 DEBUG REQUEST 22:');
+                    console.log('  parentsInfo:', parentsInfo);
+                    console.log('  children:', children);
+                }
+
                 return {
                     ...request,
                     children,
+                    parsedChildren: children,
                     parentsInfo
                 };
             });
@@ -932,6 +940,17 @@ const inscriptionController = {
                     }
                 }
 
+                // Parser les informations des parents
+                let parentsInfo = {};
+                if (request.message) {
+                    try {
+                        parentsInfo = typeof request.message === 'string' ? JSON.parse(request.message) : request.message;
+                    } catch (e) {
+                        console.error('Erreur parsing parents info:', e);
+                        parentsInfo = {};
+                    }
+                }
+
                 normalizedRequest = {
                     id: request.id,
                     type: 'PRE_INSCRIPTION',
@@ -943,6 +962,7 @@ const inscriptionController = {
                     parentPhone: request.parentPhone,
                     parentAddress: request.parentAddress,
                     children: children,
+                    parentsInfo: parentsInfo,
                     processor: request.processor,
                     processedAt: request.processedAt,
                     adminNotes: request.adminNotes,
@@ -985,6 +1005,11 @@ const inscriptionController = {
                         parentPhone: request.pereTelephone || request.mereTelephone,
                         parentAddress: request.adresseComplete,
                         children: children,
+                        parentsInfo: {
+                            pere: `${request.perePrenom} ${request.pereNom} - ${request.pereEmail}`,
+                            mere: `${request.merePrenom} ${request.mereNom} - ${request.mereEmail}`,
+                            adresse: request.adresseComplete
+                        },
                         processor: request.traitant,
                         processedAt: request.dateTraitement,
                         adminNotes: request.notesAdministratives,
