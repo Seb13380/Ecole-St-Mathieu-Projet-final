@@ -85,7 +85,8 @@
 												<div class="text-sm text-slate-900 font-medium">{{ eleve.parentsDisplay }}</div>
 												{% for parent in eleve.allParents %}
 													<div class="text-sm text-slate-500">{{ parent.email }}</div>
-													{% if not loop.last and eleve.allParents|length > 1 %}<hr class="my-1">{% endif %}
+													{% if not loop.last and eleve.allParents|length > 1 %}<hr class="my-1">
+													{% endif %}
 												{% endfor %}
 											{% else %}
 												<div class="text-sm text-slate-500">Aucun parent</div>

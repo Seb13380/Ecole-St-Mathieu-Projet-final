@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function checkLocalData() {
     console.log('🔍 Vérification des données LOCALES...\n');
-    
+
     try {
         // Vérifier les pre-inscriptions
         const preInscriptions = await prisma.preInscriptionRequest.findMany({
@@ -21,13 +21,13 @@ async function checkLocalData() {
 
         console.log('=== PRE-INSCRIPTIONS ===');
         console.log(`Total: ${preInscriptions.length}`);
-        
+
         // Compter par statut
         const statusCount = {};
         preInscriptions.forEach(req => {
             statusCount[req.status] = (statusCount[req.status] || 0) + 1;
         });
-        
+
         console.log('Répartition par statut:');
         Object.keys(statusCount).forEach(status => {
             console.log(`  - ${status}: ${statusCount[status]}`);
@@ -56,13 +56,13 @@ async function checkLocalData() {
         });
 
         console.log(`Total: ${dossiersInscription.length}`);
-        
+
         // Compter par statut
         const dossierStatusCount = {};
         dossiersInscription.forEach(dossier => {
             dossierStatusCount[dossier.statut] = (dossierStatusCount[dossier.statut] || 0) + 1;
         });
-        
+
         console.log('Répartition par statut:');
         Object.keys(dossierStatusCount).forEach(status => {
             console.log(`  - ${status}: ${dossierStatusCount[status]}`);
@@ -94,12 +94,12 @@ async function checkLocalData() {
 
 async function simulateVPSData() {
     console.log('\n🌐 Simulation des données VPS basées sur les captures d\'écran...\n');
-    
+
     // Basé sur les captures d'écran:
     // - 14 en attente
     // - 10 approuvées  
     // - 21 refusées
-    
+
     const vpsData = {
         preInscriptions: {
             total: 45,
@@ -138,7 +138,7 @@ async function simulateVPSData() {
 
 async function createSampleVPSData() {
     console.log('\n🔄 Création de données d\'exemple pour simuler la VPS...\n');
-    
+
     try {
         // Créer des pre-inscriptions supplémentaires pour atteindre les nombres VPS
         const samplePreInscriptions = [
@@ -287,7 +287,7 @@ async function createSampleVPSData() {
         }
 
         console.log('\n✅ Données d\'exemple créées avec succès !');
-        
+
     } catch (error) {
         console.error('❌ Erreur lors de la création des données d\'exemple:', error);
     }
@@ -296,35 +296,35 @@ async function createSampleVPSData() {
 async function main() {
     try {
         console.log('🔄 SYNCHRONISATION LOCAL <-> VPS\n');
-        
+
         // 1. Vérifier les données actuelles
         const localData = await checkLocalData();
-        
+
         // 2. Simuler les données VPS
         const vpsData = await simulateVPSData();
-        
+
         // 3. Comparer les différences
         console.log('\n📊 COMPARAISON LOCAL vs VPS\n');
-        
+
         console.log('PRE-INSCRIPTIONS:');
         console.log(`  Local: ${localData.preInscriptions.total} | VPS: ${vpsData.preInscriptions.total}`);
         console.log('  Différence:', vpsData.preInscriptions.total - localData.preInscriptions.total);
-        
+
         console.log('\nDOSSIERS D\'INSCRIPTION:');
         console.log(`  Local: ${localData.dossiersInscription.total} | VPS: ${vpsData.dossiersInscription.total}`);
         console.log('  Différence:', vpsData.dossiersInscription.total - localData.dossiersInscription.total);
-        
+
         // 4. Proposer de créer des données d'exemple
         console.log('\n🤔 Voulez-vous créer des données d\'exemple pour simuler la VPS ?');
         console.log('   Cela ajoutera des pre-inscriptions pour atteindre les mêmes nombres.');
-        
+
         // Créer automatiquement les données d'exemple
         await createSampleVPSData();
-        
+
         // 5. Revérifier après ajout
         console.log('\n🔍 VERIFICATION APRES SYNCHRONISATION...\n');
         await checkLocalData();
-        
+
     } catch (error) {
         console.error('❌ Erreur durant la synchronisation:', error);
     } finally {
