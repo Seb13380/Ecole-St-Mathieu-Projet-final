@@ -417,7 +417,7 @@ e.preventDefault();
 const formData = new FormData(e.target);
 
 try {
-const response = await fetch (`/directeur/inscriptions/${currentRequestId}/finalize`, {
+const response = await fetch (`/directeur/rendez-vous-inscriptions/${currentRequestId}/finalize`, {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -573,12 +573,14 @@ if (modal)
 modal.remove();
 
 
+
 }
 
 function closeErrorModal() {
 const modal = document.getElementById('errorModal');
 if (modal) 
 modal.remove();
+
 
 
 }
