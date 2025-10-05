@@ -10,7 +10,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 
 // Middleware d'authentification et de rôle
 router.use(requireAuth);
-router.use(requireRole(['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE']));
+router.use(requireRole(['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION']));
 
 // Dashboard principal des analytics
 router.get('/', analyticsController.getAnalyticsDashboard);

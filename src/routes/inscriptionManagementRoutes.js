@@ -7,7 +7,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 
 // Middleware d'authentification et d'autorisation pour l'admin
 router.use('/admin', requireAuth);
-router.use('/admin', requireRole(['DIRECTION', 'GESTIONNAIRE_SITE']));
+router.use('/admin', requireRole(['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION']));
 
 // Page de gestion des inscriptions
 router.get('/admin', inscriptionManagementController.getInscriptionManagement);

@@ -20,65 +20,64 @@
 		</head>
 		<body
 			class="bg-gray-100 min-h-screen font-poppins">
-			<!-- Navigation Admin -->
-			<nav class="bg-white shadow-lg border-b border-gray-200">
+			<!-- Navigation Header Moderne -->
+			<div class="bg-gradient-to-r from-purple-600 via-blue-600 to-teal-600 shadow-lg">
 				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div class="flex justify-between h-16">
-						<div class="flex items-center">
-							<a href="/directeur/dashboard" class="flex items-center space-x-2">
-								<img src="/assets/images/LogoStMathieuV.png" alt="Logo" class="h-8 w-8">
-								<span class="text-xl font-bold text-gray-800">Admin - École Saint-Mathieu</span>
+					<div class="flex justify-between items-center py-6">
+						<div class="flex items-center space-x-4">
+							<img src="/assets/images/LogoStMathieuV.png" alt="Logo" class="h-12 w-12 rounded-lg shadow-md">
+							<div class="text-white">
+								<h1 class="text-2xl font-bold">Admin - École Saint-Mathieu</h1>
+								<p class="text-purple-100 text-sm">Panel d'administration</p>
+							</div>
+						</div>
+
+						<!-- Menu Navigation Moderne -->
+						<div class="hidden lg:flex items-center space-x-2">
+							<a href="{% if user.role == 'SECRETAIRE_DIRECTION' %}/secretaire/dashboard{% else %}/directeur/dashboard{% endif %}" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-home mr-2"></i>Dashboard
+							</a>
+							<a href="/directeur/users" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-users mr-2"></i>Utilisateurs
+							</a>
+							<a href="/directeur/classes" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-school mr-2"></i>Classes
+							</a>
+							<a href="/directeur/inscriptions" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-clipboard-list mr-2"></i>Inscriptions
+							</a>
+							<a href="/directeur/pdf-archive" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-file-pdf mr-2"></i>Archive PDF
+							</a>
+							<a href="/gallery/admin" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-images mr-2"></i>Galerie
 							</a>
 						</div>
 
-						<div
-							class="flex items-center space-x-4">
-							<!-- Menu Admin -->
-							<div class="hidden md:flex items-center space-x-1">
-								<a href="/admin/dashboard" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-home mr-1"></i>Dashboard
-								</a>
-								<a href="/admin/users" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-users mr-1"></i>Utilisateurs
-								</a>
-								<a href="/admin/students" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-child mr-1"></i>Élèves
-								</a>
-								<a href="/admin/classes" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-school mr-1"></i>Classes
-								</a>
-								<a href="/admin/inscriptions" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-clipboard-list mr-1"></i>Inscriptions
-								</a>
-								<a href="/directeur/pdf-archive" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-file-pdf mr-1"></i>PDF Archive
-								</a>
-								<a href="/travaux/manage" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-hammer mr-1"></i>Travaux
-								</a>
-								<a href="/admin/reports" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-chart-bar mr-1"></i>Rapports
-								</a>
-								<a href="/admin/settings" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-									<i class="fas fa-cogs mr-1"></i>Paramètres
+						<!-- Menu Utilisateur -->
+						{% if user %}
+							<div class="flex items-center space-x-4">
+								<div class="text-white text-right">
+									<div class="text-sm font-medium">{{ user.firstName }}
+										{{ user.lastName }}</div>
+									<div class="text-xs text-purple-100">
+										{% if user.role == 'SECRETAIRE_DIRECTION' %}
+											Secrétaire de Direction
+										{% elseif user.role == 'DIRECTION' %}
+											Direction
+										{% else %}
+											{{ user.role }}
+										{% endif %}
+									</div>
+								</div>
+								<a href="/auth/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+									<i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
 								</a>
 							</div>
-
-							<!-- Utilisateur connecté -->
-							{% if user %}
-								<div class="flex items-center space-x-3">
-									<span class="text-sm text-gray-700">{{ user.firstName }}
-										{{ user.lastName }}</span>
-									<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ user.role }}</span>
-									<a href="/auth/logout" class="text-sm text-red-600 hover:text-red-800">
-										<i class="fas fa-sign-out-alt mr-1"></i>Déconnexion
-									</a>
-								</div>
-							{% endif %}
-						</div>
+						{% endif %}
 					</div>
 				</div>
-			</nav>
+			</div>
 
 			<!-- Contenu principal -->
 			<main class="min-h-screen bg-gray-50"> {% block content %}{% endblock %}

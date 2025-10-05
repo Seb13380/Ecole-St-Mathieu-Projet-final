@@ -25,7 +25,7 @@
 			<div class="mb-6">
 				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
 					<div class="flex flex-wrap gap-4">
-						<a href="/directeur/dashboard" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors">
+						<a href="{% if user.role == 'SECRETAIRE_DIRECTION' %}/secretaire/dashboard{% else %}/directeur/dashboard{% endif %}" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors">
 							← Retour au Dashboard
 						</a>
 						<a href="/directeur/inscriptions" class="inline-flex items-center px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors">

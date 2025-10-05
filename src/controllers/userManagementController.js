@@ -9,7 +9,7 @@ const userManagementController = {
     async getParentsManagement(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).render('pages/error', {
                     message: 'Accès refusé',
                     user: req.session.user
@@ -50,7 +50,7 @@ const userManagementController = {
     async createParent(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
@@ -108,7 +108,7 @@ const userManagementController = {
     async updateParent(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
@@ -159,7 +159,7 @@ const userManagementController = {
     async deleteParent(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
@@ -223,7 +223,7 @@ const userManagementController = {
             console.log('👤 Utilisateur:', req.session.user?.email, 'Role:', req.session.user?.role);
 
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 console.log('❌ Accès refusé pour le rôle:', req.session.user.role);
                 return res.status(403).render('pages/error', {
                     message: 'Accès refusé',
@@ -269,14 +269,14 @@ const userManagementController = {
             const elevesEnriches = eleves.map(eleve => {
                 const allParents = [];
                 const parentKeys = new Set(); // Pour éviter les doublons
-                
+
                 // Ajouter le parent principal s'il existe
                 if (eleve.parent) {
                     const key = `${eleve.parent.firstName}_${eleve.parent.lastName}`;
                     allParents.push(eleve.parent);
                     parentKeys.add(key);
                 }
-                
+
                 // Ajouter les parents via ParentStudent (en évitant les doublons)
                 eleve.parents.forEach(rel => {
                     const key = `${rel.parent.firstName}_${rel.parent.lastName}`;
@@ -285,12 +285,12 @@ const userManagementController = {
                         parentKeys.add(key);
                     }
                 });
-                
+
                 // Créer l'affichage des parents
-                const parentsDisplay = allParents.length > 0 
+                const parentsDisplay = allParents.length > 0
                     ? allParents.map(p => `${p.firstName} ${p.lastName}`).join(' & ')
                     : 'Aucun parent assigné';
-                
+
                 return {
                     ...eleve,
                     allParents: allParents,
@@ -320,7 +320,7 @@ const userManagementController = {
     async createStudent(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
@@ -362,7 +362,7 @@ const userManagementController = {
     async updateStudent(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
@@ -406,7 +406,7 @@ const userManagementController = {
     async deleteStudent(req, res) {
         try {
             // Vérifier les autorisations
-            if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
                 return res.status(403).json({ success: false, message: 'Accès refusé' });
             }
 
