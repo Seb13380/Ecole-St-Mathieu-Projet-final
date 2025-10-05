@@ -52,7 +52,9 @@ const inscriptionController = {
             });
 
             if (existingUser) {
-                return res.redirect('/auth/register?error=Un compte avec cet email existe déjà');
+                // ✅ NOUVEAU : Permettre une nouvelle demande d'inscription pour un parent existant
+                console.log(`⚠️ Parent ${parentEmail} existe déjà - création d'une nouvelle demande d'inscription`);
+                // Ne pas bloquer, laisser créer une nouvelle demande d'inscription
             }
 
             // Hasher le mot de passe

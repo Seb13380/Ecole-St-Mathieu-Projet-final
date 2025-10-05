@@ -91,54 +91,23 @@ const processCredentialsRequest = async (req, res) => {
             }
         });
 
-        // Générer un nouveau mot de passe temporaire
-        const tempPassword = 'Ecole' + Math.floor(Math.random() * 10000) + '!';
-        const hashedPassword = await bcrypt.hash(tempPassword, 12);
+        // ✅ NOUVEAU : Laisser la demande en attente pour validation par le directeur
+        console.log('✅ Parent trouvé, demande en attente de validation par le directeur');
 
-        // Mettre à jour le mot de passe
-        await prisma.user.update({
-            where: { id: existingParent.id },
-            data: {
-                password: hashedPassword,
-                updatedAt: new Date()
-            }
-        });
-
-        // Envoyer l'email avec les identifiants
-        await emailService.sendCredentialsEmail({
-            parentFirstName: existingParent.firstName,
-            parentLastName: existingParent.lastName,
-            parentEmail: existingParent.email,
-            temporaryPassword: tempPassword
-        });
-
-        console.log('✅ Identifiants envoyés à:', existingParent.email);
-
-        // Mettre à jour la demande comme complétée
+        // Mettre à jour la demande comme trouvée mais en attente
         await prisma.credentialsRequest.update({
             where: { id: credentialsRequest.id },
             data: {
-                status: 'COMPLETED',
-                identifiersSent: true,
-                processed: true,
-                processedAt: new Date()
+                status: 'PENDING', // En attente de validation
+                processed: false,   // Pas encore traitée
+                foundParentId: existingParent.id,
+                foundParentEmail: existingParent.email
             }
         });
 
-        // Envoyer notification à l'admin
-        try {
-            await emailService.sendAdminNotification({
-                type: 'credentials_request',
-                parentName: `${existingParent.firstName} ${existingParent.lastName}`,
-                parentEmail: existingParent.email,
-                timestamp: new Date()
-            });
-        } catch (adminError) {
-            console.error('⚠️ Erreur notification admin:', adminError);
-            // Ne pas faire échouer la demande pour cela
-        }
+        // Note: La notification sera gérée par le directeur lors de la validation
 
-        res.redirect('/demande-identifiants?message=Vos identifiants ont été envoyés par email. Vérifiez votre boîte de réception et vos spams.');
+        res.redirect('/demande-identifiants?message=Votre demande d\'identifiants a été transmise à la direction. Vous recevrez vos codes d\'accès par email après validation (sous 48h).');
 
     } catch (error) {
         console.error('❌ Erreur traitement demande identifiants:', error);

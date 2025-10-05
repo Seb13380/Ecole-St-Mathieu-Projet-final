@@ -265,15 +265,49 @@ const userManagementController = {
             console.log('   - Parents:', parents.length);
             console.log('   - Classes:', classes.length);
 
+            // Enrichir les données des élèves avec tous les parents
+            const elevesEnriches = eleves.map(eleve => {
+                const allParents = [];
+                const parentKeys = new Set(); // Pour éviter les doublons
+                
+                // Ajouter le parent principal s'il existe
+                if (eleve.parent) {
+                    const key = `${eleve.parent.firstName}_${eleve.parent.lastName}`;
+                    allParents.push(eleve.parent);
+                    parentKeys.add(key);
+                }
+                
+                // Ajouter les parents via ParentStudent (en évitant les doublons)
+                eleve.parents.forEach(rel => {
+                    const key = `${rel.parent.firstName}_${rel.parent.lastName}`;
+                    if (!parentKeys.has(key)) {
+                        allParents.push(rel.parent);
+                        parentKeys.add(key);
+                    }
+                });
+                
+                // Créer l'affichage des parents
+                const parentsDisplay = allParents.length > 0 
+                    ? allParents.map(p => `${p.firstName} ${p.lastName}`).join(' & ')
+                    : 'Aucun parent assigné';
+                
+                return {
+                    ...eleve,
+                    allParents: allParents,
+                    parentCount: allParents.length,
+                    parentsDisplay: parentsDisplay
+                };
+            });
+
             res.render('pages/admin/students-management', {
-                eleves,
+                eleves: elevesEnriches,
                 parents,
                 classes,
                 title: 'Gestion des Élèves',
                 user: req.session.user
             });
 
-            console.log('✅ Vue rendue avec succès');
+            console.log(`✅ Vue rendue avec ${elevesEnriches.length} élèves enrichis`);
         } catch (error) {
             console.error('❌ Erreur lors de la récupération des élèves:', error);
             res.status(500).render('pages/error', {

@@ -81,12 +81,11 @@
 											</div>
 										</td>
 										<td class="px-6 py-4 whitespace-nowrap">
-											{% if eleve.parents|length > 0 %}
-												{% for parentRelation in eleve.parents %}
-													<div class="text-sm text-slate-900">{{ parentRelation.parent.firstName }}
-														{{ parentRelation.parent.lastName }}</div>
-													<div class="text-sm text-slate-500">{{ parentRelation.parent.email }}</div>
-													{% if not loop.last %}<hr class="my-1">
+											{% if eleve.allParents|length > 0 %}
+												<div class="text-sm text-slate-900 font-medium">{{ eleve.parentsDisplay }}</div>
+												{% for parent in eleve.allParents %}
+													<div class="text-sm text-slate-500">{{ parent.email }}</div>
+													{% if not loop.last and eleve.allParents|length > 1 %}<hr class="my-1">
 													{% endif %}
 												{% endfor %}
 											{% else %}
