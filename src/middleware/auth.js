@@ -111,16 +111,37 @@ const requireDirection = (req, res, next) => {
     }
 
     console.log('🎭 Rôle utilisateur:', req.session.user.role);
-    const allowedRoles = ['DIRECTEUR', 'DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];
+    const allowedRoles = ['DIRECTEUR', 'DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'];
     if (!allowedRoles.includes(req.session.user.role)) {
         console.log('❌ Accès refusé - rôle insuffisant pour direction');
         return res.status(403).render('pages/error', {
-            message: 'Accès refusé. Réservé aux directeurs et gestionnaires.',
+            message: 'Accès refusé. Réservé aux directeurs, secrétaires et gestionnaires.',
             user: req.session.user
         });
     }
 
     console.log('✅ Accès direction autorisé');
+    next();
+};
+
+const requireSecretary = (req, res, next) => {
+    console.log('📋 Vérification SECRÉTAIRE - Session user:', req.session.user ? req.session.user.email : 'Absent');
+    if (!req.session.user) {
+        console.log('❌ Redirection vers login - pas de session secrétaire');
+        return res.redirect('/auth/login');
+    }
+
+    console.log('🎭 Rôle utilisateur:', req.session.user.role);
+    const allowedRoles = ['SECRETAIRE_DIRECTION', 'DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];
+    if (!allowedRoles.includes(req.session.user.role)) {
+        console.log('❌ Accès refusé - rôle insuffisant pour secrétariat');
+        return res.status(403).render('pages/error', {
+            message: 'Accès refusé. Réservé au secrétariat de direction.',
+            user: req.session.user
+        });
+    }
+
+    console.log('✅ Accès secrétariat autorisé');
     next();
 };
 
@@ -133,5 +154,6 @@ module.exports = {
     requireEnseignant,
     requireParent,
     requireDirection,
+    requireSecretary,
     requireAPEL
 };
