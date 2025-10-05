@@ -232,7 +232,7 @@
 			<!-- Téléchargements populaires -->
 			<div class="chart-container">
 				<h3 class="text-xl font-bold mb-4">📥 Téléchargements populaires</h3>
-				<div class="space-y-2">
+				<div class="space-y-2" data-downloads-list>
 					{% if additionalStats.topDownloads|length > 0 %}
 						{% for download in additionalStats.topDownloads|slice(0, 6) %}
 							<div class="metric-item">
@@ -242,7 +242,7 @@
 						{% endfor %}
 					{% else %}
 						<div class="text-center text-gray-500 py-4">
-							Aucun téléchargement enregistré
+							Aucun téléchargement enregistré pour cette période
 						</div>
 					{% endif %}
 				</div>
@@ -343,22 +343,92 @@ display: false
 });{% endif %}
 });
 
-function loadPeriod(period) { // Mettre à jour l'apparence des boutons
+function loadPeriod(period) { 
+// Mettre à jour l'apparence des boutons
 document.querySelectorAll('button[onclick^="loadPeriod"]').forEach(btn => {
 btn.className = 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors';
 });
 event.target.className = 'px-4 py-2 bg-blue-600 text-white rounded';
 
-// Charger les nouvelles données
-fetch (`/directeur/analytics/data?period=${period}`).then(response => response.json()).then(data => {
-if (data.success) { // Recharger la page avec les nouvelles données
-window.location.reload();
+// Calculer les dates de début et fin selon la période
+let startDate = new Date();
+let endDate = new Date();
+
+switch(period) {
+case 'today':
+startDate.setHours(0, 0, 0, 0);
+break;
+case 'week':
+startDate.setDate(startDate.getDate() - 7);
+break;
+case 'month':
+startDate.setMonth(startDate.getMonth() - 1);
+break;
+case 'year':
+startDate.setFullYear(startDate.getFullYear() - 1);
+break;
+}
+
+// Charger les nouvelles données avec AJAX
+const url = `/directeur/analytics/data?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+
+fetch(url)
+.then(response => response.json())
+.then(data => {
+if (data.success) {
+// Mettre à jour les statistiques sur la page
+updateStatsDisplay(data.data);
+console.log('📊 Données mises à jour pour:', period);
 } else {
 console.error('Erreur lors du chargement des données:', data.message);
 }
-}).catch(error => {
+})
+.catch(error => {
 console.error('Erreur:', error);
 });
+}
+
+function updateStatsDisplay(data) {
+// Mettre à jour les cartes de statistiques
+if (data.stats) {
+const statsCards = document.querySelectorAll('.stats-number');
+if (statsCards[0]) statsCards[0].textContent = new Intl.NumberFormat().format(data.stats.totalVisits || 0);
+if (statsCards[1]) statsCards[1].textContent = new Intl.NumberFormat().format(data.stats.uniqueVisitors || 0);
+if (statsCards[2]) statsCards[2].textContent = (data.stats.avgResponseTime || 0) + 'ms';
+if (statsCards[3]) {
+const successRate = data.stats.totalVisits > 0 ? 
+((data.stats.totalVisits - (data.stats.topErrors?.length || 0)) / data.stats.totalVisits * 100).toFixed(1) : 0;
+statsCards[3].textContent = successRate + '%';
+}
+}
+
+// Mettre à jour les téléchargements populaires
+if (data.additionalStats && data.additionalStats.topDownloads) {
+updateTopDownloads(data.additionalStats.topDownloads);
+}
+}
+
+function updateTopDownloads(downloads) {
+const container = document.querySelector('[data-downloads-list]');
+if (!container) return;
+
+if (!downloads || downloads.length === 0) {
+container.innerHTML = '<div class="text-center text-gray-500 py-4">Aucun téléchargement pour cette période</div>';
+return;
+}
+
+let html = '';
+downloads.slice(0, 6).forEach((download, index) => {
+const fileName = download.url.replace(/^.*\//, '').replace(/\.(pdf|doc|docx|jpg|png)$/i, '');
+html += `
+<div class="metric-item">
+<span class="text-sm truncate">${fileName}</span>
+<span class="font-medium text-orange-600">${download.downloads}</span>
+</div>
+`;
+});
+
+container.innerHTML = html;
 }
 
 function exportLogs() {

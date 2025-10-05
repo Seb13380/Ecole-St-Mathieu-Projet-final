@@ -25,17 +25,40 @@ async function getAdditionalStats(startDate, endDate) {
         _count: { userRole: true }
     });
 
-    // Documents les plus téléchargés
-    const topDownloads = await prisma.siteLog.groupBy({
+    // Documents les plus téléchargés (filtrer uniquement les fichiers existants)
+    const fs = require('fs');
+    const path = require('path');
+    
+    const allDownloads = await prisma.siteLog.groupBy({
         by: ['url'],
         where: {
             ...whereClause,
-            action: 'download'
+            action: 'download',
+            url: { not: null }
         },
         _count: { url: true },
         orderBy: { _count: { url: 'desc' } },
-        take: 10
+        take: 20 // Prendre plus pour pouvoir filtrer
     });
+
+    // Filtrer uniquement les fichiers qui existent vraiment
+    const topDownloads = [];
+    for (const download of allDownloads) {
+        if (topDownloads.length >= 10) break;
+        
+        try {
+            // Construire le chemin vers le fichier
+            const filePath = path.join(process.cwd(), 'public', download.url);
+            
+            // Vérifier si le fichier existe
+            if (fs.existsSync(filePath)) {
+                topDownloads.push(download);
+            }
+        } catch (error) {
+            // Si erreur, ne pas inclure ce fichier
+            console.log(`❌ Fichier non trouvé: ${download.url}`);
+        }
+    }
 
     // Recherches les plus fréquentes
     const topSearches = await prisma.siteLog.groupBy({
