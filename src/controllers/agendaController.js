@@ -12,8 +12,8 @@ const getAgenda = async (req, res) => {
         // Récupérer les événements selon le rôle de l'utilisateur
         let whereClause = {};
 
-        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE') {
-            // La direction voit tous les événements
+        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE' || req.session.user.role === 'SECRETAIRE_DIRECTION') {
+            // La direction et la secrétaire voient tous les événements
             whereClause = {};
         } else {
             // Les autres utilisateurs connectés ne voient que les événements visibles
@@ -61,7 +61,7 @@ const getAgenda = async (req, res) => {
 const getAgendaManagement = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
             return res.status(403).render('pages/error', {
                 message: 'Accès non autorisé',
                 title: 'Erreur 403',
@@ -296,8 +296,8 @@ const getEventsAPI = async (req, res) => {
         // Récupérer les événements selon le rôle de l'utilisateur
         let whereClause = {};
 
-        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE') {
-            // La direction voit tous les événements
+        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE' || req.session.user.role === 'SECRETAIRE_DIRECTION') {
+            // La direction et la secrétaire voient tous les événements
             whereClause = {};
         } else {
             // Les autres utilisateurs connectés ne voient que les événements visibles

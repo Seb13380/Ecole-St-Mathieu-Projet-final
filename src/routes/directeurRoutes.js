@@ -41,8 +41,8 @@ const upload = multer({
 // Middleware pour vérifier l'authentification
 router.use(requireAuth);
 
-// Middleware pour vérifier le rôle directeur/admin/gestionnaire
-router.use(requireRole(['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE']));
+// Middleware pour vérifier le rôle directeur/admin/gestionnaire/secrétaire
+router.use(requireRole(['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION']));
 
 // Dashboard
 router.get('/dashboard', directeurController.dashboard);

@@ -265,6 +265,10 @@
 							<li>
 								<a href="/directeur/dashboard">Tableau de bord</a>
 							</li>
+						{% elseif user.role == 'SECRETAIRE_DIRECTION' %}
+							<li>
+								<a href="/secretaire/dashboard">Tableau de bord</a>
+							</li>
 						{% elseif user.role == 'GESTIONNAIRE_SITE' %}
 							<li>
 								<a href="/directeur/dashboard">Tableau de bord</a>

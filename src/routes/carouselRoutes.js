@@ -10,8 +10,8 @@ router.get('/api/active', carouselController.getActiveImages);
 // Middleware pour vérifier l'authentification APRÈS l'API publique
 router.use(requireAuth);
 
-// Middleware pour vérifier les rôles autorisés (Directeur et Maintenance)
-router.use(requireRole(['DIRECTION', 'ADMIN', 'MAINTENANCE_SITE']));
+// Middleware pour vérifier les rôles autorisés (Directeur, Maintenance et Secrétaire)
+router.use(requireRole(['DIRECTION', 'ADMIN', 'MAINTENANCE_SITE', 'SECRETAIRE_DIRECTION']));
 
 // Routes pour la gestion du carousel (AVEC AUTHENTIFICATION)
 router.get('/manage', carouselController.showManagement);

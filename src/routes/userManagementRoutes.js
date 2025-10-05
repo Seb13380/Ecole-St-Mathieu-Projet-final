@@ -5,7 +5,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 
 // Middleware d'authentification et d'autorisation
 router.use(requireAuth);
-router.use(requireRole(['DIRECTION', 'GESTIONNAIRE_SITE']));
+router.use(requireRole(['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION']));
 
 // === ROUTES GESTION DES PARENTS ===
 

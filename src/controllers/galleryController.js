@@ -83,7 +83,7 @@ const showAdminGallery = async (req, res) => {
         console.log('User role:', req.session.user?.role);
         console.log('====');
 
-        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias
+        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias - TRIÉS PAR ORDRE
         const themes = await prisma.galleryTheme.findMany({
             include: {
                 medias: {
@@ -100,9 +100,10 @@ const showAdminGallery = async (req, res) => {
                     }
                 }
             },
-            orderBy: {
-                name: "asc"
-            }
+            orderBy: [
+                { ordre: "asc" },  // D'abord par ordre personnalisé
+                { name: "asc" }    // Puis par nom si même ordre
+            ]
         });
 
         console.log('Themes found:', themes.length);
@@ -261,6 +262,35 @@ const deleteTheme = async (req, res) => {
     }
 };
 
+// 🆕 NOUVELLE FONCTION - Réorganiser les thèmes
+const reorderThemes = async (req, res) => {
+    try {
+        const { themeIds } = req.body;
+
+        if (!Array.isArray(themeIds)) {
+            return res.status(400).json({ error: 'Format invalide - tableau requis' });
+        }
+
+        console.log('🔄 Réorganisation des thèmes:', themeIds);
+
+        // Mettre à jour l'ordre de chaque thème
+        const updatePromises = themeIds.map((themeId, index) => {
+            return prisma.galleryTheme.update({
+                where: { id: parseInt(themeId) },
+                data: { ordre: index + 1 }
+            });
+        });
+
+        await Promise.all(updatePromises);
+
+        console.log('✅ Ordre des thèmes mis à jour');
+        res.json({ success: true, message: 'Ordre mis à jour avec succès' });
+    } catch (error) {
+        console.error('❌ Erreur lors de la réorganisation:', error);
+        res.status(500).json({ error: 'Erreur lors de la réorganisation' });
+    }
+};
+
 module.exports = {
     upload,
     showGallery,
@@ -268,6 +298,7 @@ module.exports = {
     createTheme,
     uploadMedia,
     deleteMedia,
-    deleteTheme
+    deleteTheme,
+    reorderThemes
 };
 

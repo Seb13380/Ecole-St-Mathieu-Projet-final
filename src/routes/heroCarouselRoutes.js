@@ -3,8 +3,8 @@ const router = express.Router();
 const heroCarouselController = require('../controllers/heroCarouselController');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
-// Middleware pour vérifier les permissions (DIRECTION, MAINTENANCE_SITE ou ADMIN)
-const requireHeroCarouselPermission = requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN']);
+// Middleware pour vérifier les permissions (DIRECTION, MAINTENANCE_SITE, ADMIN ou SECRETAIRE_DIRECTION)
+const requireHeroCarouselPermission = requireRole(['DIRECTION', 'MAINTENANCE_SITE', 'ADMIN', 'SECRETAIRE_DIRECTION']);
 
 // Routes pour la gestion des images hero carousel
 // Route principale - supporte les deux variantes

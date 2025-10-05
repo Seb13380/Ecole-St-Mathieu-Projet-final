@@ -167,9 +167,9 @@ const parentInvitationController = {
     // Afficher les demandes d'inscription pour le directeur
     async showInvitationManagement(req, res) {
         try {
-            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN' && req.session.user.role !== 'SECRETAIRE_DIRECTION') {
                 return res.status(403).render('pages/error', {
-                    message: 'Accès refusé. Réservé aux directeurs.',
+                    message: 'Accès refusé. Réservé aux directeurs et secrétaires.',
                     user: req.session.user
                 });
             }
@@ -207,7 +207,7 @@ const parentInvitationController = {
     // Approuver une demande d'inscription
     async approveInscription(req, res) {
         try {
-            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN' && req.session.user.role !== 'SECRETAIRE_DIRECTION') {
                 return res.status(403).json({ error: 'Accès refusé' });
             }
 
@@ -286,7 +286,7 @@ const parentInvitationController = {
     // Refuser une demande d'inscription
     async rejectInscription(req, res) {
         try {
-            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN' && req.session.user.role !== 'SECRETAIRE_DIRECTION') {
                 return res.status(403).json({ error: 'Accès refusé' });
             }
 
@@ -399,7 +399,7 @@ const parentInvitationController = {
     // Créer et envoyer une invitation
     async createAndSendInvitation(req, res) {
         try {
-            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN' && req.session.user.role !== 'SECRETAIRE_DIRECTION') {
                 return res.status(403).json({ error: 'Accès refusé' });
             }
 
@@ -467,7 +467,7 @@ const parentInvitationController = {
     // Supprimer une invitation
     async deleteInvitation(req, res) {
         try {
-            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN' && req.session.user.role !== 'SECRETAIRE_DIRECTION') {
                 return res.status(403).json({ error: 'Accès refusé' });
             }
 
@@ -491,7 +491,7 @@ const parentInvitationController = {
     // Renvoyer une invitation
     async resendInvitation(req, res) {
         try {
-            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN') {
+            if (req.session.user.role !== 'DIRECTION' && req.session.user.role !== 'ADMIN' && req.session.user.role !== 'SECRETAIRE_DIRECTION') {
                 return res.status(403).json({ error: 'Accès refusé' });
             }
 
