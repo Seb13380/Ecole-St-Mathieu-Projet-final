@@ -76,12 +76,7 @@
 						<div class="bg-gray-100 border-b border-gray-200 p-3 flex items-center justify-center">
 							<div class="flex items-center space-x-3">
 								<label class="text-gray-600 text-sm font-medium">Ordre d'affichage :</label>
-								<input type="number" 
-									   value="{{ theme.ordre ?? loop.index }}" 
-									   min="1" 
-									   max="99" 
-									   class="w-16 text-center text-sm border border-gray-300 rounded px-2 py-1"
-									   onchange="updateThemeOrder({{ theme.id }}, this.value)">
+								<input type="number" value="{{ theme.ordre ?? loop.index }}" min="1" max="99" class="w-16 text-center text-sm border border-gray-300 rounded px-2 py-1" onchange="updateThemeOrder({{ theme.id }}, this.value)">
 								<span class="text-xs text-gray-500">(1 = premier, 2 = deuxième, etc.)</span>
 							</div>
 						</div>
@@ -141,12 +136,7 @@
 													<h3 class="font-semibold text-gray-800 truncate flex-1">{{ media.title }}</h3>
 													<div class="ml-2 text-center">
 														<label class="text-xs text-gray-500 block">Ordre</label>
-														<input type="number" 
-															   value="{{ media.ordre ?? loop.index }}" 
-															   min="1" 
-															   max="99" 
-															   class="w-12 text-center text-xs border border-gray-300 rounded px-1 py-1"
-															   onchange="updateMediaOrder({{ media.id }}, this.value)">
+														<input type="number" value="{{ media.ordre ?? loop.index }}" min="1" max="99" class="w-12 text-center text-xs border border-gray-300 rounded px-1 py-1" onchange="updateMediaOrder({{ media.id }}, this.value)">
 													</div>
 												</div>
 												{% if media.description %}
@@ -566,58 +556,66 @@ return false;
 
 // 🆕 Fonction pour mettre à jour l'ordre d'un thème
 async function updateThemeOrder(themeId, ordre) {
-	console.log(`📊 Mise à jour ordre thème ${themeId} -> ${ordre}`);
-	
-	try {
-		const response = await fetch(`/gallery/admin/themes/${themeId}/order`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ ordre: parseInt(ordre) })
-		});
+console.log(`📊 Mise à jour ordre thème ${themeId} -> ${ordre}`);
 
-		const result = await response.json();
+try {
+const response = await fetch (`/gallery/admin/themes/${themeId}/order`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{ordre: parseInt(ordre)}
+)
+});
 
-		if (result.success) {
-			showMessage('✅ Ordre mis à jour !', 'success');
-			// Recharger pour voir le nouvel ordre
-			setTimeout(() => location.reload(), 1000);
-		} else {
-			showMessage('❌ ' + (result.error || 'Erreur lors de la mise à jour'), 'error');
-		}
-	} catch (error) {
-		console.error('Erreur:', error);
-		showMessage('❌ Erreur de connexion', 'error');
-	}
+const result = await response.json();
+
+if (result.success) {
+showMessage('✅ Ordre mis à jour !', 'success');
+// Recharger pour voir le nouvel ordre
+setTimeout(() => location.reload(), 1000);
+} else {
+showMessage('❌ ' + (
+result.error || 'Erreur lors de la mise à jour'
+), 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('❌ Erreur de connexion', 'error');
+}
 }
 
 // 🆕 Fonction pour mettre à jour l'ordre d'un média
 async function updateMediaOrder(mediaId, ordre) {
-	console.log(`📊 Mise à jour ordre média ${mediaId} -> ${ordre}`);
-	
-	try {
-		const response = await fetch(`/gallery/admin/media/${mediaId}/order`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ ordre: parseInt(ordre) })
-		});
+console.log(`📊 Mise à jour ordre média ${mediaId} -> ${ordre}`);
 
-		const result = await response.json();
+try {
+const response = await fetch (`/gallery/admin/media/${mediaId}/order`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{ordre: parseInt(ordre)}
+)
+});
 
-		if (result.success) {
-			showMessage('✅ Ordre du média mis à jour !', 'success');
-			// Recharger pour voir le nouvel ordre
-			setTimeout(() => location.reload(), 1000);
-		} else {
-			showMessage('❌ ' + (result.error || 'Erreur lors de la mise à jour'), 'error');
-		}
-	} catch (error) {
-		console.error('Erreur:', error);
-		showMessage('❌ Erreur de connexion', 'error');
-	}
+const result = await response.json();
+
+if (result.success) {
+showMessage('✅ Ordre du média mis à jour !', 'success');
+// Recharger pour voir le nouvel ordre
+setTimeout(() => location.reload(), 1000);
+} else {
+showMessage('❌ ' + (
+result.error || 'Erreur lors de la mise à jour'
+), 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('❌ Erreur de connexion', 'error');
+}
 }
 
 async function saveThemeOrder() {

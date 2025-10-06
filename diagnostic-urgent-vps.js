@@ -26,7 +26,7 @@ async function diagnosticUrgent() {
         uploadDirs.forEach(dir => {
             const exists = fs.existsSync(dir);
             console.log(`   ${dir}: ${exists ? '✅ Existe' : '❌ Manquant'}`);
-            
+
             if (exists) {
                 try {
                     const files = fs.readdirSync(dir);

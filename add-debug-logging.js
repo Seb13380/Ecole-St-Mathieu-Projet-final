@@ -15,7 +15,7 @@ function addDebugLogging() {
 
         // Trouver la fonction rejectRequest et ajouter des logs
         const originalFunction = controller.match(/(rejectRequest: async \(req, res\) => {[\s\S]*?^    },)/m);
-        
+
         if (originalFunction) {
             const newFunction = `rejectRequest: async (req, res) => {
         console.log('🔍 REJECT REQUEST APPELÉ - ID:', req.params.id);
@@ -80,10 +80,10 @@ function addDebugLogging() {
 
             // Remplacer la fonction
             controller = controller.replace(originalFunction[0], newFunction);
-            
+
             // Écrire le fichier modifié
             fs.writeFileSync(controllerPath + '.debug', controller);
-            
+
             console.log('✅ Version debug créée:', controllerPath + '.debug');
             console.log('');
             console.log('🔧 POUR APPLIQUER LE PATCH:');
@@ -95,7 +95,7 @@ function addDebugLogging() {
             console.log('🔄 POUR RESTAURER:');
             console.log('cp src/controllers/inscriptionController.js.backup src/controllers/inscriptionController.js');
             console.log('pm2 restart all');
-            
+
         } else {
             console.log('❌ Fonction rejectRequest non trouvée');
         }

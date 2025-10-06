@@ -351,7 +351,7 @@
 									<button class="btn btn-circle pointer-events-auto carousel-next-btn">❯</button>
 								</div>
 
-								
+
 							{% endif %}
 						</div>
 					</div>
@@ -548,7 +548,6 @@
 		}
 
 
-
 		/* Forcer la visibilité des boutons même sur petits écrans */
 		@media(max-width: 768px) {
 			.btn-circle {
@@ -594,6 +593,7 @@ if (! carousel)
 return;
 
 
+
 const slides = carousel.querySelectorAll('.carousel-slide');
 const prevBtn = carousel.querySelector('.carousel-prev-btn');
 const nextBtn = carousel.querySelector('.carousel-next-btn');
@@ -601,12 +601,12 @@ if (slides.length === 0)
 return;
 
 
+
 let currentSlide = 0;
 let autoSlideInterval;
 
 // Fonction pour afficher une slide spécifique
-function showSlide(index) { 
-// Masquer toutes les slides
+function showSlide(index) { // Masquer toutes les slides
 slides.forEach(slide => {
 slide.classList.remove('active');
 });
@@ -647,7 +647,6 @@ resetAutoSlide();
 }
 
 
-
 // Auto-défilement
 function startAutoSlide() {
 autoSlideInterval = setInterval(nextSlide, 5000);
@@ -679,6 +678,7 @@ document.addEventListener('DOMContentLoaded', function () {
 const heroCarousel = document.querySelector('.hero-carousel');
 if (! heroCarousel) 
 return;
+
 
 
 const heroSlides = heroCarousel.querySelectorAll('.carousel-item');
@@ -727,6 +727,7 @@ currentHeroSlide = targetIndex;
 
 
 setTimeout(autoScrollHero, 1000);
+
 });
 
 // Fonction pour afficher/masquer le texte complet des actualités

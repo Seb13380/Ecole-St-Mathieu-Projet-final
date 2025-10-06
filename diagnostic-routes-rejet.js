@@ -20,7 +20,7 @@ async function diagnosticRoutesVPS() {
 
         console.log('\n📁 VÉRIFICATION FICHIERS:');
         const fs = require('fs');
-        
+
         routeFiles.forEach(file => {
             const exists = fs.existsSync(file);
             console.log(`   ${file}: ${exists ? '✅' : '❌'}`);
@@ -32,9 +32,9 @@ async function diagnosticRoutesVPS() {
             const directeurRoutes = fs.readFileSync('src/routes/directeurRoutes.js', 'utf8');
             const hasRejectRoute = directeurRoutes.includes('/inscriptions/:id/reject');
             console.log(`   Route reject présente: ${hasRejectRoute ? '✅' : '❌'}`);
-            
+
             if (hasRejectRoute) {
-                const rejectLines = directeurRoutes.split('\n').filter(line => 
+                const rejectLines = directeurRoutes.split('\n').filter(line =>
                     line.includes('/inscriptions/:id/reject')
                 );
                 console.log('   Ligne trouvée:', rejectLines[0]?.trim());
@@ -71,12 +71,12 @@ async function diagnosticRoutesVPS() {
             const appjs = fs.readFileSync('app.js', 'utf8');
             const hasDirecteurRoutes = appjs.includes('directeurRoutes') || appjs.includes('./routes/directeur');
             console.log(`   Routes directeur chargées: ${hasDirecteurRoutes ? '✅' : '❌'}`);
-            
+
             // Chercher les lignes qui chargent les routes
-            const routeLines = appjs.split('\n').filter(line => 
+            const routeLines = appjs.split('\n').filter(line =>
                 line.includes('routes') && (line.includes('use') || line.includes('require'))
             );
-            
+
             console.log('   Lignes de chargement routes:');
             routeLines.forEach(line => {
                 console.log(`     ${line.trim()}`);
