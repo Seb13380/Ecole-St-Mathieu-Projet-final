@@ -7,12 +7,12 @@ const prisma = new PrismaClient();
 
 async function diagnosticMenusVPS() {
     console.log('🍽️ DIAGNOSTIC MENUS CANTINE VPS');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     try {
         // 1. Vérifier la base de données
         console.log('\n📊 VÉRIFICATION BASE DE DONNÉES:');
-        
+
         const allMenus = await prisma.menu.findMany({
             include: {
                 auteur: { select: { firstName: true, lastName: true, email: true } }
@@ -21,7 +21,7 @@ async function diagnosticMenusVPS() {
         });
 
         console.log(`📝 Total menus en base: ${allMenus.length}`);
-        
+
         if (allMenus.length === 0) {
             console.log('⚠️  AUCUN MENU TROUVÉ EN BASE !');
             return;
@@ -41,17 +41,17 @@ async function diagnosticMenusVPS() {
 
         // 3. Vérifier les fichiers PDF
         console.log('\n📁 VÉRIFICATION FICHIERS PDF:');
-        
+
         for (const menu of allMenus) {
             if (menu.pdfUrl) {
                 const fullPath = path.join(process.cwd(), 'public', menu.pdfUrl);
                 const exists = fs.existsSync(fullPath);
-                
+
                 console.log(`   ${menu.semaine}:`);
                 console.log(`      URL: ${menu.pdfUrl}`);
                 console.log(`      Path: ${fullPath}`);
                 console.log(`      Existe: ${exists ? '✅ OUI' : '❌ NON'}`);
-                
+
                 if (exists) {
                     const stats = fs.statSync(fullPath);
                     console.log(`      Taille: ${Math.round(stats.size / 1024)} KB`);
@@ -62,26 +62,26 @@ async function diagnosticMenusVPS() {
 
         // 4. Vérifier les dossiers
         console.log('\n📂 VÉRIFICATION DOSSIERS:');
-        
+
         const menuDir = path.join(process.cwd(), 'public/assets/documents/menus');
         const imageDir = path.join(process.cwd(), 'public/assets/images/menus');
-        
+
         console.log(`   Dossier PDF: ${menuDir}`);
         console.log(`   Existe: ${fs.existsSync(menuDir) ? '✅ OUI' : '❌ NON'}`);
-        
+
         if (fs.existsSync(menuDir)) {
             const files = fs.readdirSync(menuDir);
             console.log(`   Fichiers: ${files.length}`);
             files.forEach(file => console.log(`      - ${file}`));
         }
-        
+
         console.log(`\n   Dossier Images: ${imageDir}`);
         console.log(`   Existe: ${fs.existsSync(imageDir) ? '✅ OUI' : '❌ NON'}`);
 
         // 5. Menus actifs
         console.log('\n🟢 MENUS ACTIFS:');
         const menusActifs = allMenus.filter(m => m.actif);
-        
+
         if (menusActifs.length === 0) {
             console.log('   ⚠️  AUCUN MENU ACTIF !');
         } else {
@@ -97,26 +97,26 @@ async function diagnosticMenusVPS() {
 
         // 7. Recommandations
         console.log('\n💡 RECOMMANDATIONS:');
-        
+
         if (allMenus.length === 0) {
             console.log('   ❌ Créer au moins un menu via l\'interface admin');
         }
-        
+
         if (menusActifs.length === 0) {
             console.log('   ❌ Activer au moins un menu');
         }
-        
-        const menusAvecFichierManquant = allMenus.filter(m => 
+
+        const menusAvecFichierManquant = allMenus.filter(m =>
             m.pdfUrl && !fs.existsSync(path.join(process.cwd(), 'public', m.pdfUrl))
         );
-        
+
         if (menusAvecFichierManquant.length > 0) {
             console.log('   ❌ Fichiers PDF manquants à re-uploader:');
             menusAvecFichierManquant.forEach(m => {
                 console.log(`      - ${m.semaine}`);
             });
         }
-        
+
         if (menusActifs.length > 0 && menusAvecFichierManquant.length === 0) {
             console.log('   ✅ Configuration semble correcte');
         }

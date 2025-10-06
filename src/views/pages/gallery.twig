@@ -28,12 +28,12 @@
 								class="bg-white rounded-xl shadow-lg overflow-hidden">
 
 								<!-- En-tête du thème -->
-								<div class="bg-gradient-to-r from-blue-600 to-green-600 text-white p-6">
-									<h2 class="text-2xl font-bold mb-2">{{ theme.name }}</h2>
+								<div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-6">
+									<h2 class="text-3xl font-bold mb-3">{{ theme.name }}</h2>
 									{% if theme.description %}
-										<p class="text-blue-100">{{ theme.description }}</p>
+										<p class="text-slate-200 text-lg font-medium">{{ theme.description }}</p>
 									{% endif %}
-									<div class="text-sm mt-2 opacity-75">
+									<div class="text-sm mt-3 bg-white bg-opacity-20 inline-block px-3 py-1 rounded-full">
 										{{ theme.medias|length }}
 										{% if theme.medias|length > 1 %}éléments{% else %}élément
 										{% endif %}
@@ -66,12 +66,19 @@
 												{% endif %}
 
 												<div class="p-4">
-													<h3 class="font-semibold text-gray-800 truncate">{{ media.title }}</h3>
+													<h3 class="font-bold text-gray-900 text-base mb-2">{{ media.title }}</h3>
 													{% if media.description %}
-														<p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ media.description }}</p>
+														<div class="bg-gray-100 rounded-lg p-3 mb-3">
+															<p class="text-gray-800 text-sm leading-relaxed">{{ media.description }}</p>
+														</div>
 													{% endif %}
-													<div class="text-xs text-gray-500 mt-2">
-														{{ media.createdAt|date('d/m/Y') }}
+													<div class="flex justify-between items-center">
+														<div class="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded">
+															{{ media.createdAt|date('d/m/Y') }}
+														</div>
+														<div class="text-xs text-blue-600 font-medium">
+															Cliquer pour agrandir
+														</div>
 													</div>
 												</div>
 											</div>
@@ -93,18 +100,20 @@
 	</div>
 
 	<!-- Modal pour afficher les médias -->
-	<div id="mediaModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center">
-		<div class="bg-white rounded-lg max-w-4xl max-h-screen m-4 overflow-hidden">
-			<div class="flex justify-between items-center p-4 border-b">
-				<h3 id="modalTitle" class="text-xl font-bold"></h3>
-				<button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+	<div id="mediaModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 items-center justify-center" style="display: none;">
+		<div class="bg-white rounded-xl max-w-5xl max-h-screen m-4 overflow-hidden shadow-2xl">
+			<div class="flex justify-between items-center p-6 border-b border-gray-200 bg-slate-50">
+				<h3 id="modalTitle" class="text-2xl font-bold text-slate-900"></h3>
+				<button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-3xl font-bold p-2 hover:bg-slate-200 rounded-full transition-colors">&times;</button>
 			</div>
 
-			<div class="p-4 max-h-96 overflow-y-auto">
-				<div
-					id="modalContent" class="text-center"><!-- Le contenu sera injecté ici -->
+			<div class="p-6">
+				<div id="modalContent" class="text-center mb-6">
+					<!-- Le contenu sera injecté ici -->
 				</div>
-				<div id="modalDescription" class="mt-4 text-gray-600"></div>
+				<div id="modalDescription" class="bg-slate-100 rounded-lg p-4">
+					<div class="text-slate-800 text-base leading-relaxed"></div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -117,48 +126,94 @@
 			overflow: hidden;
 		}
 
+		.media-item {
+			transition: all 0.3s ease;
+			border: 2px solid transparent;
+		}
+
 		.media-item:hover {
-			transform: translateY(-2px);
-			transition: transform 0.2s ease;
+			transform: translateY(-4px);
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			border-color: #3b82f6;
 		}
 
 		.aspect-square {
 			aspect-ratio: 1 / 1;
 		}
+
+		/* Améliorer le contraste des textes */
+		.media-item h3 {
+			color: #1f2937 !important;
+			font-weight: 700 !important;
+		}
+
+		.media-item p {
+			color: #374151 !important;
+		}
+
+		/* Animation du modal */
+		#mediaModal {
+			backdrop-filter: blur(4px);
+		}
+
+		#mediaModal > div {
+			animation: modalSlideIn 0.3s ease-out;
+		}
+
+		@keyframes modalSlideIn {
+			from {
+				opacity: 0;
+				transform: scale(0.9) translateY(-20px);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
+		}
 	</style>
 
 	<script>
 		function openModal(id, type, filename, title, description) {
-const modal = document.getElementById('mediaModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalContent = document.getElementById('modalContent');
-const modalDescription = document.getElementById('modalDescription');
+			const modal = document.getElementById('mediaModal');
+			const modalTitle = document.getElementById('modalTitle');
+			const modalContent = document.getElementById('modalContent');
+			const modalDescription = document.getElementById('modalDescription');
 
-modalTitle.textContent = title;
-modalDescription.textContent = description || '';
+			modalTitle.textContent = title;
+			
+			// Améliorer l'affichage de la description
+			const descriptionDiv = modalDescription.querySelector('div');
+			if (description && description.trim()) {
+				descriptionDiv.innerHTML = `<strong class="text-slate-900 block mb-2">Description :</strong>${description.replace(/\n/g, '<br>')}`;
+				modalDescription.style.display = 'block';
+			} else {
+				modalDescription.style.display = 'none';
+			}
 
-if (type === 'IMAGE') {
-modalContent.innerHTML = `<img src="/uploads/gallery/${filename}" alt="${title}" class="max-w-full max-h-96 object-contain">`;
-} else {
-modalContent.innerHTML = `
-      <video controls class="max-w-full max-h-96">
-        <source src="/uploads/gallery/${filename}" type="video/mp4">
-        Votre navigateur ne supporte pas la lecture vidéo.
-      </video>
-    `;
-} modal.classList.remove('hidden');
-document.body.style.overflow = 'hidden';
-}
+			if (type === 'IMAGE') {
+				modalContent.innerHTML = `<img src="/uploads/gallery/${filename}" alt="${title}" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg">`;
+			} else {
+				modalContent.innerHTML = `
+					<video controls class="max-w-full max-h-[70vh] rounded-lg shadow-lg">
+						<source src="/uploads/gallery/${filename}" type="video/mp4">
+						Votre navigateur ne supporte pas la lecture vidéo.
+					</video>
+				`;
+			}
+			
+			modal.style.display = 'flex';
+			document.body.style.overflow = 'hidden';
+		}
 
-function closeModal() {
-const modal = document.getElementById('mediaModal');
-modal.classList.add('hidden');
-document.body.style.overflow = 'auto';
+		function closeModal() {
+			const modal = document.getElementById('mediaModal');
+			modal.style.display = 'none';
+			document.body.style.overflow = 'auto';
 
-// Arrêter la vidéo si elle joue
-const video = modal.querySelector('video');
-if (video) {
-video.pause();
+			// Arrêter la vidéo si elle joue
+			const video = modal.querySelector('video');
+			if (video) {
+				video.pause();
 }
 }
 
