@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function diagnosticGallery() {
     console.log('🖼️ DIAGNOSTIC GALERIE');
-    console.log('=' .repeat(40));
+    console.log('='.repeat(40));
 
     try {
         // Récupérer tous les thèmes
@@ -35,7 +35,7 @@ async function diagnosticGallery() {
             console.log(`   Description: "${theme.description || 'Aucune'}"`);
             console.log(`   Ordre: ${theme.ordre || 'Non défini'}`);
             console.log(`   Médias: ${theme.medias.length}`);
-            
+
             if (theme.medias.length > 0) {
                 console.log('   📷 Médias:');
                 theme.medias.forEach((media, idx) => {
@@ -50,14 +50,14 @@ async function diagnosticGallery() {
         console.log('\n📁 VÉRIFICATION FICHIERS:');
         const fs = require('fs');
         const path = require('path');
-        
+
         const uploadDir = path.join(process.cwd(), 'uploads/gallery');
         console.log(`   Dossier: ${uploadDir}`);
-        
+
         if (fs.existsSync(uploadDir)) {
             const files = fs.readdirSync(uploadDir);
             console.log(`   Fichiers physiques: ${files.length}`);
-            
+
             // Vérifier si tous les médias ont leurs fichiers
             let fichiersManquants = 0;
             for (const theme of themes) {
@@ -69,7 +69,7 @@ async function diagnosticGallery() {
                     }
                 }
             }
-            
+
             if (fichiersManquants === 0) {
                 console.log('   ✅ Tous les fichiers sont présents');
             }
