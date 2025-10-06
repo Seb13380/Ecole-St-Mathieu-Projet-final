@@ -291,6 +291,54 @@ const reorderThemes = async (req, res) => {
     }
 };
 
+// 🆕 Mettre à jour l'ordre d'un thème
+const updateThemeOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { ordre } = req.body;
+
+        if (!ordre || ordre < 1) {
+            return res.status(400).json({ error: 'Ordre invalide' });
+        }
+
+        console.log(`📊 Mise à jour ordre thème ${id} -> ${ordre}`);
+
+        await prisma.galleryTheme.update({
+            where: { id: parseInt(id) },
+            data: { ordre: parseInt(ordre) }
+        });
+
+        res.json({ success: true, message: 'Ordre mis à jour' });
+    } catch (error) {
+        console.error('❌ Erreur mise à jour ordre thème:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+    }
+};
+
+// 🆕 Mettre à jour l'ordre d'un média
+const updateMediaOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { ordre } = req.body;
+
+        if (!ordre || ordre < 1) {
+            return res.status(400).json({ error: 'Ordre invalide' });
+        }
+
+        console.log(`📊 Mise à jour ordre média ${id} -> ${ordre}`);
+
+        await prisma.galleryMedia.update({
+            where: { id: parseInt(id) },
+            data: { ordre: parseInt(ordre) }
+        });
+
+        res.json({ success: true, message: 'Ordre du média mis à jour' });
+    } catch (error) {
+        console.error('❌ Erreur mise à jour ordre média:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+    }
+};
+
 module.exports = {
     upload,
     showGallery,
@@ -299,6 +347,8 @@ module.exports = {
     uploadMedia,
     deleteMedia,
     deleteTheme,
-    reorderThemes
+    reorderThemes,
+    updateThemeOrder,
+    updateMediaOrder
 };
 
