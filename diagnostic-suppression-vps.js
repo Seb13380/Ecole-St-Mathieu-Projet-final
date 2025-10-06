@@ -5,17 +5,17 @@ const prisma = new PrismaClient();
 
 async function diagnosticSuppression() {
     console.log('🗑️ DIAGNOSTIC SUPPRESSION INSCRIPTIONS VPS');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     try {
         // 1. Vérifier les demandes d'inscription
         console.log('\n📊 ÉTAT DES DEMANDES:');
-        
+
         const preInscriptions = await prisma.preInscriptionRequest.findMany({
             orderBy: { createdAt: 'desc' },
             take: 5
         });
-        
+
         const dossierInscriptions = await prisma.dossierInscription.findMany({
             orderBy: { createdAt: 'desc' },
             take: 5
@@ -33,22 +33,22 @@ async function diagnosticSuppression() {
 
         // 2. Test de suppression simulé
         console.log('\n🧪 TEST DE SUPPRESSION SIMULÉ:');
-        
+
         if (preInscriptions.length > 0) {
             const testId = preInscriptions[0].id;
             console.log(`Test avec ID: ${testId} (${preInscriptions[0].nom})`);
-            
+
             try {
                 // Vérifier si l'enregistrement existe
                 const exists = await prisma.preInscriptionRequest.findUnique({
                     where: { id: testId }
                 });
-                
+
                 console.log(`   Existe dans PreInscriptionRequest: ${exists ? '✅ OUI' : '❌ NON'}`);
-                
+
                 // Test de suppression en mode dry-run
                 console.log('   ⚠️  Test en mode lecture seule - aucune suppression réelle');
-                
+
             } catch (error) {
                 console.error('   ❌ Erreur lors du test:', error.message);
             }

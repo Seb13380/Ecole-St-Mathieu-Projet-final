@@ -44,18 +44,20 @@ const upload = multer({
 // Afficher la galerie publique
 const showGallery = async (req, res) => {
     try {
-        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias
+        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias - TRIÉS PAR ORDRE PERSONNALISÉ
         const themes = await prisma.galleryTheme.findMany({
             include: {
                 medias: {
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
+                    orderBy: [
+                        { ordre: 'asc' },      // D'abord par ordre personnalisé
+                        { createdAt: 'desc' }  // Puis par date si même ordre
+                    ]
                 }
             },
-            orderBy: {
-                name: 'asc'
-            }
+            orderBy: [
+                { ordre: 'asc' },  // D'abord par ordre personnalisé
+                { name: 'asc' }    // Puis par nom si même ordre
+            ]
         });
 
         res.render('pages/gallery', {
@@ -95,9 +97,10 @@ const showAdminGallery = async (req, res) => {
                             }
                         }
                     },
-                    orderBy: {
-                        createdAt: "desc"
-                    }
+                    orderBy: [
+                        { ordre: "asc" },      // D'abord par ordre personnalisé
+                        { createdAt: "desc" }  // Puis par date si même ordre
+                    ]
                 }
             },
             orderBy: [
