@@ -789,28 +789,61 @@ const inscriptionController = {
                 });
             }
 
-            // Récupérer la demande
-            const request = await prisma.preInscriptionRequest.findUnique({
+            console.log(`🔍 Tentative de refus demande ID: ${id}`);
+
+            // Chercher d'abord dans inscriptionRequest
+            let request = await prisma.inscriptionRequest.findUnique({
                 where: { id: parseInt(id) }
             });
 
+            let foundIn = null;
+
+            if (request) {
+                foundIn = 'inscriptionRequest';
+                console.log(`✅ Demande trouvée dans inscriptionRequest`);
+                
+                // Mettre à jour le statut dans inscriptionRequest
+                await prisma.inscriptionRequest.update({
+                    where: { id: parseInt(id) },
+                    data: {
+                        status: 'REJECTED',
+                        processedAt: new Date(),
+                        processedBy: req.session.user.id,
+                        adminNotes: reason
+                    }
+                });
+            } else {
+                // Sinon chercher dans preInscriptionRequest
+                request = await prisma.preInscriptionRequest.findUnique({
+                    where: { id: parseInt(id) }
+                });
+
+                if (request) {
+                    foundIn = 'preInscriptionRequest';
+                    console.log(`✅ Demande trouvée dans preInscriptionRequest`);
+                    
+                    // Mettre à jour le statut dans preInscriptionRequest
+                    await prisma.preInscriptionRequest.update({
+                        where: { id: parseInt(id) },
+                        data: {
+                            status: 'REJECTED',
+                            processedAt: new Date(),
+                            processedBy: req.session.user.id,
+                            adminNotes: reason
+                        }
+                    });
+                }
+            }
+
             if (!request) {
+                console.log(`❌ Demande ID ${id} non trouvée dans aucune table`);
                 return res.status(404).json({
                     success: false,
                     message: 'Demande non trouvée'
                 });
             }
 
-            // Mettre à jour le statut
-            await prisma.preInscriptionRequest.update({
-                where: { id: parseInt(id) },
-                data: {
-                    status: 'REJECTED',
-                    processedAt: new Date(),
-                    processedBy: req.session.user.id,
-                    adminNotes: reason
-                }
-            });
+            console.log(`✅ Demande ID ${id} refusée avec succès (table: ${foundIn})`);
 
             res.json({
                 success: true,
