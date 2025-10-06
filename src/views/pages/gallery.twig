@@ -28,56 +28,59 @@
 								class="bg-white rounded-xl shadow-lg overflow-hidden">
 
 								<!-- En-tête du thème -->
-								<div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-6">
-									<h2 class="text-3xl font-bold mb-3">{{ theme.name }}</h2>
+								<div class="p-8 shadow-2xl" style="background: linear-gradient(135deg, #2d5a56 0%, #4a7c79 50%, #a7e3dd 100%); border-left: 8px solid #1e3a39;">
+									<h2 class="text-4xl font-black mb-4 text-white drop-shadow-2xl" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ theme.name }}</h2>
 									{% if theme.description %}
-										<p class="text-slate-200 text-lg font-medium">{{ theme.description }}</p>
+										<p class="text-white text-xl font-bold p-4 rounded-lg" style="background: rgba(30, 58, 57, 0.7); border: 2px solid #a7e3dd;">{{ theme.description }}</p>
 									{% endif %}
-									<div class="text-sm mt-3 bg-white bg-opacity-20 inline-block px-3 py-1 rounded-full">
+									<div class="text-lg mt-4 font-black inline-block px-6 py-3 rounded-full shadow-xl" style="background: #a7e3dd; color: #1e3a39; border: 2px solid white;">
 										{{ theme.medias|length }}
-										{% if theme.medias|length > 1 %}éléments{% else %}élément
-										{% endif %}
+										{% if theme.medias|length > 1 %} éléments{% else %} élément{% endif %}
 									</div>
 								</div>
 
 								<!-- Grille des médias -->
-								<div class="p-6">
-									<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+								<div class="p-8">
+									<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
 										{% for media in theme.medias %}
-											<div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer media-item" onclick="openModal('{{ media.id }}', '{{ media.type }}', '{{ media.filename }}', '{{ media.title }}', '{{ media.description }}')">
+											<div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl cursor-pointer media-item border-2 border-gray-200 transition-all duration-300" style="hover:border-color: #a7e3dd;" onclick="openModal('{{ media.id }}', '{{ media.type }}', '{{ media.filename }}', '{{ media.titre }}', '{{ media.description }}')">
 
 												{% if media.type == 'IMAGE' %}
-													<div class="aspect-square bg-gray-200 relative">
+													<div class="h-80 bg-gray-200 relative">
 														<img src="/uploads/gallery/{{ media.filename }}" alt="{{ media.title }}" class="w-full h-full object-cover">
-														<div class="absolute top-2 right-2">
-															<span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">📷</span>
+														<div class="absolute top-3 right-3">
+															<span class="bg-black bg-opacity-60 text-white text-sm px-3 py-1 rounded-full">📷</span>
 														</div>
 													</div>
 												{% else %}
-													<div class="aspect-square bg-gray-800 relative flex items-center justify-center">
+													<div class="h-80 bg-gray-800 relative flex items-center justify-center">
 														<div class="text-white text-center">
-															<div class="text-4xl mb-2">🎬</div>
-															<div class="text-sm">Vidéo</div>
+															<div class="text-6xl mb-4">🎬</div>
+															<div class="text-lg font-semibold">Vidéo</div>
 														</div>
-														<div class="absolute top-2 right-2">
-															<span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">🎥</span>
+														<div class="absolute top-3 right-3">
+															<span class="bg-black bg-opacity-60 text-white text-sm px-3 py-1 rounded-full">🎥</span>
 														</div>
 													</div>
 												{% endif %}
 
-												<div class="p-4">
-													<h3 class="font-bold text-gray-900 text-base mb-2">{{ media.title }}</h3>
+												<div class="p-6">
+													<h3 class="font-black text-gray-900 text-xl mb-4">{{ media.titre }}</h3>
 													{% if media.description %}
-														<div class="bg-gray-100 rounded-lg p-3 mb-3">
-															<p class="text-gray-800 text-sm leading-relaxed">{{ media.description }}</p>
+														<div class="rounded-lg p-5 mb-5 min-h-[140px]" style="background: #f0faf9; border-left: 6px solid #a7e3dd;">
+															<p class="text-gray-900 text-lg leading-relaxed font-medium">{{ media.description }}</p>
+														</div>
+													{% else %}
+														<div class="rounded-lg p-5 mb-5 min-h-[140px] flex items-center justify-center" style="background: #f9f9f9;">
+															<p class="text-gray-500 text-base italic">Aucune description disponible</p>
 														</div>
 													{% endif %}
-													<div class="flex justify-between items-center">
-														<div class="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded">
-															{{ media.createdAt|date('d/m/Y') }}
+													<div class="flex justify-between items-center pt-3 border-t-2" style="border-color: #e6f7f5;">
+														<div class="text-base text-gray-700 px-4 py-2 rounded-full font-bold" style="background: #e6f7f5;">
+															📅 {{ media.createdAt|date('d/m/Y') }}
 														</div>
-														<div class="text-xs text-blue-600 font-medium">
-															Cliquer pour agrandir
+														<div class="text-base font-bold px-4 py-2 rounded-full hover:opacity-80 transition-opacity" style="background: #a7e3dd; color: #2d5a56;">
+															👁️ Voir en grand
 														</div>
 													</div>
 												</div>
@@ -133,8 +136,8 @@
 
 		.media-item:hover {
 			transform: translateY(-4px);
-			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-			border-color: #3b82f6;
+			box-shadow: 0 20px 25px -5px rgba(167, 227, 221, 0.3), 0 10px 10px -5px rgba(167, 227, 221, 0.2);
+			border-color: #a7e3dd !important;
 		}
 
 		.aspect-square {
