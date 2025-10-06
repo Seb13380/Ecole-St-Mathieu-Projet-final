@@ -108,8 +108,8 @@
 			</div>
 
 			<div class="p-6">
-				<div id="modalContent" class="text-center mb-6">
-					<!-- Le contenu sera injecté ici -->
+				<div
+					id="modalContent" class="text-center mb-6"><!-- Le contenu sera injecté ici -->
 				</div>
 				<div id="modalDescription" class="bg-slate-100 rounded-lg p-4">
 					<div class="text-slate-800 text-base leading-relaxed"></div>
@@ -174,46 +174,46 @@
 
 	<script>
 		function openModal(id, type, filename, title, description) {
-			const modal = document.getElementById('mediaModal');
-			const modalTitle = document.getElementById('modalTitle');
-			const modalContent = document.getElementById('modalContent');
-			const modalDescription = document.getElementById('modalDescription');
+const modal = document.getElementById('mediaModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalContent = document.getElementById('modalContent');
+const modalDescription = document.getElementById('modalDescription');
 
-			modalTitle.textContent = title;
-			
-			// Améliorer l'affichage de la description
-			const descriptionDiv = modalDescription.querySelector('div');
-			if (description && description.trim()) {
-				descriptionDiv.innerHTML = `<strong class="text-slate-900 block mb-2">Description :</strong>${description.replace(/\n/g, '<br>')}`;
-				modalDescription.style.display = 'block';
-			} else {
-				modalDescription.style.display = 'none';
-			}
+modalTitle.textContent = title;
 
-			if (type === 'IMAGE') {
-				modalContent.innerHTML = `<img src="/uploads/gallery/${filename}" alt="${title}" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg">`;
-			} else {
-				modalContent.innerHTML = `
+// Améliorer l'affichage de la description
+const descriptionDiv = modalDescription.querySelector('div');
+if (description && description.trim()) {
+descriptionDiv.innerHTML = `<strong class="text-slate-900 block mb-2">Description :</strong>${
+description.replace(/\n/g, '<br>')
+}`;
+modalDescription.style.display = 'block';
+} else {
+modalDescription.style.display = 'none';
+}
+
+if (type === 'IMAGE') {
+modalContent.innerHTML = `<img src="/uploads/gallery/${filename}" alt="${title}" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg">`;
+} else {
+modalContent.innerHTML = `
 					<video controls class="max-w-full max-h-[70vh] rounded-lg shadow-lg">
 						<source src="/uploads/gallery/${filename}" type="video/mp4">
 						Votre navigateur ne supporte pas la lecture vidéo.
 					</video>
 				`;
-			}
-			
-			modal.style.display = 'flex';
-			document.body.style.overflow = 'hidden';
-		}
+} modal.style.display = 'flex';
+document.body.style.overflow = 'hidden';
+}
 
-		function closeModal() {
-			const modal = document.getElementById('mediaModal');
-			modal.style.display = 'none';
-			document.body.style.overflow = 'auto';
+function closeModal() {
+const modal = document.getElementById('mediaModal');
+modal.style.display = 'none';
+document.body.style.overflow = 'auto';
 
-			// Arrêter la vidéo si elle joue
-			const video = modal.querySelector('video');
-			if (video) {
-				video.pause();
+// Arrêter la vidéo si elle joue
+const video = modal.querySelector('video');
+if (video) {
+video.pause();
 }
 }
 
