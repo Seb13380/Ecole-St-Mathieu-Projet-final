@@ -21,7 +21,7 @@ const inscriptionController = {
             // 🛡️ PROTECTION ANTI-SPAM AVANCÉE
             const formStartTime = req.body.formStartTime ? parseInt(req.body.formStartTime) : null;
             const spamDetection = spamDetector.detectSpam(req, formStartTime);
-            
+
             if (spamDetection.isSpam) {
                 // Logger l'activité suspecte
                 spamDetector.logSuspiciousActivity(spamDetection, {
@@ -32,7 +32,7 @@ const inscriptionController = {
                         lastName: req.body.parentLastName
                     }
                 });
-                
+
                 // Réponse différente selon le niveau de risque
                 if (spamDetection.riskLevel === 'HIGH') {
                     // Risque élevé : blocage direct
