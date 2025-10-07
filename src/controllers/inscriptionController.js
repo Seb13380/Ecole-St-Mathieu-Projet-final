@@ -170,6 +170,8 @@ const inscriptionController = {
     // Pour l'admin : voir toutes les demandes
     showAllRequests: async (req, res) => {
         try {
+            console.log('🔄 === RECHARGEMENT PAGE INSCRIPTIONS ===');
+            
             // Récupérer les pré-inscriptions ET les dossiers d'inscription
             const [preInscriptions, dossierInscriptions] = await Promise.all([
                 prisma.preInscriptionRequest.findMany({
@@ -215,6 +217,18 @@ const inscriptionController = {
             // Combiner et trier toutes les demandes
             const allRequests = [...normalizedPreInscriptions, ...normalizedDossiers]
                 .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+            // 🔍 DEBUG: Vérifier spécifiquement la demande 51
+            const request51 = allRequests.find(req => req.id === 51);
+            if (request51) {
+                console.log('🎯 DEMANDE 51 TROUVÉE DANS allRequests:');
+                console.log(`   - ID: ${request51.id}`);
+                console.log(`   - Status: "${request51.status}"`);
+                console.log(`   - Type: ${request51.type}`);
+                console.log(`   - Parent: ${request51.parentFirstName} ${request51.parentLastName}`);
+            } else {
+                console.log('❌ DEMANDE 51 NON TROUVÉE dans allRequests');
+            }
 
             // Parser les enfants et les parents pour chaque demande
             const requestsWithParsedChildren = allRequests.map(request => {
