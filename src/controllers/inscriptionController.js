@@ -185,14 +185,21 @@ const inscriptionController = {
             ]);
 
             // Normaliser les dossiers d'inscription vers le format des pré-inscriptions
-            const normalizedDossiers = dossierInscriptions.map(dossier => ({
-                id: dossier.id,
-                type: 'DOSSIER_INSCRIPTION',
-                parentFirstName: dossier.perePrenom,
-                parentLastName: dossier.pereNom,
-                parentEmail: dossier.pereEmail,
-                parentPhone: dossier.pereTelephone,
-                status: dossier.statut,
+            const normalizedDossiers = dossierInscriptions.map(dossier => {
+                // Normaliser les statuts pour l'affichage uniforme
+                let normalizedStatus = dossier.statut;
+                if (dossier.statut === 'REFUSE') normalizedStatus = 'REJECTED';
+                if (dossier.statut === 'VALIDE') normalizedStatus = 'ACCEPTED';
+                if (dossier.statut === 'EN_ATTENTE') normalizedStatus = 'PENDING';
+                
+                return {
+                    id: dossier.id,
+                    type: 'DOSSIER_INSCRIPTION',
+                    parentFirstName: dossier.perePrenom,
+                    parentLastName: dossier.pereNom,
+                    parentEmail: dossier.pereEmail,
+                    parentPhone: dossier.pereTelephone,
+                    status: normalizedStatus,
                 submittedAt: dossier.createdAt,
                 children: JSON.stringify([{
                     firstName: dossier.enfantPrenom,
@@ -206,7 +213,8 @@ const inscriptionController = {
                     adresse: dossier.adresseComplete
                 }),
                 processor: dossier.traitant
-            }));
+            };
+            });
 
             // Ajouter le type aux pré-inscriptions
             const normalizedPreInscriptions = preInscriptions.map(req => ({
