@@ -856,6 +856,29 @@ const inscriptionController = {
                             adminNotes: reason
                         }
                     });
+                } else {
+                    // Enfin, chercher dans dossierInscription
+                    const dossierRequest = await prisma.dossierInscription.findUnique({
+                        where: { id: parseInt(id) }
+                    });
+
+                    if (dossierRequest) {
+                        foundIn = 'dossierInscription';
+                        console.log(`✅ Demande trouvée dans dossierInscription`);
+                        
+                        // Mettre à jour le statut dans dossierInscription
+                        await prisma.dossierInscription.update({
+                            where: { id: parseInt(id) },
+                            data: {
+                                statut: 'REFUSE',  // Attention: champ "statut", pas "status"
+                                traiteLe: new Date(),
+                                traitantId: req.session.user.id,
+                                notesAdmin: reason
+                            }
+                        });
+                        
+                        request = dossierRequest; // Pour pas que ce soit null
+                    }
                 }
             }
 
