@@ -823,39 +823,42 @@ const inscriptionController = {
 
             console.log(`🔍 Tentative de refus demande ID: ${id}`);
 
-            // Chercher d'abord dans inscriptionRequest
-            let request = await prisma.inscriptionRequest.findUnique({
+            let request = null;
+            let foundIn = null;
+
+            // 1. Chercher d'abord dans dossierInscription (plus probable)
+            const dossierRequest = await prisma.dossierInscription.findUnique({
                 where: { id: parseInt(id) }
             });
 
-            let foundIn = null;
-
-            if (request) {
-                foundIn = 'inscriptionRequest';
-                console.log(`✅ Demande trouvée dans inscriptionRequest`);
+            if (dossierRequest) {
+                foundIn = 'dossierInscription';
+                console.log(`✅ Demande trouvée dans dossierInscription`);
                 
-                // Mettre à jour le statut dans inscriptionRequest
-                await prisma.inscriptionRequest.update({
+                // Mettre à jour le statut dans dossierInscription
+                await prisma.dossierInscription.update({
                     where: { id: parseInt(id) },
                     data: {
-                        status: 'REJECTED',
-                        processedAt: new Date(),
-                        processedBy: req.session.user.id,
-                        adminNotes: reason
+                        statut: 'REFUSE',
+                        dateTraitement: new Date(),
+                        traitePar: req.session.user.id,
+                        notesAdministratives: reason
                     }
                 });
+                
+                request = dossierRequest; // Pour pas que ce soit null
             } else {
-                // Sinon chercher dans preInscriptionRequest
-                request = await prisma.preInscriptionRequest.findUnique({
+                // 2. Sinon chercher dans inscriptionRequest
+                request = await prisma.inscriptionRequest.findUnique({
                     where: { id: parseInt(id) }
                 });
 
                 if (request) {
-                    foundIn = 'preInscriptionRequest';
-                    console.log(`✅ Demande trouvée dans preInscriptionRequest`);
+                    foundIn = 'inscriptionRequest';
+                    console.log(`✅ Demande trouvée dans inscriptionRequest`);
                     
-                    // Mettre à jour le statut dans preInscriptionRequest
-                    await prisma.preInscriptionRequest.update({
+                    // Mettre à jour le statut dans inscriptionRequest
+                    await prisma.inscriptionRequest.update({
                         where: { id: parseInt(id) },
                         data: {
                             status: 'REJECTED',
@@ -865,27 +868,25 @@ const inscriptionController = {
                         }
                     });
                 } else {
-                    // Enfin, chercher dans dossierInscription
-                    const dossierRequest = await prisma.dossierInscription.findUnique({
+                    // 3. Enfin chercher dans preInscriptionRequest
+                    request = await prisma.preInscriptionRequest.findUnique({
                         where: { id: parseInt(id) }
                     });
 
-                    if (dossierRequest) {
-                        foundIn = 'dossierInscription';
-                        console.log(`✅ Demande trouvée dans dossierInscription`);
+                    if (request) {
+                        foundIn = 'preInscriptionRequest';
+                        console.log(`✅ Demande trouvée dans preInscriptionRequest`);
                         
-                        // Mettre à jour le statut dans dossierInscription
-                        await prisma.dossierInscription.update({
+                        // Mettre à jour le statut dans preInscriptionRequest
+                        await prisma.preInscriptionRequest.update({
                             where: { id: parseInt(id) },
                             data: {
-                                statut: 'REFUSE',  // Attention: champ "statut", pas "status"
-                                traiteLe: new Date(),
-                                traitantId: req.session.user.id,
-                                notesAdmin: reason
+                                status: 'REJECTED',
+                                processedAt: new Date(),
+                                processedBy: req.session.user.id,
+                                adminNotes: reason
                             }
                         });
-                        
-                        request = dossierRequest; // Pour pas que ce soit null
                     }
                 }
             }
