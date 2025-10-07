@@ -779,10 +779,20 @@ const inscriptionController = {
     // Pour l'admin : rejeter une demande
     rejectRequest: async (req, res) => {
         try {
+            console.log('🚀 === DEBUT REJECT REQUEST ===');
+            console.log('User session:', req.session.user);
+            console.log('Params:', req.params);
+            console.log('Body:', req.body);
+            console.log('Method:', req.method);
+            console.log('URL:', req.url);
+            
             const { id } = req.params;
             const { reason } = req.body;
 
+            console.log(`📝 ID reçu: ${id}, Reason: ${reason}`);
+
             if (!reason) {
+                console.log('❌ Motif manquant');
                 return res.status(400).json({
                     success: false,
                     message: 'Le motif du refus est obligatoire'
