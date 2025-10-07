@@ -4,10 +4,10 @@ const prisma = new PrismaClient();
 async function debugAllTables() {
     try {
         console.log('=== DEBUG TOUTES LES TABLES ===');
-        
+
         // Vérifier toutes les tables possibles
         console.log('\n🔍 Recherche dans toutes les tables...');
-        
+
         try {
             const inscriptions = await prisma.inscriptionRequest.findMany({
                 select: {
@@ -23,7 +23,7 @@ async function debugAllTables() {
         } catch (e) {
             console.log('❌ inscriptionRequest:', e.message);
         }
-        
+
         try {
             const preInscriptions = await prisma.preInscriptionRequest.findMany({
                 select: {
@@ -39,7 +39,7 @@ async function debugAllTables() {
         } catch (e) {
             console.log('❌ preInscriptionRequest:', e.message);
         }
-        
+
         try {
             const dossiers = await prisma.dossierInscription.findMany({
                 select: {

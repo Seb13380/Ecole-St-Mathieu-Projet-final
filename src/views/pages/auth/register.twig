@@ -143,11 +143,34 @@
 					</div>
 				</div>
 
-				<!-- Champ anti-spam caché (honeypot) -->
+				<!-- Champs anti-spam cachés (honeypots) -->
 				<div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
 					<label for="floflo">Ne pas remplir ce champ</label>
 					<input type="text" id="floflo" name="floflo" tabindex="-1" autocomplete="off">
+					
+					<label for="website">Site web</label>
+					<input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+					
+					<label for="homepage">Page d'accueil</label>
+					<input type="text" id="homepage" name="homepage" tabindex="-1" autocomplete="off">
+					
+					<label for="url">URL</label>
+					<input type="text" id="url" name="url" tabindex="-1" autocomplete="off">
+					
+					<label for="business">Entreprise</label>
+					<input type="text" id="business" name="business" tabindex="-1" autocomplete="off">
+					
+					<label for="company">Société</label>
+					<input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
 				</div>
+				
+				<!-- Horodatage pour validation temporelle -->
+				<input type="hidden" id="formStartTime" name="formStartTime" value="">
+				
+				<script>
+					// Enregistrer l'heure de début du formulaire
+					document.getElementById('formStartTime').value = Date.now();
+				</script>
 
 				<!-- Bouton de soumission -->
 				<div class="text-center">

@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const emailService = require('../services/emailService');
+const spamDetector = require('../middleware/spamDetector');
 
 const prisma = new PrismaClient();
 
@@ -17,14 +18,34 @@ const inscriptionController = {
     // Traiter l'inscription depuis le formulaire  
     processRegistration: async (req, res) => {
         try {
-            // 🛡️ PROTECTION ANTI-SPAM (Honeypot) - PREMIÈRE VÉRIFICATION
-            // Si le champ caché "floflo" est rempli, c'est probablement un bot
-            if (req.body.floflo && req.body.floflo.trim() !== '') {
-                console.log('🚫 Tentative de spam détectée - champ honeypot rempli:', req.body.floflo);
-                console.log('🔍 IP source:', req.ip || req.connection.remoteAddress);
-                console.log('🔍 User-Agent:', req.get('User-Agent'));
-                // Faire semblant que tout s'est bien passé pour tromper les bots
-                return res.redirect('/auth/register?success=Votre demande d\'inscription a été envoyée avec succès. Vous recevrez une réponse sous 48h.');
+            // 🛡️ PROTECTION ANTI-SPAM AVANCÉE
+            const formStartTime = req.body.formStartTime ? parseInt(req.body.formStartTime) : null;
+            const spamDetection = spamDetector.detectSpam(req, formStartTime);
+            
+            if (spamDetection.isSpam) {
+                // Logger l'activité suspecte
+                spamDetector.logSuspiciousActivity(spamDetection, {
+                    endpoint: '/inscription',
+                    data: {
+                        email: req.body.parentEmail,
+                        firstName: req.body.parentFirstName,
+                        lastName: req.body.parentLastName
+                    }
+                });
+                
+                // Réponse différente selon le niveau de risque
+                if (spamDetection.riskLevel === 'HIGH') {
+                    // Risque élevé : blocage direct
+                    console.log('🚫 SPAM HAUTE RISQUE BLOQUÉ:', spamDetection.reasons);
+                    return res.status(429).json({
+                        error: 'Trop de requêtes. Veuillez réessayer plus tard.',
+                        blocked: true
+                    });
+                } else {
+                    // Risque moyen : faire semblant que ça marche
+                    console.log('🚫 SPAM RISQUE MOYEN DÉTECTÉ:', spamDetection.reasons);
+                    return res.redirect('/auth/register?success=Votre demande d\'inscription a été envoyée avec succès. Vous recevrez une réponse sous 48h.');
+                }
             }
 
             const {
@@ -171,7 +192,7 @@ const inscriptionController = {
     showAllRequests: async (req, res) => {
         try {
             console.log('🔄 === RECHARGEMENT PAGE INSCRIPTIONS ===');
-            
+
             // Récupérer les pré-inscriptions ET les dossiers d'inscription
             const [preInscriptions, dossierInscriptions] = await Promise.all([
                 prisma.preInscriptionRequest.findMany({
@@ -191,7 +212,7 @@ const inscriptionController = {
                 if (dossier.statut === 'REFUSE') normalizedStatus = 'REJECTED';
                 if (dossier.statut === 'VALIDE') normalizedStatus = 'ACCEPTED';
                 if (dossier.statut === 'EN_ATTENTE') normalizedStatus = 'PENDING';
-                
+
                 return {
                     id: dossier.id,
                     type: 'DOSSIER_INSCRIPTION',
@@ -200,20 +221,20 @@ const inscriptionController = {
                     parentEmail: dossier.pereEmail,
                     parentPhone: dossier.pereTelephone,
                     status: normalizedStatus,
-                submittedAt: dossier.createdAt,
-                children: JSON.stringify([{
-                    firstName: dossier.enfantPrenom,
-                    lastName: dossier.enfantNom,
-                    birthDate: dossier.enfantDateNaissance,
-                    requestedClass: dossier.enfantClasseDemandee
-                }]),
-                message: JSON.stringify({
-                    pere: `${dossier.perePrenom} ${dossier.pereNom}`,
-                    mere: `${dossier.merePrenom} ${dossier.mereNom}`,
-                    adresse: dossier.adresseComplete
-                }),
-                processor: dossier.traitant
-            };
+                    submittedAt: dossier.createdAt,
+                    children: JSON.stringify([{
+                        firstName: dossier.enfantPrenom,
+                        lastName: dossier.enfantNom,
+                        birthDate: dossier.enfantDateNaissance,
+                        requestedClass: dossier.enfantClasseDemandee
+                    }]),
+                    message: JSON.stringify({
+                        pere: `${dossier.perePrenom} ${dossier.pereNom}`,
+                        mere: `${dossier.merePrenom} ${dossier.mereNom}`,
+                        adresse: dossier.adresseComplete
+                    }),
+                    processor: dossier.traitant
+                };
             });
 
             // Ajouter le type aux pré-inscriptions
@@ -807,7 +828,7 @@ const inscriptionController = {
             console.log('Body:', req.body);
             console.log('Method:', req.method);
             console.log('URL:', req.url);
-            
+
             const { id } = req.params;
             const { reason } = req.body;
 
@@ -834,7 +855,7 @@ const inscriptionController = {
             if (dossierRequest) {
                 foundIn = 'dossierInscription';
                 console.log(`✅ Demande trouvée dans dossierInscription`);
-                
+
                 // Mettre à jour le statut dans dossierInscription
                 await prisma.dossierInscription.update({
                     where: { id: parseInt(id) },
@@ -845,7 +866,7 @@ const inscriptionController = {
                         notesAdministratives: reason
                     }
                 });
-                
+
                 request = dossierRequest; // Pour pas que ce soit null
             } else {
                 // 2. Sinon chercher dans inscriptionRequest
@@ -856,7 +877,7 @@ const inscriptionController = {
                 if (request) {
                     foundIn = 'inscriptionRequest';
                     console.log(`✅ Demande trouvée dans inscriptionRequest`);
-                    
+
                     // Mettre à jour le statut dans inscriptionRequest
                     await prisma.inscriptionRequest.update({
                         where: { id: parseInt(id) },
@@ -876,7 +897,7 @@ const inscriptionController = {
                     if (request) {
                         foundIn = 'preInscriptionRequest';
                         console.log(`✅ Demande trouvée dans preInscriptionRequest`);
-                        
+
                         // Mettre à jour le statut dans preInscriptionRequest
                         await prisma.preInscriptionRequest.update({
                             where: { id: parseInt(id) },
