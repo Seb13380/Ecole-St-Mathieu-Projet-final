@@ -1,5 +1,7 @@
 const LoggingService = require('../services/loggingService');
 const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
 const prisma = new PrismaClient();
 
 /**
@@ -25,17 +27,37 @@ async function getAdditionalStats(startDate, endDate) {
         _count: { userRole: true }
     });
 
-    // Documents les plus téléchargés
-    const topDownloads = await prisma.siteLog.groupBy({
+    // Documents les plus téléchargés (filtrer uniquement les fichiers existants)
+    const allDownloads = await prisma.siteLog.groupBy({
         by: ['url'],
         where: {
             ...whereClause,
-            action: 'download'
+            action: 'download',
+            url: { not: null }
         },
         _count: { url: true },
         orderBy: { _count: { url: 'desc' } },
-        take: 10
+        take: 20 // Prendre plus pour pouvoir filtrer
     });
+
+    // Filtrer uniquement les fichiers qui existent vraiment
+    const topDownloads = [];
+    for (const download of allDownloads) {
+        if (topDownloads.length >= 10) break;
+
+        try {
+            // Construire le chemin vers le fichier
+            const filePath = path.join(process.cwd(), 'public', download.url);
+
+            // Vérifier si le fichier existe
+            if (fs.existsSync(filePath)) {
+                topDownloads.push(download);
+            }
+        } catch (error) {
+            // Si erreur, ne pas inclure ce fichier
+            console.log(`❌ Fichier non trouvé: ${download.url}`);
+        }
+    }
 
     // Recherches les plus fréquentes
     const topSearches = await prisma.siteLog.groupBy({
@@ -72,17 +94,17 @@ async function getAdditionalStats(startDate, endDate) {
     const deviceStats = analyzeDeviceTypes(deviceTypes);
 
     return {
-        loginsByRole: loginsByRole.map(l => ({ 
-            role: l.userRole, 
-            logins: l._count.userRole 
+        loginsByRole: loginsByRole.map(l => ({
+            role: l.userRole,
+            logins: l._count.userRole
         })),
-        topDownloads: topDownloads.map(d => ({ 
-            url: d.url, 
-            downloads: d._count.url 
+        topDownloads: topDownloads.map(d => ({
+            url: d.url,
+            downloads: d._count.url
         })),
-        topSearches: topSearches.map(s => ({ 
-            query: s.searchQuery, 
-            count: s._count.searchQuery 
+        topSearches: topSearches.map(s => ({
+            query: s.searchQuery,
+            count: s._count.searchQuery
         })),
         hourlyTraffic: hourlyTraffic.map(h => ({
             hour: h.hour,
@@ -208,7 +230,7 @@ const analyticsController = {
     async getAnalyticsData(req, res) {
         try {
             const { startDate, endDate, period } = req.query;
-            
+
             const stats = await LoggingService.getStatistics(startDate, endDate);
             const additionalStats = await getAdditionalStats(startDate, endDate);
 
@@ -235,9 +257,9 @@ const analyticsController = {
     async getDetailedStats(req, res) {
         try {
             const { type, period } = req.params;
-            
+
             let startDate = new Date();
-            
+
             switch (period) {
                 case 'today':
                     startDate.setHours(0, 0, 0, 0);
@@ -277,7 +299,7 @@ const analyticsController = {
     async exportLogsCSV(req, res) {
         try {
             const { startDate, endDate } = req.query;
-            
+
             // Construire la clause WHERE pour la période
             const whereClause = {};
             if (startDate || endDate) {
@@ -304,7 +326,7 @@ const analyticsController = {
 
             // Générer le CSV
             const csv = generateCSV(logs);
-            
+
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader('Content-Disposition', 'attachment; filename="logs_ecole_saint_mathieu.csv"');
             res.send(csv);

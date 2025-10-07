@@ -47,13 +47,20 @@
 					<option value="2024/2025">2024/2025</option>
 				</select>
 			</div>
+
+			<!-- 🆕 Champ de recherche -->
+			<div class="flex flex-wrap gap-3 items-center mt-4">
+				<span class="text-gray-700 font-medium">🔍 Rechercher :</span>
+				<input type="text" id="searchInput" placeholder="Tapez le nom ou prénom des parents..." class="input input-bordered w-full max-w-md" onkeyup="filterBySearch()">
+				<button onclick="clearSearch()" class="btn btn-ghost px-4 py-2 min-w-[80px]">Effacer</button>
+			</div>
 		</div>
 
 		<!-- Liste des demandes -->
 		<div id="requestsList">
 			{% for request in requests %}
 				<div
-					class="request-item bg-white rounded-lg shadow-md p-6 mb-6" data-status="{{ request.status }}" data-year="{{ request.submittedAt|date('Y') }}">
+					class="request-item bg-white rounded-lg shadow-md p-6 mb-6" data-status="{{ request.status }}" data-year="{{ request.submittedAt|date('Y') }}" data-parent-first-name="{{ request.parentFirstName ?? request.pereInfo.prenom ?? '' }}" data-parent-last-name="{{ request.parentLastName ?? request.pereInfo.nom ?? '' }}" data-parent-email="{{ request.parentEmail }}" data-search-content="{{ request.parentFirstName ?? request.pereInfo.prenom ?? '' }} {{ request.parentLastName ?? request.pereInfo.nom ?? '' }} {{ request.mereInfo.prenom ?? '' }} {{ request.mereInfo.nom ?? '' }} {{ request.parentEmail }}">
 
 					<!-- En-tête de la demande -->
 					<div class="flex justify-between items-start mb-4">
@@ -504,6 +511,62 @@ document.getElementById('yearFilter').addEventListener('change', (e) => {
 const year = e.target.value;
 filterByYear(year);
 });
+
+// 🆕 Fonction de recherche par nom/prénom
+function filterBySearch() {
+const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+const requests = document.querySelectorAll('.request-item');
+let visibleCount = 0;
+
+requests.forEach(item => {
+if (! searchTerm) {
+item.style.display = 'block';
+visibleCount++;
+return;
+}
+
+// Rechercher dans le contenu consolidé
+const searchContent = item.dataset.searchContent ?. toLowerCase() || '';
+const found = searchContent.includes(searchTerm);
+
+if (found) {
+item.style.display = 'block';
+visibleCount++;
+} else {
+item.style.display = 'none';
+}
+});
+
+updateSearchResults(visibleCount, searchTerm);
+}
+
+// 🆕 Effacer la recherche
+function clearSearch() {
+document.getElementById('searchInput').value = '';
+filterBySearch();
+}
+
+// 🆕 Afficher les résultats de recherche
+function updateSearchResults(count, searchTerm) {
+let resultText = document.getElementById('searchResults');
+if (! resultText) {
+resultText = document.createElement('div');
+resultText.id = 'searchResults';
+resultText.className = 'text-sm text-gray-600 mt-2';
+document.getElementById('searchInput').parentNode.appendChild(resultText);
+}
+
+if (searchTerm) {
+resultText.textContent = `${count} résultat${
+count > 1 ? 's' : ''
+} trouvé${
+count > 1 ? 's' : ''
+} pour "${searchTerm}"`;
+resultText.style.display = 'block';
+} else {
+resultText.style.display = 'none';
+}
+}
 
 function filterByStatus(status) {
 const requests = document.querySelectorAll('.request-item');

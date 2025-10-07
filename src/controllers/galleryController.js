@@ -44,18 +44,20 @@ const upload = multer({
 // Afficher la galerie publique
 const showGallery = async (req, res) => {
     try {
-        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias
+        // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias - TRIÉS PAR ORDRE PERSONNALISÉ
         const themes = await prisma.galleryTheme.findMany({
             include: {
                 medias: {
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
+                    orderBy: [
+                        { ordre: 'asc' },      // D'abord par ordre personnalisé
+                        { createdAt: 'desc' }  // Puis par date si même ordre
+                    ]
                 }
             },
-            orderBy: {
-                name: 'asc'
-            }
+            orderBy: [
+                { ordre: 'asc' },  // D'abord par ordre personnalisé
+                { name: 'asc' }    // Puis par nom si même ordre
+            ]
         });
 
         res.render('pages/gallery', {
@@ -95,9 +97,10 @@ const showAdminGallery = async (req, res) => {
                             }
                         }
                     },
-                    orderBy: {
-                        createdAt: "desc"
-                    }
+                    orderBy: [
+                        { ordre: "asc" },      // D'abord par ordre personnalisé
+                        { createdAt: "desc" }  // Puis par date si même ordre
+                    ]
                 }
             },
             orderBy: [
@@ -291,6 +294,54 @@ const reorderThemes = async (req, res) => {
     }
 };
 
+// 🆕 Mettre à jour l'ordre d'un thème
+const updateThemeOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { ordre } = req.body;
+
+        if (!ordre || ordre < 1) {
+            return res.status(400).json({ error: 'Ordre invalide' });
+        }
+
+        console.log(`📊 Mise à jour ordre thème ${id} -> ${ordre}`);
+
+        await prisma.galleryTheme.update({
+            where: { id: parseInt(id) },
+            data: { ordre: parseInt(ordre) }
+        });
+
+        res.json({ success: true, message: 'Ordre mis à jour' });
+    } catch (error) {
+        console.error('❌ Erreur mise à jour ordre thème:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+    }
+};
+
+// 🆕 Mettre à jour l'ordre d'un média
+const updateMediaOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { ordre } = req.body;
+
+        if (!ordre || ordre < 1) {
+            return res.status(400).json({ error: 'Ordre invalide' });
+        }
+
+        console.log(`📊 Mise à jour ordre média ${id} -> ${ordre}`);
+
+        await prisma.galleryMedia.update({
+            where: { id: parseInt(id) },
+            data: { ordre: parseInt(ordre) }
+        });
+
+        res.json({ success: true, message: 'Ordre du média mis à jour' });
+    } catch (error) {
+        console.error('❌ Erreur mise à jour ordre média:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+    }
+};
+
 module.exports = {
     upload,
     showGallery,
@@ -299,6 +350,8 @@ module.exports = {
     uploadMedia,
     deleteMedia,
     deleteTheme,
-    reorderThemes
+    reorderThemes,
+    updateThemeOrder,
+    updateMediaOrder
 };
 
