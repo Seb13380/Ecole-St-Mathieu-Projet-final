@@ -22,7 +22,7 @@ async function getAdditionalStats(startDate, endDate) {
             ...whereClause,
             action: 'login_attempt',
             statusCode: 200,
-            userRole: { not: null }
+            userRole: { not: '' }
         },
         _count: { userRole: true }
     });
@@ -33,7 +33,7 @@ async function getAdditionalStats(startDate, endDate) {
         where: {
             ...whereClause,
             action: 'download',
-            url: { not: null }
+            url: { not: '' }
         },
         _count: { url: true },
         orderBy: { _count: { url: 'desc' } },
@@ -64,7 +64,7 @@ async function getAdditionalStats(startDate, endDate) {
         by: ['searchQuery'],
         where: {
             ...whereClause,
-            searchQuery: { not: null }
+            searchQuery: { not: '' }
         },
         _count: { searchQuery: true },
         orderBy: { _count: { searchQuery: 'desc' } },
@@ -85,7 +85,7 @@ async function getAdditionalStats(startDate, endDate) {
         by: ['userAgent'],
         where: {
             ...whereClause,
-            userAgent: { not: null }
+            userAgent: { not: '' }
         },
         _count: { userAgent: true }
     });
