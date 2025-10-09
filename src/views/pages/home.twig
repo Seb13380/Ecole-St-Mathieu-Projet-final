@@ -7,7 +7,7 @@
 
 {% block main %}
 
-	<!-- Bandeau de défilement -->
+	{# <!-- Bandeau de défilement -->
 	<div style="background: linear-gradient(45deg, #0d9488, #14b8a6, #5eead4); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #0f766e;">
 		<div style="animation: marquee 20s linear infinite;">
 			✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
@@ -23,7 +23,7 @@
 				transform: translateX(-100%);
 			}
 		}
-	</style>
+	</style> #}
 
 	<div class="py-8 px-4 md:py-16 md:px-8 bg-gradient-to-b from-[#a7e3dd] to-[#8dd3cc]">
 		<div class="max-w-15xl mx-auto text-center">
@@ -503,23 +503,23 @@
 		}
 
 		/* Colonnes 50/50 sur desktop, 100% sur mobile */
-		@media (min-width: 1024px) {
+		@media(min-width: 1024px) {
 			.lg\:w-2\/3 {
 				width: 66.666667% !important;
 			}
-			
+
 			.flex-1 {
 				width: 33.333333% !important;
 			}
 		}
-		
+
 		/* Sur mobile, sections empilées verticallement */
-		@media (max-width: 1023px) {
+		@media(max-width: 1023px) {
 			.w-full.lg\:w-2\/3 {
 				width: 100% !important;
 				margin-bottom: 1rem;
 			}
-			
+
 			.flex-1 {
 				width: 100% !important;
 			}
@@ -533,25 +533,25 @@
 		.carousel-slide.active {
 			opacity: 1 !important;
 		}
-		
+
 		/* Carousel responsive */
-		@media (max-width: 1023px) {
+		@media(max-width: 1023px) {
 			#main-carousel {
 				height: 400px !important;
 			}
-			
+
 			.carousel-slide img {
 				object-fit: cover;
 			}
-			
+
 			.carousel-slide .absolute.bottom-0 {
 				padding: 1rem !important;
 			}
-			
+
 			.carousel-slide h4 {
 				font-size: 1.5rem !important;
 			}
-			
+
 			.carousel-slide p {
 				font-size: 1rem !important;
 			}
@@ -764,6 +764,7 @@ currentHeroSlide = targetIndex;
 
 
 setTimeout(autoScrollHero, 1000);
+
 
 });
 
