@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 const ticketController = {    // Afficher la page d'achat de tickets
     showPurchasePage: async (req, res) => {
         try {
-            console.log('Accès à la page d\'achat de tickets');
 
             // DONNÉES DE TEST TEMPORAIRES - À supprimer quand MySQL sera configuré
             if (req.session.user.email === 'sebcecg@gmail.com') {
@@ -76,12 +75,10 @@ const ticketController = {    // Afficher la page d'achat de tickets
     },    // Traiter l'achat de tickets
     processPurchase: async (req, res) => {
         try {
-            console.log('Traitement achat tickets:', req.body);
 
             // SIMULATION POUR LE COMPTE TEST
             if (req.session.user.email === 'sebcecg@gmail.com') {
                 const { studentId, quantity } = req.body;
-                console.log('✅ Simulation achat réussi pour enfant ID:', studentId, 'Quantité:', quantity);
                 return res.redirect('/parent/tickets/purchase?success=' + encodeURIComponent(`${quantity} tickets achetés avec succès ! (Mode test)`));
             }
 
@@ -137,7 +134,6 @@ const ticketController = {    // Afficher la page d'achat de tickets
                 data: { paymentStatus: 'COMPLETED' }
             });
 
-            console.log('✅ Achat tickets réussi:', booklet);
             res.redirect('/parent/tickets/purchase?success=' + encodeURIComponent(`${ticketsQuantity} tickets achetés avec succès !`));
 
         } catch (error) {

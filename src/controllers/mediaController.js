@@ -45,8 +45,6 @@ const mediaController = {
     // Afficher la page de gestion des médias
     getMediaManagement: async (req, res) => {
         try {
-            console.log('📸 Accès à la gestion des médias');
-            console.log('👤 Utilisateur:', req.session.user?.email, 'Rôle:', req.session.user?.role);
 
             // Lire le dossier des images
             const imagesPath = path.join(__dirname, '../../public/assets/images');
@@ -89,14 +87,11 @@ const mediaController = {
     // Upload de nouvelles images
     uploadImages: async (req, res) => {
         try {
-            console.log('📸 Upload de nouvelles images');
-            console.log('📁 Fichiers reçus:', req.files?.length || 0);
 
             if (!req.files || req.files.length === 0) {
                 return res.redirect('/admin/media?error=Aucun fichier sélectionné');
             }
 
-            console.log('🎉 Images uploadées avec succès:', req.files.map(f => f.filename));
             res.redirect('/admin/media?success=' + encodeURIComponent(`${req.files.length} image(s) uploadée(s) avec succès`));
 
         } catch (error) {
@@ -130,7 +125,6 @@ const mediaController = {
             // Supprimer le fichier
             fs.unlinkSync(filePath);
 
-            console.log('🗑️ Image supprimée:', filename);
             res.json({ success: true });
 
         } catch (error) {

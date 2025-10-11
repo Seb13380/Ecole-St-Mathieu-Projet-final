@@ -133,7 +133,6 @@ const heroCarouselController = {
                     }
                 });
 
-                console.log('🖼️ Nouvelle image hero carousel ajoutée:', {
                     filename: newHeroImage.filename,
                     titre: newHeroImage.titre,
                     auteur: `${newHeroImage.auteur.firstName} ${newHeroImage.auteur.lastName}`
@@ -183,7 +182,6 @@ const heroCarouselController = {
                 }
             });
 
-            console.log('✏️ Image hero carousel mise à jour:', {
                 id: updatedHeroImage.id,
                 titre: updatedHeroImage.titre,
                 active: updatedHeroImage.active
@@ -225,13 +223,11 @@ const heroCarouselController = {
             try {
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
-                    console.log('🗑️ Fichier supprimé:', filePath);
                 }
             } catch (deleteError) {
                 console.error('Erreur lors de la suppression du fichier:', deleteError);
             }
 
-            console.log('🗑️ Image hero carousel supprimée:', {
                 id: heroImage.id,
                 filename: heroImage.filename,
                 titre: heroImage.titre
@@ -269,7 +265,6 @@ const heroCarouselController = {
                 data: { active: !heroImage.active }
             });
 
-            console.log('🔄 Statut image hero carousel modifié:', {
                 id: updatedHeroImage.id,
                 titre: updatedHeroImage.titre || 'Sans titre',
                 active: updatedHeroImage.active

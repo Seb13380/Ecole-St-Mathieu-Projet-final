@@ -80,10 +80,6 @@ const showGallery = async (req, res) => {
 // Admin - Afficher la gestion de la galerie
 const showAdminGallery = async (req, res) => {
     try {
-        console.log('=== DEBUG GALLERY ADMIN ===');
-        console.log('User:', req.session.user);
-        console.log('User role:', req.session.user?.role);
-        console.log('====');
 
         // RÃ©cupÃ©rer tous les thÃ¨mes avec leurs mÃ©dias - TRIÉS PAR ORDRE
         const themes = await prisma.galleryTheme.findMany({
@@ -109,7 +105,6 @@ const showAdminGallery = async (req, res) => {
             ]
         });
 
-        console.log('Themes found:', themes.length);
 
         res.render('admin/gallery', {
             title: 'Gestion de la Galerie',
@@ -274,7 +269,6 @@ const reorderThemes = async (req, res) => {
             return res.status(400).json({ error: 'Format invalide - tableau requis' });
         }
 
-        console.log('🔄 Réorganisation des thèmes:', themeIds);
 
         // Mettre à jour l'ordre de chaque thème
         const updatePromises = themeIds.map((themeId, index) => {
@@ -286,7 +280,6 @@ const reorderThemes = async (req, res) => {
 
         await Promise.all(updatePromises);
 
-        console.log('✅ Ordre des thèmes mis à jour');
         res.json({ success: true, message: 'Ordre mis à jour avec succès' });
     } catch (error) {
         console.error('❌ Erreur lors de la réorganisation:', error);
@@ -304,7 +297,6 @@ const updateThemeOrder = async (req, res) => {
             return res.status(400).json({ error: 'Ordre invalide' });
         }
 
-        console.log(`📊 Mise à jour ordre thème ${id} -> ${ordre}`);
 
         await prisma.galleryTheme.update({
             where: { id: parseInt(id) },
@@ -328,7 +320,6 @@ const updateMediaOrder = async (req, res) => {
             return res.status(400).json({ error: 'Ordre invalide' });
         }
 
-        console.log(`📊 Mise à jour ordre média ${id} -> ${ordre}`);
 
         await prisma.galleryMedia.update({
             where: { id: parseInt(id) },

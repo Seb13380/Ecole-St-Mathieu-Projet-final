@@ -83,7 +83,6 @@ const userManagementController = {
                 }
             });
 
-            console.log('✅ Parent créé:', parent.email);
             res.json({
                 success: true,
                 message: 'Parent créé avec succès',
@@ -134,7 +133,6 @@ const userManagementController = {
                 data: updateData
             });
 
-            console.log('✅ Parent mis à jour:', parent.email);
             res.json({
                 success: true,
                 message: 'Parent mis à jour avec succès',
@@ -201,7 +199,6 @@ const userManagementController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('✅ Parent supprimé:', parent.email);
             res.json({
                 success: true,
                 message: 'Parent supprimé avec succès'
@@ -219,19 +216,15 @@ const userManagementController = {
 
     async getStudentsManagement(req, res) {
         try {
-            console.log('🔍 Début getStudentsManagement');
-            console.log('👤 Utilisateur:', req.session.user?.email, 'Role:', req.session.user?.role);
 
             // Vérifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
-                console.log('❌ Accès refusé pour le rôle:', req.session.user.role);
                 return res.status(403).render('pages/error', {
                     message: 'Accès refusé',
                     user: req.session.user
                 });
             }
 
-            console.log('✅ Autorisation OK, récupération des données...');
             const [eleves, parents, classes] = await Promise.all([
                 prisma.student.findMany({
                     include: {
@@ -260,10 +253,6 @@ const userManagementController = {
                 })
             ]);
 
-            console.log('📊 Données récupérées:');
-            console.log('   - Élèves:', eleves.length);
-            console.log('   - Parents:', parents.length);
-            console.log('   - Classes:', classes.length);
 
             // Enrichir les données des élèves avec tous les parents
             const elevesEnriches = eleves.map(eleve => {
@@ -307,7 +296,6 @@ const userManagementController = {
                 user: req.session.user
             });
 
-            console.log(`✅ Vue rendue avec ${elevesEnriches.length} élèves enrichis`);
         } catch (error) {
             console.error('❌ Erreur lors de la récupération des élèves:', error);
             res.status(500).render('pages/error', {
@@ -344,7 +332,6 @@ const userManagementController = {
                 }
             });
 
-            console.log('✅ Élève créé:', `${eleve.firstName} ${eleve.lastName}`);
             res.json({
                 success: true,
                 message: 'Élève créé avec succès',
@@ -388,7 +375,6 @@ const userManagementController = {
                 }
             });
 
-            console.log('✅ Élève mis à jour:', `${eleve.firstName} ${eleve.lastName}`);
             res.json({
                 success: true,
                 message: 'Élève mis à jour avec succès',
@@ -427,7 +413,6 @@ const userManagementController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('✅ Élève supprimé:', `${eleve.firstName} ${eleve.lastName}`);
             res.json({
                 success: true,
                 message: 'Élève supprimé avec succès'

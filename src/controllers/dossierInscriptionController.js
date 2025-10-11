@@ -37,8 +37,6 @@ const dossierInscriptionController = {
     // Traiter la soumission du dossier d'inscription
     submitDossier: async (req, res) => {
         try {
-            console.log('🔍 === DÉBUT TRAITEMENT DOSSIER INSCRIPTION ===');
-            console.log('📋 Réception d\'un nouveau dossier d\'inscription');
 
             // Extraction des données du formulaire
             const {
@@ -67,25 +65,18 @@ const dossierInscriptionController = {
             } = req.body;
 
             // Validation des champs obligatoires
-            console.log('🔍 Validation des champs obligatoires...');
-            console.log('Père - Nom:', pereNom, 'Prénom:', perePrenom, 'Email:', pereEmail);
-            console.log('Mère - NomJF:', mereNomJeuneFille, 'Prénom:', merePrenom, 'Email:', mereEmail);
-            console.log('Enfant - Nom:', enfantNom, 'Prénom:', enfantPrenom, 'Date:', enfantDateNaissance, 'Classe:', enfantClasseDemandee);
 
             // Validation simplifiée
             if (!enfantNom || !enfantPrenom || !enfantDateNaissance || !enfantSexe || !enfantClasseDemandee) {
-                console.log('❌ Champs obligatoires manquants pour l\'enfant');
                 req.flash('error', 'Veuillez remplir au minimum les informations de l\'enfant (nom, prénom, date de naissance, sexe, classe demandée).');
                 return res.redirect('/dossier-inscription');
             }
 
             if ((!pereNom && !mereNomJeuneFille) || (!pereEmail && !mereEmail)) {
-                console.log('❌ Informations parent manquantes');
                 req.flash('error', 'Veuillez remplir au minimum les informations d\'un parent (nom et email).');
                 return res.redirect('/dossier-inscription');
             }
 
-            console.log('✅ Validation des champs réussie');
 
             // Composer l'adresse complète
             const adresseComplete = `${adresseRue}${adresseComplement ? '\n' + adresseComplement : ''}\n${adresseCodePostal} ${adresseVille}`;
@@ -212,7 +203,6 @@ const dossierInscriptionController = {
                 }
             });
 
-            console.log('✅ Dossier d\'inscription créé avec ID:', dossier.id);
 
             // 📧 ENVOI EMAIL CONFIRMATION PARENT
             try {
@@ -227,11 +217,9 @@ const dossierInscriptionController = {
                     }]
                 };
 
-                console.log('📧 Envoi confirmation parent:', parentEmail);
                 const parentEmailResult = await emailService.sendInscriptionConfirmation(parentConfirmationData);
 
                 if (parentEmailResult.success) {
-                    console.log('✅ Email parent envoyé:', parentEmailResult.messageId);
                 } else {
                     console.error('❌ Erreur email parent:', parentEmailResult.error);
                 }
@@ -258,11 +246,9 @@ const dossierInscriptionController = {
                     adminEmail: 'sgdigitalweb13@gmail.com'
                 };
 
-                console.log('📧 Envoi notification admin pour dossier ID:', dossier.id);
                 const emailResult = await emailService.sendNewInscriptionNotification(adminEmailData);
 
                 if (emailResult.success) {
-                    console.log('✅ Email admin envoyé:', emailResult.messageId);
                 } else {
                     console.error('❌ Erreur email admin:', emailResult.error);
                 }

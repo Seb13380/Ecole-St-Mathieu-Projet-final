@@ -6,8 +6,6 @@ const menuController = {
     // Afficher les menus de la semaine (page publique)
     getMenus: async (req, res) => {
         try {
-            console.log('🍽️ DEBUT - Accès à /restauration/menus');
-            console.log('📍 Tentative de récupération des menus actifs...');
 
             const menusActifs = await prisma.menu.findMany({
                 where: { actif: true },
@@ -19,7 +17,6 @@ const menuController = {
                 orderBy: { dateDebut: 'asc' } // Tri par date de début (chronologique)
             });
 
-            console.log(`📊 Menus actifs trouvés: ${menusActifs.length}`);
 
             // Simple tri chronologique par date de début
             let menusOrdonnes = menusActifs.sort((a, b) => {
@@ -29,22 +26,17 @@ const menuController = {
                 return new Date(a.dateDebut) - new Date(b.dateDebut);
             });
 
-            console.log('📅 Date actuelle:', new Date().toLocaleDateString('fr-FR'));
-            console.log('� Ordre chronologique des menus:');
             menusOrdonnes.forEach((menu, index) => {
                 const debut = menu.dateDebut ? new Date(menu.dateDebut).toLocaleDateString('fr-FR') : 'Non définie';
                 const fin = menu.dateFin ? new Date(menu.dateFin).toLocaleDateString('fr-FR') : 'Non définie';
-                console.log(`  ${index + 1}. ${menu.semaine} (${debut} - ${fin})`);
             });
 
-            console.log('📍 Tentative de rendu du template...');
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',
                 menus: menusOrdonnes // Menus triés avec priorité à la semaine courante
             });
 
-            console.log('✅ Template rendu avec succès');
         } catch (error) {
             console.error('❌ Erreur lors de la récupération des menus:', error);
             res.status(500).render('pages/error', {
@@ -56,8 +48,6 @@ const menuController = {
     // Admin: Liste tous les menus
     getAdminMenus: async (req, res) => {
         try {
-            console.log('🍽️ Accès à la page admin des menus');
-            console.log('👤 Utilisateur:', req.session.user?.email);
 
             // Récupérer tous les menus de la base de données
             const menus = await prisma.menu.findMany({
@@ -69,7 +59,6 @@ const menuController = {
                 orderBy: { createdAt: 'desc' }
             });
 
-            console.log('📝 Menus trouvés:', menus.length);
 
             res.render('pages/admin/menus', {
                 title: 'Gestion des menus',
@@ -93,32 +82,25 @@ const menuController = {
     // Admin: Créer un nouveau menu
     postCreateMenu: async (req, res) => {
         try {
-            console.log('🍽️ Tentative de création de menu');
-            console.log('📝 Données reçues:', req.body);
-            console.log('👤 Utilisateur:', req.session.user);
 
             const { semaine, lundi, mardi, mercredi, jeudi, vendredi, desactiverAnciens } = req.body;
 
             if (!semaine || semaine.trim() === '') {
-                console.log('❌ Semaine manquante');
                 return res.redirect('/admin/menus?error=La semaine est obligatoire');
             }
 
             if (!req.session.user || !req.session.user.id) {
-                console.log('❌ Utilisateur non connecté');
                 return res.redirect('/auth/login');
             }
 
             // Si l'option est cochée, désactiver les anciens menus
             if (desactiverAnciens === 'on') {
-                console.log('🔄 Désactivation des anciens menus...');
                 await prisma.menu.updateMany({
                     where: { actif: true },
                     data: { actif: false }
                 });
             }
 
-            console.log('✅ Création du nouveau menu...');
             // Créer le nouveau menu (sans désactiver les anciens automatiquement)
             const nouveauMenu = await prisma.menu.create({
                 data: {
@@ -133,7 +115,6 @@ const menuController = {
                 }
             });
 
-            console.log('🎉 Menu créé avec succès:', nouveauMenu.id);
             res.redirect('/admin/menus?success=Menu créé avec succès');
         } catch (error) {
             console.error('❌ Erreur complète lors de la création du menu:', error);
@@ -218,7 +199,6 @@ const menuController = {
                 data: { actif: false }
             });
 
-            console.log(`✅ ${result.count} menus désactivés`);
             res.status(200).json({ success: true, count: result.count });
         } catch (error) {
             console.error('Erreur lors de la désactivation des menus:', error);

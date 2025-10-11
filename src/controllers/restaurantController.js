@@ -142,7 +142,6 @@ const RestaurantController = {
             //     }
             // });
 
-            console.log(`✅ Ticket ${reservationId} marqué comme consommé par ${req.user?.username || 'restaurant'}`);
 
             res.json({
                 success: true,
@@ -180,7 +179,6 @@ const RestaurantController = {
             //     }
             // });
 
-            console.log(`❌ Ticket ${reservationId} marqué comme absent par ${req.user?.username || 'restaurant'}`);
 
             res.json({
                 success: true,

@@ -55,7 +55,6 @@ async function getAdditionalStats(startDate, endDate) {
             }
         } catch (error) {
             // Si erreur, ne pas inclure ce fichier
-            console.log(`❌ Fichier non trouvé: ${download.url}`);
         }
     }
 

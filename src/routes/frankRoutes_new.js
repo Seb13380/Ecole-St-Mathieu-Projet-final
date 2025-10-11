@@ -4,7 +4,6 @@ const { requireAuth } = require('../middleware/auth');
 
 // Route pour le dashboard de Frank
 router.get('/dashboard', requireAuth, (req, res) => {
-    console.log('🏫 Accès au dashboard Frank - utilisateur:', req.session.user?.email);
 
     // Vérifier que l'utilisateur est bien Frank (MAINTENANCE_SITE)
     if (req.session.user.role !== 'MAINTENANCE_SITE') {

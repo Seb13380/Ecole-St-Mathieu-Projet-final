@@ -155,7 +155,6 @@ const ProfileController = {
                 notifications: notifications === 'on'
             };
 
-            console.log(`✅ Profil mis à jour pour: ${user.email}`);
 
             res.redirect('/profile?success=Profil mis à jour avec succès');
         } catch (error) {
@@ -197,7 +196,6 @@ const ProfileController = {
             const user = req.session.user;
             const { currentPassword, newPassword, confirmPassword } = req.body;
 
-            console.log('🔒 Tentative de changement de mot de passe pour:', user?.email);
 
             if (!user) {
                 return res.redirect('/auth/login');
@@ -205,17 +203,14 @@ const ProfileController = {
 
             // Validation
             if (!currentPassword || !newPassword || !confirmPassword) {
-                console.log('❌ Champs manquants');
                 return res.redirect('/profile/change-password?error=Tous les champs sont requis');
             }
 
             if (newPassword !== confirmPassword) {
-                console.log('❌ Mots de passe ne correspondent pas');
                 return res.redirect('/profile/change-password?error=Les nouveaux mots de passe ne correspondent pas');
             }
 
             if (newPassword.length < 6) {
-                console.log('❌ Mot de passe trop court');
                 return res.redirect('/profile/change-password?error=Le mot de passe doit contenir au moins 6 caractères');
             }
 
@@ -225,14 +220,12 @@ const ProfileController = {
             });
 
             if (!currentUser) {
-                console.log('❌ Utilisateur non trouvé en base');
                 return res.redirect('/profile/change-password?error=Utilisateur non trouvé');
             }
 
             // Vérifier le mot de passe actuel
             const isValidPassword = await bcrypt.compare(currentPassword, currentUser.password);
             if (!isValidPassword) {
-                console.log('❌ Mot de passe actuel incorrect');
                 return res.redirect('/profile/change-password?error=Mot de passe actuel incorrect');
             }
 
@@ -248,7 +241,6 @@ const ProfileController = {
                 }
             });
 
-            console.log(`✅ Mot de passe changé pour: ${user.email}`);
 
             res.redirect('/profile?success=Mot de passe changé avec succès');
         } catch (error) {

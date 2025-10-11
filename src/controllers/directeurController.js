@@ -7,7 +7,6 @@ const directeurController = {
     // Afficher le tableau de bord du directeur
     dashboard: async (req, res) => {
         try {
-            console.log('🏫 Accès au tableau de bord directeur');
 
             // Vérifier que l'utilisateur a les droits (DIRECTION, ADMIN ou GESTIONNAIRE_SITE)
             if (!['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -47,10 +46,6 @@ const directeurController = {
             };
 
             // Debug - vérification des valeurs
-            console.log('🔍 DEBUG STATS DASHBOARD:');
-            console.log('  - pendingInscriptions:', stats.pendingInscriptions);
-            console.log('  - acceptedInscriptions:', stats.acceptedInscriptions);
-            console.log('  - pendingCredentials:', stats.pendingCredentials);
 
             // Récupérer les utilisateurs récents
             const recentUsers = await prisma.user.findMany({
@@ -831,7 +826,6 @@ const directeurController = {
 
     async getCredentialsRequests(req, res) {
         try {
-            console.log('🔑 Accès aux demandes d\'identifiants');
 
             // Récupérer toutes les demandes d'identifiants
             const credentialsRequests = await prisma.credentialsRequest.findMany({
@@ -878,7 +872,6 @@ const directeurController = {
             const { id } = req.params;
             const { notes } = req.body;
 
-            console.log(`✅ Approbation demande identifiants ID: ${id}`);
 
             await prisma.credentialsRequest.update({
                 where: { id: parseInt(id) },
@@ -910,7 +903,6 @@ const directeurController = {
             const { id } = req.params;
             const { reason, notes } = req.body;
 
-            console.log(`❌ Rejet demande identifiants ID: ${id}`);
 
             await prisma.credentialsRequest.update({
                 where: { id: parseInt(id) },
@@ -941,7 +933,6 @@ const directeurController = {
         try {
             const { id } = req.params;
 
-            console.log(`🗑️ Suppression demande identifiants ID: ${id}`);
 
             await prisma.credentialsRequest.delete({
                 where: { id: parseInt(id) }
@@ -966,12 +957,10 @@ const directeurController = {
     // Afficher la liste des rendez-vous d'inscription (statut ACCEPTED)
     getRendezVousInscriptions: async (req, res) => {
         try {
-            console.log('🔍 Début récupération rendez-vous inscriptions...');
 
             // 🔄 RÉCUPÉRATION UNIFIÉE DES DEMANDES PRÊTES POUR RENDEZ-VOUS
 
             // 1. Pré-inscriptions acceptées
-            console.log('📝 Recherche des pré-inscriptions acceptées...');
             const acceptedPreInscriptions = await prisma.preInscriptionRequest.findMany({
                 where: {
                     status: 'ACCEPTED'
@@ -988,13 +977,10 @@ const directeurController = {
                     }
                 }
             });
-            console.log(`✅ ${acceptedPreInscriptions.length} pré-inscriptions acceptées trouvées`);
 
             // 2. Dossiers validés (prêts pour rendez-vous)
-            console.log('📂 Recherche des dossiers validés...');
             // 🔥 TEMPORAIRE: Désactiver les dossiers validés pour éviter les erreurs de structure
             const validatedDossiers = [];
-            console.log(`✅ ${validatedDossiers.length} dossiers validés trouvés (désactivé temporairement)`);
 
             // 3. Normaliser les dossiers vers le format des pré-inscriptions
             const normalizedDossiers = validatedDossiers.map(dossier => ({
@@ -1030,7 +1016,6 @@ const directeurController = {
             // 5. Combiner et trier
             const acceptedRequests = [...normalizedPreInscriptions, ...normalizedDossiers]
                 .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-            console.log(`📋 Total des demandes combinées: ${acceptedRequests.length}`);
 
             // Parser les données enfants et parents pour l'affichage
             const requestsWithParsedChildren = acceptedRequests.map(request => {
@@ -1066,7 +1051,6 @@ const directeurController = {
                 };
             });
 
-            console.log(`🎯 Rendu du template avec ${requestsWithParsedChildren.length} demandes`);
             res.render('pages/directeur/rendez-vous-inscriptions', {
                 title: 'Rendez-vous d\'inscription - École Saint-Mathieu',
                 user: req.session.user,
@@ -1090,7 +1074,6 @@ const directeurController = {
             const { id } = req.params;
 
             // DEBUG: Message très visible pour confirmer l'exécution
-            console.log('🔥🔥🔥 GÉNÉRATION PDF DÉMARRÉE - ID:', id, '🔥🔥🔥');
 
             // Essayer d'abord de récupérer depuis DossierInscription (données détaillées)
             let dossierDetaille = null;
@@ -1101,11 +1084,9 @@ const directeurController = {
                     where: { id: parseInt(id) }
                 });
             } catch (error) {
-                console.log('ℹ️ Pas de dossier détaillé trouvé, utilisation des données de pré-inscription');
             }
 
             if (dossierDetaille) {
-                console.log('✅ Dossier détaillé trouvé:', dossierDetaille.enfantNom);
 
                 // Convertir les données du dossier détaillé au format attendu par le PDF
                 request = {
@@ -1151,16 +1132,13 @@ const directeurController = {
                 });
 
                 if (!request) {
-                    console.log('❌ Aucune demande d\'inscription trouvée pour ID:', id);
                     return res.status(404).json({
                         success: false,
                         message: 'Demande d\'inscription non trouvée'
                     });
                 }
-                console.log('✅ Demande de pré-inscription trouvée:', request.parentLastName);
             }
 
-            console.log('✅ Demande trouvée:', request.parentLastName);
 
             // Parser les données enfants
             let children = [];
@@ -1188,7 +1166,6 @@ const directeurController = {
                 }
             }
 
-            console.log('📄 Démarrage création PDF...');
 
             // Créer le PDF avec PDFKit selon le format officiel
             const PDFDocument = require('pdfkit');
@@ -1217,7 +1194,6 @@ const directeurController = {
             const archiveDir = path.join(__dirname, '../../public/pdf_archive');
             if (!fs.existsSync(archiveDir)) {
                 fs.mkdirSync(archiveDir, { recursive: true });
-                console.log('📁 Dossier d\'archivage PDF créé:', archiveDir);
             }
 
             // AMÉLIORATION: Créer un nom de fichier plus descriptif pour l'archivage
@@ -1235,27 +1211,21 @@ const directeurController = {
             const archiveFilename = `inscription-${id}-${parentNameSafe}${childName}-${anneeScolaireSafe}-${timestamp}.pdf`;
             const archivePath = path.join(archiveDir, archiveFilename);
 
-            console.log('📄 Création du document PDFKit...');
             const doc = new PDFDocument({
                 size: 'A4',
                 margin: 60
             });
-            console.log('✅ Document PDFKit créé avec succès');
 
             // Configuration des en-têtes pour affichage dans le navigateur
-            console.log('📄 Configuration des headers HTTP...');
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'inline; filename="demande-inscription-' + request.parentLastName + '.pdf"');
-            console.log('✅ Headers configurés');
 
             // AMÉLIORATION: Pipe vers la réponse ET sauvegarde en archive
-            console.log('📄 Configuration du pipe...');
             doc.pipe(res);
 
             // Sauvegarder aussi dans les archives
             const archiveStream = fs.createWriteStream(archivePath);
             doc.pipe(archiveStream);
-            console.log('✅ Pipe configuré vers navigateur ET archive:', archiveFilename);
 
             let yPos = 30;
 
@@ -1273,7 +1243,6 @@ const directeurController = {
                     doc.image(logoEnseignPath, 130, yPos, { width: 55, height: 55 });
                 }
             } catch (error) {
-                console.log('Erreur chargement logos:', error);
             }
 
             // Titre élégant à droite
@@ -1405,12 +1374,10 @@ const directeurController = {
                         // Si la mère n'a pas de téléphone et qu'il y a un téléphone alternatif
                         if (!mereInfo.phone) {
                             mereInfo.phone = messageData.tel;
-                            console.log('📄 PDF - Téléphone alternatif attribué à la mère:', messageData.tel);
                         }
                         // Si le père n'a pas de téléphone principal
                         if (!pereInfo.phone) {
                             pereInfo.phone = messageData.tel;
-                            console.log('📄 PDF - Téléphone alternatif attribué au père:', messageData.tel);
                         }
                     }
 
@@ -1424,7 +1391,6 @@ const directeurController = {
             }
 
             // DEBUG: Voir ce qu'on a dans mereInfo
-            console.log('📄 PDF - mereInfo:', JSON.stringify(mereInfo, null, 2));
 
             doc.fontSize(10).font('Helvetica');
 
@@ -1447,7 +1413,6 @@ const directeurController = {
             yPos += 25;
 
             // === SITUATION DE FAMILLE ===
-            console.log('📄 PDF - Position SITUATION DE FAMILLE - yPos:', yPos);
 
             doc.moveTo(60, yPos).lineTo(535, yPos).stroke();
             yPos += 12;
@@ -1469,21 +1434,16 @@ const directeurController = {
                     const memeNom = mereInfo.lastName.toLowerCase() === pereInfo.lastName.toLowerCase();
                     if (memeNom) {
                         situationFamiliale = 'marie'; // Par défaut si même nom
-                        console.log('📄 PDF - Situation déduite: Mariés (même nom de famille)');
                     } else {
                         situationFamiliale = 'concubinage'; // Union libre si noms différents
-                        console.log('📄 PDF - Situation déduite: Union libre (noms différents)');
                     }
                 } else if (pereInfo.firstName && pereInfo.lastName && (!mereInfo.firstName || !mereInfo.lastName)) {
                     situationFamiliale = 'autre'; // Parent seul
-                    console.log('📄 PDF - Situation déduite: Autre (parent seul - père)');
                 } else if (mereInfo.firstName && mereInfo.lastName && (!pereInfo.firstName || !pereInfo.lastName)) {
                     situationFamiliale = 'autre'; // Parent seul
-                    console.log('📄 PDF - Situation déduite: Autre (parent seule - mère)');
                 }
             }
 
-            console.log('📄 PDF - situationFamiliale finale:', situationFamiliale);
 
             // Solution simple avec caractères compatibles
             let mariés = 'O';
@@ -1506,7 +1466,6 @@ const directeurController = {
             doc.text(`${mariés} Mariés     ${pacsés} Pacsés     ${unionLibre} Union libre     ${divorcés} Divorcés     ${séparés} Séparés     ${autre} Autre: ${autre === 'X' ? situationFamiliale : '___________'}`, 60, yPos);
 
             // DEBUG: Ajout d'une ligne pour vérifier que le code s'exécute
-            console.log('📄 PDF - Section Situation de famille générée avec situation:', situationFamiliale);
 
             yPos += 25;
 
@@ -1529,7 +1488,6 @@ const directeurController = {
 
                 // DEBUG: Vérifier le formatage de date
                 const formattedDate = formatDateFrench(child.birthDate);
-                console.log('📄 PDF - Date originale:', child.birthDate, '-> Formatée:', formattedDate);
 
                 doc.text('Date de naissance: ' + formattedDate, 300, yPos);
                 yPos += 15;
@@ -1540,7 +1498,6 @@ const directeurController = {
                 yPos += 15;
 
                 // Ligne 3: Classe demandée (plus proéminente)
-                console.log('📄 PDF - Classe enfant:', child.requestedClass);
                 const classeDemandee = child.requestedClass || child.schoolLevel || 'Non spécifiée';
                 doc.fontSize(10).font('Helvetica-Bold')
                     .text('CLASSE DEMANDÉE: ' + classeDemandee, 60, yPos);
@@ -1682,29 +1639,21 @@ const directeurController = {
                 .text('Date: ________', 480, yPos);
 
             // Envoyer le PDF directement au navigateur
-            console.log('📄 PDF - Début du pipe vers le navigateur');
 
             // Attacher les événements AVANT la finalisation
             doc.on('end', () => {
-                console.log('✅ Événement END du PDF déclenché');
             });
 
             res.on('finish', () => {
-                console.log('✅ Réponse HTTP terminée');
             });
 
             res.on('close', () => {
-                console.log('🔒 Connexion fermée');
             });
 
-            console.log('📄 PDF - Pipe déjà configuré, finalisation...');
 
             // Finaliser le PDF avec plus de debug
-            console.log('🔚 Début finalisation PDF...');
             doc.end();
-            console.log('🔥🔥🔥 PDF FINALISÉ ET ENVOYÉ 🔥🔥🔥');
 
-            console.log('📄 PDF - doc.end() appelé, PDF envoyé');
 
         } catch (error) {
             console.error('❌❌❌ ERREUR GÉNÉRATION PDF ❌❌❌');
@@ -1729,7 +1678,6 @@ const directeurController = {
     // Page d'import Excel
     getImportExcel: async (req, res) => {
         try {
-            console.log('📊 Accès à la page d\'import Excel');
 
             res.render('pages/directeur/import-excel', {
                 title: 'Import Excel des familles - École Saint-Mathieu',
@@ -1748,9 +1696,6 @@ const directeurController = {
     // Traitement de l'import Excel
     processExcelImport: async (req, res) => {
         try {
-            console.log('🔥 Import Excel démarré');
-            console.log('Process:', process.pid);
-            console.log('User request file:', req.file ? req.file.originalname : 'No file');
 
             if (!req.file) {
                 return res.status(400).json({
@@ -1763,7 +1708,6 @@ const directeurController = {
             const fs = require('fs');
 
             // Lire le fichier Excel
-            console.log('📖 Lecture du fichier Excel:', req.file.originalname);
             const workbook = XLSX.readFile(req.file.path);
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
@@ -1782,8 +1726,6 @@ const directeurController = {
             const headers = jsonData[3]; // Index 3 = ligne 4
             const dataRows = jsonData.slice(4); // Données à partir de la ligne 5
 
-            console.log('📋 Headers détectés:', headers);
-            console.log('📊 Nombre de lignes de données:', dataRows.length);
 
             // Mapping des colonnes selon votre fichier
             const columnMapping = {
@@ -1817,14 +1759,12 @@ const directeurController = {
                 if (!row || row.length === 0) continue;
 
                 try {
-                    console.log(`📝 Traitement ligne ${i + 1}: ${row[columnMapping.responsable1]}`);
 
                     // Extraire les informations du responsable 1 (père)
                     const resp1Full = row[columnMapping.responsable1] || '';
                     const email1 = row[columnMapping.email1] || '';
                     const tel1 = row[columnMapping.tel1] || '';
 
-                    console.log(`� Traitement ligne ${i + 1}: ${resp1Full}`);
 
                     const resp1Match = resp1Full.match(/^(M\.|Mme)\s+(.+)$/);
 
@@ -1871,7 +1811,6 @@ const directeurController = {
                             prenom = 'Non renseigné';
                         }
 
-                        console.log(`👨 Père analysé: "${nomComplet}" → Nom: "${nom}", Prénom: "${prenom}"`);
 
                         if (civilite === 'M.' && nom && prenom) {
                             pere = {
@@ -1934,7 +1873,6 @@ const directeurController = {
                             prenom = 'Non renseigné';
                         }
 
-                        console.log(`👩 Mère analysée: "${nomComplet}" → Nom: "${nom}", Prénom: "${prenom}"`);
 
                         if (civilite === 'Mme' && nom && prenom) {
                             mere = {
@@ -1998,7 +1936,6 @@ const directeurController = {
                         enfantPrenom = 'Non renseigné';
                     }
 
-                    console.log(`👶 Enfant analysé: "${enfantNomComplet}" → Nom: "${enfantNom}", Prénom: "${enfantPrenom}"`);
 
                     const dateNaissanceRaw = row[columnMapping.dateNaissance] || '';
                     const codeClasse = row[columnMapping.codeClasse] || '';
@@ -2006,13 +1943,11 @@ const directeurController = {
                     // Convertir la date (format DD/MM/YYYY vers YYYY-MM-DD ou objet Date Excel)
                     let dateNaissance = null;
                     if (dateNaissanceRaw) {
-                        console.log('Date brute Excel:', dateNaissanceRaw, 'Type:', typeof dateNaissanceRaw);
 
                         try {
                             if (dateNaissanceRaw instanceof Date) {
                                 // Si c'est déjà un objet Date d'Excel
                                 dateNaissance = dateNaissanceRaw;
-                                console.log('→ Objet Date Excel détecté');
                             } else if (typeof dateNaissanceRaw === 'string') {
                                 // Si c'est une chaîne au format DD/MM/YYYY
                                 const dateMatch = dateNaissanceRaw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -2023,42 +1958,33 @@ const directeurController = {
 
                                     // Créer la date en utilisant le constructeur Date(year, month-1, day)
                                     dateNaissance = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                    console.log(`→ Format DD/MM/YYYY détecté: ${day}/${month}/${year}`);
                                 } else {
                                     // Essayer d'autres formats
                                     const testDate = new Date(dateNaissanceRaw);
                                     if (!isNaN(testDate.getTime())) {
                                         dateNaissance = testDate;
-                                        console.log('→ Format ISO ou autre accepté');
                                     } else {
-                                        console.log('→ Format de string non reconnu');
                                     }
                                 }
                             } else if (typeof dateNaissanceRaw === 'number') {
                                 // Si c'est un nombre de série Excel (jours depuis 1900)
                                 const excelEpoch = new Date(1900, 0, 1);
                                 dateNaissance = new Date(excelEpoch.getTime() + (dateNaissanceRaw - 2) * 24 * 60 * 60 * 1000);
-                                console.log('→ Nombre série Excel détecté');
                             }
 
                             // Vérifier que la date est valide
                             if (dateNaissance && !isNaN(dateNaissance.getTime())) {
-                                console.log('Date convertie:', dateNaissance.toISOString());
                             } else {
-                                console.log('❌ Date invalide après conversion');
                                 dateNaissance = null;
                             }
                         } catch (dateError) {
-                            console.log('❌ Erreur conversion date:', dateError.message);
                             dateNaissance = null;
                         }
                     } else {
-                        console.log('⚠️ Date de naissance vide');
                     }
 
                     // Si pas de date de naissance, utiliser une date par défaut
                     if (!dateNaissance) {
-                        console.log('⚠️ Date de naissance manquante, utilisation d\'une date par défaut');
                         dateNaissance = new Date('2018-01-01'); // Date par défaut pour éviter les erreurs
                     }
 
@@ -2069,14 +1995,9 @@ const directeurController = {
                         codeClasse: codeClasse
                     };
 
-                    console.log(`📋 Données enfant: FirstName="${enfant.firstName}", LastName="${enfant.lastName}", DateNaissance=${enfant.dateNaissance}, CodeClasse="${enfant.codeClasse}"`);
 
                     // Validation basique
                     if (!enfant.firstName || !enfant.lastName || !enfant.codeClasse) {
-                        console.log(`❌ Validation échouée pour enfant ligne ${i + 1}:`);
-                        console.log(`   - firstName: "${enfant.firstName}" ${enfant.firstName ? '✅' : '❌'}`);
-                        console.log(`   - lastName: "${enfant.lastName}" ${enfant.lastName ? '✅' : '❌'}`);
-                        console.log(`   - codeClasse: "${enfant.codeClasse}" ${enfant.codeClasse ? '✅' : '❌'}`);
 
                         results.errors++;
                         results.details.push({
@@ -2089,7 +2010,6 @@ const directeurController = {
 
                     // Vérification avant création  
                     if (!pere && !mere) {
-                        console.log(`❌ Aucun parent identifié pour enfant ${enfant.firstName}`);
                         results.errors++;
                         results.details.push({
                             ligne: i + 1,
@@ -2103,7 +2023,6 @@ const directeurController = {
                     const hasValidEmail = (pere && pere.email) || (mere && mere.email);
 
                     if (!hasValidEmail) {
-                        console.log(`⚠️ ATTENTION: Aucun parent avec email pour enfant ${enfant.firstName} - création avec email temporaire`);
                     }
 
                     // === CRÉATION EN BASE DE DONNÉES ===
@@ -2148,9 +2067,7 @@ const directeurController = {
                                         role: 'PARENT'
                                     }
                                 });
-                                console.log(`✅ Père créé: ${pere.firstName} ${pere.lastName}`);
                             } else {
-                                console.log(`♻️ Père existant trouvé: ${pere.firstName} ${pere.lastName}`);
                             }
 
                             if (existingPere) {
@@ -2194,9 +2111,7 @@ const directeurController = {
                                         role: 'PARENT'
                                     }
                                 });
-                                console.log(`✅ Mère créée: ${mere.firstName} ${mere.lastName}`);
                             } else {
-                                console.log(`♻️ Mère existante trouvée: ${mere.firstName} ${mere.lastName}`);
                             }
 
                             if (existingMere) {
@@ -2205,14 +2120,8 @@ const directeurController = {
                         }
 
                         // 👶 CRÉER L'ENFANT
-                        console.log(`🔍 Vérification conditions pour création enfant ${enfant.firstName} ${enfant.lastName}:`);
-                        console.log(`   - Parents créés: ${createdParents.length} (père: ${pere ? '✅' : '❌'}, mère: ${mere ? '✅' : '❌'})`);
-                        console.log(`   - firstName: "${enfant.firstName}" ${enfant.firstName ? '✅' : '❌'}`);
-                        console.log(`   - lastName: "${enfant.lastName}" ${enfant.lastName ? '✅' : '❌'}`);
-                        console.log(`   - dateNaissance: ${enfant.dateNaissance} ${enfant.dateNaissance ? '✅' : '❌'}`);
 
                         if ((pere || mere) && enfant.firstName && enfant.lastName && enfant.dateNaissance) {
-                            console.log(`✅ Conditions validées, création de l'enfant ${enfant.firstName} ${enfant.lastName}`);
                             // Vérifier si l'étudiant existe déjà
                             const existingStudent = await prisma.student.findFirst({
                                 where: {
@@ -2223,7 +2132,6 @@ const directeurController = {
                             });
 
                             if (existingStudent) {
-                                console.log(`♻️ Étudiant ${enfant.firstName} ${enfant.lastName} existe déjà - vérification des relations`);
 
                                 // Créer les relations manquantes avec les parents
                                 for (const parent of createdParents) {
@@ -2241,10 +2149,8 @@ const directeurController = {
                                                 studentId: existingStudent.id
                                             }
                                         });
-                                        console.log(`🔗 Relation créée: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
                                         results.relations++;
                                     } else {
-                                        console.log(`♻️ Relation déjà existante: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
                                     }
                                 }
 
@@ -2258,13 +2164,11 @@ const directeurController = {
                             }
 
                             // Trouver ou créer la classe
-                            console.log(`🏫 Recherche classe: "${enfant.codeClasse}"`);
                             let classe = await prisma.classe.findFirst({
                                 where: { nom: enfant.codeClasse }
                             });
 
                             if (!classe) {
-                                console.log(`🏗️ Classe "${enfant.codeClasse}" non trouvée, création...`);
                                 classe = await prisma.classe.create({
                                     data: {
                                         nom: enfant.codeClasse,
@@ -2272,21 +2176,14 @@ const directeurController = {
                                         anneeScolaire: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
                                     }
                                 });
-                                console.log(`✅ Classe créée: ${enfant.codeClasse} (ID: ${classe.id})`);
                                 results.classes++;
                             } else {
-                                console.log(`✅ Classe "${enfant.codeClasse}" trouvée (ID: ${classe.id})`);
                             }
 
 
 
                             // Créer l'étudiant (sans parentId direct maintenant)
                             if (createdParents.length > 0) {
-                                console.log(`👶 Tentative de création étudiant avec les données:`);
-                                console.log(`   - firstName: "${enfant.firstName}"`);
-                                console.log(`   - lastName: "${enfant.lastName}"`);
-                                console.log(`   - dateNaissance: ${enfant.dateNaissance}`);
-                                console.log(`   - classeId: ${classe.id}`);
 
                                 try {
                                     // Utiliser le premier parent créé comme parent principal
@@ -2301,11 +2198,7 @@ const directeurController = {
                                             classeId: classe.id            // Utilisation du classeId
                                         }
                                     });
-                                    console.log(`✅ Étudiant créé avec succès (ID: ${createdStudent.id})`);
                                 } catch (studentError) {
-                                    console.log(`❌ ERREUR création étudiant:`, studentError.message);
-                                    console.log(`   Code erreur: ${studentError.code}`);
-                                    console.log(`   Détails:`, studentError);
                                     throw studentError; // Relancer l'erreur pour le catch externe
                                 }
 
@@ -2326,16 +2219,12 @@ const directeurController = {
                                                 studentId: createdStudent.id
                                             }
                                         });
-                                        console.log(`🔗 Relation créée: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
                                     } else {
-                                        console.log(`♻️ Relation déjà existante: ${parent.firstName} ${parent.lastName} → ${enfant.firstName} ${enfant.lastName}`);
                                     }
                                 }
 
-                                console.log(`✅ Enfant créé: ${enfant.firstName} ${enfant.lastName} - Classe: ${enfant.codeClasse} - Parents: ${createdParents.length}`);
                                 results.students++;
                             } else {
-                                console.log(`❌ ÉCHEC création enfant: Aucun parent créé (createdParents.length = ${createdParents.length})`);
                                 results.errors++;
                                 results.details.push({
                                     ligne: i + 1,
@@ -2345,11 +2234,6 @@ const directeurController = {
                                 });
                             }
                         } else {
-                            console.log(`❌ Conditions non remplies pour création enfant:`);
-                            console.log(`   - (pere || mere): ${(pere || mere) ? '✅' : '❌'}`);
-                            console.log(`   - enfant.firstName: ${enfant.firstName ? '✅' : '❌'}`);
-                            console.log(`   - enfant.lastName: ${enfant.lastName ? '✅' : '❌'}`);
-                            console.log(`   - enfant.dateNaissance: ${enfant.dateNaissance ? '✅' : '❌'}`);
 
                             results.errors++;
                             results.details.push({
@@ -2394,7 +2278,6 @@ const directeurController = {
             // Nettoyer le fichier temporaire
             fs.unlinkSync(req.file.path);
 
-            console.log('🎉 Import terminé:', results);
 
             res.json({
                 success: true,
@@ -2424,7 +2307,6 @@ const directeurController = {
     // === ARCHIVE PDF ===
     getPDFArchive: async (req, res) => {
         try {
-            console.log('📁 Accès à l\'archive PDF');
 
             // Vérifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -2471,7 +2353,6 @@ const directeurController = {
                     .sort((a, b) => new Date(b.modified) - new Date(a.modified));
             }
 
-            console.log(`📋 ${pdfFiles.length} fichiers PDF trouvés dans l'archive`);
 
             res.render('pages/admin/pdf-archive', {
                 title: 'Archive PDF des Inscriptions',
