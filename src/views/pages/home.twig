@@ -3,30 +3,144 @@
 {% block title %}École Saint-Mathieu - Accueil
 {% endblock %}
 
-{% block styles %}{% endblock %}
+{% block styles %}
+	<style>
+		/* Hero carousel sizing & transitions */
+		#hero-carousel {
+			height: 85rem;
+		}
+
+		@media(max-width: 1023px) {
+			#hero-carousel {
+				height: 40rem;
+			}
+		}
+
+		/* Secondary carousel sizing */
+		#secondary-carousel {
+			height: 50rem;
+		}
+
+		@media(max-width: 1023px) {
+			#secondary-carousel {
+				height: 30rem;
+			}
+		}
+
+		/* Custom carousel styles - Slideshow avec fade */
+		.carousel-slide {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: opacity 0.8s ease-in-out;
+			pointer-events: none;
+		}
+
+		.carousel-slide.active {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		.carousel-slide img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		/* Full-width sections */
+		.full-width-section {
+			width: 98vw !important;
+			position: relative;
+			left: 50%;
+			right: 50%;
+			margin-left: -49vw !important;
+			margin-right: -49vw !important;
+			background-color: #a7e3dd;
+			padding: 20px 0;
+			box-sizing: border-box;
+			max-width: 100%;
+			overflow-x: hidden;
+		}
+
+		/* Colonnes 50/50 sur desktop, 100% sur mobile */
+		@media(min-width: 1024px) {
+			.lg\:w-1\/2 {
+				width: 50% !important;
+			}
+		}
+
+		/* Sur mobile, sections empilées verticalement */
+		@media(max-width: 1023px) {
+			.w-full.lg\:w-1\/2 {
+				width: 100% !important;
+				margin-bottom: 1rem;
+			}
+		}
+
+		/* Force le flex-row sur desktop */
+		@media(min-width: 1024px) {
+			.lg\:flex-row {
+				flex-direction: row !important;
+				flex-wrap: nowrap !important;
+			}
+		}
+
+		/* Carousel secondaire responsive */
+		@media(max-width: 1023px) {
+			#secondary-carousel {
+				height: 400px !important;
+			}
+		}
+
+		/* Google Maps styling */
+		.maps-container iframe {
+			border-radius: 12px;
+			transition: transform 0.3s ease;
+			height: 600px !important;
+			min-height: 600px !important;
+		}
+
+		.maps-container:hover iframe {
+			transform: scale(1.02);
+		}
+
+		/* Animation pour les icônes des informations pratiques */
+		.info-card {
+			transition: all 0.3s ease;
+		}
+
+		.info-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(167, 227, 221, 0.3);
+		}
+	</style>
+{% endblock %}
 
 {% block main %}
 
 	{# <!-- Bandeau de défilement -->
-		<div style="background: linear-gradient(45deg, #0d9488, #14b8a6, #5eead4); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #0f766e;">
-			<div style="animation: marquee 20s linear infinite;">
-				✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
-			</div>
-		</div>
-	
-		<style>
-			@keyframes marquee {
-				0% {
-					transform: translateX(100%);
-				}
-				100% {
-					transform: translateX(-100%);
-				}
-			}
-		</style> #}
+					<div style="background: linear-gradient(45deg, #0d9488, #14b8a6, #5eead4); color: white; padding: 20px 0; font-weight: bold; font-size: 24px; text-align: center; position: relative; overflow: hidden; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); border-bottom: 3px solid #0f766e;">
+						<div style="animation: marquee 20s linear infinite;">
+							✨ Site web École Saint-Mathieu - Déploiement en cours - Nouvelles fonctionnalités progressivement disponibles ! ✨
+						</div>
+					</div>
+				
+					<style>
+						@keyframes marquee {
+							0% {
+								transform: translateX(100%);
+							}
+							100% {
+								transform: translateX(-100%);
+							}
+						}
+					</style> #}
 
 	<div class="py-8 px-4 md:py-16 md:px-8 bg-gradient-to-b from-[#a7e3dd] to-[#8dd3cc]">
-		<div class="max-w-15xl mx-auto text-center">
+		<div class="max-w-17xl mx-auto text-center">
 			<h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-[#304a4d] mb-8 leading-tight" style="font-size: 3rem !important;">
 				Bienvenue à l'École Saint-Mathieu
 			</h1>
@@ -37,59 +151,41 @@
 			</p>
 		</div>
 	</div>
-	<!-- Hero Carousel -->
-	<div class="w-full">
+	<!-- Hero Carousel - Custom Slideshow -->
+	<div class="relative w-full overflow-hidden" id="hero-carousel">
 		{% if heroCarouselImages and heroCarouselImages|length > 0 %}
-			<!-- Hero Carousel DaisyUI avec images uploadées -->
-			<div class="carousel w-full hero-carousel" style="height: 55rem !important;">
-				{% for image in heroCarouselImages %}
-					<div id="hero-slide{{ loop.index }}" class="carousel-item relative w-full">
-						<img src="/uploads/hero-carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'École Saint-Mathieu' }}">
-						{% if image.titre or image.description %}
-							<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-								{% if image.titre %}
-									<h3 class="text-white text-4xl font-bold mb-2 drop-shadow-lg">{{ image.titre }}</h3>
-								{% endif %}
-								{% if image.description %}
-									<p class="text-white text-2xl drop-shadow-lg">{{ image.description }}</p>
-								{% endif %}
-							</div>
-						{% endif %}
-						{% if heroCarouselImages|length > 1 %}
-							<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-								<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-slide{{ loop.index == 1 ? heroCarouselImages|length : loop.index - 1 }}">❮</button>
-								<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-slide{{ loop.index == heroCarouselImages|length ? 1 : loop.index + 1 }}">❯</button>
-							</div>
-						{% endif %}
-					</div>
-				{% endfor %}
-			</div>
+			{% for image in heroCarouselImages %}
+				<div class="carousel-slide {% if loop.first %}active{% endif %}" data-slide-index="{{ loop.index - 1 }}">
+					<img src="/uploads/hero-carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'École Saint-Mathieu' }}"/>
+					{% if image.titre or image.description %}
+						<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+							{% if image.titre %}
+								<h3 class="text-white text-4xl font-bold mb-2 drop-shadow-lg">{{ image.titre }}</h3>
+							{% endif %}
+							{% if image.description %}
+								<p class="text-white text-2xl drop-shadow-lg">{{ image.description }}</p>
+							{% endif %}
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
 		{% else %}
-			<!-- Fallback: Hero Carousel DaisyUI avec images par défaut -->
-			<div class="carousel w-full hero-carousel" style="height: 55rem !important;">
-				<div id="hero-fallback-slide1" class="carousel-item relative w-full">
-					<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="École Saint-Mathieu">
-					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-						<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide3">❮</button>
-						<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide2">❯</button>
-					</div>
-				</div>
-				<div id="hero-fallback-slide2" class="carousel-item relative w-full">
-					<img src="/assets/images/20250326_114954.jpg" class="w-full h-full object-cover" alt="Activités scolaires">
-					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-						<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide1">❮</button>
-						<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide3">❯</button>
-					</div>
-				</div>
-				<div id="hero-fallback-slide3" class="carousel-item relative w-full">
-					<img src="/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg" class="w-full h-full object-cover" alt="Cour de récréation">
-					<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-						<button class="btn btn-circle carousel-prev pointer-events-auto" data-target="hero-fallback-slide2">❮</button>
-						<button class="btn btn-circle carousel-next pointer-events-auto" data-target="hero-fallback-slide1">❯</button>
-					</div>
-				</div>
+			<div class="carousel-slide active" data-slide-index="0">
+				<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="École Saint-Mathieu"/>
+			</div>
+			<div class="carousel-slide" data-slide-index="1">
+				<img src="/assets/images/20250326_114954.jpg" class="w-full h-full object-cover" alt="Activités scolaires"/>
+			</div>
+			<div class="carousel-slide" data-slide-index="2">
+				<img src="/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg" class="w-full h-full object-cover" alt="Cour de récréation"/>
 			</div>
 		{% endif %}
+
+		<!-- Navigation buttons -->
+		<div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2 z-20">
+			<button class="btn btn-circle bg-white/30 border-none hover:bg-white/50 carousel-prev">❮</button>
+			<button class="btn btn-circle bg-white/30 border-none hover:bg-white/50 carousel-next">❯</button>
+		</div>
 	</div>
 
 	<div class="full-width-section py-8">
@@ -288,12 +384,12 @@
 					<div class="bg-white p-8 h-full rounded-lg lg:rounded-l-lg lg:rounded-r-none">
 						<h3 class="text-3xl md:text-4xl font-bold text-[#304a4d] mb-8 text-center">"Les Echos liés de St Mathieu"</h3>
 
-						<!-- Nouveau carousel avec transitions fade -->
-						<div id="main-carousel" class="relative w-full h-[700px] rounded-lg overflow-hidden">
+						<!-- Carousel Custom secondaire -->
+						<div class="relative w-full overflow-hidden rounded-lg" id="secondary-carousel">
 							{% if carouselImages and carouselImages|length > 0 %}
 								{% for image in carouselImages %}
-									<div class="carousel-slide {% if loop.first %}active{% endif %} absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="{{ loop.index }}">
-										<img src="/uploads/carousel/{{ image.filename }}" class="w-full h-full object-cover" alt="{{ image.titre ?: 'Image carrousel' }}">
+									<div class="carousel-slide {% if loop.first %}active{% endif %}" data-slide-index="{{ loop.index - 1 }}">
+										<img src="/uploads/carousel/{{ image.filename }}" class="w-full h-full object-cover rounded-lg" alt="{{ image.titre ?: 'Image carrousel' }}"/>
 										{% if image.titre or image.description %}
 											<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-8">
 												{% if image.titre %}
@@ -306,53 +402,26 @@
 										{% endif %}
 									</div>
 								{% endfor %}
-
-								<!-- Boutons de navigation -->
-								<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-									<button class="btn btn-circle pointer-events-auto carousel-prev-btn">❮</button>
-									<button class="btn btn-circle pointer-events-auto carousel-next-btn">❯</button>
-								</div>
-
-
 							{% else %}
-								<!-- Images par défaut si aucune image n'est uploadée -->
-								<div class="carousel-slide active absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="1">
-									<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover" alt="Actualités école">
-									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-										<h4 class="font-bold">Rentrée scolaire 2025</h4>
-										<p class="text-sm">Préparatifs en cours pour accueillir nos élèves</p>
-									</div>
+								<div class="carousel-slide active" data-slide-index="0">
+									<img src="/assets/images/20250326_114849.jpg" class="w-full h-full object-cover rounded-lg" alt="Actualités école"/>
 								</div>
-								<div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="2">
-									<img src="/assets/images/20250710_123601.jpg" class="w-full h-full object-cover" alt="Travaux école">
-									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-										<h4 class="font-bold">Rénovation en cours</h4>
-										<p class="text-sm">Amélioration des espaces de vie scolaire</p>
-									</div>
+								<div class="carousel-slide" data-slide-index="1">
+									<img src="/assets/images/20250710_123601.jpg" class="w-full h-full object-cover rounded-lg" alt="Travaux école"/>
 								</div>
-								<div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="3">
-									<img src="/assets/images/entreePrincipale.jpg" class="w-full h-full object-cover" alt="Vie scolaire">
-									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-										<h4 class="font-bold">Vie de l'école</h4>
-										<p class="text-sm">Moments de partage et d'apprentissage</p>
-									</div>
+								<div class="carousel-slide" data-slide-index="2">
+									<img src="/assets/images/entreePrincipale.jpg" class="w-full h-full object-cover rounded-lg" alt="Vie scolaire"/>
 								</div>
-								<div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-in-out" data-slide="4">
-									<img src="/assets/images/20250710_123943.jpg" class="w-full h-full object-cover" alt="Projets école">
-									<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-										<h4 class="font-bold">Nouveaux projets</h4>
-										<p class="text-sm">Innovation et modernisation continue</p>
-									</div>
+								<div class="carousel-slide" data-slide-index="3">
+									<img src="/assets/images/20250710_123943.jpg" class="w-full h-full object-cover rounded-lg" alt="Projets école"/>
 								</div>
-
-								<!-- Boutons de navigation -->
-								<div class="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
-									<button class="btn btn-circle pointer-events-auto carousel-prev-btn">❮</button>
-									<button class="btn btn-circle pointer-events-auto carousel-next-btn">❯</button>
-								</div>
-
-
 							{% endif %}
+
+							<!-- Navigation buttons -->
+							<div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2 z-20">
+								<button class="btn btn-circle bg-white/30 border-none hover:bg-white/50 carousel-prev">❮</button>
+								<button class="btn btn-circle bg-white/30 border-none hover:bg-white/50 carousel-next">❯</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -488,290 +557,11 @@
 	</div>
 {% endblock %}
 
-{% block styles %}
-	<style>
-		.full-width-section {
-			width: 98vw !important;
-			position: relative;
-			left: 50%;
-			right: 50%;
-			margin-left: -49vw !important;
-			margin-right: -49vw !important;
-			background-color: #a7e3dd;
-			padding: 20px 0;
-			box-sizing: border-box;
-			max-width: 100%;
-			overflow-x: hidden;
-		}
-
-		/* Colonnes 50/50 sur desktop, 100% sur mobile */
-		@media(min-width: 1024px) {
-			.lg\:w-1\/2 {
-				width: 50% !important;
-			}
-		}
-
-		/* Sur mobile, sections empilées verticallement */
-		@media(max-width: 1023px) {
-			.w-full.lg\:w-1\/2 {
-				width: 100% !important;
-				margin-bottom: 1rem;
-			}
-		}
-
-		/* Force le flex-row sur desktop */
-		@media(min-width: 1024px) {
-			.lg\:flex-row {
-				flex-direction: row !important;
-				flex-wrap: nowrap !important;
-			}
-		}
-
-		/* Nouveau carousel fade */
-		.carousel-slide {
-			transition: opacity 0.7s ease-in-out;
-		}
-
-		.carousel-slide.active {
-			opacity: 1 !important;
-		}
-
-		/* Carousel responsive */
-		@media(max-width: 1023px) {
-			#main-carousel {
-				height: 400px !important;
-			}
-
-			.carousel-slide img {
-				object-fit: cover;
-			}
-
-			.carousel-slide .absolute.bottom-0 {
-				padding: 1rem !important;
-			}
-
-			.carousel-slide h4 {
-				font-size: 1.5rem !important;
-			}
-
-			.carousel-slide p {
-				font-size: 1rem !important;
-			}
-		}
-
-		/* Amélioration des boutons de carousel */
-		.btn-circle {
-			background-color: rgba(48, 74, 77, 0.9) !important;
-			border: 3px solid rgba(167, 227, 221, 0.8) !important;
-			color: white !important;
-			font-weight: bold !important;
-			font-size: 24px !important;
-			width: 4rem !important;
-			height: 4rem !important;
-			min-height: 4rem !important;
-			transition: all 0.3s ease !important;
-			z-index: 999 !important;
-			backdrop-filter: blur(8px) !important;
-			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-			display: flex !important;
-			align-items: center !important;
-			justify-content: center !important;
-			position: relative !important;
-		}
-
-		.btn-circle:hover {
-			background-color: rgba(48, 74, 77, 1) !important;
-			border-color: rgba(167, 227, 221, 1) !important;
-			transform: scale(1.1) !important;
-			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
-		}
-
-
-		/* Forcer la visibilité des boutons même sur petits écrans */
-		@media(max-width: 768px) {
-			.btn-circle {
-				width: 3rem !important;
-				height: 3rem !important;
-				font-size: 18px !important;
-			}
-		}
-
-		/* Google Maps styling */
-		.maps-container iframe {
-			border-radius: 12px;
-			transition: transform 0.3s ease;
-			height: 600px !important;
-			min-height: 600px !important;
-		}
-
-		.maps-container:hover iframe {
-			transform: scale(1.02);
-		}
-
-		/* Animation pour les icônes des informations pratiques */
-		.info-card {
-			transition: all 0.3s ease;
-		}
-
-		.info-card:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(167, 227, 221, 0.3);
-		}
-	</style>
-{% endblock %}
 
 {% block scripts %}
 	{{ parent() }}
 	<script>
-		// Nouveau carousel avec transitions fade (comme l'exemple Flowbite)
-document.addEventListener('DOMContentLoaded', function () {
-console.log('✅ Initialisation du nouveau carousel fade');
-
-const carousel = document.getElementById('main-carousel');
-if (! carousel) 
-return;
-
-
-
-const slides = carousel.querySelectorAll('.carousel-slide');
-const prevBtn = carousel.querySelector('.carousel-prev-btn');
-const nextBtn = carousel.querySelector('.carousel-next-btn');
-if (slides.length === 0) 
-return;
-
-
-
-let currentSlide = 0;
-let autoSlideInterval;
-
-// Fonction pour afficher une slide spécifique
-function showSlide(index) { // Masquer toutes les slides
-slides.forEach(slide => {
-slide.classList.remove('active');
-});
-
-// Afficher la slide active
-slides[index].classList.add('active');
-
-currentSlide = index;
-}
-
-// Fonction pour passer à la slide suivante
-function nextSlide() {
-const nextIndex = (currentSlide + 1) % slides.length;
-showSlide(nextIndex);
-}
-
-// Fonction pour passer à la slide précédente
-function prevSlide() {
-const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
-showSlide(prevIndex);
-}
-
-// Gestion des boutons
-if (nextBtn) {
-nextBtn.addEventListener('click', function (e) {
-e.preventDefault();
-nextSlide();
-resetAutoSlide();
-});
-}
-
-if (prevBtn) {
-prevBtn.addEventListener('click', function (e) {
-e.preventDefault();
-prevSlide();
-resetAutoSlide();
-});
-}
-
-
-// Auto-défilement
-function startAutoSlide() {
-autoSlideInterval = setInterval(nextSlide, 5000);
-}
-
-function resetAutoSlide() {
-clearInterval(autoSlideInterval);
-startAutoSlide();
-}
-
-// Pause auto-défilement au hover
-carousel.addEventListener('mouseenter', function () {
-clearInterval(autoSlideInterval);
-});
-
-carousel.addEventListener('mouseleave', function () {
-startAutoSlide();
-});
-
-// Initialisation
-showSlide(0);
-startAutoSlide();
-
-console.log('🚀 Nouveau carousel fade initialisé avec', slides.length, 'slides');
-});
-
-// Auto-défilement pour le hero carousel (si il existe)
-document.addEventListener('DOMContentLoaded', function () {
-const heroCarousel = document.querySelector('.hero-carousel');
-if (! heroCarousel) 
-return;
-
-
-
-const heroSlides = heroCarousel.querySelectorAll('.carousel-item');
-const heroButtons = heroCarousel.querySelectorAll('.carousel-prev, .carousel-next');
-
-if (heroSlides.length<= 1) return;
-
-			let currentHeroSlide = 0;
-
-			function autoScrollHero() {
-				setInterval(function () {
-					const nextSlide = (currentHeroSlide + 1) % heroSlides.length;
-					const targetSlide = heroSlides[nextSlide];
-					if (targetSlide) {
-						const slideWidth = targetSlide.offsetWidth;
-						heroCarousel.scrollTo({
-							left: slideWidth * nextSlide, behavior: 'smooth'
-						});
-						currentHeroSlide = nextSlide;
-					}
-				}, 6000);
-			}
-
-			// Gestion des clics sur les boutons hero
-			heroButtons.forEach(button => {
-button.addEventListener('click', function (e) {
-e.preventDefault();
-e.stopPropagation();
-
-const targetId = this.getAttribute('data-target');
-const targetSlide = document.getElementById(targetId);
-
-if (targetSlide && heroCarousel) {
-const allSlides = Array.from(heroCarousel.querySelectorAll('.carousel-item'));
-const targetIndex = allSlides.indexOf(targetSlide);
-const slideWidth = targetSlide.offsetWidth;
-
-heroCarousel.scrollTo({
-left: slideWidth * targetIndex,
-behavior: 'smooth'
-});
-currentHeroSlide = targetIndex;
-}
-});
-}) 
-
-
-setTimeout(autoScrollHero, 1000);
-
-
-
-});
-
-// Fonction pour afficher/masquer le texte complet des actualités
+		// Fonction pour afficher/masquer le texte complet des actualités
 function toggleFullText(button) {
 const hiddenContent = button.nextElementSibling;
 const isExpanded = hiddenContent.style.display !== 'none';
@@ -786,6 +576,137 @@ button.textContent = 'Réduire';
 button.className = 'bg-orange-500 hover:bg-orange-600 text-white font-medium ml-2 px-3 py-1 rounded-lg transition-colors duration-300 text-sm';
 }
 }
+
+// Gestion des carousels avec autoplay - chaque carousel est complètement indépendant
+function createCarouselManager(carouselId, interval = 5000) {
+return(function () {
+const carousel = document.getElementById(carouselId);
+if (! carousel) {
+console.warn('Carousel introuvable:', carouselId);
+return null;
+}
+
+const slides = carousel.querySelectorAll('.carousel-slide');
+if (slides.length === 0) {
+console.warn('Aucun slide trouvé dans:', carouselId);
+return null;
+}
+
+let currentIndex = 0;
+let autoplayTimer = null;
+let isRunning = false;
+
+console.log(`Initialisation ${carouselId} avec ${
+slides.length
+} slides`);
+
+// Afficher le premier slide au démarrage
+slides[0].classList.add('active');
+
+function showSlide(index) { // Navigation circulaire
+if (index >= slides.length) {
+index = 0;
+} else if (index < 0) {
+index = slides.length - 1;
+}
+
+// Fade out tous les slides
+slides.forEach(slide => slide.classList.remove('active'));
+
+// Fade in le slide actuel
+slides[index].classList.add('active');
+currentIndex = index;
+
+console.log(`${carouselId}: affichage slide ${
+index + 1
+}/${
+slides.length
+}`);
+}
+
+function nextSlide() {
+showSlide(currentIndex + 1);
+}
+
+function prevSlide() {
+showSlide(currentIndex - 1);
+}
+
+function startAutoplay() {
+if (isRunning) 
+return;
+
+
+
+stopAutoplay();
+autoplayTimer = setInterval(function () {
+nextSlide();
+}, interval);
+isRunning = true;
+console.log(`${carouselId}: autoplay démarré (${interval}ms)`);
+}
+
+function stopAutoplay() {
+if (autoplayTimer) {
+clearInterval(autoplayTimer);
+autoplayTimer = null;
+}
+isRunning = false;
+}
+
+// Configuration des boutons
+const prevBtn = carousel.querySelector('.carousel-prev');
+const nextBtn = carousel.querySelector('.carousel-next');
+
+if (prevBtn) {
+prevBtn.addEventListener('click', function (e) {
+e.preventDefault();
+e.stopPropagation();
+stopAutoplay();
+prevSlide();
+setTimeout(function () {
+startAutoplay();
+}, 10000);
+});
+}
+
+if (nextBtn) {
+nextBtn.addEventListener('click', function (e) {
+e.preventDefault();
+e.stopPropagation();
+stopAutoplay();
+nextSlide();
+setTimeout(function () {
+startAutoplay();
+}, 10000);
+});
+}
+
+// Pause au survol
+carousel.addEventListener('mouseenter', function () {
+stopAutoplay();
+});
+
+carousel.addEventListener('mouseleave', function () {
+startAutoplay();
+});
+
+// Démarrer l'autoplay
+startAutoplay();
+
+return {next: nextSlide, prev: prevSlide, stop: stopAutoplay, start: startAutoplay};
+})();
+}
+
+// Initialiser les carousels au chargement de la page
+document.addEventListener('DOMContentLoaded', function () { // Attendre que tout soit chargé
+setTimeout(function () {
+const heroCarousel = createCarouselManager('hero-carousel', 4000);
+const secondaryCarousel = createCarouselManager('secondary-carousel', 6000);
+
+console.log('✅ Carousels initialisés');
+}, 100);
+});
 
 // Gestion des cartes Google Maps avec fallback
 function showMapFallback() {
