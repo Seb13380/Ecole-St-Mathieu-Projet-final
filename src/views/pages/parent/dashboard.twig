@@ -80,6 +80,26 @@
 				</h2>
 				<div class="flex flex-wrap justify-center gap-6">
 
+					{% if user.role == 'APEL' %}
+						<!-- Carte spéciale pour les membres APEL -->
+						<a href="/documents/admin" class="group bg-white shadow-md border-l-4 border-green-500 p-6 hover:shadow-xl hover:border-green-600 transition-all duration-300 text-center w-64 h-48">
+							<div class="flex flex-col items-center h-full justify-center">
+								<div class="bg-green-100 p-3 group-hover:bg-green-200 transition-colors mb-4">
+									<svg class="h-8 w-8 text-green-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+									</svg>
+								</div>
+								<h3 class="text-lg font-bold text-slate-800 mb-2">Gestion Documents</h3>
+								<p class="text-slate-600 text-sm">Documents APEL</p>
+								<div class="mt-2">
+									<span class="bg-green-100 text-green-800 px-2 py-1 text-xs font-medium">
+										🤝 Accès APEL
+									</span>
+								</div>
+							</div>
+						</a>
+					{% endif %}
+
 					<a href="/parent/messages" class="group bg-white shadow-md border-l-4 border-purple-500 p-6 hover:shadow-xl hover:border-purple-600 transition-all duration-300 text-center w-64 h-48">
 						<div class="flex flex-col items-center h-full justify-center">
 							<div class="bg-purple-100 p-3 group-hover:bg-purple-200 transition-colors mb-4">

@@ -147,6 +147,28 @@ const requireSecretary = (req, res, next) => {
 
 const requireAPEL = requireRole(['APEL', 'ADMIN', 'DIRECTION']);
 
+// Middleware pour la gestion des documents (DIRECTION + APEL)
+const requireDocumentManager = (req, res, next) => {
+    console.log('📄 Vérification GESTION DOCUMENTS - Session user:', req.session.user ? req.session.user.email : 'Absent');
+    if (!req.session.user) {
+        console.log('❌ Redirection vers login - pas de session');
+        return res.redirect('/auth/login');
+    }
+
+    console.log('🎭 Rôle utilisateur:', req.session.user.role);
+    const allowedRoles = ['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'APEL'];
+    if (!allowedRoles.includes(req.session.user.role)) {
+        console.log('❌ Accès refusé - rôle insuffisant pour gestion documents');
+        return res.status(403).render('pages/error', {
+            message: 'Accès refusé. Réservé à la direction, au secrétariat et à l\'APEL.',
+            user: req.session.user
+        });
+    }
+
+    console.log('✅ Accès gestion documents autorisé');
+    next();
+};
+
 module.exports = {
     requireAuth,
     requireRole,
@@ -155,5 +177,6 @@ module.exports = {
     requireParent,
     requireDirection,
     requireSecretary,
-    requireAPEL
+    requireAPEL,
+    requireDocumentManager
 };
