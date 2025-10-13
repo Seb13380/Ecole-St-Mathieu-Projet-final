@@ -133,11 +133,6 @@ const heroCarouselController = {
                     }
                 });
 
-                    filename: newHeroImage.filename,
-                    titre: newHeroImage.titre,
-                    auteur: `${newHeroImage.auteur.firstName} ${newHeroImage.auteur.lastName}`
-                });
-
                 res.redirect('/hero-carousel/management?success=' + encodeURIComponent('Image ajoutée avec succès au carrousel principal.'));
             } catch (error) {
                 console.error('Erreur lors de l\'ajout d\'image hero carousel:', error);
@@ -182,11 +177,6 @@ const heroCarouselController = {
                 }
             });
 
-                id: updatedHeroImage.id,
-                titre: updatedHeroImage.titre,
-                active: updatedHeroImage.active
-            });
-
             res.redirect('/hero-carousel/management?success=' + encodeURIComponent('Image mise à jour avec succès.'));
         } catch (error) {
             console.error('Erreur lors de la mise à jour de l\'image hero carousel:', error);
@@ -228,11 +218,6 @@ const heroCarouselController = {
                 console.error('Erreur lors de la suppression du fichier:', deleteError);
             }
 
-                id: heroImage.id,
-                filename: heroImage.filename,
-                titre: heroImage.titre
-            });
-
             res.redirect('/hero-carousel/management?success=' + encodeURIComponent('Image supprimée avec succès.'));
         } catch (error) {
             console.error('Erreur lors de la suppression de l\'image hero carousel:', error);
@@ -263,11 +248,6 @@ const heroCarouselController = {
             const updatedHeroImage = await prisma.heroCarousel.update({
                 where: { id: parseInt(id) },
                 data: { active: !heroImage.active }
-            });
-
-                id: updatedHeroImage.id,
-                titre: updatedHeroImage.titre || 'Sans titre',
-                active: updatedHeroImage.active
             });
 
             res.redirect('/hero-carousel/management?success=' + encodeURIComponent(`Image ${updatedHeroImage.active ? 'activée' : 'désactivée'} avec succès.`));

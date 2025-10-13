@@ -173,12 +173,6 @@ const actualiteController = {
     const { id } = req.params; // Déplacer la déclaration ici pour être accessible dans catch
 
     try {
-        method: req.method,
-        url: req.url,
-        params: req.params,
-        body: req.body,
-        file: req.file
-      });
 
       const { titre, contenu, important, visible, public: isPublic, lienUrl, lienTexte } = req.body;
 
@@ -222,11 +216,6 @@ const actualiteController = {
 
   async deleteActualite(req, res) {
     try {
-        method: req.method,
-        params: req.params,
-        body: req.body
-      });
-
       const { id } = req.params;
 
       await prisma.actualite.delete({

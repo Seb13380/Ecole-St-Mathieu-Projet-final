@@ -11,7 +11,7 @@ const patterns = [
     // Logs de debug basiques
     /\s*console\.log\([^)]*\);\s*\n/g,
     /\s*\/\/\s*console\.log\([^)]*\);\s*\n/g,
-    
+
     // Logs multi-lignes
     /\s*console\.log\([^)]*\);?\s*\n/g,
 ];
@@ -24,15 +24,15 @@ function cleanFile(filePath) {
         let content = fs.readFileSync(filePath, 'utf8');
         const originalLength = content.length;
         const originalLines = content.split('\n').length;
-        
+
         let removedInFile = 0;
-        
+
         // Supprimer les console.log
         const consoleLogMatches = content.match(/console\.log/g);
         if (consoleLogMatches) {
             removedInFile = consoleLogMatches.length;
         }
-        
+
         // Supprimer ligne par ligne les console.log
         const lines = content.split('\n');
         const cleanedLines = lines.filter(line => {
@@ -47,12 +47,12 @@ function cleanFile(filePath) {
             }
             return true;
         });
-        
+
         content = cleanedLines.join('\n');
-        
+
         const newLength = content.length;
         const newLines = content.split('\n').length;
-        
+
         if (originalLength !== newLength) {
             fs.writeFileSync(filePath, content, 'utf8');
             const fileName = path.basename(filePath);
@@ -62,7 +62,7 @@ function cleanFile(filePath) {
             totalRemoved += removedInFile;
             filesProcessed++;
         }
-        
+
     } catch (error) {
         console.error(`❌ Erreur dans ${filePath}:`, error.message);
     }
@@ -70,11 +70,11 @@ function cleanFile(filePath) {
 
 function processDirectory(dir) {
     const files = fs.readdirSync(dir);
-    
+
     files.forEach(file => {
         const filePath = path.join(dir, file);
         const stats = fs.statSync(filePath);
-        
+
         if (stats.isDirectory()) {
             processDirectory(filePath);
         } else if (file.endsWith('.js')) {

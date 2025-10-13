@@ -15,39 +15,39 @@ const patternsToDelete = [
     /^test-.+\.log$/,
     /^test-.+\.txt$/,
     /^test-.+\.xlsx$/,
-    
+
     // Scripts de vérification
     /^verify-.+\.js$/,
     /^verifier-.+\.js$/,
     /^verification-.+\.js$/,
-    
+
     // Scripts de check
     /^check-.+\.js$/,
     /^check-.+\.sql$/,
-    
+
     // Scripts de diagnostic
     /^diagnos.+\.js$/,
     /^diagnostic-.+\.js$/,
     /^diagnostic-.+\.ps1$/,
     /^diagnostic-.+\.sh$/,
-    
+
     // Scripts de debug
     /^debug-.+\.js$/,
-    
+
     // Scripts de fix temporaires
     /^fix-.+\.js$/,
     /^fix-.+\.sql$/,
     /^fix-.+\.ps1$/,
     /^fix-.+\.sh$/,
-    
+
     // Scripts de correction temporaires
     /^correction-.+\.js$/,
     /^corriger-.+\.js$/,
-    
+
     // Scripts d'analyse
     /^analyz.+\.js$/,
     /^analyser-.+\.js$/,
-    
+
     // Scripts de création de test
     /^create-test-.+\.js$/,
     /^create-sample-.+\.js$/,
@@ -56,38 +56,38 @@ const patternsToDelete = [
     /^create-essential-.+\.js$/,
     /^create-temp-.+\.js$/,
     /^create-all-main-.+\.js$/,
-    
+
     // Scripts de déploiement temporaires
     /^deploy-.+\.ps1$/,
     /^deploy-.+\.sh$/,
     /^deploy-.+\.bat$/,
-    
+
     // Scripts de monitoring
     /^monitor-.+\.js$/,
-    
+
     // Scripts VPS temporaires
     /^vps-.+\.js$/,
     /^vps-.+\.sh$/,
-    
+
     // Scripts de migration temporaires
     /^migrate-.+\.js$/,
     /^migration-.+\.sql$/,
-    
+
     // Scripts de nettoyage anciens
     /^clean-.+\.js$/,
     /^clean-.+\.ps1$/,
-    
+
     // Scripts de sync
     /^sync-.+\.js$/,
     /^sync-.+\.ps1$/,
     /^sync-.+\.sh$/,
-    
+
     // Scripts de réparation
     /^repair-.+\.js$/,
     /^reparation-.+\.js$/,
     /^reparation-.+\.sh$/,
     /^rollback-.+\.ps1$/,
-    
+
     // Scripts divers temporaires
     /^recap-.+\.js$/,
     /^resume-.+\.js$/,
@@ -113,26 +113,26 @@ const patternsToDelete = [
     /^associer-.+\.js$/,
     /^final-.+\.js$/,
     /^finalize-.+\.js$/,
-    
+
     // Fichiers de backup/template temporaires
     /^dashboard-backup-.+\.twig$/,
     /^dashboard-clean\.twig$/,
     /^menus-clean\.twig$/,
-    
+
     // Fichiers JSON temporaires
     /^documents-backup\.json$/,
     /^preinscription_requests\.json$/,
     /^inscriptions-local\.json$/,
-    
+
     // Fichiers SQL temporaires
     /^create-users.+\.sql$/,
     /^restore-documents.+\.sql$/,
-    
+
     // Scripts de plan/guide temporaires
     /^plan-.+\.js$/,
     /^guide-.+\.txt$/,
     /^instructions-.+\.js$/,
-    
+
     // Scripts spécifiques temporaires
     /^change-password\.js$/,
     /^clear-cache\.js$/,
@@ -141,12 +141,12 @@ const patternsToDelete = [
     /^server-backup\.js$/,
     /^validate-dashboard\.js$/,
     /^search-contacts\.js$/,
-    
+
     // Fichiers HTML de test
     /^admin-create-users\.html$/,
     /^index\.html$/,
     /^tailwind-classes\.html$/,
-    
+
     // Fichiers texte temporaires
     /^query$/,
     /^google-maps-urls\.txt$/,
@@ -168,23 +168,23 @@ const files = fs.readdirSync(rootDir);
 
 files.forEach(file => {
     const filePath = path.join(rootDir, file);
-    
+
     // Ignorer les dossiers
     const stats = fs.statSync(filePath);
     if (stats.isDirectory()) {
         return;
     }
-    
+
     // Vérifier si le fichier correspond à un pattern
     let shouldDelete = false;
-    
+
     for (const pattern of patternsToDelete) {
         if (pattern.test(file)) {
             shouldDelete = true;
             break;
         }
     }
-    
+
     if (shouldDelete) {
         try {
             fs.unlinkSync(filePath);

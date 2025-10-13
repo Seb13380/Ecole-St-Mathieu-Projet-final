@@ -176,25 +176,17 @@ const inscriptionEleveController = {
                 childrenData = Object.keys(children).map(key => {
                     const child = children[key];
 
-                        firstName: child.firstName,
-                        lastName: child.lastName,
-                        requestedClass: child.requestedClass,
-                        hasRequestedClass: !!child.requestedClass
-                    });
-
                     return {
                         firstName: child.firstName,
                         lastName: child.lastName,
                         birthDate: child.birthDate,
                         currentClass: child.currentClass || null,
-                        requestedClass: child.requestedClass || null, // Ne pas exclure si null
+                        requestedClass: child.requestedClass || null,
                         previousSchool: child.previousSchool || null
                     };
                 }).filter(child => {
                     // Ne PAS filtrer sur requestedClass car on veut la conserver même si elle est manquante
                     const isValid = child.firstName && child.lastName && child.birthDate;
-                    if (!isValid) {
-                    }
                     return isValid;
                 });
 
