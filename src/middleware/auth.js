@@ -101,7 +101,7 @@ const requireAdmin = (req, res, next) => {
 
 const requireEnseignant = requireRole(['ENSEIGNANT', 'ADMIN', 'DIRECTION']);
 
-const requireParent = requireRole(['PARENT', 'ADMIN', 'DIRECTION']);
+const requireParent = requireRole(['PARENT', 'APEL', 'ADMIN', 'DIRECTION']);
 
 const requireDirection = (req, res, next) => {
     console.log('🏢 Vérification DIRECTION - Session user:', req.session.user ? req.session.user.email : 'Absent');
