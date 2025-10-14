@@ -6,7 +6,6 @@ const frankController = {
     // Afficher le tableau de bord de Frank
     dashboard: async (req, res) => {
         try {
-            console.log('🏫 Accès au tableau de bord Frank');
 
             // Vérifier que l'utilisateur est bien Frank (GESTIONNAIRE_SITE)
             if (req.session.user.role !== 'GESTIONNAIRE_SITE') {

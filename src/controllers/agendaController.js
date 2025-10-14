@@ -137,7 +137,6 @@ const createEvent = async (req, res) => {
             }
         });
 
-        console.log('✅ Événement agenda créé:', event.titre);
 
         res.json({
             success: true,
@@ -190,7 +189,6 @@ const updateEvent = async (req, res) => {
             }
         });
 
-        console.log('✅ Événement agenda modifié:', event.titre);
 
         res.json({
             success: true,
@@ -222,7 +220,6 @@ const deleteEvent = async (req, res) => {
             where: { id: parseInt(id) }
         });
 
-        console.log('🗑️ Événement agenda supprimé ID:', id);
 
         res.json({
             success: true,
@@ -268,7 +265,6 @@ const toggleVisibility = async (req, res) => {
             }
         });
 
-        console.log(`👁️ Événement agenda ${event.visible ? 'ouvert aux connectés' : 'réservé direction'}:`, event.titre);
 
         res.json({
             success: true,

@@ -6,8 +6,6 @@ const prisma = new PrismaClient();
 const actualiteController = {
   async getActualites(req, res) {
     try {
-      console.log('🔍 getActualites appelé');
-      console.log('Session utilisateur:', req.session && req.session.user ? 'Connecté' : 'Non connecté');
 
       // Déterminer quelles actualités afficher selon l'état de connexion
       let whereClause = { visible: true };
@@ -15,14 +13,11 @@ const actualiteController = {
       if (req.session && req.session.user) {
         // Utilisateur connecté : voir toutes les actualités visibles (publiques ET privées)
         whereClause = { visible: true };
-        console.log('👤 Mode connecté : actualités visibles (publiques + privées)');
       } else {
         // Utilisateur non connecté : voir seulement les actualités publiques
         whereClause = { visible: true, public: true };
-        console.log('🌍 Mode public : actualités visibles ET publiques seulement');
       }
 
-      console.log('📋 Clause WHERE:', whereClause);
 
       const actualites = await prisma.actualite.findMany({
         where: whereClause,
@@ -37,11 +32,9 @@ const actualiteController = {
         ]
       });
 
-      console.log(`📊 ${actualites.length} actualité(s) trouvée(s)`);
 
       // Log détaillé pour debug
       actualites.forEach(act => {
-        console.log(`   - ${act.titre}: visible=${act.visible}, public=${act.public}, important=${act.important}`);
       });
 
       res.render('pages/actualites', {
@@ -83,8 +76,6 @@ const actualiteController = {
 
   async createActualite(req, res) {
     try {
-      console.log('📝 Données reçues pour création:', req.body);
-      console.log('📁 Fichier reçu:', req.file);
 
       const { titre, contenu, important, visible, public: isPublic, datePublication, lienUrl, lienTexte } = req.body;
       const auteurId = req.session.user.id;
@@ -110,7 +101,6 @@ const actualiteController = {
           mediaType = 'pdf';
           mediaUrl = `/assets/documents/actualites/${req.file.filename}`;
         }
-        console.log('📁 Média ajouté:', { mediaUrl, mediaType, mimetype: req.file.mimetype });
       }
 
       const actualite = await prisma.actualite.create({
@@ -134,12 +124,10 @@ const actualiteController = {
         }
       });
 
-      console.log('✅ Actualité créée:', actualite.titre, `(Public: ${actualite.public})`);
 
       // Envoyer des notifications par email aux parents si l'actualité est visible
       if (visible === 'true') {
         try {
-          console.log('📧 Envoi des notifications aux parents...');
 
           // Récupérer tous les emails des parents
           const parents = await prisma.user.findMany({
@@ -162,19 +150,16 @@ const actualiteController = {
             }, parentEmails);
 
             if (emailResult.success) {
-              console.log(`✅ Notifications envoyées à ${emailResult.recipientCount} parents`);
             } else {
               console.error('❌ Erreur lors de l\'envoi des notifications:', emailResult.error);
             }
           } else {
-            console.log('ℹ️ Aucun parent trouvé pour les notifications');
           }
         } catch (emailError) {
           console.error('❌ Erreur lors de l\'envoi des notifications par email:', emailError);
           // On continue même si l'email échoue
         }
       } else {
-        console.log('ℹ️ Actualité non visible, aucune notification envoyée');
       }
 
       res.redirect('/actualites/manage?success=' + encodeURIComponent('Actualité créée avec succès'));
@@ -188,13 +173,6 @@ const actualiteController = {
     const { id } = req.params; // Déplacer la déclaration ici pour être accessible dans catch
 
     try {
-      console.log('🔧 updateActualite appelé:', {
-        method: req.method,
-        url: req.url,
-        params: req.params,
-        body: req.body,
-        file: req.file
-      });
 
       const { titre, contenu, important, visible, public: isPublic, lienUrl, lienTexte } = req.body;
 
@@ -222,7 +200,6 @@ const actualiteController = {
           updateData.mediaType = 'pdf';
           updateData.mediaUrl = `/assets/documents/actualites/${req.file.filename}`;
         }
-        console.log('📁 Nouveau média ajouté:', { mediaUrl: updateData.mediaUrl, mediaType: updateData.mediaType, mimetype: req.file.mimetype });
       }
 
       const actualite = await prisma.actualite.update({
@@ -230,7 +207,6 @@ const actualiteController = {
         data: updateData
       });
 
-      console.log('✅ Actualité mise à jour:', actualite.titre, `(Public: ${actualite.public})`);
       res.redirect(`/actualites/manage?success=${encodeURIComponent('Actualité mise à jour avec succès')}#actualite-${id}`);
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'actualité:', error);
@@ -240,19 +216,12 @@ const actualiteController = {
 
   async deleteActualite(req, res) {
     try {
-      console.log('🗑️ deleteActualite appelé:', {
-        method: req.method,
-        params: req.params,
-        body: req.body
-      });
-
       const { id } = req.params;
 
       await prisma.actualite.delete({
         where: { id: parseInt(id) }
       });
 
-      console.log('✅ Actualité supprimée:', id);
       res.redirect('/actualites/manage?success=' + encodeURIComponent('Actualité supprimée avec succès'));
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'actualité:', error);
@@ -283,12 +252,10 @@ const actualiteController = {
       });
 
       const message = updatedActualite.visible ? 'Actualité rendue visible' : 'Actualité masquée';
-      console.log('✅ Visibilité modifiée:', message);
 
       // Si l'actualité devient visible, envoyer des notifications aux parents
       if (updatedActualite.visible && !actualite.visible) {
         try {
-          console.log('📧 Envoi des notifications aux parents pour actualité rendue visible...');
 
           // Récupérer tous les emails des parents
           const parents = await prisma.user.findMany({
@@ -311,12 +278,10 @@ const actualiteController = {
             }, parentEmails);
 
             if (emailResult.success) {
-              console.log(`✅ Notifications envoyées à ${emailResult.recipientCount} parents`);
             } else {
               console.error('❌ Erreur lors de l\'envoi des notifications:', emailResult.error);
             }
           } else {
-            console.log('ℹ️ Aucun parent trouvé pour les notifications');
           }
         } catch (emailError) {
           console.error('❌ Erreur lors de l\'envoi des notifications par email:', emailError);

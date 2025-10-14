@@ -43,7 +43,6 @@ const travauxController = {
                 orderBy: { createdAt: 'desc' }
             });
 
-            console.log('🔨 Gestion des travaux - Travaux récupérés:', travaux.length);
 
             res.render('pages/admin/travaux', {
                 travaux,
@@ -62,7 +61,6 @@ const travauxController = {
     // Page de gestion (admin)
     showManagement: async (req, res) => {
         try {
-            console.log('🏗️ Accès à la gestion des travaux par:', req.session.user?.email);
 
             const travaux = await prisma.travaux.findMany({
                 include: {
@@ -132,7 +130,6 @@ const travauxController = {
                 }
             });
 
-            console.log('✅ Nouveau travail créé:', nouveauTravail.titre);
             res.redirect('/travaux/manage?success=' + encodeURIComponent('Travail créé avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la création du travail:', error);
@@ -169,7 +166,6 @@ const travauxController = {
                 }
             });
 
-            console.log('✅ Travail mis à jour:', travauxMisAJour.titre);
             res.redirect('/travaux/manage?success=' + encodeURIComponent('Travail mis à jour avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la mise à jour du travail:', error);
@@ -186,7 +182,6 @@ const travauxController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('🗑️ Travail supprimé:', travauxSupprime.titre);
             res.redirect('/travaux/manage?success=' + encodeURIComponent('Travail supprimé avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la suppression du travail:', error);
@@ -213,7 +208,6 @@ const travauxController = {
             });
 
             const message = travauxMisAJour.visible ? 'Travail rendu visible' : 'Travail masqué';
-            console.log('🔄 Visibilité modifiée:', travauxMisAJour.titre, '->', travauxMisAJour.visible);
             res.redirect('/travaux/manage?success=' + encodeURIComponent(message));
         } catch (error) {
             console.error('❌ Erreur lors du changement de visibilité:', error);

@@ -20,7 +20,6 @@ router.get('/register/:token', parentInvitationController.showRegistrationForm);
 router.post('/register/:token', parentInvitationController.processInvitationRegistration);
 
 router.get('/logout', (req, res) => {
-    console.log('� Déconnexion directe pour:', req.session.user?.email);
     req.session.destroy((err) => {
         if (err) {
             console.error('❌ Erreur déconnexion:', err);
@@ -30,7 +29,6 @@ router.get('/logout', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-    console.log('🚪 Déconnexion POST pour:', req.session.user?.email);
     req.session.destroy((err) => {
         if (err) {
             console.error('❌ Erreur déconnexion:', err);

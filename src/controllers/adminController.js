@@ -201,7 +201,6 @@ const adminController = {
                 }
             });
 
-            console.log('✅ Classe mise à jour:', classe.nom);
             res.redirect('/admin/classes?success=' + encodeURIComponent('Classe mise à jour avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la mise à jour de la classe:', error);
@@ -226,7 +225,6 @@ const adminController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('🗑️ Classe supprimée:', classe.nom);
             res.redirect('/admin/classes?success=' + encodeURIComponent('Classe supprimée avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la suppression de la classe:', error);
@@ -347,7 +345,6 @@ const adminController = {
                 });
             }
 
-            console.log('✅ Élève mis à jour:', `${student.firstName} ${student.lastName}`);
             res.redirect('/admin/students?success=' + encodeURIComponent('Élève mis à jour avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la mise à jour de l\'élève:', error);
@@ -373,7 +370,6 @@ const adminController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('🗑️ Élève supprimé:', `${student.firstName} ${student.lastName}`);
             res.redirect('/admin/students?success=' + encodeURIComponent('Élève supprimé avec succès'));
         } catch (error) {
             console.error('❌ Erreur lors de la suppression de l\'élève:', error);
@@ -558,7 +554,6 @@ const adminController = {
             // Ici vous pouvez sauvegarder les paramètres dans la base de données
             // ou dans un fichier de configuration selon votre architecture
 
-            console.log('✅ Paramètres mis à jour:', settings);
 
             res.redirect('/admin/settings?success=' + encodeURIComponent('Paramètres mis à jour avec succès'));
         } catch (error) {

@@ -19,7 +19,6 @@ const inscriptionController = {
     processRegistration: async (req, res) => {
         try {
             // 🛡️ PROTECTION ANTI-SPAM AVANCÉE - TEMPORAIREMENT DÉSACTIVÉE POUR DIAGNOSTIC
-            console.log('⚠️ ANTI-SPAM DÉSACTIVÉ POUR DIAGNOSTIC');
             // const formStartTime = req.body.formStartTime ? parseInt(req.body.formStartTime) : null;
             // const spamDetection = spamDetector.detectSpam(req, formStartTime);
 
@@ -37,14 +36,12 @@ const inscriptionController = {
             //     // Réponse différente selon le niveau de risque
             //     if (spamDetection.riskLevel === 'HIGH') {
             //         // Risque élevé : blocage direct
-            //         console.log('🚫 SPAM HAUTE RISQUE BLOQUÉ:', spamDetection.reasons);
             //         return res.status(429).json({
             //             error: 'Trop de requêtes. Veuillez réessayer plus tard.',
             //             blocked: true
             //         });
             //     } else {
             //         // Risque moyen : faire semblant que ça marche
-            //         console.log('🚫 SPAM RISQUE MOYEN DÉTECTÉ:', spamDetection.reasons);
             //         return res.redirect('/auth/register?success=Votre demande d\'inscription a été envoyée avec succès. Vous recevrez une réponse sous 48h.');
             //     }
             // }
@@ -75,7 +72,6 @@ const inscriptionController = {
 
             if (existingUser) {
                 // ✅ NOUVEAU : Permettre une nouvelle demande d'inscription pour un parent existant
-                console.log(`⚠️ Parent ${parentEmail} existe déjà - création d'une nouvelle demande d'inscription`);
                 // Ne pas bloquer, laisser créer une nouvelle demande d'inscription
             }
 
@@ -146,11 +142,9 @@ const inscriptionController = {
                     adminEmail: 'sgdigitalweb13@gmail.com'
                 };
 
-                console.log('📧 Envoi notification admin pour demande ID:', inscriptionRequest.id);
                 const emailResult = await emailService.sendNewInscriptionNotification(adminEmailData);
 
                 if (emailResult.success) {
-                    console.log('✅ Email admin envoyé:', emailResult.messageId);
                 } else {
                     console.error('❌ Erreur email admin:', emailResult.error);
                 }
@@ -168,11 +162,9 @@ const inscriptionController = {
                     children: childrenData
                 };
 
-                console.log('📧 Envoi confirmation parent:', parentEmail);
                 const parentEmailResult = await emailService.sendInscriptionConfirmation(parentConfirmationData);
 
                 if (parentEmailResult.success) {
-                    console.log('✅ Email parent envoyé:', parentEmailResult.messageId);
                 } else {
                     console.error('❌ Erreur email parent:', parentEmailResult.error);
                 }
@@ -192,7 +184,6 @@ const inscriptionController = {
     // Pour l'admin : voir toutes les demandes
     showAllRequests: async (req, res) => {
         try {
-            console.log('🔄 === RECHARGEMENT PAGE INSCRIPTIONS ===');
 
             // Récupérer les pré-inscriptions ET les dossiers d'inscription
             const [preInscriptions, dossierInscriptions] = await Promise.all([
@@ -251,13 +242,7 @@ const inscriptionController = {
             // 🔍 DEBUG: Vérifier spécifiquement la demande 51
             const request51 = allRequests.find(req => req.id === 51);
             if (request51) {
-                console.log('🎯 DEMANDE 51 TROUVÉE DANS allRequests:');
-                console.log(`   - ID: ${request51.id}`);
-                console.log(`   - Status: "${request51.status}"`);
-                console.log(`   - Type: ${request51.type}`);
-                console.log(`   - Parent: ${request51.parentFirstName} ${request51.parentLastName}`);
             } else {
-                console.log('❌ DEMANDE 51 NON TROUVÉE dans allRequests');
             }
 
             // Parser les enfants et les parents pour chaque demande
@@ -289,9 +274,6 @@ const inscriptionController = {
 
                 // Debug temporaire
                 if (request.id === 22) {
-                    console.log('🔍 DEBUG REQUEST 22:');
-                    console.log('  parentsInfo:', parentsInfo);
-                    console.log('  children:', children);
                 }
 
                 return {
@@ -323,7 +305,6 @@ const inscriptionController = {
             const { comment } = req.body;
             const requestId = parseInt(id);
 
-            console.log(`🔍 Validation du dossier ID: ${requestId}`);
 
             // Chercher dans DossierInscription uniquement
             const dossier = await prisma.dossierInscription.findUnique({
@@ -331,7 +312,6 @@ const inscriptionController = {
             });
 
             if (!dossier) {
-                console.log(`❌ Dossier ID ${requestId} non trouvé`);
                 return res.status(404).json({
                     success: false,
                     message: 'Dossier d\'inscription non trouvé'
@@ -356,14 +336,12 @@ const inscriptionController = {
                 }
             });
 
-            console.log(`✅ Dossier ID ${requestId} validé avec succès`);
 
             // Envoyer email de validation aux parents
             try {
                 const parentEmail = dossier.pereEmail || dossier.mereEmail;
                 const parentName = `${dossier.perePrenom || dossier.merePrenom} ${dossier.pereNom || dossier.mereNom}`;
 
-                console.log(`📧 Envoi email validation à: ${parentEmail}`);
 
                 await emailService.sendDossierValidationEmail({
                     parentFirstName: dossier.perePrenom || dossier.merePrenom,
@@ -374,7 +352,6 @@ const inscriptionController = {
                     enfantClasseDemandee: dossier.enfantClasseDemandee
                 }, comment);
 
-                console.log('✅ Email de validation envoyé');
             } catch (emailError) {
                 console.error('❌ Erreur envoi email validation:', emailError);
                 // Ne pas faire échouer la validation si l'email échoue
@@ -432,7 +409,6 @@ const inscriptionController = {
                     parentEmail: request.parentEmail,
                     children: request.children
                 }, comment);
-                console.log('✅ Email de confirmation de rendez-vous envoyé');
             } catch (emailError) {
                 console.error('❌ Erreur envoi email rendez-vous:', emailError);
             }
@@ -459,7 +435,6 @@ const inscriptionController = {
             const { comment } = req.body;
             const requestId = parseInt(id);
 
-            console.log(`🔄 Finalisation de l'inscription ID: ${requestId}`);
 
             // 🔍 RECHERCHE UNIFIÉE DANS LES DEUX TABLES
             let request = null;
@@ -494,7 +469,6 @@ const inscriptionController = {
                     children: children,
                     message: request.message
                 };
-                console.log(`✅ Trouvé dans PreInscriptionRequest - Status: ${request.status}`);
             }
 
             // 2. Si pas trouvé ou pas au bon statut, essayer DossierInscription
@@ -526,13 +500,11 @@ const inscriptionController = {
                             adresse: dossierInscription.adresseComplete
                         })
                     };
-                    console.log(`✅ Trouvé dans DossierInscription - Status: ${request.statut}`);
                 }
             }
 
             // 3. Vérifications
             if (!request) {
-                console.log(`❌ Demande ID ${requestId} introuvable dans les deux tables`);
                 return res.status(404).json({
                     success: false,
                     message: 'Demande d\'inscription non trouvée'
@@ -543,14 +515,12 @@ const inscriptionController = {
             const expectedStatuses = requestType === 'PRE_INSCRIPTION' ? ['ACCEPTED'] : ['VALIDE'];
 
             if (!expectedStatuses.includes(status)) {
-                console.log(`❌ Statut incorrect: ${status}, attendu: ${expectedStatuses.join(' ou ')}`);
                 return res.status(400).json({
                     success: false,
                     message: `Cette demande n'est pas au bon statut (actuel: ${status})`
                 });
             }
 
-            console.log(`🎯 Type de demande: ${requestType}, Status: ${status}`);
 
             // Maintenant utiliser requestData au lieu de request pour la suite...
 
@@ -643,7 +613,6 @@ const inscriptionController = {
                             adress: parentData.adress || existingUser.adress
                         }
                     });
-                    console.log('✅ Compte parent existant mis à jour:', parentData.email);
                 } else {
                     // Créer le nouveau compte parent
                     parentUser = await prisma.user.create({
@@ -652,7 +621,6 @@ const inscriptionController = {
                             password: hashedTempPassword
                         }
                     });
-                    console.log('✅ Nouveau compte parent créé:', parentData.email);
                 }
 
                 createdParents.push(parentUser);
@@ -666,7 +634,6 @@ const inscriptionController = {
             if (requestData.children && requestData.children.length > 0) {
                 const childrenData = requestData.children;
 
-                console.log('👶 Création des enfants...');
 
                 for (const childData of childrenData) {
                     if (childData.firstName && childData.lastName && childData.birthDate) {
@@ -752,12 +719,10 @@ const inscriptionController = {
                             }
 
                             createdStudents.push(student);
-                            console.log(`✅ Enfant créé: ${student.firstName} ${student.lastName} (ID: ${student.id}) - Classe: ${assignmentMethod}`);
                         }
                     }
                 }
 
-                console.log(`✅ ${createdStudents.length} enfant(s) créé(s) pour les parents`);
             }
 
             // 🔄 METTRE À JOUR LE STATUT SELON LE TYPE DE DEMANDE
@@ -773,7 +738,6 @@ const inscriptionController = {
                         adminNotes: finalNote
                     }
                 });
-                console.log(`✅ PreInscriptionRequest ID ${requestId} marquée comme COMPLETED`);
             } else if (requestType === 'DOSSIER_INSCRIPTION') {
                 await prisma.dossierInscription.update({
                     where: { id: requestId },
@@ -784,7 +748,6 @@ const inscriptionController = {
                         notesAdministratives: finalNote
                     }
                 });
-                console.log(`✅ DossierInscription ID ${requestId} marqué comme FINALISE`);
             }
 
             // Envoyer email avec les identifiants à tous les parents créés
@@ -798,7 +761,6 @@ const inscriptionController = {
                         createdStudents: createdStudents,
                         tempPassword: tempPassword
                     }, comment);
-                    console.log(`✅ Email avec identifiants envoyé à: ${parent.email}`);
                 } catch (emailError) {
                     console.error(`❌ Erreur envoi email identifiants à ${parent.email}:`, emailError);
                 }
@@ -823,27 +785,18 @@ const inscriptionController = {
     // Pour l'admin : rejeter une demande
     rejectRequest: async (req, res) => {
         try {
-            console.log('🚀 === DEBUT REJECT REQUEST ===');
-            console.log('User session:', req.session.user);
-            console.log('Params:', req.params);
-            console.log('Body:', req.body);
-            console.log('Method:', req.method);
-            console.log('URL:', req.url);
 
             const { id } = req.params;
             const { reason } = req.body;
 
-            console.log(`📝 ID reçu: ${id}, Reason: ${reason}`);
 
             if (!reason) {
-                console.log('❌ Motif manquant');
                 return res.status(400).json({
                     success: false,
                     message: 'Le motif du refus est obligatoire'
                 });
             }
 
-            console.log(`🔍 Tentative de refus demande ID: ${id}`);
 
             let request = null;
             let foundIn = null;
@@ -855,7 +808,6 @@ const inscriptionController = {
 
             if (dossierRequest) {
                 foundIn = 'dossierInscription';
-                console.log(`✅ Demande trouvée dans dossierInscription`);
 
                 // Mettre à jour le statut dans dossierInscription
                 await prisma.dossierInscription.update({
@@ -877,7 +829,6 @@ const inscriptionController = {
 
                 if (request) {
                     foundIn = 'inscriptionRequest';
-                    console.log(`✅ Demande trouvée dans inscriptionRequest`);
 
                     // Mettre à jour le statut dans inscriptionRequest
                     await prisma.inscriptionRequest.update({
@@ -897,7 +848,6 @@ const inscriptionController = {
 
                     if (request) {
                         foundIn = 'preInscriptionRequest';
-                        console.log(`✅ Demande trouvée dans preInscriptionRequest`);
 
                         // Mettre à jour le statut dans preInscriptionRequest
                         await prisma.preInscriptionRequest.update({
@@ -914,14 +864,12 @@ const inscriptionController = {
             }
 
             if (!request) {
-                console.log(`❌ Demande ID ${id} non trouvée dans aucune table`);
                 return res.status(404).json({
                     success: false,
                     message: 'Demande non trouvée'
                 });
             }
 
-            console.log(`✅ Demande ID ${id} refusée avec succès (table: ${foundIn})`);
 
             res.json({
                 success: true,
@@ -943,7 +891,6 @@ const inscriptionController = {
             const { id } = req.params;
             const requestId = parseInt(id);
 
-            console.log(`🗑️ Tentative de suppression de la demande ID: ${requestId}`);
 
             // 🔍 DÉTECTER DANS QUELLE TABLE SE TROUVE LA DEMANDE
             let deleteResult = null;
@@ -961,7 +908,6 @@ const inscriptionController = {
                     });
                     deleteResult = true;
                     deletedFrom = 'PreInscriptionRequest';
-                    console.log(`✅ Suppression réussie de PreInscriptionRequest ID: ${requestId}`);
                 }
             } catch (error) {
                 if (error.code !== 'P2025') { // P2025 = Record not found
@@ -982,7 +928,6 @@ const inscriptionController = {
                         });
                         deleteResult = true;
                         deletedFrom = 'DossierInscription';
-                        console.log(`✅ Suppression réussie de DossierInscription ID: ${requestId}`);
                     }
                 } catch (error) {
                     if (error.code !== 'P2025') { // P2025 = Record not found
@@ -998,7 +943,6 @@ const inscriptionController = {
                     message: `Demande supprimée avec succès depuis ${deletedFrom}`
                 });
             } else {
-                console.log(`❌ Demande ID ${requestId} introuvable dans les deux tables`);
                 res.status(404).json({
                     success: false,
                     message: `Demande ID ${requestId} introuvable`
@@ -1020,7 +964,6 @@ const inscriptionController = {
             const { id } = req.params;
             const requestId = parseInt(id);
 
-            console.log(`🔍 Recherche des détails pour ID: ${requestId}`);
 
             // 🔍 RECHERCHE UNIFIÉE DANS LES DEUX TABLES
             let request = null;
@@ -1040,7 +983,6 @@ const inscriptionController = {
             if (preInscriptionRequest) {
                 request = preInscriptionRequest;
                 requestType = 'PRE_INSCRIPTION';
-                console.log(`✅ Trouvé dans PreInscriptionRequest`);
 
                 // Normaliser vers le format unifié
                 let children = [];
@@ -1097,7 +1039,6 @@ const inscriptionController = {
                 if (dossierInscription) {
                     request = dossierInscription;
                     requestType = 'DOSSIER_INSCRIPTION';
-                    console.log(`✅ Trouvé dans DossierInscription`);
 
                     // Normaliser vers le format unifié
                     const children = [{
@@ -1149,14 +1090,12 @@ const inscriptionController = {
 
             // 3. Vérifications
             if (!request) {
-                console.log(`❌ Demande ID ${requestId} introuvable dans les deux tables`);
                 return res.status(404).render('pages/error', {
                     message: 'Demande non trouvée',
                     user: req.session.user
                 });
             }
 
-            console.log(`📋 Affichage des détails - Type: ${requestType}, Status: ${normalizedRequest.status}`);
 
             res.render('pages/admin/inscription-request-details', {
                 title: 'Détails de la demande',
@@ -1441,7 +1380,6 @@ const inscriptionController = {
                 });
             }
 
-            console.log(`Configuration PS2026 mise à jour: ${afficherAnnoncePS2026 ? 'activée' : 'désactivée'}`);
 
             res.json({
                 success: true,

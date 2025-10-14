@@ -8,7 +8,6 @@ const prisma = new PrismaClient();
 // Route pour le dashboard de Frank - avec vraies données
 router.get('/dashboard', requireAuth, async (req, res) => {
     try {
-        console.log('🏫 Accès au dashboard Frank - utilisateur:', req.session.user?.email);
 
         // Vérifier que l'utilisateur est bien Frank (DIRECTION ou GESTIONNAIRE_SITE)
         // Frank a maintenant le rôle DIRECTION mais doit garder l'accès à son dashboard spécifique

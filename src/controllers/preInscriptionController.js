@@ -105,7 +105,6 @@ const preInscriptionController = {
                 }
             });
 
-            console.log('Nouvelle demande de pré-inscription créée:', preInscription.id);
 
             req.flash('success', 'Votre demande de pré-inscription a été envoyée avec succès ! Nous vous recontacterons rapidement.');
             res.redirect('/pre-inscription');

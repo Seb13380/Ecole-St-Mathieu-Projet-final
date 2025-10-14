@@ -9,7 +9,6 @@ const getDocumentsByCategory = async (req, res) => {
     try {
         const { category } = req.params; // 'ecole' ou 'pastorale'
 
-        console.log(`[getDocumentsByCategory] Catégorie demandée: ${category}`);
 
         let documentTypes = [];
         let pageTitle = '';
@@ -56,7 +55,6 @@ const getDocumentsByCategory = async (req, res) => {
             ]
         });
 
-        console.log(`[getDocumentsByCategory] ${documents.length} documents trouvés pour ${category}`);
 
         // Grouper par type
         const documentsByType = {};
@@ -86,7 +84,6 @@ const showDocument = async (req, res) => {
     try {
         const { id } = req.params;
 
-        console.log(`[showDocument] ID demandé: ${id}`);
 
         const document = await prisma.document.findUnique({
             where: {
@@ -104,11 +101,9 @@ const showDocument = async (req, res) => {
         });
 
         if (!document) {
-            console.log(`[showDocument] Document ${id} non trouvé ou inactif`);
             return res.status(404).render('errors/404.twig');
         }
 
-        console.log(`[showDocument] Document trouvé: ${document.titre}`);
 
         res.render('pages/documents/show.twig', {
             document
@@ -215,8 +210,6 @@ const documentController = {
     // Interface de gestion des documents (pour Lionel et Frank)
     async manageDocuments(req, res) {
         try {
-            console.log('🔍 manageDocuments - Début de la méthode');
-            console.log('👤 Utilisateur:', req.session.user ? req.session.user.email : 'Non connecté');
 
             // Récupérer tous les documents groupés par type
             const documents = await prisma.document.findMany({
@@ -231,7 +224,6 @@ const documentController = {
                 ]
             });
 
-            console.log(`📄 Documents trouvés: ${documents.length}`);
 
             // Grouper par type
             const documentsByType = {};
@@ -242,8 +234,6 @@ const documentController = {
                 documentsByType[doc.type].push(doc);
             });
 
-            console.log('📋 Groupes de documents:', Object.keys(documentsByType));
-            console.log('🎯 Rendu du template: pages/documents/manage.twig');
 
             res.render('pages/documents/manage.twig', {
                 documentsByType,
@@ -264,7 +254,6 @@ const documentController = {
     // Méthode de test pour diagnostiquer
     async testManage(req, res) {
         try {
-            console.log('🧪 testManage - Test de la gestion des documents');
 
             const documents = await prisma.document.findMany({
                 include: {
@@ -274,7 +263,6 @@ const documentController = {
                 }
             });
 
-            console.log(`📄 Documents trouvés pour le test: ${documents.length}`);
 
             const documentsByType = {};
             documents.forEach(doc => {
@@ -300,6 +288,16 @@ const documentController = {
     // Créer un nouveau document
     async createDocument(req, res) {
         try {
+            console.log('📝 === CRÉATION DE DOCUMENT ===');
+            console.log('Utilisateur:', req.session.user?.email);
+            console.log('Données reçues:', { type: req.body.type, titre: req.body.titre });
+            console.log('Fichier uploadé:', req.file ? {
+                filename: req.file.filename,
+                originalname: req.file.originalname,
+                path: req.file.path,
+                size: req.file.size
+            } : 'Aucun fichier');
+
             const { type, titre, description, contenu, externalUrl, isExternalLink } = req.body;
             const auteurId = req.session.user.id;
 
@@ -309,13 +307,16 @@ const documentController = {
             if (req.file) {
                 pdfUrl = `/uploads/documents/${req.file.filename}`;
                 pdfFilename = req.file.originalname;
+                console.log('✅ Fichier traité:', { pdfUrl, pdfFilename });
             }
 
             // Validation : soit un fichier PDF soit un lien externe
             if (!pdfUrl && !externalUrl) {
+                console.log('❌ Validation échouée: pas de fichier ni de lien externe');
                 return res.redirect('/documents/admin?error=' + encodeURIComponent('Veuillez fournir soit un fichier PDF soit un lien externe'));
             }
 
+            console.log('💾 Création dans la base de données...');
             const document = await prisma.document.create({
                 data: {
                     type: type.toUpperCase(),
@@ -331,14 +332,18 @@ const documentController = {
                 }
             });
 
-            console.log('✅ Document créé:', document.titre);
-
-            console.log('✅ Document créé:', document.titre);
+            console.log('✅ Document créé avec succès, ID:', document.id);
             res.redirect('/documents/admin?success=' + encodeURIComponent('Document créé avec succès'));
 
         } catch (error) {
-            console.error('Erreur lors de la création du document:', error);
-            res.redirect('/documents/admin?error=' + encodeURIComponent('Erreur lors de la création du document'));
+            console.error('❌ ===== ERREUR CRÉATION DOCUMENT =====');
+            console.error('Message:', error.message);
+            console.error('Stack:', error.stack);
+            console.error('Données req.body:', req.body);
+            console.error('Fichier req.file:', req.file);
+            console.error('========================================');
+
+            res.redirect('/documents/admin?error=' + encodeURIComponent('Erreur lors de la création du document: ' + error.message));
         }
     },
 
@@ -370,7 +375,6 @@ const documentController = {
                 data: updateData
             });
 
-            console.log('✅ Document mis à jour:', document.titre);
             res.redirect('/documents/admin?success=' + encodeURIComponent('Document mis à jour avec succès'));
 
         } catch (error) {
@@ -388,7 +392,6 @@ const documentController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('✅ Document supprimé:', id);
             res.redirect('/documents/admin?success=' + encodeURIComponent('Document supprimé avec succès'));
 
         } catch (error) {
@@ -416,7 +419,6 @@ const documentController = {
             });
 
             const message = updatedDocument.active ? 'Document activé' : 'Document désactivé';
-            console.log('✅ Statut modifié:', message);
             res.redirect('/documents/admin?success=' + encodeURIComponent(message));
 
         } catch (error) {
@@ -430,7 +432,6 @@ const documentController = {
         try {
             const { category } = req.params;
 
-            console.log(`[getDocumentsByCategory] Catégorie demandée: ${category}`);
 
             let documentTypes = [];
             let pageTitle = '';
@@ -486,7 +487,6 @@ const documentController = {
                 ]
             });
 
-            console.log(`[getDocumentsByCategory] ${documents.length} documents trouvés pour ${category}`);
 
             // Grouper par type
             const documentsByType = {};
@@ -516,7 +516,6 @@ const documentController = {
         try {
             const { id } = req.params;
 
-            console.log(`[showPublicDocument] ID demandé: ${id}`);
 
             const document = await prisma.document.findUnique({
                 where: {
@@ -534,11 +533,9 @@ const documentController = {
             });
 
             if (!document) {
-                console.log(`[showPublicDocument] Document ${id} non trouvé ou inactif`);
                 return res.status(404).render('errors/404.twig');
             }
 
-            console.log(`[showPublicDocument] Document trouvé: ${document.titre}`);
 
             res.render('pages/documents/show.twig', {
                 document

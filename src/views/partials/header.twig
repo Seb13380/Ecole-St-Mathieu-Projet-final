@@ -277,6 +277,13 @@
 							<li>
 								<a href="/enseignant/dashboard">Tableau de bord</a>
 							</li>
+						{% elseif user.role == 'APEL' %}
+							<li>
+								<a href="/parent/dashboard">Tableau de bord</a>
+							</li>
+							<li>
+								<a href="/documents/admin">📄 Gestion Documents</a>
+							</li>
 						{% elseif user.role == 'PARENT' %}
 							<li>
 								<a href="/parent/dashboard">Tableau de bord</a>

@@ -1561,7 +1561,7 @@ class EmailService {
         const mailOptions = {
             from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
             to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
-            subject: '✅ Dossier d\'inscription validé - École Saint-Mathieu',
+            subject: '✅ Dossier d\'inscription accepté - École Saint-Mathieu',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fdfc;">
                     <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -1569,12 +1569,12 @@ class EmailService {
                             🎓 École Saint-Mathieu
                         </h1>
                         
-                        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; border-left: 5px solid #28a745; margin-bottom: 30px;">
-                            <h2 style="color: #155724; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-                                ✅ Dossier d'inscription validé !
+                        <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-left: 5px solid #ffc107; margin-bottom: 30px;">
+                            <h2 style="color: #856404; margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                                ✅ Dossier d'inscription accepté
                             </h2>
-                            <p style="color: #155724; margin: 0; font-size: 16px;">
-                                Félicitations ! Le dossier d'inscription de votre enfant a été validé par notre équipe.
+                            <p style="color: #856404; margin: 0; font-size: 16px;">
+                                Votre demande d'inscription a été acceptée. L'inscription sera actée suite au rendez-vous par courrier.
                             </p>
                         </div>
                         
@@ -1583,16 +1583,24 @@ class EmailService {
                         </p>
                         
                         <p style="color: #333; line-height: 1.6;">
-                            Nous avons le plaisir de vous informer que le dossier d'inscription de <strong>${enfantPrenom} ${enfantNom}</strong> 
-                            pour la classe <strong>${enfantClasseDemandee}</strong> a été <strong>validé</strong> par notre équipe pédagogique.
+                            Nous avons le plaisir de vous informer que la demande d'inscription de <strong>${enfantPrenom} ${enfantNom}</strong> 
+                            pour la classe <strong>${enfantClasseDemandee}</strong> a été <strong>acceptée</strong> par notre équipe pédagogique.
                         </p>
 
-                        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 5px solid #2196F3;">
+                            <h3 style="color: #0d47a1; margin-top: 0;">⚠️ Important :</h3>
+                            <p style="color: #1565c0; margin: 0; font-size: 15px; font-weight: bold;">
+                                L'inscription sera définitivement actée lors du rendez-vous avec la direction, suite à la confirmation par courrier officiel.
+                            </p>
+                        </div>
+
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
                             <h3 style="color: #0d47a1; margin-top: 0;">📋 Prochaines étapes :</h3>
-                            <ol style="color: #1565c0; padding-left: 20px;">
-                                <li style="margin-bottom: 10px;">Un rendez-vous sera programmé pour finaliser l'inscription</li>
-                                <li style="margin-bottom: 10px;">Vous recevrez les identifiants d'accès au portail parents</li>
-                                <li style="margin-bottom: 10px;">Les documents administratifs vous seront communiqués</li>
+                            <ol style="color: #495057; padding-left: 20px; line-height: 1.8;">
+                                <li style="margin-bottom: 10px;">Vous recevrez un courrier officiel confirmant l'acceptation</li>
+                                <li style="margin-bottom: 10px;">Un rendez-vous sera programmé avec la direction pour finaliser l'inscription</li>
+                                <li style="margin-bottom: 10px;">Lors du rendez-vous, vous recevrez les identifiants d'accès au portail parents</li>
+                                <li style="margin-bottom: 10px;">Les documents administratifs vous seront remis</li>
                                 <li>La classe définitive sera confirmée selon les effectifs</li>
                             </ol>
                         </div>
@@ -1603,6 +1611,15 @@ class EmailService {
                             <p style="color: #856404; margin: 0;">${comment}</p>
                         </div>
                         ` : ''}
+
+                        <div style="background-color: #fff8e1; padding: 20px; border-radius: 8px; margin: 25px 0; border: 2px solid #ffc107;">
+                            <h3 style="color: #f57c00; margin-top: 0;">⏳ En attente de finalisation :</h3>
+                            <p style="color: #e65100; margin: 0; font-size: 14px; line-height: 1.6;">
+                                <strong>Attention :</strong> Ce message confirme l'<strong>acceptation</strong> de votre demande d'inscription. 
+                                L'inscription ne sera <strong>définitivement validée</strong> qu'après le rendez-vous avec la direction 
+                                et la réception du courrier officiel de confirmation.
+                            </p>
+                        </div>
 
                         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
                             <h3 style="color: #304a4d; margin-top: 0;">📞 Contact :</h3>
@@ -1617,8 +1634,8 @@ class EmailService {
                         </div>
                         
                         <p style="color: #333; line-height: 1.6;">
-                            Nous sommes ravis d'accueillir <strong>${enfantPrenom}</strong> dans notre établissement et nous réjouissons 
-                            de l'accompagner dans son parcours scolaire.
+                            Nous sommes ravis d'avoir accepté la demande d'inscription de <strong>${enfantPrenom}</strong> et nous réjouissons 
+                            de pouvoir l'accueillir dans notre établissement après finalisation de l'inscription.
                         </p>
                         
                         <p style="color: #333; line-height: 1.6;">
@@ -1644,6 +1661,137 @@ class EmailService {
             return { success: true, messageId: info.messageId };
         } catch (error) {
             console.error('❌ Erreur lors de l\'envoi de l\'email de validation:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Envoyer un email d'acceptation de demande (pour rendez-vous)
+     * @param {Object} requestData - Données de la demande acceptée
+     * @param {string} comment - Commentaire administratif
+     */
+    async sendAppointmentAcceptanceEmail(requestData, comment = '') {
+        const { parentFirstName, parentLastName, parentEmail, children } = requestData;
+
+        // Préparer la liste des enfants
+        let childrenList = '';
+        if (children && Array.isArray(children)) {
+            childrenList = children.map(child =>
+                `<li><strong>${child.prenom} ${child.nom}</strong> - ${child.classeDemandee || 'Classe à déterminer'}</li>`
+            ).join('');
+        }
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'ecole-saint-mathieu@wanadoo.fr',
+            to: process.env.TEST_MODE === 'true' ? process.env.TEST_EMAIL : parentEmail,
+            subject: '✅ Demande d\'inscription acceptée - École Saint-Mathieu',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fdfc;">
+                    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h1 style="color: #304a4d; text-align: center; margin-bottom: 30px;">
+                            🎓 École Saint-Mathieu
+                        </h1>
+                        
+                        <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-left: 5px solid #ffc107; margin-bottom: 30px;">
+                            <h2 style="color: #856404; margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                                ✅ Demande d'inscription acceptée
+                            </h2>
+                            <p style="color: #856404; margin: 0; font-size: 16px;">
+                                Votre demande a été acceptée. L'inscription sera actée suite au rendez-vous par courrier.
+                            </p>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Bonjour <strong>${parentFirstName} ${parentLastName}</strong>,
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Nous avons le plaisir de vous informer que votre demande d'inscription a été <strong>acceptée</strong> par notre équipe pédagogique.
+                        </p>
+
+                        ${childrenList ? `
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #304a4d; margin-top: 0;">👶 Enfant(s) concerné(s) :</h3>
+                            <ul style="color: #333; padding-left: 20px;">
+                                ${childrenList}
+                            </ul>
+                        </div>
+                        ` : ''}
+
+                        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 5px solid #2196F3;">
+                            <h3 style="color: #0d47a1; margin-top: 0;">⚠️ Important :</h3>
+                            <p style="color: #1565c0; margin: 0; font-size: 15px; font-weight: bold;">
+                                L'inscription sera définitivement actée lors du rendez-vous avec la direction, suite à la confirmation par courrier officiel.
+                            </p>
+                        </div>
+
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #0d47a1; margin-top: 0;">📋 Prochaines étapes :</h3>
+                            <ol style="color: #495057; padding-left: 20px; line-height: 1.8;">
+                                <li style="margin-bottom: 10px;">Vous recevrez un <strong>courrier officiel</strong> confirmant l'acceptation de votre demande</li>
+                                <li style="margin-bottom: 10px;">Un <strong>rendez-vous</strong> sera programmé avec la direction pour finaliser l'inscription</li>
+                                <li style="margin-bottom: 10px;">Lors du rendez-vous, vous recevrez les <strong>identifiants d'accès</strong> au portail parents</li>
+                                <li style="margin-bottom: 10px;">Les <strong>documents administratifs</strong> vous seront remis</li>
+                                <li>La <strong>classe définitive</strong> sera confirmée selon les effectifs</li>
+                            </ol>
+                        </div>
+
+                        ${comment ? `
+                        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #856404; margin-top: 0;">💬 Message de l'équipe :</h3>
+                            <p style="color: #856404; margin: 0;">${comment}</p>
+                        </div>
+                        ` : ''}
+
+                        <div style="background-color: #fff8e1; padding: 20px; border-radius: 8px; margin: 25px 0; border: 2px solid #ffc107;">
+                            <h3 style="color: #f57c00; margin-top: 0;">⏳ En attente de finalisation :</h3>
+                            <p style="color: #e65100; margin: 0; font-size: 14px; line-height: 1.6;">
+                                <strong>Attention :</strong> Ce message confirme l'<strong>acceptation</strong> de votre demande d'inscription. 
+                                L'inscription ne sera <strong>définitivement validée</strong> qu'après le rendez-vous avec la direction 
+                                et la réception du courrier officiel de confirmation.
+                            </p>
+                        </div>
+
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #304a4d; margin-top: 0;">📞 Contact :</h3>
+                            <p style="color: #333; margin: 5px 0;">
+                                Pour toute question, n'hésitez pas à nous contacter :
+                            </p>
+                            <ul style="color: #333; padding-left: 20px;">
+                                <li>📧 Email : ecole-saint-mathieu@wanadoo.fr</li>
+                                <li>📞 Téléphone : [Numéro de téléphone]</li>
+                                <li>🏫 Secrétariat : [Horaires d'ouverture]</li>
+                            </ul>
+                        </div>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Nous sommes ravis d'avoir accepté votre demande et nous réjouissons 
+                            de pouvoir accueillir votre/vos enfant(s) dans notre établissement après finalisation de l'inscription.
+                        </p>
+                        
+                        <p style="color: #333; line-height: 1.6;">
+                            Cordialement,<br>
+                            <strong>L'équipe de direction<br>
+                            École Saint-Mathieu</strong>
+                        </p>
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <p style="color: #666; font-size: 12px;">
+                                © École Saint-Mathieu - Notification automatique<br>
+                                Envoyé le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email d\'acceptation de rendez-vous envoyé:', info.messageId);
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'envoi de l\'email d\'acceptation:', error);
             return { success: false, error: error.message };
         }
     }

@@ -41,7 +41,6 @@ const processCredentialsRequest = async (req, res) => {
             }
         });
 
-        console.log('📋 Demande d\'identifiants créée:', credentialsRequest.id);
 
         // Chercher si un parent existe avec ces informations
         const existingParent = await prisma.user.findFirst({
@@ -64,7 +63,6 @@ const processCredentialsRequest = async (req, res) => {
         });
 
         if (!existingParent) {
-            console.log('❌ Aucun parent trouvé pour:', { email, firstName, lastName });
 
             // Mettre à jour la demande avec l'échec
             await prisma.credentialsRequest.update({
@@ -80,7 +78,6 @@ const processCredentialsRequest = async (req, res) => {
             return res.redirect('/demande-identifiants?error=Aucun compte parent trouvé avec cette adresse email. Si vous n\'avez pas encore de compte, veuillez d\'abord faire une demande d\'inscription.');
         }
 
-        console.log('✅ Parent trouvé:', existingParent.firstName, existingParent.lastName);
 
         // Mettre à jour la demande avec le parent trouvé
         await prisma.credentialsRequest.update({
@@ -92,7 +89,6 @@ const processCredentialsRequest = async (req, res) => {
         });
 
         // ✅ NOUVEAU : Laisser la demande en attente pour validation par le directeur
-        console.log('✅ Parent trouvé, demande en attente de validation par le directeur');
 
         // Mettre à jour la demande comme trouvée mais en attente
         await prisma.credentialsRequest.update({

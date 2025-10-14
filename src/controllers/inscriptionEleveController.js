@@ -107,7 +107,6 @@ const inscriptionEleveController = {
                 }
             });
 
-            console.log(`✅ Email validé pour la demande ${request.id} - ${request.parentEmail}`);
 
             // 📧 MAINTENANT envoyer notification au directeur
             try {
@@ -119,7 +118,6 @@ const inscriptionEleveController = {
                     children: childrenData,
                     requestId: request.id
                 });
-                console.log('📧 Notification envoyée au directeur après validation email');
             } catch (emailError) {
                 console.error('❌ Erreur envoi notification directeur après validation:', emailError);
             }
@@ -173,37 +171,25 @@ const inscriptionEleveController = {
             // Traitement des enfants - le nouveau format envoie children comme objet
             let childrenData = [];
             if (children) {
-                console.log('🔍 Données children reçues:', JSON.stringify(children, null, 2));
 
                 // Convertir l'objet children en tableau
                 childrenData = Object.keys(children).map(key => {
                     const child = children[key];
-
-                    console.log(`📝 Traitement enfant ${key}:`, {
-                        firstName: child.firstName,
-                        lastName: child.lastName,
-                        requestedClass: child.requestedClass,
-                        hasRequestedClass: !!child.requestedClass
-                    });
 
                     return {
                         firstName: child.firstName,
                         lastName: child.lastName,
                         birthDate: child.birthDate,
                         currentClass: child.currentClass || null,
-                        requestedClass: child.requestedClass || null, // Ne pas exclure si null
+                        requestedClass: child.requestedClass || null,
                         previousSchool: child.previousSchool || null
                     };
                 }).filter(child => {
                     // Ne PAS filtrer sur requestedClass car on veut la conserver même si elle est manquante
                     const isValid = child.firstName && child.lastName && child.birthDate;
-                    if (!isValid) {
-                        console.log('❌ Enfant exclu (données de base manquantes):', child);
-                    }
                     return isValid;
                 });
 
-                console.log('✅ Enfants traités:', childrenData);
             }
 
             // Vérifier qu'au moins un enfant est présent et valide
@@ -257,7 +243,6 @@ const inscriptionEleveController = {
                 }
             });
 
-            console.log(`Nouvelle demande d'inscription créée pour ${childrenData.length} enfant(s):`, inscriptionRequest.id);
 
             // ✉️ ENVOYER EMAIL DE VALIDATION (au lieu de confirmation)
             try {
@@ -267,7 +252,6 @@ const inscriptionEleveController = {
                     validationToken: validationToken,
                     children: childrenData
                 });
-                console.log('📧 Email de validation envoyé à:', parentEmail);
             } catch (emailError) {
                 console.error('❌ Erreur envoi email de validation:', emailError);
                 // Ne pas arrêter le processus, juste logguer l'erreur
@@ -370,7 +354,6 @@ const inscriptionEleveController = {
                 parentAddress
             } = inscriptionRequest;
 
-            console.log('🔄 Création comptes parent(s) et enfant(s)...');
 
             // Générer un mot de passe temporaire
             const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
@@ -389,7 +372,6 @@ const inscriptionEleveController = {
                 }
             });
 
-            console.log('✅ Parent principal créé:', `${parentFirstName} ${parentLastName} (${parentEmail})`);
 
             // Créer aussi le compte du deuxième parent si les infos sont disponibles
             let secondParentUser = null;
@@ -426,9 +408,7 @@ const inscriptionEleveController = {
                                     }
                                 });
 
-                                console.log('✅ Deuxième parent créé:', `${mereFirstName} ${mereLastName} (${mereEmail})`);
                             } else {
-                                console.log('ℹ️ Deuxième parent existe déjà:', mereEmail);
                                 secondParentUser = existingMother;
                             }
                         }
@@ -490,7 +470,6 @@ const inscriptionEleveController = {
                 });
 
                 students.push(student);
-                console.log('✅ Élève créé:', `${student.firstName} ${student.lastName} - Classe: ${child.requestedClass}`);
             }
 
             // Envoyer email avec identifiants
@@ -505,7 +484,6 @@ const inscriptionEleveController = {
                 console.error('Erreur envoi identifiants:', emailError);
             }
 
-            console.log(`✅ Comptes créés pour ${parentFirstName} ${parentLastName} avec ${students.length} enfant(s)`);
             return { parentUser, students };
 
         } catch (error) {

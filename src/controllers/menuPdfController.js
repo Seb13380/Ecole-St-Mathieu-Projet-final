@@ -40,9 +40,6 @@ const menuPdfController = {
 
     getMenusManagement: async (req, res) => {
         try {
-            console.log('🍽️ DEBUT - Accès à la gestion des menus PDF');
-            console.log('👤 Utilisateur:', req.session.user?.email, 'Rôle:', req.session.user?.role);
-            console.log('📍 Tentative de rendu du template...');
 
             const menus = await prisma.menu.findMany({
                 include: {
@@ -53,8 +50,6 @@ const menuPdfController = {
                 orderBy: { dateDebut: 'desc' }
             });
 
-            console.log('📝 Menus trouvés:', menus.length);
-            console.log('🎭 Template path: pages/menus/pdf-management-simple');
 
             res.render('pages/menus/pdf-management-simple', {
                 title: 'Gestion des Menus PDF',
@@ -64,7 +59,6 @@ const menuPdfController = {
                 error: req.query.error
             });
 
-            console.log('✅ Template rendu avec succès');
         } catch (error) {
             console.error('❌ Erreur lors de la récupération des menus:', error);
             res.status(500).render('pages/error', {
@@ -76,9 +70,6 @@ const menuPdfController = {
     // Créer un nouveau menu avec PDF
     createMenu: async (req, res) => {
         try {
-            console.log('🍽️ Création d\'un nouveau menu PDF');
-            console.log('📝 Données reçues:', req.body);
-            console.log('📁 Fichier reçu:', req.file);
 
             const { actif, dateDebut, dateFin, semaine } = req.body;
 
@@ -97,7 +88,6 @@ const menuPdfController = {
 
             // Si ce menu est actif, désactiver les autres
             if (actif === 'on') {
-                console.log('🔄 Nouveau menu actif créé - les autres restent tels quels');
                 // Note: On permet maintenant plusieurs menus actifs simultanément
             }
 
@@ -115,7 +105,6 @@ const menuPdfController = {
             const nomMenu = semaine || `Menu du ${formatDateToFrench(dateDebut)} au ${formatDateToFrench(dateFin)}`;
 
             // Convertir le PDF en images
-            console.log('🖼️ Conversion du PDF en images...');
             const pdfPath = path.join(__dirname, '../../public/assets/documents/menus', req.file.filename);
             const imageDir = path.join(__dirname, '../../public/assets/images/menus');
 
@@ -140,7 +129,6 @@ const menuPdfController = {
 
                 // Convertir le PDF en images
                 const convertedPages = await fromPath(pdfPath, options).bulk(-1, true);
-                console.log('📸 Pages converties:', convertedPages.length);
 
                 // Générer les URLs des images
                 convertedPages.forEach((page, index) => {
@@ -148,7 +136,6 @@ const menuPdfController = {
                     imageUrls.push(`/assets/images/menus/${imageName}`);
                 });
 
-                console.log('🖼️ URLs des images générées:', imageUrls);
             } catch (conversionError) {
                 console.warn('⚠️ Échec de la conversion PDF en images:', conversionError);
                 // On continue sans les images si la conversion échoue
@@ -169,7 +156,6 @@ const menuPdfController = {
                 }
             });
 
-            console.log('🎉 Menu PDF créé avec succès:', nouveauMenu.id);
             res.redirect('/admin/menus-pdf?success=Menu créé avec succès');
 
         } catch (error) {
@@ -191,7 +177,6 @@ const menuPdfController = {
     toggleMenu: async (req, res) => {
         try {
             const { id } = req.params;
-            console.log(`🔄 Basculer l'état du menu ${id}`);
 
             // Récupérer le menu actuel
             const menu = await prisma.menu.findUnique({
@@ -205,7 +190,6 @@ const menuPdfController = {
             // Si on active ce menu, ne plus désactiver les autres
             // Note: Permet maintenant d'avoir plusieurs menus actifs simultanément
             if (!menu.actif) {
-                console.log('🔄 Activation du menu - les autres restent tels quels');
                 // Les autres menus actifs restent actifs
             }
 
@@ -233,11 +217,9 @@ const menuPdfController = {
             const { id } = req.params;
             const { statut, actif } = req.body;
 
-            console.log(`🔄 Mise à jour du statut du menu ${id}:`, { statut, actif });
 
             // Si on active ce menu, ne plus désactiver les autres automatiquement
             if (actif === 'true' || statut === 'ACTIF') {
-                console.log('🔄 Activation du menu - les autres menus actifs restent actifs');
                 // Note: Permet maintenant d'avoir plusieurs menus actifs simultanément
             }
 
@@ -279,7 +261,6 @@ const menuPdfController = {
 
                 fs.unlink(filePath, (err) => {
                     if (err) console.error('Erreur lors de la suppression du fichier PDF:', err);
-                    else console.log('📁 Fichier PDF supprimé:', filename);
                 });
             }
 
@@ -288,7 +269,6 @@ const menuPdfController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('🗑️ Menu supprimé avec succès:', id);
             res.redirect('/admin/menus-pdf?success=Menu supprimé avec succès');
 
         } catch (error) {
@@ -398,7 +378,6 @@ const menuPdfController = {
                 }
             });
 
-            console.log('✅ Menu activé (les autres menus actifs restent actifs):', menuActive.semaine);
             res.redirect('/admin/menus-pdf?success=Menu activé avec succès');
 
         } catch (error) {

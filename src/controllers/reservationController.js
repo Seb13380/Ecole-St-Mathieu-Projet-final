@@ -5,7 +5,6 @@ const reservationController = {
     // Afficher le calendrier de réservation
     showCalendar: async (req, res) => {
         try {
-            console.log('Accès au calendrier de réservation');
 
             const studentId = parseInt(req.params.studentId);
             const parentId = req.session.user.id;
@@ -101,14 +100,12 @@ const reservationController = {
     // Créer une réservation
     createReservation: async (req, res) => {
         try {
-            console.log('Création réservation:', req.body);
 
             const { studentId, mealDate } = req.body;
             const parentId = req.session.user.id;
 
             // SIMULATION POUR LE COMPTE TEST
             if (req.session.user.email === 'sebcecg@gmail.com') {
-                console.log('✅ Simulation réservation réussie pour le', mealDate);
                 return res.redirect(`/parent/tickets/calendar/${studentId}?success=` +
                     encodeURIComponent(`Repas réservé pour le ${new Date(mealDate).toLocaleDateString('fr-FR')} ! (Mode test)`));
             }
@@ -174,7 +171,6 @@ const reservationController = {
                 }
             });
 
-            console.log('✅ Réservation créée:', reservation);
             res.redirect(`/parent/tickets/calendar/${studentId}?success=` +
                 encodeURIComponent(`Repas réservé pour le ${new Date(mealDate).toLocaleDateString('fr-FR')} !`));
 
@@ -193,7 +189,6 @@ const reservationController = {
 
             // SIMULATION POUR LE COMPTE TEST
             if (req.session.user.email === 'sebcecg@gmail.com') {
-                console.log('✅ Simulation annulation réussie');
                 return res.json({ success: true, message: 'Réservation annulée (Mode test)' });
             }
 
@@ -244,7 +239,6 @@ const reservationController = {
                 }
             });
 
-            console.log('✅ Réservation annulée:', reservationId);
             res.json({ success: true, message: 'Réservation annulée et ticket remboursé' });
 
         } catch (error) {

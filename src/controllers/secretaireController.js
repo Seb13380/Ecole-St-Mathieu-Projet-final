@@ -7,7 +7,6 @@ const secretaireController = {
     // Dashboard secrétaire - Utilise le même dashboard que le directeur
     dashboard: async (req, res) => {
         try {
-            console.log('📋 Accès au tableau de bord secrétaire (mode directeur)');
 
             // Vérifier que l'utilisateur a les droits
             if (!['SECRETAIRE_DIRECTION', 'DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
@@ -47,10 +46,6 @@ const secretaireController = {
             };
 
             // Debug - vérification des valeurs
-            console.log('🔍 DEBUG STATS DASHBOARD SECRÉTAIRE:');
-            console.log('  - pendingInscriptions:', stats.pendingInscriptions);
-            console.log('  - acceptedInscriptions:', stats.acceptedInscriptions);
-            console.log('  - pendingCredentials:', stats.pendingCredentials);
 
             // Récupérer les utilisateurs récents
             const recentUsers = await prisma.user.findMany({

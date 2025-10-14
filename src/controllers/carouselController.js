@@ -40,7 +40,6 @@ const carouselController = {
     // Afficher la page de gestion du carousel
     async showManagement(req, res) {
         try {
-            console.log('📸 Accès à la gestion du carousel par:', req.session.user.email);
 
             // Vérifier les permissions (DIRECTION ou MAINTENANCE_SITE)
             const allowedRoles = ['DIRECTION', 'ADMIN', 'MAINTENANCE_SITE'];
@@ -120,12 +119,6 @@ const carouselController = {
                     }
                 });
 
-                console.log('✅ Image ajoutée au carousel:', {
-                    id: newImage.id,
-                    filename: newImage.filename,
-                    auteur: req.session.user.email
-                });
-
                 res.redirect('/carousel/manage?success=' + encodeURIComponent('Image ajoutée avec succès au carousel'));
 
             } catch (error) {
@@ -151,14 +144,6 @@ const carouselController = {
             const { id } = req.params;
             const { titre, description, ordre, active } = req.body;
 
-            console.log('📝 Modification image carousel:', {
-                id,
-                titre,
-                ordre,
-                active,
-                body: req.body
-            });
-
             // Gérer la checkbox active
             const isActive = active === 'on' || active === 'true' || active === true || active === '1';
 
@@ -173,14 +158,7 @@ const carouselController = {
                 }
             });
 
-            console.log('✅ Image carousel modifiée:', {
-                id: updatedImage.id,
-                titre: updatedImage.titre,
-                active: updatedImage.active
-            });
-
             res.redirect('/carousel/manage?success=' + encodeURIComponent('Image modifiée avec succès'));
-
         } catch (error) {
             console.error('❌ Erreur modification image:', error);
             console.error('❌ Détails erreur:', error.message);
@@ -193,7 +171,6 @@ const carouselController = {
         try {
             const { id } = req.params;
 
-            console.log('🗑️ Suppression image carousel:', id);
 
             // Récupérer l'image pour obtenir le nom du fichier
             const image = await prisma.carouselImage.findUnique({
@@ -213,12 +190,10 @@ const carouselController = {
             try {
                 const filePath = path.join(__dirname, '../../public/uploads/carousel', image.filename);
                 await fs.unlink(filePath);
-                console.log('📁 Fichier physique supprimé:', image.filename);
             } catch (fileError) {
                 console.warn('⚠️ Fichier physique non trouvé:', image.filename);
             }
 
-            console.log('✅ Image carousel supprimée:', id);
             res.redirect('/carousel/manage?success=' + encodeURIComponent('Image supprimée avec succès'));
 
         } catch (error) {
@@ -232,7 +207,6 @@ const carouselController = {
         try {
             const { id } = req.params;
 
-            console.log('🔄 Basculement statut image:', id);
 
             const image = await prisma.carouselImage.findUnique({
                 where: { id: parseInt(id) }
@@ -251,7 +225,6 @@ const carouselController = {
             });
 
             const message = updatedImage.active ? 'Image activée' : 'Image désactivée';
-            console.log('✅ Statut modifié:', { id, active: updatedImage.active });
 
             res.redirect('/carousel/manage?success=' + encodeURIComponent(message));
 

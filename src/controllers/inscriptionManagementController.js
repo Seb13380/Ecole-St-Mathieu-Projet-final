@@ -44,7 +44,6 @@ const inscriptionManagementController = {
 
     async getInscriptionManagement(req, res) {
         try {
-            console.log('ðŸ” AccÃ¨s Ã  la gestion des inscriptions par:', req.session.user?.email);
 
             // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -78,7 +77,6 @@ const inscriptionManagementController = {
                         }
                     }
                 });
-                console.log('âœ… Configuration par défaut créée');
             }
 
             // RÃ©cupÃ©rer les documents d'inscription
@@ -92,9 +90,6 @@ const inscriptionManagementController = {
                 orderBy: { ordre: 'asc' }
             });
 
-            console.log('ðŸ“Š Donnés rÃ©cupÃ©rés:');
-            console.log('   - Configuration:', config.soustitre);
-            console.log('   - Documents actifs:', documents.length);
 
             res.render('pages/admin/inscription-management', {
                 config,
@@ -114,7 +109,6 @@ const inscriptionManagementController = {
 
     async updateInscriptionConfig(req, res) {
         try {
-            console.log('ðŸ”„ Mise Ã  jour configuration inscription par:', req.session.user?.email);
 
             // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -146,7 +140,6 @@ const inscriptionManagementController = {
                 }
             });
 
-            console.log('âœ… Configuration mise Ã  jour:', { soustitre, afficherAnnoncePS2026: Boolean(afficherAnnoncePS2026) });
 
             res.json({
                 success: true,
@@ -167,7 +160,6 @@ const inscriptionManagementController = {
 
     async addDocument(req, res) {
         try {
-            console.log('ðŸ“ Ajout document inscription par:', req.session.user?.email);
 
             // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -242,7 +234,6 @@ const inscriptionManagementController = {
                 }
             });
 
-            console.log('âœ… Document ajoutÃ©:', nom, '- Type:', type);
 
             res.json({
                 success: true,
@@ -267,7 +258,6 @@ const inscriptionManagementController = {
 
     async deleteDocument(req, res) {
         try {
-            console.log('ðŸ—‘ï¸  Suppression document inscription par:', req.session.user?.email);
 
             // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -291,7 +281,6 @@ const inscriptionManagementController = {
             if (document.type === 'FILE' && document.cheminFichier) {
                 try {
                     await fs.unlink(document.cheminFichier);
-                    console.log('ðŸ—‘ï¸  Fichier physique supprimÃ©:', document.nomFichier);
                 } catch (error) {
                     console.warn('âš ï¸  Impossible de supprimer le fichier physique:', error.message);
                 }
@@ -302,7 +291,6 @@ const inscriptionManagementController = {
                 where: { id: parseInt(id) }
             });
 
-            console.log('âœ… Document supprimÃ©:', document.nom, '- Type:', document.type);
 
             res.json({
                 success: true,
@@ -320,7 +308,6 @@ const inscriptionManagementController = {
 
     async updateDocumentOrder(req, res) {
         try {
-            console.log('ðŸ”„ Mise Ã  jour ordre documents par:', req.session.user?.email);
 
             // VÃ©rifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
@@ -346,7 +333,6 @@ const inscriptionManagementController = {
 
             await Promise.all(updatePromises);
 
-            console.log('âœ… Ordre des documents mis Ã  jour');
 
             res.json({
                 success: true,
@@ -366,7 +352,6 @@ const inscriptionManagementController = {
 
     async getInscriptionData(req, res) {
         try {
-            console.log('ðŸ“„ RÃ©cupÃ©ration donnés inscription publiques');
 
             // RÃ©cupÃ©rer la configuration active
             const config = await prisma.inscriptionConfig.findFirst({
@@ -442,7 +427,6 @@ const inscriptionManagementController = {
                     });
                 }
 
-                console.log('ðŸ“¥ TÃ©lÃ©chargement document:', document.nom, 'par IP:', req.ip);
 
                 // Configurer les headers pour le tÃ©lÃ©chargement
                 res.setHeader('Content-Type', 'application/pdf');
