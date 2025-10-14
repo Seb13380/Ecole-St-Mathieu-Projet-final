@@ -128,7 +128,7 @@ const loginController = {
                 res.redirect('/admin/dashboard');
                 break;
             case 'APEL':
-                res.redirect('/admin/dashboard');
+                res.redirect('/parent/dashboard');
                 break;
             case 'ADMIN': // Garde compatibilité
                 res.redirect('/admin/dashboard');
