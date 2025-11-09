@@ -58,6 +58,12 @@ const menuController = {
 
             const processingTime = Date.now() - startTime;
             console.log(`✅ ${menusOrdonnes.length} menus valides traités en ${processingTime}ms`);
+            
+            // 🔍 DEBUG CRUCIAL pour diagnostic
+            console.log('🎯 ENVOI AU TEMPLATE:');
+            console.log(`   - Nombre de menus: ${menusOrdonnes.length}`);
+            console.log(`   - Premier menu: ${menusOrdonnes.length > 0 ? menusOrdonnes[0].semaine : 'AUCUN'}`);
+            console.log(`   - Variable menus sera: `, menusOrdonnes.map(m => ({ id: m.id, semaine: m.semaine })));
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',
