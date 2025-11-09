@@ -26,9 +26,10 @@ const menuController = {
 
             console.log(`📋 ${menusActifs.length} menus actifs trouvés`);
 
-            // Validation et nettoyage des données
+            // Validation et nettoyage des données - CORRECTION pour accepter menus sans titre
             const menusValides = menusActifs.filter(menu => {
-                const isValid = menu.titre && (menu.mediaUrl || menu.semaine);
+                // Un menu est valide s'il a au moins un semaine défini
+                const isValid = menu.semaine && menu.semaine.trim().length > 0;
                 if (!isValid) {
                     console.warn(`⚠️ Menu invalide ignoré (ID: ${menu.id}):`, {
                         titre: menu.titre,
