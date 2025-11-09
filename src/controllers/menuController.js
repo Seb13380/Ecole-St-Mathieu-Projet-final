@@ -9,14 +9,11 @@ const menuController = {
             console.log('🍽️ Récupération des menus restaurant');
             const startTime = Date.now();
 
-            // Récupération optimisée avec filtre date et limitation
+            // Récupération optimisée - récupérer TOUS les menus actifs
             const menusActifs = await prisma.menu.findMany({
                 where: {
-                    actif: true,
-                    // Filtrer les menus futurs et actuels uniquement
-                    dateFin: {
-                        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 jours dans le passé max
-                    }
+                    actif: true
+                    // Suppression du filtre date strict qui bloquait l'affichage
                 },
                 include: {
                     auteur: {
