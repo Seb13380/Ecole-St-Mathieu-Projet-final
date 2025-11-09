@@ -2,16 +2,13 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Créer le dossier uploads/actualites s'il n'existe pas
 const uploadsDir = path.join(__dirname, '..', 'public', 'uploads', 'actualites');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Configuration du storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Déterminer le dossier selon le type de fichier
         let uploadPath;
 
         if (file.mimetype.startsWith('image/')) {
@@ -24,7 +21,6 @@ const storage = multer.diskStorage({
             uploadPath = uploadsDir; // fallback
         }
 
-        // Créer le dossier s'il n'existe pas
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
@@ -39,7 +35,6 @@ const storage = multer.diskStorage({
     }
 });
 
-// Filtre pour accepter images, vidéos et PDF
 const fileFilter = (req, file, cb) => {
     const allowedMimes = [
         'image/jpeg',
@@ -60,7 +55,6 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Configuration multer
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,

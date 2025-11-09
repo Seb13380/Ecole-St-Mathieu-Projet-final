@@ -123,13 +123,10 @@ const actualiteController = {
           }
         }
       });
-
-
-      // Envoyer des notifications par email aux parents si l'actualité est visible
+    
       if (visible === 'true') {
         try {
 
-          // Récupérer tous les emails des parents
           const parents = await prisma.user.findMany({
             where: {
               role: 'PARENT'
@@ -157,7 +154,6 @@ const actualiteController = {
           }
         } catch (emailError) {
           console.error('❌ Erreur lors de l\'envoi des notifications par email:', emailError);
-          // On continue même si l'email échoue
         }
       } else {
       }
@@ -170,13 +166,12 @@ const actualiteController = {
   },
 
   async updateActualite(req, res) {
-    const { id } = req.params; // Déplacer la déclaration ici pour être accessible dans catch
+    const { id } = req.params;
 
     try {
 
       const { titre, contenu, important, visible, public: isPublic, lienUrl, lienTexte } = req.body;
 
-      // Préparer les données de mise à jour
       const updateData = {
         titre,
         contenu,
@@ -187,9 +182,7 @@ const actualiteController = {
         public: isPublic === 'true'
       };
 
-      // Gestion du nouveau fichier média
       if (req.file) {
-        // Déterminer le type de média selon le MIME type
         if (req.file.mimetype.startsWith('image/')) {
           updateData.mediaType = 'image';
           updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;

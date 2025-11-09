@@ -3,44 +3,84 @@
 const prisma = new PrismaClient();
 
 const menuController = {
-    // Afficher les menus de la semaine (page publique)
+    // Afficher les menus de la semaine (page publique) - OPTIMISÉ
     getMenus: async (req, res) => {
         try {
+            console.log('🍽️ Récupération des menus restaurant');
+            const startTime = Date.now();
 
+            // Récupération optimisée avec filtre date et limitation
             const menusActifs = await prisma.menu.findMany({
-                where: { actif: true },
+                where: {
+                    actif: true,
+                    // Filtrer les menus futurs et actuels uniquement
+                    dateFin: {
+                        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 jours dans le passé max
+                    }
+                },
                 include: {
                     auteur: {
                         select: { firstName: true, lastName: true }
                     }
                 },
-                orderBy: { dateDebut: 'asc' } // Tri par date de début (chronologique)
+                orderBy: { dateDebut: 'asc' },
+                take: 10 // Limiter à 10 menus max pour performance
             });
 
+            console.log(`📋 ${menusActifs.length} menus actifs trouvés`);
 
-            // Simple tri chronologique par date de début
-            let menusOrdonnes = menusActifs.sort((a, b) => {
+            // Validation et nettoyage des données
+            const menusValides = menusActifs.filter(menu => {
+                const isValid = menu.titre && (menu.mediaUrl || menu.semaine);
+                if (!isValid) {
+                    console.warn(`⚠️ Menu invalide ignoré (ID: ${menu.id}):`, {
+                        titre: menu.titre,
+                        mediaUrl: menu.mediaUrl,
+                        semaine: menu.semaine
+                    });
+                }
+                return isValid;
+            });
+
+            // Tri chronologique optimisé
+            let menusOrdonnes = menusValides.sort((a, b) => {
                 if (!a.dateDebut && !b.dateDebut) return 0;
                 if (!a.dateDebut) return 1;
                 if (!b.dateDebut) return -1;
                 return new Date(a.dateDebut) - new Date(b.dateDebut);
             });
 
-            menusOrdonnes.forEach((menu, index) => {
-                const debut = menu.dateDebut ? new Date(menu.dateDebut).toLocaleDateString('fr-FR') : 'Non définie';
-                const fin = menu.dateFin ? new Date(menu.dateFin).toLocaleDateString('fr-FR') : 'Non définie';
-            });
+            // Optimisation des URLs pour WebP si disponible
+            menusOrdonnes = menusOrdonnes.map(menu => ({
+                ...menu,
+                mediaUrl: menu.mediaUrl ? menu.mediaUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp') : null,
+                fallbackUrl: menu.mediaUrl, // Fallback si WebP indisponible
+                dateDebutFormatted: menu.dateDebut ? new Date(menu.dateDebut).toLocaleDateString('fr-FR') : 'Non définie',
+                dateFinFormatted: menu.dateFin ? new Date(menu.dateFin).toLocaleDateString('fr-FR') : 'Non définie'
+            }));
 
+            const processingTime = Date.now() - startTime;
+            console.log(`✅ ${menusOrdonnes.length} menus valides traités en ${processingTime}ms`);
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',
-                menus: menusOrdonnes // Menus triés avec priorité à la semaine courante
+                menus: menusOrdonnes,
+                user: req.session.user,
+                currentDate: new Date().toISOString().split('T')[0],
+                processingTime
             });
 
         } catch (error) {
             console.error('❌ Erreur lors de la récupération des menus:', error);
-            res.status(500).render('pages/error', {
-                message: 'Erreur lors de la récupération des menus'
+            console.error('Stack trace:', error.stack);
+
+            // Rendu avec gestion d'erreur gracieuse
+            res.render('pages/restauration/menus', {
+                title: 'École Saint-Mathieu - Menus de la semaine',
+                menus: [],
+                error: 'Impossible de charger les menus actuellement. Veuillez réessayer plus tard.',
+                user: req.session.user,
+                currentDate: new Date().toISOString().split('T')[0]
             });
         }
     },

@@ -37,7 +37,50 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(__dirname + '/public'));
+// ⚡ OPTIMISATION PERFORMANCE - Cache statique agressif
+// Cache optimisé pour images WebP et ressources statiques avec headers appropriés
+app.use('/uploads', express.static(__dirname + '/public/uploads', {
+  maxAge: '30d',           // Cache 30 jours pour images
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.webp')) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable'); // 30 jours
+      res.setHeader('Vary', 'Accept-Encoding');
+    } else if (/\.(jpg|jpeg|png|gif)$/i.test(path)) {
+      res.setHeader('Cache-Control', 'public, max-age=604800'); // 7 jours pour anciennes images
+    }
+  }
+}));
+
+// Cache pour CSS/JS (7 jours)
+app.use('/css', express.static(__dirname + '/public/css', {
+  maxAge: '7d',
+  etag: true,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=604800');
+  }
+}));
+
+app.use('/js', express.static(__dirname + '/public/js', {
+  maxAge: '7d',
+  etag: true,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=604800');
+  }
+}));
+
+// Cache pour assets (fonts, icons - 1 mois)
+app.use('/assets', express.static(__dirname + '/public/assets', {
+  maxAge: '30d',
+  etag: true,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+  }
+}));
+
+// Fallback pour autres fichiers statiques (cache court)
+app.use(express.static(__dirname + '/public', { maxAge: '1d' }));
 
 // Protection spéciale pour les PDF de documents avec accès restreint
 app.use('/uploads/documents', async (req, res, next) => {
@@ -99,26 +142,85 @@ app.use('/uploads/documents', async (req, res, next) => {
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
+// ⚡ MONITORING PERFORMANCE - Détection des requêtes lentes
+// Middleware pour identifier bottlenecks et optimiser performances
+const performanceMonitoring = (req, res, next) => {
+  const start = Date.now();
+  const method = req.method;
+  const url = req.originalUrl;
+
+  // Hook sur la fin de la réponse
+  const originalSend = res.send;
+  const originalJson = res.json;
+
+  res.send = function (data) {
+    logPerformance();
+    return originalSend.call(this, data);
+  };
+
+  res.json = function (data) {
+    logPerformance();
+    return originalJson.call(this, data);
+  };
+
+  function logPerformance() {
+    const duration = Date.now() - start;
+    const status = res.statusCode;
+    const contentLength = res.get('Content-Length') || 0;
+
+    // 🐌 Requêtes TRÈS lentes (> 3000ms)
+    if (duration > 3000) {
+      console.error(`🚨 CRITIQUE: ${method} ${url} - ${duration}ms - Status: ${status} - Size: ${contentLength}b`);
+    }
+    // ⚠️ Requêtes lentes (> 1000ms)  
+    else if (duration > 1000) {
+      console.warn(`🐌 LENT: ${method} ${url} - ${duration}ms - Status: ${status} - Size: ${contentLength}b`);
+    }
+    // ⏰ Requêtes moyennes (> 500ms)
+    else if (duration > 500) {
+      console.log(`⏰ MOYEN: ${method} ${url} - ${duration}ms - Status: ${status}`);
+    }
+    // ✅ Requêtes rapides (logging debug seulement)
+    else if (process.env.NODE_ENV === 'development' && duration > 100) {
+      console.log(`✅ OK: ${method} ${url} - ${duration}ms`);
+    }
+
+    // Alertes spécifiques pour images
+    if (url.includes('/uploads/') && duration > 2000) {
+      console.error(`📸 IMAGE TRÈS LENTE: ${url} - ${duration}ms - Convertir en WebP recommandé!`);
+    }
+
+    // Alertes pour menus restaurant
+    if (url.includes('/menus') && duration > 1500) {
+      console.warn(`🍽️ MENUS LENTS: ${url} - ${duration}ms - Vérifier base de données`);
+    }
+  }
+
+  next();
+};
+
+// Activer le monitoring en développement et production
+if (process.env.NODE_ENV !== 'test') {
+  app.use(performanceMonitoring);
+}
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // mettre à true en production avec HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 24 heures
+    secure: false,
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 
-// Configuration du middleware flash pour les messages temporaires
 app.use(flash());
 
-// 📊 Middleware de logging pour analytics (après session, avant routes)
 app.use(loggingMiddleware);
 
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
 
-// Désactiver complètement le cache Twig en développement
 twig.cache(false);
 app.set('twig options', {
   allowAsync: true,
