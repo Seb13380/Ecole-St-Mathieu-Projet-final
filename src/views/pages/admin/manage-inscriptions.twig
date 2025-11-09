@@ -73,20 +73,16 @@
 				<i class="fas fa-cog text-blue-600"></i>
 				Configuration des Annonces
 			</h2>
-			
+
 			<div class="flex items-center justify-between">
 				<div>
 					<h3 class="font-semibold text-gray-800">🌟 Annonce Petite Section 2026</h3>
 					<p class="text-sm text-gray-600">Afficher l'annonce d'ouverture des inscriptions pour la Petite Section 2026</p>
 				</div>
-				
+
 				<div class="flex items-center">
 					<label class="relative inline-flex items-center cursor-pointer">
-						<input type="checkbox" 
-							   id="ps2026-toggle" 
-							   class="sr-only peer" 
-							   {{ config and config.afficherAnnoncePS2026 ? 'checked' : '' }}
-							   onchange="togglePS2026Announcement()">
+						<input type="checkbox" id="ps2026-toggle" class="sr-only peer" {{ config and config.afficherAnnoncePS2026 ? 'checked' : '' }} onchange="togglePS2026Announcement()">
 						<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
 					</label>
 				</div>
@@ -235,7 +231,7 @@
 												</div>
 												<div>
 													<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-														{{ child.requestedClass }}
+														{{ child.requestedClass ? child.requestedClass : 'Non renseignée' }}
 													</span>
 												</div>
 											</div>
@@ -387,285 +383,285 @@
 
 <script>
 	let currentRequestId = null;
-	
-	// Charger les classes disponibles
-	let availableClasses = [];
-	
-	async function loadClasses() {
-	    try {
-	        const response = await fetch('/api/admin/classes');
-	        const data = await response.json();
-	        if (data.success) {
-	            availableClasses = data.classes;
-	        }
-	    } catch (error) {
-	        console.error('Erreur chargement classes:', error);
-	    }
-	}
-	
-	// Initialisation
-	document.addEventListener('DOMContentLoaded', function() {
-	    loadClasses();
-	});
-	
-	// Modal d'approbation
-	function showApprovalModal(requestId, firstName, lastName) {
-	    currentRequestId = requestId;
-	    document.getElementById('approval-family-name').textContent = `${firstName} ${lastName}`;
-	    
-	    // Récupérer les enfants de cette demande
-	    const requestCard = document.querySelector(`.request-card[data-id="${requestId}"]`);
-	    if (requestCard) {
-	        generateChildrenClassSelection(requestCard);
-	    }
-	    
-	    document.getElementById('approvalModal').classList.remove('hidden');
-	}
-	
-	function generateChildrenClassSelection(requestCard) {
-	    const container = document.getElementById('children-class-selection');
-	    container.innerHTML = '';
-	    
-	    // Récupérer les enfants depuis les données de la demande
-	    // Pour cet exemple, nous utiliserons une structure simplifiée
-	    const children = [
-	        { firstName: 'Exemple', lastName: 'Enfant', requestedClass: 'CP-A' }
-	    ]; // À remplacer par les vraies données
-	
-	    children.forEach((child, index) => {
-	        const childDiv = document.createElement('div');
-	        childDiv.className = 'border border-gray-200 rounded-lg p-4 mb-4';
-	        childDiv.innerHTML = `
-	            <h4 class="font-semibold text-gray-800 mb-3">
-	                👶 ${child.firstName} ${child.lastName}
-	            </h4>
-	            <div>
-	                <label class="block text-sm font-medium text-gray-700 mb-2">
-	                    Choisir la classe:
-	                </label>
-	                <select name="classe_${index}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-	                    <option value="">Sélectionner une classe...</option>
-	                    ${availableClasses.map(classe => 
-	                        `<option value="${classe.id}" ${child.requestedClass === classe.nom ? 'selected' : ''}>
-	                            ${classe.nom} (${classe.niveau})
-	                        </option>`
-	                    ).join('')}
-	                </select>
-	            </div>
-	        `;
-	        container.appendChild(childDiv);
-	    });
-	}
-	
-	// Modal de refus
-	function showRejectionModal(requestId, firstName, lastName) {
-	    currentRequestId = requestId;
-	    document.getElementById('rejection-family-name').textContent = `${firstName} ${lastName}`;
-	    document.getElementById('rejectionModal').classList.remove('hidden');
-	}
-	
-	function closeModal(modalId) {
-	    document.getElementById(modalId).classList.add('hidden');
-	    currentRequestId = null;
-	}
-	
-	// Approbation
-	async function approveInscription() {
-	    if (!currentRequestId) return;
-	    
-	    const comment = document.getElementById('approval-comment').value;
-	    
-	    // Récupérer les choix de classes
-	    const classSelections = {};
-	    const selects = document.querySelectorAll('#children-class-selection select');
-	    selects.forEach(select => {
-	        const childIndex = select.name.split('_')[1];
-	        classSelections[childIndex] = select.value;
-	    });
-	    
-	    try {
-	        const response = await fetch(`/admin/inscriptions/${currentRequestId}/approve`, {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json',
-	            },
-	            body: JSON.stringify({
-	                comment: comment,
-	                classSelections: classSelections
-	            })
-	        });
-	        
-	        const result = await response.json();
-	        
-	        if (result.success) {
-	            showNotification('✅ Inscription approuvée avec succès ! Comptes créés et email envoyé.', 'success');
-	            closeModal('approvalModal');
-	            setTimeout(() => location.reload(), 1500);
-	        } else {
-	            showNotification('❌ Erreur: ' + result.message, 'error');
-	        }
-	    } catch (error) {
-	        console.error('Erreur:', error);
-	        showNotification('❌ Erreur lors de l\'approbation', 'error');
-	    }
-	}
-	
-	// Refus
-	async function rejectInscription() {
-	    if (!currentRequestId) return;
-	    
-	    const reason = document.getElementById('rejection-reason').value;
-	    if (!reason.trim()) {
-	        showNotification('⚠️ Veuillez indiquer le motif du refus', 'warning');
-	        return;
-	    }
-	    
-	    try {
-	        const response = await fetch(`/admin/inscriptions/${currentRequestId}/reject`, {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json',
-	            },
-	            body: JSON.stringify({
-	                reason: reason
-	            })
-	        });
-	        
-	        const result = await response.json();
-	        
-	        if (result.success) {
-	            showNotification('✅ Inscription refusée. Email de notification envoyé.', 'success');
-	            closeModal('rejectionModal');
-	            setTimeout(() => location.reload(), 1500);
-	        } else {
-	            showNotification('❌ Erreur: ' + result.message, 'error');
-	        }
-	    } catch (error) {
-	        console.error('Erreur:', error);
-	        showNotification('❌ Erreur lors du refus', 'error');
-	    }
-	}
-	
-	// Filtres
-	function filterRequests(status) {
-	    const cards = document.querySelectorAll('.request-card');
-	    const buttons = document.querySelectorAll('.filter-btn');
-	    
-	    // Mettre à jour les boutons
-	    buttons.forEach(btn => {
-	        btn.classList.remove('active', 'bg-blue-100', 'text-blue-800');
-	        btn.classList.add('bg-gray-100', 'text-gray-600');
-	    });
-	    
-	    event.target.classList.remove('bg-gray-100', 'text-gray-600');
-	    event.target.classList.add('active', 'bg-blue-100', 'text-blue-800');
-	    
-	    // Filtrer les cartes
-	    cards.forEach(card => {
-	        if (status === 'all' || card.dataset.status === status) {
-	            card.style.display = 'block';
-	        } else {
-	            card.style.display = 'none';
-	        }
-	    });
-	}
-	
-	// Recherche
-	document.getElementById('search-input').addEventListener('input', function(e) {
-	    const searchTerm = e.target.value.toLowerCase();
-	    const cards = document.querySelectorAll('.request-card');
-	    
-	    cards.forEach(card => {
-	        const searchData = card.dataset.search.toLowerCase();
-	        if (searchData.includes(searchTerm)) {
-	            card.style.display = 'block';
-	        } else {
-	            card.style.display = 'none';
-	        }
-	    });
-	});
-	
-	// Actualiser
-	function refreshRequests() {
-	    location.reload();
-	}
-	
-	// Notifier Yamina
-	async function notifyYamina() {
-	    try {
-	        const response = await fetch('/admin/notify-yamina', {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json',
-	            }
-	        });
-	        
-	        const result = await response.json();
-	        
-	        if (result.success) {
-	            showNotification('📧 Notification envoyée à Yamina avec succès !', 'success');
-	        } else {
-	            showNotification('❌ Erreur: ' + result.message, 'error');
-	        }
-	    } catch (error) {
-	        console.error('Erreur:', error);
-	        showNotification('❌ Erreur lors de l\'envoi de la notification', 'error');
-	    }
-	}
-
-	// Toggle PS2026 Announcement
-	async function togglePS2026Announcement() {
-	    const checkbox = document.getElementById('ps2026-toggle');
-	    const isChecked = checkbox.checked;
-	    
-	    try {
-	        const response = await fetch('/directeur/inscription-config', {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json',
-	            },
-	            body: JSON.stringify({
-	                afficherAnnoncePS2026: isChecked
-	            })
-	        });
-	        
-	        const result = await response.json();
-	        
-	        if (result.success) {
-	            showNotification(
-	                isChecked ? 
-	                '🌟 Annonce PS2026 activée avec succès !' : 
-	                '✅ Annonce PS2026 désactivée avec succès !', 
-	                'success'
-	            );
-	        } else {
-	            // Revenir à l'état précédent en cas d'erreur
-	            checkbox.checked = !isChecked;
-	            showNotification('❌ Erreur: ' + result.message, 'error');
-	        }
-	    } catch (error) {
-	        console.error('Erreur:', error);
-	        // Revenir à l'état précédent en cas d'erreur
-	        checkbox.checked = !isChecked;
-	        showNotification('❌ Erreur lors de la mise à jour de la configuration', 'error');
-	    }
-	}
-	
-	// Notifications
-	function showNotification(message, type) {
-	    const notification = document.createElement('div');
-	    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white ${
-	        type === 'success' ? 'bg-green-500' :
-	        type === 'error' ? 'bg-red-500' :
-	        type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-	    }`;
-	    notification.textContent = message;
-	    
-	    document.body.appendChild(notification);
-	    
-	    setTimeout(() => {
-	        notification.remove();
-	    }, 5000);
-	}
-	</script>
-	{% endblock %}
+			
+			// Charger les classes disponibles
+			let availableClasses = [];
+			
+			async function loadClasses() {
+			    try {
+			        const response = await fetch('/api/admin/classes');
+			        const data = await response.json();
+			        if (data.success) {
+			            availableClasses = data.classes;
+			        }
+			    } catch (error) {
+			        console.error('Erreur chargement classes:', error);
+			    }
+			}
+			
+			// Initialisation
+			document.addEventListener('DOMContentLoaded', function() {
+			    loadClasses();
+			});
+			
+			// Modal d'approbation
+			function showApprovalModal(requestId, firstName, lastName) {
+			    currentRequestId = requestId;
+			    document.getElementById('approval-family-name').textContent = `${firstName} ${lastName}`;
+			    
+			    // Récupérer les enfants de cette demande
+			    const requestCard = document.querySelector(`.request-card[data-id="${requestId}"]`);
+			    if (requestCard) {
+			        generateChildrenClassSelection(requestCard);
+			    }
+			    
+			    document.getElementById('approvalModal').classList.remove('hidden');
+			}
+			
+			function generateChildrenClassSelection(requestCard) {
+			    const container = document.getElementById('children-class-selection');
+			    container.innerHTML = '';
+			    
+			    // Récupérer les enfants depuis les données de la demande
+			    // Pour cet exemple, nous utiliserons une structure simplifiée
+			    const children = [
+			        { firstName: 'Exemple', lastName: 'Enfant', requestedClass: 'CP-A' }
+			    ]; // À remplacer par les vraies données
+			
+			    children.forEach((child, index) => {
+			        const childDiv = document.createElement('div');
+			        childDiv.className = 'border border-gray-200 rounded-lg p-4 mb-4';
+			        childDiv.innerHTML = `
+			            <h4 class="font-semibold text-gray-800 mb-3">
+			                👶 ${child.firstName} ${child.lastName}
+			            </h4>
+			            <div>
+			                <label class="block text-sm font-medium text-gray-700 mb-2">
+			                    Choisir la classe:
+			                </label>
+			                <select name="classe_${index}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+			                    <option value="">Sélectionner une classe...</option>
+			                    ${availableClasses.map(classe => 
+			                        `<option value="${classe.id}" ${child.requestedClass === classe.nom ? 'selected' : ''}>
+			                            ${classe.nom} (${classe.niveau})
+			                        </option>`
+			                    ).join('')}
+			                </select>
+			            </div>
+			        `;
+			        container.appendChild(childDiv);
+			    });
+			}
+			
+			// Modal de refus
+			function showRejectionModal(requestId, firstName, lastName) {
+			    currentRequestId = requestId;
+			    document.getElementById('rejection-family-name').textContent = `${firstName} ${lastName}`;
+			    document.getElementById('rejectionModal').classList.remove('hidden');
+			}
+			
+			function closeModal(modalId) {
+			    document.getElementById(modalId).classList.add('hidden');
+			    currentRequestId = null;
+			}
+			
+			// Approbation
+			async function approveInscription() {
+			    if (!currentRequestId) return;
+			    
+			    const comment = document.getElementById('approval-comment').value;
+			    
+			    // Récupérer les choix de classes
+			    const classSelections = {};
+			    const selects = document.querySelectorAll('#children-class-selection select');
+			    selects.forEach(select => {
+			        const childIndex = select.name.split('_')[1];
+			        classSelections[childIndex] = select.value;
+			    });
+			    
+			    try {
+			        const response = await fetch(`/admin/inscriptions/${currentRequestId}/approve`, {
+			            method: 'POST',
+			            headers: {
+			                'Content-Type': 'application/json',
+			            },
+			            body: JSON.stringify({
+			                comment: comment,
+			                classSelections: classSelections
+			            })
+			        });
+			        
+			        const result = await response.json();
+			        
+			        if (result.success) {
+			            showNotification('✅ Inscription approuvée avec succès ! Comptes créés et email envoyé.', 'success');
+			            closeModal('approvalModal');
+			            setTimeout(() => location.reload(), 1500);
+			        } else {
+			            showNotification('❌ Erreur: ' + result.message, 'error');
+			        }
+			    } catch (error) {
+			        console.error('Erreur:', error);
+			        showNotification('❌ Erreur lors de l\'approbation', 'error');
+			    }
+			}
+			
+			// Refus
+			async function rejectInscription() {
+			    if (!currentRequestId) return;
+			    
+			    const reason = document.getElementById('rejection-reason').value;
+			    if (!reason.trim()) {
+			        showNotification('⚠️ Veuillez indiquer le motif du refus', 'warning');
+			        return;
+			    }
+			    
+			    try {
+			        const response = await fetch(`/admin/inscriptions/${currentRequestId}/reject`, {
+			            method: 'POST',
+			            headers: {
+			                'Content-Type': 'application/json',
+			            },
+			            body: JSON.stringify({
+			                reason: reason
+			            })
+			        });
+			        
+			        const result = await response.json();
+			        
+			        if (result.success) {
+			            showNotification('✅ Inscription refusée. Email de notification envoyé.', 'success');
+			            closeModal('rejectionModal');
+			            setTimeout(() => location.reload(), 1500);
+			        } else {
+			            showNotification('❌ Erreur: ' + result.message, 'error');
+			        }
+			    } catch (error) {
+			        console.error('Erreur:', error);
+			        showNotification('❌ Erreur lors du refus', 'error');
+			    }
+			}
+			
+			// Filtres
+			function filterRequests(status) {
+			    const cards = document.querySelectorAll('.request-card');
+			    const buttons = document.querySelectorAll('.filter-btn');
+			    
+			    // Mettre à jour les boutons
+			    buttons.forEach(btn => {
+			        btn.classList.remove('active', 'bg-blue-100', 'text-blue-800');
+			        btn.classList.add('bg-gray-100', 'text-gray-600');
+			    });
+			    
+			    event.target.classList.remove('bg-gray-100', 'text-gray-600');
+			    event.target.classList.add('active', 'bg-blue-100', 'text-blue-800');
+			    
+			    // Filtrer les cartes
+			    cards.forEach(card => {
+			        if (status === 'all' || card.dataset.status === status) {
+			            card.style.display = 'block';
+			        } else {
+			            card.style.display = 'none';
+			        }
+			    });
+			}
+			
+			// Recherche
+			document.getElementById('search-input').addEventListener('input', function(e) {
+			    const searchTerm = e.target.value.toLowerCase();
+			    const cards = document.querySelectorAll('.request-card');
+			    
+			    cards.forEach(card => {
+			        const searchData = card.dataset.search.toLowerCase();
+			        if (searchData.includes(searchTerm)) {
+			            card.style.display = 'block';
+			        } else {
+			            card.style.display = 'none';
+			        }
+			    });
+			});
+			
+			// Actualiser
+			function refreshRequests() {
+			    location.reload();
+			}
+			
+			// Notifier Yamina
+			async function notifyYamina() {
+			    try {
+			        const response = await fetch('/admin/notify-yamina', {
+			            method: 'POST',
+			            headers: {
+			                'Content-Type': 'application/json',
+			            }
+			        });
+			        
+			        const result = await response.json();
+			        
+			        if (result.success) {
+			            showNotification('📧 Notification envoyée à Yamina avec succès !', 'success');
+			        } else {
+			            showNotification('❌ Erreur: ' + result.message, 'error');
+			        }
+			    } catch (error) {
+			        console.error('Erreur:', error);
+			        showNotification('❌ Erreur lors de l\'envoi de la notification', 'error');
+			    }
+			}
+		
+			// Toggle PS2026 Announcement
+			async function togglePS2026Announcement() {
+			    const checkbox = document.getElementById('ps2026-toggle');
+			    const isChecked = checkbox.checked;
+			    
+			    try {
+			        const response = await fetch('/directeur/inscription-config', {
+			            method: 'POST',
+			            headers: {
+			                'Content-Type': 'application/json',
+			            },
+			            body: JSON.stringify({
+			                afficherAnnoncePS2026: isChecked
+			            })
+			        });
+			        
+			        const result = await response.json();
+			        
+			        if (result.success) {
+			            showNotification(
+			                isChecked ? 
+			                '🌟 Annonce PS2026 activée avec succès !' : 
+			                '✅ Annonce PS2026 désactivée avec succès !', 
+			                'success'
+			            );
+			        } else {
+			            // Revenir à l'état précédent en cas d'erreur
+			            checkbox.checked = !isChecked;
+			            showNotification('❌ Erreur: ' + result.message, 'error');
+			        }
+			    } catch (error) {
+			        console.error('Erreur:', error);
+			        // Revenir à l'état précédent en cas d'erreur
+			        checkbox.checked = !isChecked;
+			        showNotification('❌ Erreur lors de la mise à jour de la configuration', 'error');
+			    }
+			}
+			
+			// Notifications
+			function showNotification(message, type) {
+			    const notification = document.createElement('div');
+			    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white ${
+			        type === 'success' ? 'bg-green-500' :
+			        type === 'error' ? 'bg-red-500' :
+			        type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+			    }`;
+			    notification.textContent = message;
+			    
+			    document.body.appendChild(notification);
+			    
+			    setTimeout(() => {
+			        notification.remove();
+			    }, 5000);
+			}
+			</script>
+			{% endblock %}

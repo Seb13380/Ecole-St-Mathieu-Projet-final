@@ -1293,7 +1293,12 @@ const inscriptionController = {
                 parentFirstName: dossier.perePrenom || dossier.merePrenom,
                 parentLastName: dossier.pereNom || dossier.mereNom,
                 parentEmail: dossier.pereEmail || dossier.mereEmail,
-                children: [], // Pas de structure children dans DossierInscription
+                children: [{
+                    firstName: dossier.enfantPrenom,
+                    lastName: dossier.enfantNom,
+                    birthDate: dossier.enfantDateNaissance,
+                    requestedClass: dossier.enfantClasseDemandee
+                }], // ✅ CORRECTION: Créer la structure children pour uniformité
                 enfantPrenom: dossier.enfantPrenom,
                 enfantNom: dossier.enfantNom,
                 enfantClasseDemandee: dossier.enfantClasseDemandee,
