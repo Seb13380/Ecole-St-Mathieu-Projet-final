@@ -288,10 +288,6 @@ const documentController = {
     // Créer un nouveau document
     async createDocument(req, res) {
         try {
-            console.log('📝 === CRÉATION DE DOCUMENT ===');
-            console.log('Utilisateur:', req.session.user?.email);
-            console.log('Données reçues:', { type: req.body.type, titre: req.body.titre });
-            console.log('Fichier uploadé:', req.file ? {
                 filename: req.file.filename,
                 originalname: req.file.originalname,
                 path: req.file.path,
@@ -307,16 +303,13 @@ const documentController = {
             if (req.file) {
                 pdfUrl = `/uploads/documents/${req.file.filename}`;
                 pdfFilename = req.file.originalname;
-                console.log('✅ Fichier traité:', { pdfUrl, pdfFilename });
             }
 
             // Validation : soit un fichier PDF soit un lien externe
             if (!pdfUrl && !externalUrl) {
-                console.log('❌ Validation échouée: pas de fichier ni de lien externe');
                 return res.redirect('/documents/admin?error=' + encodeURIComponent('Veuillez fournir soit un fichier PDF soit un lien externe'));
             }
 
-            console.log('💾 Création dans la base de données...');
             const document = await prisma.document.create({
                 data: {
                     type: type.toUpperCase(),
@@ -332,7 +325,6 @@ const documentController = {
                 }
             });
 
-            console.log('✅ Document créé avec succès, ID:', document.id);
             res.redirect('/documents/admin?success=' + encodeURIComponent('Document créé avec succès'));
 
         } catch (error) {

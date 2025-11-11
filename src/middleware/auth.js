@@ -1,26 +1,27 @@
 // Middleware pour vérifier l'authentification
 const requireAuth = (req, res, next) => {
-    console.log('🔐 Vérification auth');
-    console.log('📋 Session ID:', req.sessionID);
-    console.log('📋 Session complète:', req.session);
-    console.log('👤 Session user:', req.session.user ? 'Présent' : 'Absent');
-    console.log('📋 Headers reçus:', {
-        'accept': req.headers.accept,
-        'content-type': req.headers['content-type'],
-        'x-requested-with': req.headers['x-requested-with'],
-        'cookie': req.headers.cookie,
-        'xhr': req.xhr
-    });
+    // Logs de debug désactivés pour production
+    // console.log('🔐 Vérification auth');
+    // console.log('📋 Session ID:', req.sessionID);
+    // console.log('📋 Session complète:', req.session);
+    // console.log('👤 Session user:', req.session.user ? 'Présent' : 'Absent');
+    // console.log('📋 Headers reçus:', {
+    //     'accept': req.headers.accept,
+    //     'content-type': req.headers['content-type'],
+    //     'x-requested-with': req.headers['x-requested-with'],
+    //     'cookie': req.headers.cookie,
+    //     'xhr': req.xhr
+    // });
 
     if (!req.session.user) {
-        console.log('❌ Redirection vers login - pas de session');
+        // console.log('❌ Redirection vers login - pas de session');
 
         // Si c'est une requête AJAX/API, renvoyer du JSON
         if (req.xhr ||
             req.headers.accept && req.headers.accept.indexOf('json') > -1 ||
             req.headers['content-type'] && req.headers['content-type'].indexOf('json') > -1 ||
             req.headers['x-requested-with'] === 'XMLHttpRequest') {
-            console.log('🔄 Requête AJAX détectée - retour JSON');
+            // console.log('🔄 Requête AJAX détectée - retour JSON');
             return res.status(401).json({
                 success: false,
                 error: 'Non authentifié',
@@ -28,10 +29,10 @@ const requireAuth = (req, res, next) => {
             });
         }
 
-        console.log('🌐 Requête normale - redirection');
+        // console.log('🌐 Requête normale - redirection');
         return res.redirect('/auth/login?message=Vous devez être connecté pour accéder à cette page');
     }
-    console.log('✅ Authentification OK pour:', req.session.user.email);
+    // console.log('✅ Authentification OK pour:', req.session.user.email);
     next();
 };
 
@@ -77,17 +78,17 @@ const requireRole = (roles) => {
 };
 
 const requireAdmin = (req, res, next) => {
-    console.log('👑 Vérification admin - Session user:', req.session.user ? req.session.user.email : 'Absent');
+    // console.log('👑 Vérification admin - Session user:', req.session.user ? req.session.user.email : 'Absent');
     if (!req.session.user) {
-        console.log('❌ Redirection vers login - pas de session admin');
+        // console.log('❌ Redirection vers login - pas de session admin');
         return res.redirect('/auth/login?message=Vous devez être connecté pour accéder à cette page');
     }
 
     const allowedRoles = ['ADMIN', 'DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'];
-    console.log('🎭 Rôle utilisateur:', req.session.user.role, 'Rôles autorisés:', allowedRoles);
+    // console.log('🎭 Rôle utilisateur:', req.session.user.role, 'Rôles autorisés:', allowedRoles);
 
     if (!allowedRoles.includes(req.session.user.role)) {
-        console.log('❌ Accès refusé - rôle insuffisant');
+        // console.log('❌ Accès refusé - rôle insuffisant');
         return res.status(403).render('pages/error', {
             message: 'Vous n\'avez pas les permissions nécessaires pour accéder à cette page',
             title: 'Accès refusé',
@@ -95,7 +96,7 @@ const requireAdmin = (req, res, next) => {
         });
     }
 
-    console.log('✅ Accès admin autorisé');
+    // console.log('✅ Accès admin autorisé');
     next();
 };
 
@@ -104,44 +105,44 @@ const requireEnseignant = requireRole(['ENSEIGNANT', 'ADMIN', 'DIRECTION']);
 const requireParent = requireRole(['PARENT', 'APEL', 'ADMIN', 'DIRECTION']);
 
 const requireDirection = (req, res, next) => {
-    console.log('🏢 Vérification DIRECTION - Session user:', req.session.user ? req.session.user.email : 'Absent');
+    // console.log('🏢 Vérification DIRECTION - Session user:', req.session.user ? req.session.user.email : 'Absent');
     if (!req.session.user) {
-        console.log('❌ Redirection vers login - pas de session direction');
+        // console.log('❌ Redirection vers login - pas de session direction');
         return res.redirect('/auth/login');
     }
 
-    console.log('🎭 Rôle utilisateur:', req.session.user.role);
+    // console.log('🎭 Rôle utilisateur:', req.session.user.role);
     const allowedRoles = ['DIRECTEUR', 'DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'];
     if (!allowedRoles.includes(req.session.user.role)) {
-        console.log('❌ Accès refusé - rôle insuffisant pour direction');
+        // console.log('❌ Accès refusé - rôle insuffisant pour direction');
         return res.status(403).render('pages/error', {
             message: 'Accès refusé. Réservé aux directeurs, secrétaires et gestionnaires.',
             user: req.session.user
         });
     }
 
-    console.log('✅ Accès direction autorisé');
+    // console.log('✅ Accès direction autorisé');
     next();
 };
 
 const requireSecretary = (req, res, next) => {
-    console.log('📋 Vérification SECRÉTAIRE - Session user:', req.session.user ? req.session.user.email : 'Absent');
+    // console.log('📋 Vérification SECRÉTAIRE - Session user:', req.session.user ? req.session.user.email : 'Absent');
     if (!req.session.user) {
-        console.log('❌ Redirection vers login - pas de session secrétaire');
+        // console.log('❌ Redirection vers login - pas de session secrétaire');
         return res.redirect('/auth/login');
     }
 
-    console.log('🎭 Rôle utilisateur:', req.session.user.role);
+    // console.log('🎭 Rôle utilisateur:', req.session.user.role);
     const allowedRoles = ['SECRETAIRE_DIRECTION', 'DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE'];
     if (!allowedRoles.includes(req.session.user.role)) {
-        console.log('❌ Accès refusé - rôle insuffisant pour secrétariat');
+        // console.log('❌ Accès refusé - rôle insuffisant pour secrétariat');
         return res.status(403).render('pages/error', {
             message: 'Accès refusé. Réservé au secrétariat de direction.',
             user: req.session.user
         });
     }
 
-    console.log('✅ Accès secrétariat autorisé');
+    // console.log('✅ Accès secrétariat autorisé');
     next();
 };
 
@@ -149,23 +150,23 @@ const requireAPEL = requireRole(['APEL', 'ADMIN', 'DIRECTION']);
 
 // Middleware pour la gestion des documents (DIRECTION + APEL)
 const requireDocumentManager = (req, res, next) => {
-    console.log('📄 Vérification GESTION DOCUMENTS - Session user:', req.session.user ? req.session.user.email : 'Absent');
+    // console.log('📄 Vérification GESTION DOCUMENTS - Session user:', req.session.user ? req.session.user.email : 'Absent');
     if (!req.session.user) {
-        console.log('❌ Redirection vers login - pas de session');
+        // console.log('❌ Redirection vers login - pas de session');
         return res.redirect('/auth/login');
     }
 
-    console.log('🎭 Rôle utilisateur:', req.session.user.role);
+    // console.log('🎭 Rôle utilisateur:', req.session.user.role);
     const allowedRoles = ['DIRECTION', 'ADMIN', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'APEL'];
     if (!allowedRoles.includes(req.session.user.role)) {
-        console.log('❌ Accès refusé - rôle insuffisant pour gestion documents');
+        // console.log('❌ Accès refusé - rôle insuffisant pour gestion documents');
         return res.status(403).render('pages/error', {
             message: 'Accès refusé. Réservé à la direction, au secrétariat et à l\'APEL.',
             user: req.session.user
         });
     }
 
-    console.log('✅ Accès gestion documents autorisé');
+    // console.log('✅ Accès gestion documents autorisé');
     next();
 };
 
