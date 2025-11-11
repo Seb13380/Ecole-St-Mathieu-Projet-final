@@ -288,11 +288,12 @@ const documentController = {
     // Créer un nouveau document
     async createDocument(req, res) {
         try {
+            const fileInfo = req.file ? {
                 filename: req.file.filename,
                 originalname: req.file.originalname,
                 path: req.file.path,
                 size: req.file.size
-            } : 'Aucun fichier');
+            } : 'Aucun fichier';
 
             const { type, titre, description, contenu, externalUrl, isExternalLink } = req.body;
             const auteurId = req.session.user.id;
