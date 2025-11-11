@@ -239,7 +239,7 @@ app.use((req, res, next) => {
   //   sessionID: req.sessionID,
   //   url: req.url
   // });
-  
+
   res.locals.user = req.session.user || null;
   res.locals.isAuthenticated = !!req.session.user;
   // Rendre les messages flash disponibles dans toutes les vues
