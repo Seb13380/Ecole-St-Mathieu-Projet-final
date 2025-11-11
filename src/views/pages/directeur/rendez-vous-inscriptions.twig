@@ -82,11 +82,12 @@
 														<span class="font-medium">{{ child.firstName }}
 															{{ child.lastName }}</span>
 														{% if child.birthDate %}
-															<span class="text-slate-500 ml-2">({{ child.birthDate }})</span>
+															<span class="text-slate-500 ml-2">Né(e) le
+																{{ child.birthDate|date('d/m/Y') }}</span>
 														{% endif %}
-														{% if child.requestedClass %}
-															<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs ml-2">{{ child.requestedClass }}</span>
-														{% endif %}
+														<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs ml-2">
+															{{ child.requestedClass ? child.requestedClass : 'Classe non renseignée' }}
+														</span>
 													</div>
 												{% endfor %}
 											</div>

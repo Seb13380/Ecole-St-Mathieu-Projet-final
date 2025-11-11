@@ -174,12 +174,10 @@
 											Né(e) le
 											{{ child.birthDate|date('d/m/Y') }}
 										</p>
-										{% if child.requestedClass %}
-											<p class="text-sm">
-												<span class="text-gray-600">Classe demandée :</span>
-												<span class="badge badge-primary">{{ child.requestedClass }}</span>
-											</p>
-										{% endif %}
+										<p class="text-sm">
+											<span class="text-gray-600">Classe demandée :</span>
+											<span class="badge badge-primary">{{ child.requestedClass ? child.requestedClass : 'Non renseignée' }}</span>
+										</p>
 									</div>
 								{% endfor %}
 							{% else %}
