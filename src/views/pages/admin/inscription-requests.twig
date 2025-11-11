@@ -176,7 +176,11 @@
 										</p>
 										<p class="text-sm">
 											<span class="text-gray-600">Classe demandée :</span>
-											<span class="badge badge-primary">{{ child.requestedClass ? child.requestedClass : 'Non renseignée' }}</span>
+											{% if child.requestedClass %}
+												<span class="badge badge-primary">{{ child.requestedClass }}</span>
+											{% else %}
+												<span class="text-gray-500 italic">Non renseignée</span>
+											{% endif %}
 										</p>
 									</div>
 								{% endfor %}
