@@ -6,7 +6,6 @@ const menuController = {
     // Afficher les menus de la semaine (page publique) - OPTIMISÉ
     getMenus: async (req, res) => {
         try {
-            console.log('🍽️ Récupération des menus restaurant');
             const startTime = Date.now();
 
             // Récupération optimisée - récupérer TOUS les menus actifs
@@ -24,7 +23,6 @@ const menuController = {
                 take: 10 // Limiter à 10 menus max pour performance
             });
 
-            console.log(`📋 ${menusActifs.length} menus actifs trouvés`);
 
             // Validation et nettoyage des données - CORRECTION pour accepter menus sans titre
             const menusValides = menusActifs.filter(menu => {
@@ -58,7 +56,6 @@ const menuController = {
             }));
 
             const processingTime = Date.now() - startTime;
-            console.log(`✅ ${menusOrdonnes.length} menus valides traités en ${processingTime}ms`);
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',

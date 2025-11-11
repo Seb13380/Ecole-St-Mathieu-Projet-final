@@ -21,21 +21,22 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// DEBUG: Logger pour toutes les requêtes POST
-app.use((req, res, next) => {
-  if (req.method === 'POST') {
-    console.log('🔍 POST REQUEST:', req.originalUrl);
-    console.log('📝 Body keys:', req.body ? Object.keys(req.body) : 'undefined');
-    console.log('📝 Body size:', req.body ? Object.keys(req.body).length : 0);
-  }
-  next();
-});
+// DEBUG: Logger pour toutes les requêtes POST - DÉSACTIVÉ POUR PRODUCTION
+// app.use((req, res, next) => {
+//   if (req.method === 'POST') {
+//     console.log('🔍 POST REQUEST:', req.originalUrl);
+//     console.log('📝 Body keys:', req.body ? Object.keys(req.body) : 'undefined');
+//     console.log('📝 Body size:', req.body ? Object.keys(req.body).length : 0);
+//   }
+//   next();
+// });
 app.use(methodOverride('_method'));
 
-app.use((req, res, next) => {
-  console.log(`📥 ${req.method} ${req.url}`);
-  next();
-});
+// Logger de requêtes - DÉSACTIVÉ POUR PRODUCTION
+// app.use((req, res, next) => {
+//   console.log(`📥 ${req.method} ${req.url}`);
+//   next();
+// });
 
 // ⚡ OPTIMISATION PERFORMANCE - Cache statique agressif
 // Cache optimisé pour images WebP et ressources statiques avec headers appropriés
@@ -172,18 +173,18 @@ const performanceMonitoring = (req, res, next) => {
     if (duration > 3000) {
       console.error(`🚨 CRITIQUE: ${method} ${url} - ${duration}ms - Status: ${status} - Size: ${contentLength}b`);
     }
-    // ⚠️ Requêtes lentes (> 1000ms)  
+    // ⚠️ Requêtes lentes (> 1000ms) - GARDER POUR MONITORING PRODUCTION
     else if (duration > 1000) {
       console.warn(`🐌 LENT: ${method} ${url} - ${duration}ms - Status: ${status} - Size: ${contentLength}b`);
     }
-    // ⏰ Requêtes moyennes (> 500ms)
-    else if (duration > 500) {
-      console.log(`⏰ MOYEN: ${method} ${url} - ${duration}ms - Status: ${status}`);
-    }
-    // ✅ Requêtes rapides (logging debug seulement)
-    else if (process.env.NODE_ENV === 'development' && duration > 100) {
-      console.log(`✅ OK: ${method} ${url} - ${duration}ms`);
-    }
+    // ⏰ Requêtes moyennes - DÉSACTIVÉ POUR PRODUCTION  
+    // else if (duration > 500) {
+    //   console.log(`⏰ MOYEN: ${method} ${url} - ${duration}ms - Status: ${status}`);
+    // }
+    // ✅ Requêtes rapides - DÉSACTIVÉ POUR PRODUCTION
+    // else if (process.env.NODE_ENV === 'development' && duration > 100) {
+    //   console.log(`✅ OK: ${method} ${url} - ${duration}ms`);
+    // }
 
     // Alertes spécifiques pour images
     if (url.includes('/uploads/') && duration > 2000) {
@@ -230,15 +231,15 @@ app.set('twig options', {
 
 // Middleware pour rendre les variables de session disponibles dans les vues
 app.use((req, res, next) => {
-  // Debug temporaire
-  console.log('🔍 DEBUG SESSION:', {
-    hasSession: !!req.session,
-    hasUser: !!req.session?.user,
-    user: req.session?.user,
-    sessionID: req.sessionID,
-    url: req.url
-  });
-
+  // Debug temporaire - DÉSACTIVÉ POUR PRODUCTION
+  // console.log('🔍 DEBUG SESSION:', {
+  //   hasSession: !!req.session,
+  //   hasUser: !!req.session?.user,
+  //   user: req.session?.user,
+  //   sessionID: req.sessionID,
+  //   url: req.url
+  // });
+  
   res.locals.user = req.session.user || null;
   res.locals.isAuthenticated = !!req.session.user;
   // Rendre les messages flash disponibles dans toutes les vues
