@@ -54,24 +54,43 @@
 				<input type="text" id="searchInput" placeholder="Tapez le nom ou prénom des parents..." class="input input-bordered w-full max-w-md" onkeyup="filterBySearch()">
 				<button onclick="clearSearch()" class="btn btn-ghost px-4 py-2 min-w-[80px]">Effacer</button>
 			</div>
+
+			<!-- 🆕 Actions par lot -->
+			<div class="mt-4 pt-4 border-t border-gray-300">
+				<div class="flex flex-wrap gap-3 items-center mb-3">
+					<input type="checkbox" id="selectAll" class="checkbox checkbox-primary" onchange="toggleSelectAll()">
+					<label for="selectAll" class="text-gray-700 font-medium cursor-pointer">Tout sélectionner</label>
+					<span id="selectedCount" class="text-sm text-gray-500">(0 sélectionnée(s))</span>
+				</div>
+				<div class="flex flex-wrap gap-3">
+					<button onclick="deleteSelected()" class="btn btn-error" disabled id="deleteSelectedBtn">🗑️ Supprimer la sélection</button>
+					<button onclick="deleteUnderOneYear()" class="btn btn-warning">🚫 Supprimer enfants &lt; 1 an</button>
+				</div>
+			</div>
 		</div>
 
 		<!-- Liste des demandes -->
 		<div id="requestsList">
 			{% for request in requests %}
 				<div
-					class="request-item bg-white rounded-lg shadow-md p-6 mb-6" data-status="{{ request.status }}" data-year="{{ request.submittedAt|date('Y') }}" data-parent-first-name="{{ request.parentFirstName ?? request.pereInfo.prenom ?? '' }}" data-parent-last-name="{{ request.parentLastName ?? request.pereInfo.nom ?? '' }}" data-parent-email="{{ request.parentEmail }}" data-search-content="{{ request.parentFirstName ?? request.pereInfo.prenom ?? '' }} {{ request.parentLastName ?? request.pereInfo.nom ?? '' }} {{ request.mereInfo.prenom ?? '' }} {{ request.mereInfo.nom ?? '' }} {{ request.parentEmail }}">
+					class="request-item bg-white rounded-lg shadow-md p-6 mb-6" data-status="{{ request.status }}" data-year="{{ request.submittedAt|date('Y') }}" data-parent-first-name="{{ request.parentFirstName ?? request.pereInfo.prenom ?? '' }}" data-parent-last-name="{{ request.parentLastName ?? request.pereInfo.nom ?? '' }}" data-parent-email="{{ request.parentEmail }}" data-search-content="{{ request.parentFirstName ?? request.pereInfo.prenom ?? '' }} {{ request.parentLastName ?? request.pereInfo.nom ?? '' }} {{ request.mereInfo.prenom ?? '' }} {{ request.mereInfo.nom ?? '' }} {{ request.parentEmail }}" data-request-id="{{ request.id }}">
 
 					<!-- En-tête de la demande -->
 					<div class="flex justify-between items-start mb-4">
-						<div>
-							<h2 class="text-xl font-semibold text-[#304a4d]">
-								{{ request.parentFirstName }}
-								{{ request.parentLastName }}
-							</h2>
-							<p class="text-gray-600">{{ request.parentEmail }}</p>
-							<p class="text-gray-600">{{ request.parentPhone }}</p>
-							<span class="badge badge-info">{{ request.submittedAt|date('Y') }}/{{ request.submittedAt|date('Y') + 1 }}</span>
+						<div
+							class="flex items-start gap-3">
+							<!-- 🆕 Case à cocher pour sélection multiple -->
+							<input type="checkbox" class="checkbox checkbox-primary request-checkbox mt-1" data-id="{{ request.id }}" onchange="updateSelectedCount()">
+
+							<div>
+								<h2 class="text-xl font-semibold text-[#304a4d]">
+									{{ request.parentFirstName }}
+									{{ request.parentLastName }}
+								</h2>
+								<p class="text-gray-600">{{ request.parentEmail }}</p>
+								<p class="text-gray-600">{{ request.parentPhone }}</p>
+								<span class="badge badge-info">{{ request.submittedAt|date('Y') }}/{{ request.submittedAt|date('Y') + 1 }}</span>
+							</div>
 						</div>
 
 						<div class="text-right">
@@ -165,7 +184,7 @@
 
 							{% if request.children and request.children|length > 0 %}
 								{% for child in request.children %}
-									<div class="mb-3 {% if not loop.last %}border-b border-green-200 pb-3{% endif %}">
+									<div class="mb-3 {% if not loop.last %}border-b border-green-200 pb-3{% endif %}" data-birth-date="{{ child.birthDate }}">
 										<p>
 											<strong>{{ child.firstName }}
 												{{ child.lastName }}</strong>
@@ -648,6 +667,136 @@ modal.remove();
 
 
 
+}
+
+// 🆕 GESTION SÉLECTION MULTIPLE
+function toggleSelectAll() {
+const selectAllCheckbox = document.getElementById('selectAll');
+const checkboxes = document.querySelectorAll('.request-checkbox');
+const isChecked = selectAllCheckbox.checked;
+
+checkboxes.forEach(cb => { // Ne sélectionner que les éléments visibles
+const requestItem = cb.closest('.request-item');
+if (requestItem && requestItem.style.display !== 'none') {
+cb.checked = isChecked;
+}
+});
+
+updateSelectedCount();
+}
+
+function updateSelectedCount() {
+const checkedBoxes = document.querySelectorAll('.request-checkbox:checked');
+const count = checkedBoxes.length;
+
+document.getElementById('selectedCount').textContent = `(${count} sélectionnée(s))`;
+document.getElementById('deleteSelectedBtn').disabled = count === 0;
+}
+
+// 🆕 SUPPRESSION PAR LOT
+async function deleteSelected() {
+const checkedBoxes = document.querySelectorAll('.request-checkbox:checked');
+const ids = Array.from(checkedBoxes).map(cb => cb.dataset.id);
+
+if (ids.length === 0) {
+showErrorModal('Aucune sélection', 'Veuillez sélectionner au moins une demande à supprimer.');
+return;
+}
+
+if (!confirm (`Êtes-vous sûr de vouloir supprimer ${
+ids.length
+} demande(s) ?`)) {
+return;
+}
+
+let successCount = 0;
+let errorCount = 0;
+
+for (const id of ids) {
+try {
+const response = await fetch (`/directeur/inscriptions/${id}/delete`, {method: 'DELETE'});
+const result = await response.json();
+
+if (result.success) {
+successCount++;
+} else {
+errorCount++;
+}
+} catch (error) {
+errorCount++;
+}
+}
+
+showSuccessModal(
+'Suppression terminée',
+`${successCount} demande(s) supprimée(s) avec succès. ${
+errorCount > 0 ? errorCount + ' erreur(s).' : ''
+}`
+);
+setTimeout(() => location.reload(), 2000);
+}
+
+// 🆕 SUPPRIMER ENFANTS < 1 AN
+async function deleteUnderOneYear() {
+const currentDate = new Date();
+const oneYearAgo = new Date();
+oneYearAgo.setFullYear(currentDate.getFullYear() - 1);
+
+const allRequests = document.querySelectorAll('.request-item');
+const toDelete = [];
+
+allRequests.forEach(item => {
+const childrenDivs = item.querySelectorAll('[data-birth-date]');
+childrenDivs.forEach(childDiv => {
+const birthDateStr = childDiv.dataset.birthDate;
+if (birthDateStr) {
+const birthDate = new Date(birthDateStr);
+if (birthDate > oneYearAgo) {
+const requestId = item.dataset.requestId;
+if (! toDelete.includes(requestId)) {
+toDelete.push(requestId);
+}
+}
+}
+});
+});
+
+if (toDelete.length === 0) {
+showErrorModal('Aucune demande', 'Aucun enfant de moins d\'1 an trouvé.');
+return;
+}
+
+if (!confirm (`${
+toDelete.length
+} demande(s) avec enfant(s) de moins d'1 an trouvée(s). Supprimer ?`)) {
+return;
+}
+
+let successCount = 0;
+let errorCount = 0;
+
+for (const id of toDelete) {
+try {
+const response = await fetch (`/directeur/inscriptions/${id}/delete`, {method: 'DELETE'});
+const result = await response.json();
+
+if (result.success) {
+successCount++;
+} else {
+errorCount++;
+}
+} catch (error) {
+errorCount++;
+}
+}
+
+showSuccessModal(
+'Suppression terminée',
+`${successCount} demande(s) supprimée(s). ${
+errorCount > 0 ? errorCount + ' erreur(s).' : ''
+}`
+);
+setTimeout(() => location.reload(), 2000);
 }
 	</script>
 
