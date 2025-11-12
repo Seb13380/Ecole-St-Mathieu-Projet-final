@@ -26,23 +26,6 @@ const preInscriptionController = {
     // Traitement du formulaire de pré-inscription
     postPreInscription: async (req, res) => {
         try {
-            // 🛡️ PROTECTION ANTI-BOT 1 : Honeypot (champ invisible)
-            if (req.body.website) {
-                // Le bot a rempli le champ caché, on rejette silencieusement
-                console.log('🤖 Bot détecté (honeypot) - Bloqué');
-                return res.redirect('/pre-inscription');
-            }
-
-            // 🛡️ PROTECTION ANTI-BOT 2 : Limite de temps (min 3 secondes)
-            const formTimestamp = parseInt(req.body.formTimestamp);
-            const currentTime = Date.now();
-            const timeDiff = (currentTime - formTimestamp) / 1000; // en secondes
-
-            if (isNaN(formTimestamp) || timeDiff < 3) {
-                console.log(`🤖 Bot détecté (soumission trop rapide: ${timeDiff}s) - Bloqué`);
-                return res.redirect('/pre-inscription');
-            }
-
             const {
                 parentFirstName,
                 parentLastName,
