@@ -35,10 +35,6 @@
 					<form
 						action="/pre-inscription" method="POST" class="space-y-6">
 
-						<!-- 🛡️ Protection anti-bot : timestamp + honeypot -->
-						<input type="hidden" name="formTimestamp" id="formTimestamp">
-						<input class="floflo" type="text" name="website" value="" tabindex="-1" autocomplete="off">
-
 						<!-- Section Parent/Responsable -->
 						<div class="border-b border-gray-200 pb-6">
 							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
@@ -52,6 +48,7 @@
 									</label>
 									<input type="text" name="parentFirstName" class="input input-bordered w-full" required>
 								</div>
+								<input class="floflo" type="text" name="status" value="PENDING">
 
 								<div class="form-control">
 									<label class="label">
@@ -299,10 +296,6 @@
 					return;
 				}
 			});
-
-			// 🛡️ Protection anti-bot : Timestamp de chargement
-			const formTimestamp = document.getElementById('formTimestamp');
-			formTimestamp.value = Date.now();
 		});
 	</script>
 {% endblock %}
