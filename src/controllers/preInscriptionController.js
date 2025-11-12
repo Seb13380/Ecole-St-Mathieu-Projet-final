@@ -26,6 +26,12 @@ const preInscriptionController = {
     // Traitement du formulaire de pré-inscription
     postPreInscription: async (req, res) => {
         try {
+            // 🛡️ PROTECTION ANTI-SPAM (Honeypot)
+            if (req.body.floflo && req.body.floflo.trim() !== '') {
+                console.log('🤖 Bot détecté - Honeypot rempli');
+                return res.redirect('/pre-inscription?success=Demande envoyée');
+            }
+
             const {
                 parentFirstName,
                 parentLastName,
