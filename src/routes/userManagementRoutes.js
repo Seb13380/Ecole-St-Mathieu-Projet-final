@@ -27,4 +27,9 @@ router.post('/students', userManagementController.createStudent);
 router.put('/students/:id', userManagementController.updateStudent);
 router.delete('/students/:id', userManagementController.deleteStudent);
 
+// === OUTILS DE MAINTENANCE ===
+
+// Corriger les relations parent-enfant manquantes
+router.post('/fix-relations', userManagementController.fixMissingParentStudentRelations);
+
 module.exports = router;

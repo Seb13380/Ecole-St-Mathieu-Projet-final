@@ -332,6 +332,17 @@ const userManagementController = {
                 }
             });
 
+            // ✅ CRÉER LA RELATION DANS ParentStudent pour que le parent puisse voir l'enfant
+            if (parentId) {
+                await prisma.parentStudent.create({
+                    data: {
+                        parentId: parseInt(parentId),
+                        studentId: eleve.id
+                    }
+                });
+                console.log(`✅ Relation parent-enfant créée : Parent #${parentId} <-> Élève #${eleve.id}`);
+            }
+
             res.json({
                 success: true,
                 message: 'Élève créé avec succès',
@@ -422,6 +433,108 @@ const userManagementController = {
             res.status(500).json({
                 success: false,
                 message: 'Erreur lors de la suppression de l\'élève'
+            });
+        }
+    },
+
+    // 🔧 Corriger les relations parent-enfant manquantes
+    async fixMissingParentStudentRelations(req, res) {
+        try {
+            // Vérifier les autorisations
+            if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Accès refusé - Réservé aux administrateurs' 
+                });
+            }
+
+            console.log('🔧 Démarrage correction relations parent-enfant...');
+
+            // Récupérer tous les élèves qui ont un parentId
+            const students = await prisma.student.findMany({
+                where: {
+                    parentId: { not: null }
+                },
+                include: {
+                    parents: true,
+                    parent: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true
+                        }
+                    }
+                }
+            });
+
+            let fixed = 0;
+            let alreadyOk = 0;
+            let errors = 0;
+            const details = [];
+
+            for (const student of students) {
+                const parentId = student.parentId;
+                
+                // Vérifier si la relation existe déjà
+                const existingRelation = student.parents.find(p => p.parentId === parentId);
+
+                if (existingRelation) {
+                    alreadyOk++;
+                } else {
+                    try {
+                        // Créer la relation manquante
+                        await prisma.parentStudent.create({
+                            data: {
+                                parentId: parentId,
+                                studentId: student.id
+                            }
+                        });
+                        
+                        details.push({
+                            studentId: student.id,
+                            studentName: `${student.firstName} ${student.lastName}`,
+                            parentId: parentId,
+                            parentName: student.parent ? `${student.parent.firstName} ${student.parent.lastName}` : 'Inconnu',
+                            status: 'fixed'
+                        });
+                        
+                        console.log(`✅ Relation créée: ${student.firstName} ${student.lastName} <-> Parent #${parentId}`);
+                        fixed++;
+                    } catch (error) {
+                        console.error(`❌ Erreur pour l'élève ${student.id}:`, error.message);
+                        details.push({
+                            studentId: student.id,
+                            studentName: `${student.firstName} ${student.lastName}`,
+                            parentId: parentId,
+                            error: error.message,
+                            status: 'error'
+                        });
+                        errors++;
+                    }
+                }
+            }
+
+            console.log(`📊 Résultats: ${fixed} créées, ${alreadyOk} OK, ${errors} erreurs`);
+
+            res.json({
+                success: true,
+                message: 'Correction des relations terminée',
+                results: {
+                    total: students.length,
+                    alreadyOk: alreadyOk,
+                    fixed: fixed,
+                    errors: errors,
+                    details: details
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la correction des relations:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la correction des relations',
+                error: error.message
             });
         }
     }

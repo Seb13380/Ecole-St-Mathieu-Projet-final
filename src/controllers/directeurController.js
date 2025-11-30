@@ -867,6 +867,75 @@ const directeurController = {
         }
     },
 
+    async getCredentialsRequestDetails(req, res) {
+        try {
+            const { id } = req.params;
+
+            // Récupérer la demande avec les relations
+            const request = await prisma.credentialsRequest.findUnique({
+                where: { id: parseInt(id) },
+                include: {
+                    foundParent: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            phone: true,
+                            role: true
+                        }
+                    }
+                }
+            });
+
+            if (!request) {
+                return res.status(404).render('pages/error.twig', {
+                    message: 'Demande d\'identifiants non trouvée'
+                });
+            }
+
+            // Si un parent a été trouvé, récupérer ses enfants
+            let parentChildren = [];
+            if (request.foundParentId) {
+                const relations = await prisma.parentStudentRelation.findMany({
+                    where: { parentId: request.foundParentId },
+                    include: {
+                        student: {
+                            include: {
+                                class: {
+                                    select: {
+                                        name: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                parentChildren = relations.map(rel => ({
+                    id: rel.student.id,
+                    firstName: rel.student.firstName,
+                    lastName: rel.student.lastName,
+                    dateOfBirth: rel.student.dateOfBirth,
+                    className: rel.student.class ? rel.student.class.name : null
+                }));
+            }
+
+            res.render('pages/directeur/credential-details.twig', {
+                title: 'Détails de la demande d\'identifiants',
+                user: req.session.user,
+                request,
+                parentChildren
+            });
+
+        } catch (error) {
+            console.error('❌ Erreur récupération détails demande:', error);
+            res.status(500).render('pages/error.twig', {
+                message: 'Erreur lors du chargement des détails de la demande'
+            });
+        }
+    },
+
     async approveCredentialsRequest(req, res) {
         try {
             const { id } = req.params;
