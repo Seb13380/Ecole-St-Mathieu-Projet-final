@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const session = require("express-session");
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
-const { loggingMiddleware, errorLoggingMiddleware } = require('./src/middleware/loggingMiddleware');
 
 dotenv.config();
 const app = express();
@@ -217,8 +216,6 @@ app.use(session({
 
 app.use(flash());
 
-app.use(loggingMiddleware);
-
 app.set('views', __dirname + '/src/views');
 app.set('view engine', 'twig');
 
@@ -334,8 +331,13 @@ app.get('/test-responsive', (req, res) => {
   res.sendFile(__dirname + '/test-responsive.html');
 });
 
-// 📊 Middleware de gestion des erreurs avec logging
-app.use(errorLoggingMiddleware);
+// Middleware de gestion des erreurs
+app.use((err, req, res, next) => {
+  console.error('❌ Erreur:', err);
+  res.status(500).render('pages/error', {
+    error: process.env.NODE_ENV === 'development' ? err : 'Une erreur est survenue'
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
