@@ -2,7 +2,6 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const directeurController = require('../controllers/directeurController');
-const inscriptionController = require('../controllers/inscriptionController');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
@@ -68,19 +67,19 @@ router.post('/students', directeurController.createStudent);
 router.post('/students/:id/update', directeurController.updateStudent);
 router.post('/students/:id/delete', directeurController.deleteStudent);
 
-// Routes pour les demandes d'inscription
-router.get('/inscriptions', inscriptionController.showAllRequests);
-router.get('/inscriptions/manage', inscriptionController.showManageInscriptions);
-router.post('/inscriptions/:id/approve', inscriptionController.approveRequest);
-router.post('/inscriptions/:id/validate', inscriptionController.validateDossier);
-router.post('/inscriptions/:id/reject', inscriptionController.rejectRequest);
-router.delete('/inscriptions/:id/delete', inscriptionController.deleteRequest);
-router.get('/inscriptions/:id/details', inscriptionController.showRequestDetails);
+// Routes pour les demandes d'inscription - DÉSACTIVÉES (controller supprimé)
+router.get('/inscriptions', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.get('/inscriptions/manage', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/inscriptions/:id/approve', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/inscriptions/:id/validate', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/inscriptions/:id/reject', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.delete('/inscriptions/:id/delete', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.get('/inscriptions/:id/details', (req, res) => res.status(503).send('Service temporairement indisponible'));
 
 // Nouvelles routes pour les rendez-vous d'inscription
 router.get('/rendez-vous-inscriptions', directeurController.getRendezVousInscriptions);
 router.get('/rendez-vous-inscriptions/:id/pdf', directeurController.generateInscriptionPDF);
-router.post('/rendez-vous-inscriptions/:id/finalize', inscriptionController.finalizeInscription);
+router.post('/rendez-vous-inscriptions/:id/finalize', (req, res) => res.status(503).send('Service temporairement indisponible'));
 
 // Route PDF accessible depuis les inscriptions finalisées également
 router.get('/inscriptions/:id/pdf', directeurController.generateInscriptionPDF);
@@ -88,12 +87,12 @@ router.get('/inscriptions/:id/pdf', directeurController.generateInscriptionPDF);
 // ARCHIVE PDF - Nouvelle route pour gérer les PDF archivés
 router.get('/pdf-archive', directeurController.getPDFArchive);
 
-// API routes for inscriptions
-router.get('/api/classes', inscriptionController.getAvailableClasses);
-router.post('/notify-yamina', inscriptionController.notifyYamina);
+// API routes for inscriptions - DÉSACTIVÉES
+router.get('/api/classes', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/notify-yamina', (req, res) => res.status(503).send('Service temporairement indisponible'));
 
-// Configuration des inscriptions
-router.post('/inscription-config', inscriptionController.updateInscriptionConfig);
+// Configuration des inscriptions - DÉSACTIVÉE
+router.post('/inscription-config', (req, res) => res.status(503).send('Service temporairement indisponible'));
 
 // Messages de contact
 router.get('/contact-messages', directeurController.getContactMessages);
