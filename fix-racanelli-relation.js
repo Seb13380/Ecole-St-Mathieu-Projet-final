@@ -36,12 +36,12 @@ async function findRacanelliParent() {
             return;
         }
 
-        console.log('=' .repeat(70));
+        console.log('='.repeat(70));
         console.log(`👤 Parent trouvé: ${parent.firstName} ${parent.lastName} (ID: #${parent.id})`);
         console.log(`   Email: ${parent.email}`);
         console.log(`   Téléphone: ${parent.phone || 'Non renseigné'}`);
         console.log(`   Adresse: ${parent.adress || 'Non renseignée'}`);
-        console.log('=' .repeat(70));
+        console.log('='.repeat(70));
 
         // Relations ParentStudent
         console.log(`\n👨‍👩‍👧‍👦 Relations ParentStudent: ${parent.enfants.length}`);
@@ -77,14 +77,14 @@ async function findRacanelliParent() {
             for (const student of orphanStudents) {
                 console.log(`   → ${student.firstName} ${student.lastName} (ID: #${student.id})`);
                 console.log(`      Création de la relation...`);
-                
+
                 await prisma.parentStudent.create({
                     data: {
                         parentId: parent.id,
                         studentId: student.id
                     }
                 });
-                
+
                 console.log(`      ✅ Relation créée !`);
             }
         } else {
@@ -113,7 +113,7 @@ async function findRacanelliParent() {
             console.log(`   ParentId direct: ${sachaStudent.parentId || 'Aucun'}`);
             console.log(`   Classe: ${sachaStudent.classe ? sachaStudent.classe.nom : 'Aucune'}`);
             console.log(`   Relations ParentStudent: ${sachaStudent.parents.length}`);
-            
+
             if (sachaStudent.parents.length > 0) {
                 sachaStudent.parents.forEach(rel => {
                     console.log(`      → Parent #${rel.parentId}: ${rel.parent.firstName} ${rel.parent.lastName}`);
@@ -125,14 +125,14 @@ async function findRacanelliParent() {
             if (!isLinked) {
                 console.log(`\n🚨 Vanessa n'est PAS liée à Sacha !`);
                 console.log(`   Création de la relation...`);
-                
+
                 await prisma.parentStudent.create({
                     data: {
                         parentId: parent.id,
                         studentId: sachaStudent.id
                     }
                 });
-                
+
                 console.log(`   ✅ Relation créée !`);
             } else {
                 console.log(`\n✅ Vanessa est déjà liée à Sacha`);

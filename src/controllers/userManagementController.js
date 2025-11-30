@@ -442,9 +442,9 @@ const userManagementController = {
         try {
             // Vérifier les autorisations
             if (!['DIRECTION', 'GESTIONNAIRE_SITE', 'ADMIN'].includes(req.session.user.role)) {
-                return res.status(403).json({ 
-                    success: false, 
-                    message: 'Accès refusé - Réservé aux administrateurs' 
+                return res.status(403).json({
+                    success: false,
+                    message: 'Accès refusé - Réservé aux administrateurs'
                 });
             }
 
@@ -475,7 +475,7 @@ const userManagementController = {
 
             for (const student of students) {
                 const parentId = student.parentId;
-                
+
                 // Vérifier si la relation existe déjà
                 const existingRelation = student.parents.find(p => p.parentId === parentId);
 
@@ -490,7 +490,7 @@ const userManagementController = {
                                 studentId: student.id
                             }
                         });
-                        
+
                         details.push({
                             studentId: student.id,
                             studentName: `${student.firstName} ${student.lastName}`,
@@ -498,7 +498,7 @@ const userManagementController = {
                             parentName: student.parent ? `${student.parent.firstName} ${student.parent.lastName}` : 'Inconnu',
                             status: 'fixed'
                         });
-                        
+
                         console.log(`✅ Relation créée: ${student.firstName} ${student.lastName} <-> Parent #${parentId}`);
                         fixed++;
                     } catch (error) {

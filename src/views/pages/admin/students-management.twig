@@ -222,63 +222,59 @@
 	<script src="/assets/js/students-management.js"></script>
 	<script>
 		// Fonction pour corriger les relations parent-enfant manquantes
-		async function fixMissingRelations() {
-			if (!confirm('⚠️ Voulez-vous corriger les relations parent-enfant manquantes ?\n\nCette action va créer les relations ParentStudent manquantes pour tous les élèves qui ont un parentId mais ne sont pas visibles par leurs parents.')) {
-				return;
-			}
+async function fixMissingRelations() {
+if (!confirm('⚠️ Voulez-vous corriger les relations parent-enfant manquantes ?\n\nCette action va créer les relations ParentStudent manquantes pour tous les élèves qui ont un parentId mais ne sont pas visibles par leurs parents.')) {
+return;
+}
 
-			try {
-				// Afficher un loader
-				const btn = event.target;
-				const originalText = btn.innerHTML;
-				btn.disabled = true;
-				btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Correction en cours...';
+try { // Afficher un loader
+const btn = event.target;
+const originalText = btn.innerHTML;
+btn.disabled = true;
+btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Correction en cours...';
 
-				const response = await fetch('/user-management/fix-relations', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
+const response = await fetch('/user-management/fix-relations', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+});
 
-				const result = await response.json();
+const result = await response.json();
 
-				if (result.success) {
-					const { total, alreadyOk, fixed, errors } = result.results;
-					
-					let message = '✅ CORRECTION TERMINÉE !\n\n';
-					message += `📊 Résultats :\n`;
-					message += `• Total d'élèves vérifiés : ${total}\n`;
-					message += `• Déjà corrects : ${alreadyOk}\n`;
-					message += `• Relations créées : ${fixed}\n`;
-					message += `• Erreurs : ${errors}\n`;
+if (result.success) {
+const {total, alreadyOk, fixed, errors} = result.results;
 
-					if (fixed > 0) {
-						message += `\n🎉 ${fixed} relation(s) ont été créées avec succès !\n`;
-						message += `Les parents peuvent maintenant voir leurs enfants.`;
-					} else {
-						message += `\n✅ Toutes les relations sont déjà correctes !`;
-					}
+let message = '✅ CORRECTION TERMINÉE !\n\n';
+message += `📊 Résultats :\n`;
+message += `• Total d'élèves vérifiés : ${total}\n`;
+message += `• Déjà corrects : ${alreadyOk}\n`;
+message += `• Relations créées : ${fixed}\n`;
+message += `• Erreurs : ${errors}\n`;
 
-					alert(message);
+if (fixed > 0) {
+message += `\n🎉 ${fixed} relation(s) ont été créées avec succès !\n`;
+message += `Les parents peuvent maintenant voir leurs enfants.`;
+} else {
+message += `\n✅ Toutes les relations sont déjà correctes !`;
+}
 
-					if (fixed > 0) {
-						// Recharger la page pour afficher les changements
-						location.reload();
-					}
-				} else {
-					alert('❌ Erreur : ' + result.message);
-				}
+alert(message);
 
-				btn.disabled = false;
-				btn.innerHTML = originalText;
+if (fixed > 0) { // Recharger la page pour afficher les changements
+location.reload();
+}
+} else {
+alert('❌ Erreur : ' + result.message);
+} btn.disabled = false;
+btn.innerHTML = originalText;
 
-			} catch (error) {
-				console.error('Erreur:', error);
-				alert('❌ Erreur lors de la correction des relations');
-				btn.disabled = false;
-				btn.innerHTML = originalText;
-			}
-		}
+} catch (error) {
+console.error('Erreur:', error);
+alert('❌ Erreur lors de la correction des relations');
+btn.disabled = false;
+btn.innerHTML = originalText;
+}
+}
 	</script>
 {% endblock %}

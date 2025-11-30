@@ -48,7 +48,7 @@ async function fixSpecificRelation() {
 
         // Chercher les élèves avec parentId mais sans relation ParentStudent
         console.log('\n🔍 Recherche des élèves avec parentId mais sans relation ParentStudent...');
-        
+
         const orphans = [];
         for (const student of recentStudents) {
             if (student.parentId) {
@@ -61,11 +61,11 @@ async function fixSpecificRelation() {
 
         if (orphans.length > 0) {
             console.log(`\n🚨 ${orphans.length} élève(s) trouvé(s) sans relation !\n`);
-            
+
             for (const student of orphans) {
                 console.log(`\n🔧 Correction pour : ${student.firstName} ${student.lastName} (ID: #${student.id})`);
                 console.log(`   ParentId: ${student.parentId}`);
-                
+
                 // Récupérer le parent
                 const parent = await prisma.user.findUnique({
                     where: { id: student.parentId },
@@ -79,7 +79,7 @@ async function fixSpecificRelation() {
 
                 if (parent) {
                     console.log(`   Parent: ${parent.firstName} ${parent.lastName} (${parent.email})`);
-                    
+
                     // Créer la relation
                     await prisma.parentStudent.create({
                         data: {
@@ -87,7 +87,7 @@ async function fixSpecificRelation() {
                             studentId: student.id
                         }
                     });
-                    
+
                     console.log(`   ✅ Relation créée avec succès !`);
                 } else {
                     console.log(`   ❌ Parent #${student.parentId} non trouvé !`);

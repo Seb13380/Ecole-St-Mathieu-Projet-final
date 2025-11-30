@@ -44,7 +44,7 @@ const processCredentialsRequest = async (req, res) => {
 
         // Chercher si un parent existe avec ces informations
         console.log('🔍 Recherche parent avec email:', email.toLowerCase().trim());
-        
+
         // 1ère tentative : Email exact avec parents seulement
         let existingParent = await prisma.user.findFirst({
             where: {
@@ -56,7 +56,7 @@ const processCredentialsRequest = async (req, res) => {
         // Si pas trouvé, essayer avec un matching plus large
         if (!existingParent) {
             console.log('⚠️ Aucun parent trouvé avec l\'email exact, tentative avec nom/prénom...');
-            
+
             // Recherche plus souple : email ET (prénom OU nom)
             existingParent = await prisma.user.findFirst({
                 where: {
@@ -77,7 +77,7 @@ const processCredentialsRequest = async (req, res) => {
                     ]
                 }
             });
-            
+
             // Vérifier si un utilisateur a été trouvé mais n'est pas PARENT
             if (existingParent && existingParent.role !== 'PARENT') {
                 console.log('⚠️ Utilisateur trouvé mais n\'est pas un parent, rôle:', existingParent.role);
@@ -87,12 +87,12 @@ const processCredentialsRequest = async (req, res) => {
 
         if (!existingParent) {
             console.log('❌ Aucun parent correspondant trouvé');
-            
+
             // Vérifier s'il existe un utilisateur avec cet email (pour le debug)
             const anyUser = await prisma.user.findFirst({
                 where: { email: email.toLowerCase().trim() }
             });
-            
+
             if (anyUser) {
                 console.log('⚠️ Un utilisateur existe avec cet email mais rôle:', anyUser.role);
             }

@@ -30,7 +30,7 @@ async function fixMissingRelations() {
 
         for (const student of students) {
             const parentId = student.parentId;
-            
+
             // Vérifier si la relation existe déjà
             const existingRelation = student.parents.find(p => p.parentId === parentId);
 
@@ -46,7 +46,7 @@ async function fixMissingRelations() {
                             studentId: student.id
                         }
                     });
-                    
+
                     console.log(`🔧 CORRIGÉ: Élève "${student.firstName} ${student.lastName}" (ID: ${student.id}) - Relation créée avec parent #${parentId}`);
                     fixed++;
                 } catch (error) {
