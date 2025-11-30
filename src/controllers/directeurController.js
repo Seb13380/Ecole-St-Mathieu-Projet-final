@@ -897,14 +897,14 @@ const directeurController = {
             // Si un parent a été trouvé, récupérer ses enfants
             let parentChildren = [];
             if (request.foundParentId) {
-                const relations = await prisma.parentStudentRelation.findMany({
+                const relations = await prisma.parentStudent.findMany({
                     where: { parentId: request.foundParentId },
                     include: {
                         student: {
                             include: {
-                                class: {
+                                classe: {
                                     select: {
-                                        name: true
+                                        nom: true
                                     }
                                 }
                             }
@@ -916,8 +916,8 @@ const directeurController = {
                     id: rel.student.id,
                     firstName: rel.student.firstName,
                     lastName: rel.student.lastName,
-                    dateOfBirth: rel.student.dateOfBirth,
-                    className: rel.student.class ? rel.student.class.name : null
+                    dateOfBirth: rel.student.dateNaissance,
+                    className: rel.student.classe ? rel.student.classe.nom : null
                 }));
             }
 
