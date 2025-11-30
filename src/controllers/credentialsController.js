@@ -57,32 +57,28 @@ const processCredentialsRequest = async (req, res) => {
         if (!existingParent) {
             console.log('⚠️ Aucun parent trouvé avec l\'email exact, tentative avec nom/prénom...');
 
-            // Recherche plus souple : email ET (prénom OU nom)
-            existingParent = await prisma.user.findFirst({
+            // Recherche plus souple : nom OU prénom (insensible à la casse)
+            const users = await prisma.user.findMany({
                 where: {
-                    email: email.toLowerCase().trim(),
-                    OR: [
-                        {
-                            firstName: {
-                                contains: firstName.trim(),
-                                mode: 'insensitive'
-                            }
-                        },
-                        {
-                            lastName: {
-                                contains: lastName.trim(),
-                                mode: 'insensitive'
-                            }
-                        }
-                    ]
+                    role: 'PARENT'
                 }
             });
 
-            // Vérifier si un utilisateur a été trouvé mais n'est pas PARENT
-            if (existingParent && existingParent.role !== 'PARENT') {
-                console.log('⚠️ Utilisateur trouvé mais n\'est pas un parent, rôle:', existingParent.role);
-                existingParent = null;
-            }
+            // Filtrer manuellement avec comparaison insensible à la casse
+            existingParent = users.find(user => {
+                const userFirstName = user.firstName?.toLowerCase() || '';
+                const userLastName = user.lastName?.toLowerCase() || '';
+                const userEmail = user.email?.toLowerCase() || '';
+                const searchFirstName = firstName.trim().toLowerCase();
+                const searchLastName = lastName.trim().toLowerCase();
+                const searchEmail = email.trim().toLowerCase();
+
+                return userEmail === searchEmail && 
+                       (userFirstName.includes(searchFirstName) || 
+                        userLastName.includes(searchLastName) ||
+                        searchFirstName.includes(userFirstName) ||
+                        searchLastName.includes(userLastName));
+            });
         }
 
         if (!existingParent) {
