@@ -409,8 +409,8 @@ enum GalleryMediaType {
 model Document {
   id             Int          @id @default(autoincrement())
   type           DocumentType // Type de document (PROJET_EDUCATIF, REGLEMENT_INTERIEUR, etc.)
-  titre          String // Titre affiché 
-  description    String? // Description optionnelle
+  titre          String       @db.VarChar(500) // Titre affiché 
+  description    String?      @db.Text // Description optionnelle
   contenu        String?      @db.LongText // Contenu HTML (optionnel si juste PDF)
   pdfUrl         String? // URL du fichier PDF
   pdfFilename    String? // Nom original du fichier PDF
