@@ -6,17 +6,13 @@ const menuController = {
     // Afficher les menus de la semaine (page publique) - OPTIMISÉ
     getMenus: async (req, res) => {
         try {
-            console.log('🍽️ Récupération des menus restaurant');
             const startTime = Date.now();
 
-            // Récupération optimisée avec filtre date et limitation
+            // Récupération optimisée - récupérer TOUS les menus actifs
             const menusActifs = await prisma.menu.findMany({
                 where: {
-                    actif: true,
-                    // Filtrer les menus futurs et actuels uniquement
-                    dateFin: {
-                        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 jours dans le passé max
-                    }
+                    actif: true
+                    // Suppression du filtre date strict qui bloquait l'affichage
                 },
                 include: {
                     auteur: {
@@ -27,11 +23,11 @@ const menuController = {
                 take: 10 // Limiter à 10 menus max pour performance
             });
 
-            console.log(`📋 ${menusActifs.length} menus actifs trouvés`);
 
-            // Validation et nettoyage des données
+            // Validation et nettoyage des données - CORRECTION pour accepter menus sans titre
             const menusValides = menusActifs.filter(menu => {
-                const isValid = menu.titre && (menu.mediaUrl || menu.semaine);
+                // Un menu est valide s'il a au moins un semaine défini
+                const isValid = menu.semaine && menu.semaine.trim().length > 0;
                 if (!isValid) {
                     console.warn(`⚠️ Menu invalide ignoré (ID: ${menu.id}):`, {
                         titre: menu.titre,
@@ -60,7 +56,6 @@ const menuController = {
             }));
 
             const processingTime = Date.now() - startTime;
-            console.log(`✅ ${menusOrdonnes.length} menus valides traités en ${processingTime}ms`);
 
             res.render('pages/restauration/menus', {
                 title: 'École Saint-Mathieu - Menus de la semaine',

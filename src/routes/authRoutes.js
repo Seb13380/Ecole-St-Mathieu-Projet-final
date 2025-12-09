@@ -1,19 +1,20 @@
 const express = require('express');
 const loginRoutes = require('./loginRoutes');
-const passwordResetRoutes = require('./passwordResetRoutes');
 const parentInvitationController = require('../controllers/parentInvitationController');
-const inscriptionController = require('../controllers/inscriptionController');
 
 const router = express.Router();
 
 router.use('/login', loginRoutes);
-router.use('/', passwordResetRoutes); // Routes pour forgot-password et reset-password
 
-// Routes pour l'inscription publique
-router.get('/register', inscriptionController.showRegistrationForm);
-router.post('/register', inscriptionController.processRegistration);
+// Routes de réinitialisation du mot de passe - Désactivées (controller supprimé)
+router.get('/forgot-password', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/forgot-password', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.get('/reset-password/:token', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/reset-password/:token', (req, res) => res.status(503).send('Service temporairement indisponible'));
 
-// router.use('/register', registerRoutes); // Fichier non existant
+// Routes pour l'inscription publique - Désactivées (controller supprimé)
+router.get('/register', (req, res) => res.status(503).send('Service temporairement indisponible'));
+router.post('/register', (req, res) => res.status(503).send('Service temporairement indisponible'));
 
 // Routes pour les invitations avec token
 router.get('/register/:token', parentInvitationController.showRegistrationForm);
