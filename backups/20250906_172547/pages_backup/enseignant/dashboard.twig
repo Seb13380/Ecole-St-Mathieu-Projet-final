@@ -1,0 +1,235 @@
+{% extends "layouts/base.twig" %}
+
+{% block main %}
+	<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+		<div
+			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+			<!-- En-tête moderne -->
+			<div class="mb-8">
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+					<div class="text-center">
+						<h1 class="text-4xl font-bold text-slate-800 mb-2">
+							📚 Espace Enseignant
+						</h1>
+						<p class="text-xl text-slate-600">
+							Bienvenue,
+							<span class="font-semibold text-blue-600">{{ user.firstName }}
+								{{ user.lastName }}</span>
+						</p>
+						<p class="text-sm text-slate-500 mt-1">Enseignant - École Saint-Mathieu</p>
+						<div class="text-3xl mt-4">👨‍🏫</div>
+						<p class="text-sm text-slate-500">Tableau de bord</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Actions principales -->
+			<div class="mb-8">
+				<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+					<span class="mr-3">⚡</span>
+					Outils Pédagogiques
+				</h2>
+				<div class="flex flex-wrap justify-center gap-6">
+					<a href="/enseignant/notes" class="group bg-white shadow-md border-l-4 border-blue-500 p-6 hover:shadow-xl hover:border-blue-600 transition-all duration-300 text-center w-64 h-48">
+						<div class="flex flex-col items-center h-full justify-center">
+							<div class="bg-blue-100 p-3 group-hover:bg-blue-200 transition-colors mb-4">
+								<svg class="h-8 w-8 text-blue-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-slate-800 mb-2">Gestion des Notes</h3>
+							<p class="text-slate-600 text-sm">Saisir & modifier notes</p>
+						</div>
+					</a>
+
+					<a href="/enseignant/absences" class="group bg-white shadow-md border-l-4 border-red-500 p-6 hover:shadow-xl hover:border-red-600 transition-all duration-300 text-center w-64 h-48">
+						<div class="flex flex-col items-center h-full justify-center">
+							<div class="bg-red-100 p-3 group-hover:bg-red-200 transition-colors mb-4">
+								<svg class="h-8 w-8 text-red-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-slate-800 mb-2">Gestion des Absences</h3>
+							<p class="text-slate-600 text-sm">Marquer absences</p>
+						</div>
+					</a>
+
+					<a href="/enseignant/horaires" class="group bg-white shadow-md border-l-4 border-green-500 p-6 hover:shadow-xl hover:border-green-600 transition-all duration-300 text-center w-64 h-48">
+						<div class="flex flex-col items-center h-full justify-center">
+							<div class="bg-green-100 p-3 group-hover:bg-green-200 transition-colors mb-4">
+								<svg class="h-8 w-8 text-green-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-slate-800 mb-2">Mes Horaires</h3>
+							<p class="text-slate-600 text-sm">Emploi du temps</p>
+						</div>
+					</a>
+
+					<a href="/enseignant/messages" class="group bg-white shadow-md border-l-4 border-purple-500 p-6 hover:shadow-xl hover:border-purple-600 transition-all duration-300 text-center w-64 h-48">
+						<div class="flex flex-col items-center h-full justify-center">
+							<div class="bg-purple-100 p-3 group-hover:bg-purple-200 transition-colors mb-4">
+								<svg class="h-8 w-8 text-purple-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-slate-800 mb-2">Messagerie</h3>
+							<p class="text-slate-600 text-sm">Communication parents</p>
+						</div>
+					</a>
+				</div>
+			</div>
+			<!-- Mes Classes -->
+			{% if mesClasses|length > 0 %}
+				<div class="mb-8">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+						<span class="mr-3">🎓</span>
+						Mes Classes
+					</h2>
+					<div class="flex flex-wrap justify-center gap-6">
+						{% for classe in mesClasses %}
+							<div class="bg-white shadow-md border-l-4 border-emerald-500 p-6 hover:shadow-xl transition-all duration-300 w-80 h-64">
+								<div
+									class="flex flex-col h-full">
+									<!-- En-tête classe -->
+									<div class="flex items-center mb-4">
+										<div class="bg-emerald-100 p-3 mr-4">
+											<svg class="h-8 w-8 text-emerald-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+											</svg>
+										</div>
+										<div>
+											<h3 class="text-xl font-bold text-slate-800">{{ classe.nom }}</h3>
+											<p class="text-sm text-slate-500">{{ classe.niveau }}
+												-
+												{{ classe.anneeScolaire }}</p>
+										</div>
+									</div>
+
+									<!-- Statistiques -->
+									<div class="grid grid-cols-3 gap-4 mb-6 flex-grow">
+										<div class="text-center">
+											<div class="text-3xl font-bold text-blue-600">{{ classe._count.eleves }}</div>
+											<div class="text-xs text-slate-500">Élèves</div>
+										</div>
+										<div class="text-center">
+											<div class="text-3xl font-bold text-green-600">{{ classe._count.horaires }}</div>
+											<div class="text-xs text-slate-500">Cours/sem.</div>
+										</div>
+										<div class="text-center">
+											<div class="text-3xl font-bold text-purple-600">{{ classe._count.notes }}</div>
+											<div class="text-xs text-slate-500">Notes</div>
+										</div>
+									</div>
+
+									<!-- Actions -->
+									<div class="flex gap-2 mt-auto">
+										<a href="/enseignant/notes?classeId={{ classe.id }}" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm font-medium text-center transition-colors">
+											Notes
+										</a>
+										<a href="/enseignant/absences?classeId={{ classe.id }}" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-medium text-center transition-colors">
+											Absences
+										</a>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Horaires du jour -->
+			{% if horairesDuJour|length > 0 %}
+				<div class="mb-8">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+						<span class="mr-3">⏰</span>
+						Mes Cours Aujourd'hui
+					</h2>
+					<div class="flex flex-wrap justify-center gap-6">
+						{% for horaire in horairesDuJour %}
+							<div class="bg-white shadow-md border-l-4 border-cyan-500 p-6 hover:shadow-xl transition-all duration-300 text-center w-64 h-48">
+								<div class="flex flex-col items-center h-full justify-center">
+									<div class="bg-cyan-100 p-3 mb-4">
+										<svg class="h-8 w-8 text-cyan-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+										</svg>
+									</div>
+									<h3 class="text-lg font-bold text-slate-800 mb-2">{{ horaire.matiere }}</h3>
+									<p class="text-slate-600 text-sm mb-2">{{ horaire.classe.nom }}</p>
+									<div class="bg-slate-50 px-3 py-1 text-sm font-medium text-slate-700">
+										{{ horaire.heureDebut }}
+										-
+										{{ horaire.heureFin }}
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Actualités récentes -->
+			{% if actualites|length > 0 %}
+				<div class="mb-8">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center flex items-center justify-center">
+						<span class="mr-3">📢</span>
+						Actualités Récentes
+					</h2>
+					<div class="flex flex-wrap justify-center gap-6">
+						{% for actualite in actualites %}
+							<div class="bg-white shadow-md border-l-4 border-amber-500 p-6 hover:shadow-xl transition-all duration-300 w-80 h-64">
+								<div
+									class="flex flex-col h-full">
+									<!-- En-tête actualité -->
+									<div class="flex items-start justify-between mb-4">
+										<div class="flex items-start">
+											<div class="bg-amber-100 p-2 mr-3">
+												<svg class="h-6 w-6 text-amber-600" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+												</svg>
+											</div>
+											<div class="flex-1">
+												<h3 class="text-lg font-bold text-slate-800 mb-1">
+													{% if actualite.important %}
+														<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 mr-2">
+															Important
+														</span>
+													{% endif %}
+													{{ actualite.titre }}
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!-- Contenu -->
+									<div class="flex-grow mb-4">
+										<p class="text-slate-600 text-sm line-clamp-3">
+											{{ actualite.contenu|slice(0, 120) }}
+											{% if actualite.contenu|length > 120 %}...
+											{% endif %}
+										</p>
+									</div>
+
+									<!-- Pied de page -->
+									<div class="border-t border-slate-200 pt-3 mt-auto">
+										<div class="flex items-center justify-between text-xs text-slate-500">
+											<span>{{ actualite.auteur.firstName }}
+												{{ actualite.auteur.lastName }}</span>
+											<span>{{ actualite.datePublication|date('d/m/Y') }}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+					<div class="text-center mt-6">
+						<a href="/actualites" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 font-medium transition-colors">
+							Voir toutes les actualités
+						</a>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

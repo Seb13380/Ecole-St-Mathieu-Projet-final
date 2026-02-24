@@ -1,0 +1,51 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}
+	<title>Horaires - École Saint-Mathieu</title>
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto p-10 text-center font-poppins-regular">
+		<h1 class="text-2xl font-bold mb-4">Horaires de l'École Saint-Mathieu</h1>
+		<p class="mb-4">Voici les horaires de l'école pour l'année scolaire en cours :</p>
+
+		<table class="table w-full">
+			<thead>
+				<tr>
+					<th>Jour</th>
+					<th>Heure d'ouverture</th>
+					<th>Heure de fermeture</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Lundi</td>
+					<td>8h00</td>
+					<td>17h00</td>
+				</tr>
+				<tr>
+					<td>Mardi</td>
+					<td>8h00</td>
+					<td>17h00</td>
+				</tr>
+				<tr>
+					<td>Mercredi</td>
+					<td>8h00</td>
+					<td>12h00</td>
+				</tr>
+				<tr>
+					<td>Jeudi</td>
+					<td>8h00</td>
+					<td>17h00</td>
+				</tr>
+				<tr>
+					<td>Vendredi</td>
+					<td>8h00</td>
+					<td>16h30</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<p class="mt-4">Pour toute information complémentaire, n'hésitez pas à nous contacter.</p>
+	</div>
+{% endblock %}

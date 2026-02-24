@@ -1,0 +1,655 @@
+{% extends "layouts/admin.twig" %}
+
+{% block title %}Gestion de la Galerie
+{% endblock %}
+
+{% block content %}
+	<div
+		class="min-h-screen bg-gray-50">
+		<!-- Header moderne et élégant -->
+		<div class="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex justify-between items-center py-8">
+					<div class="text-white">
+						<h1 class="text-4xl font-bold flex items-center">
+							🎨 Gestion de la Galerie
+						</h1>
+						<p class="text-blue-100 mt-2 text-lg">
+							Organisez et gérez les images et vidéos de l'école
+						</p>
+						<div class="mt-3 flex items-center space-x-4 text-sm text-blue-100">
+							<span class="flex items-center">
+								📁
+								{{ themes|length }}
+								thème(s)
+							</span>
+							<span class="flex items-center">
+								🖼️
+								{% set total_medias = 0 %}
+								{% for theme in themes %}
+									{% set total_medias = total_medias + theme.medias|length %}
+								{% endfor %}
+								{{ total_medias }}
+								média(s)
+							</span>
+						</div>
+					</div>
+					<div class="flex space-x-3">
+						<button onclick="openThemeModal()" class="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200 flex items-center">
+							<span class="mr-2">➕</span>
+							Nouveau thème
+						</button>
+						<a href="/gallery" class="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200 flex items-center">
+							<span class="mr-2">👁️</span>
+							Voir la galerie
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<!-- Messages -->
+			<div id="messageContainer" class="mb-6"></div>
+
+			<!-- 🆕 Message d'information sur le drag & drop -->
+			{% if themes|length > 1 %}
+				<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+					<div class="flex items-center">
+						<span class="text-blue-600 text-xl mr-3">🎯</span>
+						<div>
+							<h3 class="text-blue-800 font-semibold">Réorganisation des thèmes</h3>
+							<p class="text-blue-600 text-sm">Faites glisser les thèmes pour les réorganiser dans l'ordre désiré</p>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- 🆕 Container drag & drop pour les thèmes -->
+			<div id="themesContainer" class="space-y-6">
+				{% for theme in themes %}
+					<div
+						class="theme-item bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-200 hover:shadow-xl" data-theme-id="{{ theme.id }}" draggable="true">
+
+						<!-- 🆕 Ordre du thème -->
+						<div class="bg-gray-100 border-b border-gray-200 p-3 flex items-center justify-center">
+							<div class="flex items-center space-x-3">
+								<label class="text-gray-600 text-sm font-medium">Ordre d'affichage :</label>
+								<input type="number" value="{{ theme.ordre ?? loop.index }}" min="1" max="99" class="w-16 text-center text-sm border border-gray-300 rounded px-2 py-1" onchange="updateThemeOrder({{ theme.id }}, this.value)">
+								<span class="text-xs text-gray-500">(1 = premier, 2 = deuxième, etc.)</span>
+							</div>
+						</div>
+
+						<!-- En-tête du thème -->
+						<div class="bg-gradient-to-r from-blue-600 to-green-600 text-white p-6">
+							<div class="flex justify-between items-start">
+								<div>
+									<h2 class="text-2xl font-bold mb-2">{{ theme.name }}</h2>
+									{% if theme.description %}
+										<p class="text-blue-100">{{ theme.description }}</p>
+									{% endif %}
+									<div class="text-sm mt-2 opacity-75">
+										{{ theme.medias|length }}
+										{% if theme.medias|length > 1 %}éléments{% else %}élément
+										{% endif %}
+									</div>
+								</div>
+								<div class="space-x-2">
+									<button onclick="openUploadModal({{ theme.id }})" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm">
+										📤 Ajouter des médias
+									</button>
+									<button onclick="deleteTheme({{ theme.id }})" class="bg-red-500 bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm">
+										🗑️ Supprimer le thème
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Médias du thème -->
+						<div class="p-6">
+							{% if theme.medias|length > 0 %}
+								<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+									{% for media in theme.medias %}
+										<div class="bg-gray-50 rounded-lg overflow-hidden shadow-md relative">
+
+											{% if media.type == 'IMAGE' %}
+												<div class="aspect-square bg-gray-200 relative">
+													<img src="/uploads/gallery/{{ media.filename }}" alt="{{ media.title }}" class="w-full h-full object-cover">
+												</div>
+											{% else %}
+												<div class="aspect-square bg-gray-800 relative flex items-center justify-center">
+													<div class="text-white text-center">
+														<div class="text-4xl mb-2">🎬</div>
+														<div class="text-sm">Vidéo</div>
+													</div>
+												</div>
+											{% endif %}
+
+											<!-- Bouton de suppression -->
+											<button onclick="deleteMedia({{ media.id }})" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+												×
+											</button>
+
+											<div class="p-4">
+												<div class="flex justify-between items-start mb-2">
+													<h3 class="font-semibold text-gray-800 truncate flex-1">{{ media.title }}</h3>
+													<div class="ml-2 text-center">
+														<label class="text-xs text-gray-500 block">Ordre</label>
+														<input type="number" value="{{ media.ordre ?? loop.index }}" min="1" max="99" class="w-12 text-center text-xs border border-gray-300 rounded px-1 py-1" onchange="updateMediaOrder({{ media.id }}, this.value)">
+													</div>
+												</div>
+												{% if media.description %}
+													<p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ media.description }}</p>
+												{% endif %}
+												<div class="text-xs text-gray-500 mt-2">
+													Par
+													{{ media.auteur.firstName }}
+													{{ media.auteur.lastName }}
+													•
+													{{ media.createdAt|date('d/m/Y à H:i') }}
+												</div>
+												<div class="text-xs text-gray-400 mt-1">
+													{{ (media.size / 1024 / 1024)|round(2) }}
+													MB
+												</div>
+											</div>
+										</div>
+									{% endfor %}
+								</div>
+							{% else %}
+								<div class="text-center py-12 text-gray-500">
+									<div class="text-4xl mb-2">📷</div>
+									<p>Aucun média dans ce thème</p>
+									<button onclick="openUploadModal({{ theme.id }})" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+										Ajouter des médias
+									</button>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+
+			{% if themes|length == 0 %}
+				<div class="text-center py-20">
+					<div class="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-12 max-w-lg mx-auto">
+						<div class="text-8xl mb-6">�</div>
+						<h2 class="text-3xl font-bold text-gray-800 mb-4">Votre galerie vous attend !</h2>
+						<p class="text-gray-600 mb-8 text-lg leading-relaxed">
+							Créez votre premier thème pour commencer à organiser vos images et vidéos de manière professionnelle.
+						</p>
+						<div class="space-y-4">
+							<button onclick="openThemeModal()" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105">
+								<span class="mr-2">✨</span>
+								Créer mon premier thème
+							</button>
+							<div class="text-sm text-gray-500 mt-4">
+								💡 Organisez par événements, classes, ou activités
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- Modal pour créer un thème -->
+	<div id="themeModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+		<div class="flex items-center justify-center min-h-screen p-4">
+			<div class="bg-white rounded-lg max-w-md w-full">
+				<div class="p-6">
+					<h3 class="text-lg font-bold mb-4">Nouveau thème</h3>
+					<form id="themeForm">
+						<div class="mb-4">
+							<label class="block text-sm font-medium mb-2">Nom du thème *</label>
+							<input type="text" name="name" class="w-full border rounded-lg px-3 py-2" placeholder="Ex: Rentrée 2025" required>
+						</div>
+						<div class="mb-6">
+							<label class="block text-sm font-medium mb-2">Description</label>
+							<textarea name="description" class="w-full border rounded-lg px-3 py-2" rows="3" placeholder="Description optionnelle..."></textarea>
+						</div>
+						<div class="flex space-x-4">
+							<button type="button" onclick="closeThemeModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg">
+								Annuler
+							</button>
+							<button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+								Créer
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal pour uploader des médias -->
+	<div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+		<div class="flex items-center justify-center min-h-screen p-4">
+			<div class="bg-white rounded-lg max-w-lg w-full">
+				<div class="p-6">
+					<h3 class="text-lg font-bold mb-4">Ajouter des médias</h3>
+					<form id="uploadForm" enctype="multipart/form-data">
+						<input type="hidden" name="themeId" id="uploadThemeId">
+
+						<div class="mb-4">
+							<label class="block text-sm font-medium mb-2">Fichiers *</label>
+							<input type="file" name="files" multiple accept="image/*,video/*" class="w-full border rounded-lg px-3 py-2" required>
+							<p class="text-xs text-gray-500 mt-1">Images et vidéos acceptées. Maximum 10 fichiers, 10MB par fichier.</p>
+						</div>
+
+						<div class="mb-4">
+							<label class="block text-sm font-medium mb-2">Titre</label>
+							<input type="text" name="title" class="w-full border rounded-lg px-3 py-2" placeholder="Titre optionnel">
+						</div>
+
+						<div class="mb-6">
+							<label class="block text-sm font-medium mb-2">Description</label>
+							<textarea name="description" class="w-full border rounded-lg px-3 py-2" rows="2" placeholder="Description optionnelle..."></textarea>
+						</div>
+
+						<div class="flex space-x-4">
+							<button type="button" onclick="closeUploadModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg">
+								Annuler
+							</button>
+							<button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg">
+								Upload
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.line-clamp-2 {
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.aspect-square {
+			aspect-ratio: 1 / 1;
+		}
+
+		/* 🆕 Styles pour le drag & drop */
+		.theme-item {
+			position: relative;
+		}
+
+		.theme-item.dragging {
+			opacity: 0.5;
+			transform: rotate(2deg);
+			z-index: 1000;
+		}
+
+		.theme-item.drag-over {
+			border: 3px dashed #3b82f6;
+			background-color: #eff6ff;
+		}
+
+		.drag-handle {
+			user-select: none;
+		}
+
+		.drag-handle:hover {
+			background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+		}
+
+		/* Animation pour les transitions */
+		#themesContainer {
+			transition: all 0.3s ease;
+		}
+
+		.theme-item {
+			transition: all 0.2s ease;
+		}
+
+		/* Style du feedback visuel */
+		.drop-indicator {
+			height: 4px;
+			background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+			border-radius: 2px;
+			margin: 8px 0;
+			opacity: 0;
+			transform: scaleX(0);
+			transition: all 0.2s ease;
+		}
+
+		.drop-indicator.active {
+			opacity: 1;
+			transform: scaleX(1);
+		}
+	</style>
+
+	<script>
+		// Gestion des modals
+function openThemeModal() {
+document.getElementById('themeModal').classList.remove('hidden');
+}
+
+function closeThemeModal() {
+document.getElementById('themeModal').classList.add('hidden');
+document.getElementById('themeForm').reset();
+}
+
+function openUploadModal(themeId) {
+document.getElementById('uploadThemeId').value = themeId;
+document.getElementById('uploadModal').classList.remove('hidden');
+}
+
+function closeUploadModal() {
+document.getElementById('uploadModal').classList.add('hidden');
+document.getElementById('uploadForm').reset();
+}
+
+// Affichage des messages
+function showMessage(message, type = 'success') {
+const container = document.getElementById('messageContainer');
+const alertClass = type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700';
+
+container.innerHTML = `
+    <div class="${alertClass} border-l-4 p-4 rounded">
+      <p>${message}</p>
+    </div>
+  `;
+
+setTimeout(() => {
+container.innerHTML = '';
+}, 5000);
+}
+
+// Création de thème
+document.getElementById('themeForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+
+const formData = new FormData(e.target);
+
+try {
+const response = await fetch('/gallery/admin/themes', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{name: formData.get('name'), description: formData.get('description')}
+)
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('Thème créé avec succès !');
+closeThemeModal();
+setTimeout(() => location.reload(), 1500);
+} else {
+showMessage(result.error || 'Erreur lors de la création', 'error');
+}
+} catch (error) {
+showMessage('Erreur lors de la création du thème', 'error');
+}
+});
+
+// Upload de médias
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+
+const formData = new FormData(e.target);
+
+try {
+const response = await fetch('/gallery/admin/upload', {
+method: 'POST',
+body: formData
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('Médias uploadés avec succès !');
+closeUploadModal();
+setTimeout(() => location.reload(), 1500);
+} else {
+showMessage(result.error || 'Erreur lors de l\'upload', 'error');
+}
+} catch (error) {
+showMessage('Erreur lors de l\'upload', 'error');
+}
+});
+
+// Suppression de média
+async function deleteMedia(mediaId) {
+if (!confirm('Êtes-vous sûr de vouloir supprimer ce média ?')) {
+return;
+}
+
+try {
+const response = await fetch (`/gallery/admin/media/${mediaId}`, {method: 'DELETE'});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('Média supprimé avec succès !');
+setTimeout(() => location.reload(), 1500);
+} else {
+showMessage(result.error || 'Erreur lors de la suppression', 'error');
+}
+} catch (error) {
+showMessage('Erreur lors de la suppression', 'error');
+}
+}
+
+// Suppression de thème
+async function deleteTheme(themeId) {
+if (!confirm('Êtes-vous sûr de vouloir supprimer ce thème et tous ses médias ?')) {
+return;
+}
+
+try {
+const response = await fetch (`/gallery/admin/themes/${themeId}`, {method: 'DELETE'});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('Thème supprimé avec succès !');
+setTimeout(() => location.reload(), 1500);
+} else {
+showMessage(result.error || 'Erreur lors de la suppression', 'error');
+}
+} catch (error) {
+showMessage('Erreur lors de la suppression', 'error');
+}
+}
+
+// 🆕 FONCTIONNALITÉ DRAG & DROP POUR RÉORGANISER LES THÈMES
+let draggedElement = null;
+let draggedIndex = null;
+
+// Initialisation du drag & drop
+document.addEventListener('DOMContentLoaded', function () {
+initializeDragAndDrop();
+});
+
+function initializeDragAndDrop() {
+const themeItems = document.querySelectorAll('.theme-item');
+
+themeItems.forEach((item, index) => { // Événements de drag
+item.addEventListener('dragstart', handleDragStart);
+item.addEventListener('dragend', handleDragEnd);
+
+// Événements de drop
+item.addEventListener('dragover', handleDragOver);
+item.addEventListener('dragenter', handleDragEnter);
+item.addEventListener('dragleave', handleDragLeave);
+item.addEventListener('drop', handleDrop);
+});
+}
+
+function handleDragStart(e) {
+draggedElement = this;
+draggedIndex = Array.from(this.parentNode.children).indexOf(this);
+
+this.classList.add('dragging');
+
+// Données pour le transfert
+e.dataTransfer.effectAllowed = 'move';
+e.dataTransfer.setData('text/html', this.outerHTML);
+
+console.log('🎯 Début du drag:', this.dataset.themeId);
+}
+
+function handleDragEnd(e) {
+this.classList.remove('dragging');
+
+// Nettoyer tous les indicateurs visuels
+document.querySelectorAll('.theme-item').forEach(item => {
+item.classList.remove('drag-over');
+});
+
+draggedElement = null;
+draggedIndex = null;
+}
+
+function handleDragOver(e) {
+if (e.preventDefault) {
+e.preventDefault();
+}
+
+e.dataTransfer.dropEffect = 'move';
+return false;
+}
+
+function handleDragEnter(e) {
+if (this !== draggedElement) {
+this.classList.add('drag-over');
+}
+}
+
+function handleDragLeave(e) {
+this.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+if (e.stopPropagation) {
+e.stopPropagation();
+}
+
+if (draggedElement !== this) {
+const currentIndex = Array.from(this.parentNode.children).indexOf(this);
+const container = this.parentNode;
+
+// Réorganiser visuellement
+if (draggedIndex < currentIndex) {
+container.insertBefore(draggedElement, this.nextSibling);
+} else {
+container.insertBefore(draggedElement, this);
+}
+
+// Sauvegarder le nouvel ordre
+saveThemeOrder();
+}
+
+this.classList.remove('drag-over');
+return false;
+}
+
+// 🆕 Fonction pour mettre à jour l'ordre d'un thème
+async function updateThemeOrder(themeId, ordre) {
+console.log(`📊 Mise à jour ordre thème ${themeId} -> ${ordre}`);
+
+try {
+const response = await fetch (`/gallery/admin/themes/${themeId}/order`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{ordre: parseInt(ordre)}
+)
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('✅ Ordre mis à jour !', 'success');
+// Recharger pour voir le nouvel ordre
+setTimeout(() => location.reload(), 1000);
+} else {
+showMessage('❌ ' + (
+result.error || 'Erreur lors de la mise à jour'
+), 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('❌ Erreur de connexion', 'error');
+}
+}
+
+// 🆕 Fonction pour mettre à jour l'ordre d'un média
+async function updateMediaOrder(mediaId, ordre) {
+console.log(`📊 Mise à jour ordre média ${mediaId} -> ${ordre}`);
+
+try {
+const response = await fetch (`/gallery/admin/media/${mediaId}/order`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{ordre: parseInt(ordre)}
+)
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('✅ Ordre du média mis à jour !', 'success');
+// Recharger pour voir le nouvel ordre
+setTimeout(() => location.reload(), 1000);
+} else {
+showMessage('❌ ' + (
+result.error || 'Erreur lors de la mise à jour'
+), 'error');
+}
+} catch (error) {
+console.error('Erreur:', error);
+showMessage('❌ Erreur de connexion', 'error');
+}
+}
+
+async function saveThemeOrder() {
+const themeItems = document.querySelectorAll('.theme-item');
+const themeIds = Array.from(themeItems).map(item => parseInt(item.dataset.themeId));
+
+console.log('💾 Sauvegarde de l\'ordre:', themeIds);
+
+try {
+const response = await fetch('/gallery/admin/themes/reorder', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({themeIds})
+});
+
+const result = await response.json();
+
+if (result.success) {
+showMessage('✅ Ordre des thèmes mis à jour !', 'success');
+} else {
+showMessage('❌ ' + (
+result.error || 'Erreur lors de la sauvegarde'
+), 'error');
+// Recharger en cas d'erreur pour restaurer l'ordre
+setTimeout(() => location.reload(), 2000);
+}
+} catch (error) {
+console.error('Erreur sauvegarde:', error);
+showMessage('❌ Erreur lors de la sauvegarde de l\'ordre', 'error');
+setTimeout(() => location.reload(), 2000);
+}
+}
+	</script>
+
+{% endblock %}

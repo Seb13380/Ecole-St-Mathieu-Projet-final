@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="cupcake" class="h-full">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=3.0">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-src 'self' https://www.google.com https://maps.google.com https://www.openstreetmap.org; img-src 'self' data: https: *.googleapis.com *.gstatic.com *.openstreetmap.org; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;">
+		<link rel="icon" type="image/png" href="/assets/images/testimage_1.jpg"/>
+		<title>
+			
+	<title>Connexion - École Saint-Mathieu
+	</title>
+
+		</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+		<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+		<link href="/assets/css/tailwind.css?v=20250820" rel="stylesheet">
+		<link rel="stylesheet" href="/assets/css/style.css">
+		<link
+		rel="stylesheet" href="/assets/css/https-fixes.css?v=20250906">
+
+		<!-- Optimisations pour le rendu HTTPS -->
+		<style>
+			/* Styles pour uniformiser le rendu sur tous les environnements */
+			html {
+				font-size: 14px !important; /* Réduit de 16px à 14px pour compenser le scaling */
+				-webkit-text-size-adjust: 100% !important;
+				-moz-text-size-adjust: 100% !important;
+				-ms-text-size-adjust: 100% !important;
+				text-size-adjust: 100% !important;
+			}
+
+			body {
+				font-size: 1rem !important;
+				line-height: 1.5 !important;
+				font-weight: 400 !important; /* Force un poids normal pour éviter l'effet gras */
+				-webkit-font-smoothing: antialiased !important;
+				-moz-osx-font-smoothing: grayscale !important;
+			}
+
+			/* Amélioration du rendu des textes */
+			* {
+				font-weight: inherit !important;
+			}
+
+			.font-medium {
+				font-weight: 500 !important;
+			}
+
+			.font-semibold {
+				font-weight: 600 !important;
+			}
+
+			.font-bold {
+				font-weight: 700 !important;
+			}
+
+			/* Réduction des tailles de police pour uniformiser */
+			.text-4xl {
+				font-size: 1.875rem !important;
+				line-height: 2.25rem !important;
+			}
+			.text-3xl {
+				font-size: 1.5rem !important;
+				line-height: 2rem !important;
+			}
+			.text-2xl {
+				font-size: 1.25rem !important;
+				line-height: 1.75rem !important;
+			}
+			.text-xl {
+				font-size: 1.125rem !important;
+				line-height: 1.75rem !important;
+			}
+			.text-lg {
+				font-size: 1rem !important;
+				line-height: 1.5rem !important;
+			}
+			.text-base {
+				font-size: 0.9rem !important;
+				line-height: 1.4rem !important;
+			}
+			.text-sm {
+				font-size: 0.8rem !important;
+				line-height: 1.25rem !important;
+			}
+			.text-xs {
+				font-size: 0.7rem !important;
+				line-height: 1rem !important;
+			}
+
+			/* Réduction de la taille des conteneurs pour un meilleur rendu */
+			.container {
+				max-width: 95% !important;
+			}
+
+			@media(min-width: 640px) {
+				.container {
+					max-width: 600px !important;
+				}
+			}
+
+			@media(min-width: 768px) {
+				.container {
+					max-width: 728px !important;
+				}
+			}
+
+			@media(min-width: 1024px) {
+				.container {
+					max-width: 980px !important;
+				}
+			}
+
+			@media(min-width: 1280px) {
+				.container {
+					max-width: 1200px !important;
+				}
+			}
+
+			@media(min-width: 1536px) {
+				.container {
+					max-width: 1400px !important;
+				}
+			}
+		</style>
+
+		<!-- Style de diagnostic pour le menu mobile -->
+		<style>
+			#mobile-menu {
+				background: rgba(167, 227, 221, 0.95) !important;
+				backdrop-filter: blur(5px);
+			}
+
+			#mobile-menu.translate-x-0 {
+				transform: translateX(0) !important;
+			}
+
+			#mobile-menu.translate-x-full {
+				transform: translateX(100%) !important;
+			}
+
+			.transition-transform {
+				transition: transform 0.3s ease-in-out !important;
+			}
+
+			/* Style pour les dropdowns mobiles */
+			.mobile-dropdown-content {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.3s ease-in-out;
+			}
+
+			.mobile-dropdown-content:not(.hidden) {
+				max-height: 500px;
+			}
+
+			.mobile-dropdown-content.hidden {
+				max-height: 0 !important;
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.mobile-dropdown-btn svg {
+				transition: transform 0.3s ease-in-out;
+			}
+
+			/* Améliorer la visibilité des sous-menus */
+			.mobile-dropdown-content li a {
+				background: rgba(141, 211, 204, 0.3);
+				margin: 2px 0;
+				border-radius: 8px;
+				border-left: 3px solid #8dd3cc;
+			}
+
+			.mobile-dropdown-content li a:hover {
+				background: rgba(141, 211, 204, 0.6) !important;
+			}
+		</style>
+
+		
+	</head>
+	<body class="bg-[#a7e3dd] min-h-screen font-poppins">
+		<header class="w-full bg-[#a7e3dd]">
+
+	<nav
+		class="navbar w-full px-9 font-poppins-regular">
+		<!-- Logos (toujours visibles) -->
+		<div class="flex-none logo-container" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 0.5rem; margin-left: 0.5rem;">
+			<a href="/" class="flex items-center gap-5">
+				<img src="/assets/images/testimage.jpg" alt="Logo École" class="w-auto object-contain rounded-xl shadow-md logo-img" style="height: 100px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+				<span class="text-xl font-bold text-[#304a4d]"></span>
+			</a>
+		</div>
+		<div class="flex-none logo-container  md:block" style="margin-top: 2rem; margin-bottom: 1rem; margin-right: 0.5rem; margin-left: 0.5rem;">
+			<a href="https://www.enseignementcatho-marseille.fr/" target="_blank" rel="noopener" class="flex items-center gap-6">
+				<img src="/assets/images/logo_diocese.png" alt="Logo Diocèse" class="w-auto object-contain rounded-xl shadow-md logo-img" style="height: 100px; animation: bounce 3s infinite; transform-origin: center bottom;"/>
+				<span class="text-xl font-bold text-[#304a4d]"></span>
+			</a>
+		</div>
+
+		<!-- Bouton burger pour mobile -->
+		<div class="flex-none md:hidden burger-menu">
+			<button id="mobile-menu-button" class="btn btn-ghost text-[#304a4d] text-2xl">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+				</svg>
+			</button>
+		</div>
+
+		<!-- Menu principal (desktop) et contenu mobile -->
+		<div class="flex-1 justify-center desktop-menu hidden lg:flex">
+			<ul class="menu menu-horizontal px-1 font-poppins-medium" style="font-size: clamp(14px, 1.8vw, 18px) !important; font-weight: 600;">
+				<li style="margin-top: 0.5rem;">
+					<a href="/" class="hover:font-poppins-semibold transition-all px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important;">Accueil</a>
+				</li>
+				<li style="margin-top: 0.5rem;">
+					<a href="/gestion-ecole" class="hover:font-poppins-semibold transition-all px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important;">OGEC</a>
+				</li>
+				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important;">
+						École
+						<svg class="fill-current ml-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-white rounded-xl z-[1] w-64 p-2 shadow-lg border border-[#a7e3dd] font-poppins-regular" style="margin-top: 0.2rem;">
+						<li>
+							<a href="/documents/ecole" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">📄 Documents officiels</a>
+						</li>
+						<li>
+							<a href="/dossier-inscription" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">🎓 Demande d'inscription élève</a>
+						</li>
+						<li>
+							<a href="/agenda" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">📅 Agenda</a>
+						</li>
+						<li>
+							<a href="/gallery" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">🖼️ Images et Vidéos</a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important;">
+						<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="hover:font-poppins-semibold transition-all" style="font-size: clamp(14px, 1.8vw, 18px) !important; text-decoration: none; color: inherit;">Pastorale</a>
+						<svg class="fill-current ml-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-white rounded-xl z-[1] w-64 p-2 shadow-lg border border-[#a7e3dd] font-poppins-regular" style="margin-top: 0.2rem;">
+						<li>
+							<a href="/documents/pastorale" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">📄 Axe pastoral</a>
+						</li>
+						<li>
+							<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">🌐 Ensemble Pastoral de l'étoile</a>
+						</li>
+
+					</ul>
+				</li>
+				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important;">
+						Restauration
+						<svg class="fill-current ml-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-white rounded-xl z-[1] w-64 p-2 shadow-lg border border-[#a7e3dd] font-poppins-regular" style="margin-top: 0.2rem;">
+
+						<li>
+							<a href="/restauration/menus" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">👨‍🍳 Le chef vous propose</a>
+						</li>
+						<li>
+							<a href="https://www.dupont-restauration.fr/" target="_blank" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">🍽️ Dupont Restauration</a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="dropdown dropdown-hover" style="margin-top: 0.5rem;">
+					<div tabindex="0" role="button" class="hover:font-poppins-semibold transition-all font-poppins-semibold px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important;">
+						APEL
+						<svg class="fill-current ml-1 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+							<path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z"/>
+						</svg>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-white rounded-xl z-[1] w-64 p-2 shadow-lg border border-[#a7e3dd] font-poppins-regular" style="margin-top: 0.2rem;">
+						<li>
+							<a href="/documents/apel" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">📄 Documents APEL</a>
+						</li>
+						<li>
+							<a href="https://sites.google.com/site/apelbdr/fonctionnement?authuser=0" target="_blank" rel="noopener" class="hover:font-poppins-medium transition-all hover:bg-[#a7e3dd] py-2 px-3 rounded-lg text-[#304a4d] font-medium" style="font-size: 12px !important; line-height: 1.4;">🌐 APEL Marseille</a>
+						</li>
+					</ul>
+				</li>
+
+				<li style="margin-top: 0rem;">
+					<a href="/auth/register" class="hover:font-poppins-semibold transition-all text-center flex items-center justify-center px-2" style="font-size: clamp(14px, 1.8vw, 18px) !important; line-height: 1.1; min-height: 2rem;">
+						Demande<br>identifiants
+					</a>
+				</li>
+			</ul>
+
+			<!-- Logo Educartable - Desktop seulement -->
+			<div class="flex-none" style="margin-left: 3rem;">
+				<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="flex items-center gap-6">
+					<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md hover:scale-105 transition-all duration-300" style="height: 95px; animation: pulse-glow 4s ease-in-out infinite;"/>
+					<span class="text-xl font-bold text-[#304a4d]"></span>
+				</a>
+			</div>
+		</div>
+
+		<!-- Menu mobile (caché par défaut) -->
+		<div id="mobile-menu" class="mobile-menu fixed inset-0 bg-[#a7e3dd] z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+			<div
+				class="flex flex-col h-full">
+				<!-- En-tête du menu mobile -->
+				<div class="flex justify-between items-center p-4 border-b border-[#8dd3cc]">
+					<h2 class="text-xl font-bold text-[#304a4d]">Menu</h2>
+					<button id="mobile-menu-close" class="btn btn-ghost text-[#304a4d] text-2xl">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+
+				<!-- Contenu du menu mobile -->
+				<div
+					class="flex-1 overflow-y-auto p-4">
+					<!-- Logo Educartable dans le menu mobile -->
+					<div class="mb-6 text-center">
+						<a href="https://app.educartable.com/accounts-portal/" target="_blank" rel="noopener" class="inline-block">
+							<img src="/assets/images/educartable2.png" alt="Logo Educartable" class="w-auto object-contain rounded-xl shadow-md mx-auto" style="height: 70px; animation: pulse-glow 4s ease-in-out infinite;"/>
+						</a>
+					</div>
+
+					<ul class="space-y-4 font-poppins-medium text-lg">
+						<li>
+							<a href="/" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">🏠 Accueil</a>
+						</li>
+						<li>
+							<a href="/gestion-ecole" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">🏢 OGEC</a>
+						</li>
+
+						<!-- Dropdown École pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								🎓 École
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="/documents/ecole" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📄 Documents officiels</a>
+								</li>
+								<li>
+									<a href="/dossier-inscription" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🎓 Demande d'inscription élève</a>
+								</li>
+								<li>
+									<a href="/agenda" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📅 Agenda</a>
+								</li>
+								<li>
+									<a href="/gallery" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🖼️ Images et Vidéos</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- Dropdown Pastorale pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								⛪ Pastorale
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="https://ensemble-pastoral.fr/Pretes-diacres.htm" target="_blank" rel="noopener" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🌐 Site Ensemble Pastoral</a>
+								</li>
+								<li>
+									<a href="/documents/pastorale" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📄 Documents Pastorale</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- Dropdown Restauration pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								🍽️ Restauration
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="https://www.dupont-restauration.fr/" target="_blank" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🌐 Dupont Restauration</a>
+								</li>
+								<li>
+									<a href="/restauration/menus" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">👨‍🍳 Le chef vous propose</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- Dropdown APEL pour mobile -->
+						<li class="mobile-dropdown">
+							<button class="mobile-dropdown-btn w-full text-left py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold flex justify-between items-center">
+								🤝 APEL
+								<svg class="w-4 h-4 transform transition-transform" fill="currentColor" viewbox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+								</svg>
+							</button>
+							<ul class="mobile-dropdown-content hidden pl-4 mt-2 space-y-2">
+								<li>
+									<a href="/documents/apel" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">📄 Documents APEL</a>
+								</li>
+								<li>
+									<a href="https://sites.google.com/site/apelbdr/fonctionnement?authuser=0" target="_blank" rel="noopener" class="block py-2 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d]">🌐 APEL Marseille</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="/auth/register" class="block py-3 px-4 rounded-lg hover:bg-[#8dd3cc] transition-all text-[#304a4d] font-semibold">📝 Demande identifiants</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- User menu (toujours visible à droite) -->
+		<div class="flex-none gap-4 user-menu">
+
+
+			
+				<a href="/auth/login" class="headerbutton Btn text-sm md:text-base">Connexion</a>
+			
+		</div>
+	</nav>
+</header>
+
+		<main class="min-h-screen pt-4 pb-8"> 
+	<div class="min-h-[600px] flex items-center justify-center py-8">
+		<div class="w-full max-w-4xl space-y-6 min-h-[600px] py-8 bg-white/80 border-4 border-teal-300 shadow-lg">
+			<div>
+				<h2 class="mt-4 text-center text-5xl font-extrabold text-gray-900">
+					Connexion à votre compte
+				</h2>
+				<p class="mt-2 text-center text-3xl text-gray-600">
+					École Saint-Mathieu
+				</p>
+			</div>
+
+			<form class="mt-6 space-y-4" action="/auth/login" method="POST">
+				
+
+				
+
+				<div class="form-control text-center px-5">
+					<label class="label">
+						<span class="label-text text-center w-full">Email</span>
+					</label>
+					<input type="email" name="email" value="" placeholder="votre@email.com" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2 text-center w-full" required>
+				</div>
+
+				<div class="form-control text-center px-5">
+					<label class="label">
+						<span class="label-text text-center w-full">Mot de passe</span>
+					</label>
+					<input type="password" name="password" placeholder="Votre mot de passe" class="input border-2 border-teal-300 focus:border-teal-600 focus:outline-none w-full rounded-lg px-3 py-2 text-center w-full" required>
+					<label class="label">
+						<a href="/auth/forgot-password" class="text-teal-600 hover:text-teal-800 text-sm underline text-center w-full">
+							Mot de passe oublié ?
+						</a>
+					</label>
+				</div>
+
+				<div class="form-control mt-6 text-center px-4">
+					<div class="w-full flex justify-center">
+						<button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-8 py-3 rounded-full shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-300 text-base min-w-[200px] border-2 border-teal-800 hover:shadow-2xl glow-effect">
+							✨ Se connecter
+						</button>
+					</div>
+				</div>
+
+				<div class="text-center space-y-3">
+					<p class="text-sm text-gray-600">
+						Identifiants oubliés ?
+						<a href="/demande-identifiants" class="text-amber-600 hover:text-amber-800 font-medium underline">
+							Demander mes codes d'accès
+						</a>
+					</p>
+					<p class="text-sm text-gray-600">
+						Pas encore de compte ?
+						<a href="/auth/register" class="text-teal-600 hover:text-teal-800 font-medium underline">
+							Inscrire mon enfant
+						</a>
+					</p>
+				</div>
+			</form>
+		</div>
+	</div>
+
+			</main>
+			<footer class="modern-footer">
+	<style>
+		.modern-footer {
+			background: linear-gradient(135deg, #7dd3fc 0%, #a7f3d0 50%, #bfdbfe 100%);
+			color: #1e3a3e;
+			padding: 1.5rem 0;
+			font-family: 'Poppins', sans-serif;
+			box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.modern-footer::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+			pointer-events: none;
+		}
+
+		.footer-container {
+			max-width: 100%;
+			width: 100%;
+			margin: 0 auto;
+			padding: 0 2rem;
+			position: relative;
+			z-index: 1;
+		}
+
+		.footer-content {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			gap: 2rem;
+			flex-wrap: wrap;
+		}
+
+		.footer-header {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			flex: 1;
+			min-width: 300px;
+		}
+
+		.foundation-logo {
+			transition: all 0.3s ease;
+			filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+		}
+
+		.foundation-logo:hover {
+			transform: scale(1.05) translateY(-2px);
+			filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
+		}
+
+		.foundation-logo img {
+			height: 80px;
+			width: auto;
+			border-radius: 8px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.school-info {
+			flex: 1;
+		}
+
+		.school-title {
+			font-size: 1.3rem;
+			font-weight: 700;
+			color: #0f2027;
+			margin: 0;
+			text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			letter-spacing: 0.5px;
+		}
+
+		.school-subtitle {
+			font-size: 0.9rem;
+			color: #2d4a4f;
+			margin: 0.3rem 0 0;
+			font-weight: 500;
+			line-height: 1.4;
+		}
+
+		.footer-navigation {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			flex: 1;
+			justify-content: center;
+		}
+
+		.footer-nav-link {
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: #1e3a3e;
+			text-decoration: none;
+			padding: 0.5rem 1rem;
+			border-radius: 20px;
+			background: rgba(255, 255, 255, 0.2);
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+			white-space: nowrap;
+		}
+
+		.footer-nav-link::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+			transition: left 0.5s ease;
+		}
+
+		.footer-nav-link:hover::before {
+			left: 100%;
+		}
+
+		.footer-nav-link:hover {
+			transform: translateY(-2px);
+			background: rgba(255, 255, 255, 0.35);
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+			color: #0f2027;
+		}
+
+		.footer-right {
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+			flex: 1;
+			justify-content: flex-end;
+		}
+
+		.footer-contact {
+			font-size: 1rem;
+			font-weight: 700;
+			color: #0f2027;
+			text-decoration: none;
+			padding: 0.6rem 1.2rem;
+			border: 2px solid #0f2027;
+			border-radius: 25px;
+			background: rgba(255, 255, 255, 0.15);
+			transition: all 0.3s ease;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			white-space: nowrap;
+		}
+
+		.footer-contact:hover {
+			background: #0f2027;
+			color: white;
+			transform: scale(1.05);
+			box-shadow: 0 6px 20px rgba(15, 32, 39, 0.3);
+		}
+
+		.social-media {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.social-link {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			background: rgba(255, 255, 255, 0.25);
+			border-radius: 50%;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			transition: all 0.3s ease;
+			backdrop-filter: blur(10px);
+		}
+
+		.social-link:hover {
+			transform: translateY(-3px) scale(1.1);
+			background: rgba(255, 255, 255, 0.4);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		}
+
+		.social-link svg {
+			width: 20px;
+			height: 20px;
+			fill: #1e3a3e;
+			transition: fill 0.3s ease;
+		}
+
+		.social-link:hover svg {
+			fill: #0f2027;
+		}
+
+		.footer-bottom {
+			text-align: center;
+			border-top: 1px solid rgba(255, 255, 255, 0.3);
+			padding-top: 1rem;
+			margin-top: 1rem;
+		}
+
+		.footer-copyright {
+			font-size: 0.85rem;
+			color: #2d4a4f;
+			margin: 0;
+			font-weight: 500;
+		}
+
+		.footer-credits {
+			font-size: 0.8rem;
+			color: #4a6b70;
+			margin: 0.2rem 0 0;
+			font-style: italic;
+		}
+
+		.footer-credits a {
+			color: #1e3a3e;
+			text-decoration: none;
+			font-weight: 600;
+			transition: color 0.3s ease;
+		}
+
+		.footer-credits a:hover {
+			color: #0f2027;
+			text-decoration: underline;
+		}
+
+		/* Responsive Design */
+		@media(max-width: 1024px) {
+			.footer-content {
+				flex-direction: column;
+				gap: 1.5rem;
+			}
+
+			.footer-header,
+			.footer-navigation,
+			.footer-right {
+				flex: none;
+				width: 100%;
+				justify-content: center;
+			}
+
+			.footer-navigation {
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.footer-right {
+				flex-direction: column;
+				gap: 1rem;
+			}
+		}
+
+		@media(max-width: 768px) {
+			.modern-footer {
+				padding: 1rem 0;
+			}
+
+			.footer-container {
+				padding: 0 1rem;
+			}
+
+			.footer-header {
+				flex-direction: column;
+				gap: 0.8rem;
+			}
+
+			.foundation-logo img {
+				height: 65px;
+			}
+
+			.school-title {
+				font-size: 1.1rem;
+			}
+
+			.school-subtitle {
+				font-size: 0.8rem;
+			}
+
+			.footer-nav-link {
+				font-size: 0.85rem;
+				padding: 0.4rem 0.8rem;
+			}
+
+			.footer-contact {
+				font-size: 0.9rem;
+				padding: 0.5rem 1rem;
+			}
+
+			.social-link {
+				width: 35px;
+				height: 35px;
+			}
+
+			.social-link svg {
+				width: 18px;
+				height: 18px;
+			}
+		}
+	</style>
+
+	<div class="footer-container">
+		<div
+			class="footer-content">
+			<!-- Left: Logo and school info in horizontal layout -->
+			<div class="footer-header">
+				<a href="https://investir.fondation-st-matthieu.org/" target="_blank" rel="noopener" class="foundation-logo">
+					<img src="/assets/images/fondationStMatthieu.jpg" alt="Fondation Saint Matthieu"/>
+				</a>
+				<div class="school-info">
+					<h2 class="school-title">École Privée Saint-Mathieu</h2>
+					<p class="school-subtitle">Enseignement catholique sous contrat d'association avec l'État</p>
+				</div>
+			</div>
+
+			<!-- Center: Navigation -->
+			<div class="footer-navigation">
+				<a href="/a-propos" class="footer-nav-link">À propos de nous</a>
+				<a href="/mentions-legales" class="footer-nav-link">Mentions légales</a>
+				<a href="/politique-confidentialite" class="footer-nav-link">Confidentialité</a>
+			</div>
+
+			<!-- Right: Contact and Social -->
+			<div class="footer-right">
+				<a href="/contact" class="footer-contact">Contact</a>
+				<div class="social-media">
+					<a href="#" class="social-link" aria-label="Twitter">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
+							<path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
+						</svg>
+					</a>
+					<a href="#" class="social-link" aria-label="YouTube">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
+							<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
+						</svg>
+					</a>
+					<a href="#" class="social-link" aria-label="Facebook">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
+							<path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
+						</svg>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Compact footer bottom -->
+		<div class="footer-bottom">
+			<p class="footer-copyright">©
+				2025
+				École Privée Saint-Mathieu - Tous droits réservés</p>
+			<p class="footer-credits">Site réalisé par
+				<a href="#">SG DIGITAL</a>
+			</p>
+		</div>
+	</div>
+</footer>
+
+
+			<!-- Script pour le menu mobile responsive -->
+			<script src="/assets/js/mobile-menu.js"></script>
+
+			
+		</body>
+	</html>

@@ -1,0 +1,23 @@
+-- CreateTable
+CREATE TABLE `Document` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `type` ENUM('PROJET_EDUCATIF', 'PROJET_ETABLISSEMENT', 'REGLEMENT_INTERIEUR', 'ORGANIGRAMME', 'CHARTE_LAICITE', 'CHARTE_NUMERIQUE', 'CHARTE_VIE_SCOLAIRE', 'CHARTE_RESTAURATION', 'AGENDA', 'PASTORALE_AXE', 'PASTORALE_TEMPS_PRIANT', 'PASTORALE_ENSEMBLE') NOT NULL,
+    `titre` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `contenu` LONGTEXT NULL,
+    `pdfUrl` VARCHAR(191) NULL,
+    `pdfFilename` VARCHAR(191) NULL,
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `ordre` INTEGER NOT NULL DEFAULT 0,
+    `auteurId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    INDEX `Document_type_idx`(`type`),
+    INDEX `Document_active_idx`(`active`),
+    INDEX `Document_ordre_idx`(`ordre`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Document` ADD CONSTRAINT `Document_auteurId_fkey` FOREIGN KEY (`auteurId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

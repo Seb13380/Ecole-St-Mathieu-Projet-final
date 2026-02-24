@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="cupcake" class="h-full">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+			{% block title %}Administration - École Saint-Mathieu
+			{% endblock %}
+		</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+		<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+		<link href="/assets/css/tailwind.css?v=20250820" rel="stylesheet">
+		<link rel="stylesheet" href="/assets/css/style.css">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> {% block styles %}{% endblock %}
+		</head>
+		<body
+			class="bg-gray-100 min-h-screen font-poppins">
+			<!-- Navigation Header Moderne -->
+			<div class="bg-gradient-to-r from-purple-600 via-blue-600 to-teal-600 shadow-lg">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="flex justify-between items-center py-6">
+						<div class="flex items-center space-x-4">
+							<img src="/assets/images/LogoStMathieuV.png" alt="Logo" class="h-12 w-12 rounded-lg shadow-md">
+							<div class="text-white">
+								<h1 class="text-2xl font-bold">Admin - École Saint-Mathieu</h1>
+								<p class="text-purple-100 text-sm">Panel d'administration</p>
+							</div>
+						</div>
+
+						<!-- Menu Navigation Moderne -->
+						<div class="hidden lg:flex items-center space-x-2">
+							<a href="{% if user.role == 'SECRETAIRE_DIRECTION' %}/secretaire/dashboard{% else %}/directeur/dashboard{% endif %}" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-home mr-2"></i>Dashboard
+							</a>
+							<a href="/directeur/users" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-users mr-2"></i>Utilisateurs
+							</a>
+							<a href="/directeur/classes" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-school mr-2"></i>Classes
+							</a>
+							<a href="/directeur/inscriptions" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-clipboard-list mr-2"></i>Inscriptions
+							</a>
+							<a href="/directeur/pdf-archive" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-file-pdf mr-2"></i>Archive PDF
+							</a>
+							<a href="/gallery/admin" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+								<i class="fas fa-images mr-2"></i>Galerie
+							</a>
+						</div>
+
+						<!-- Menu Utilisateur -->
+						{% if user %}
+							<div class="flex items-center space-x-4">
+								<div class="text-white text-right">
+									<div class="text-sm font-medium">{{ user.firstName }}
+										{{ user.lastName }}</div>
+									<div class="text-xs text-purple-100">
+										{% if user.role == 'SECRETAIRE_DIRECTION' %}
+											Secrétaire de Direction
+										{% elseif user.role == 'DIRECTION' %}
+											Direction
+										{% else %}
+											{{ user.role }}
+										{% endif %}
+									</div>
+								</div>
+								<a href="/auth/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+									<i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+								</a>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+
+			<!-- Contenu principal -->
+			<main class="min-h-screen bg-gray-50"> {% block content %}{% endblock %}
+				</main>
+
+				<!-- Scripts -->
+				<script src="https://cdn.tailwindcss.com"></script>
+				{% block scripts %}{% endblock %}
+			</body>
+		</html>

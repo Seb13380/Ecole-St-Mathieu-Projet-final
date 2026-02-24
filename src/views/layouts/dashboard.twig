@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>
+			{% block title %}Dashboard
+			{% endblock %}
+			- École Saint-Mathieu</title>
+
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+		<style>
+			body {
+				font-family: 'Inter', sans-serif;
+			}
+			.sidebar-transition {
+				transition: transform 0.3s ease-in-out;
+			}
+		</style>
+	</head>
+	<body
+		class="bg-gray-100">
+		<!-- Navigation Header -->
+		<header class="bg-white shadow-sm border-b">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex justify-between items-center py-4">
+					<div class="flex items-center">
+						<button id="sidebarToggle" class="md:hidden mr-3 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+							<i class="fas fa-bars"></i>
+						</button>
+						<h1 class="text-xl font-semibold text-gray-900">
+							{% if user and user.role == 'DIRECTION' %}
+								Tableau de bord - Direction
+							{% elseif user and user.role == 'ADMIN' %}
+								Tableau de bord - Administration
+							{% else %}
+								Tableau de bord
+							{% endif %}
+						</h1>
+					</div>
+					<div class="flex items-center space-x-4">
+						{% if user %}
+							<span class="text-sm text-gray-700">
+								Bonjour,
+								{{ user.firstName }}
+								{{ user.lastName }}
+							</span>
+							<a href="/logout" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+								<i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+							</a>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<div
+			class="flex">
+			<!-- Sidebar -->
+			<aside id="sidebar" class="w-64 bg-white shadow-sm h-screen sticky top-0 sidebar-transition md:translate-x-0 -translate-x-full fixed md:relative z-30">
+				<nav class="mt-6 px-3">
+					<div
+						class="space-y-1">
+						<!-- Dashboard -->
+						<a href="/directeur/dashboard" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-home mr-3 text-gray-400"></i>
+							Tableau de bord
+						</a>
+
+						<!-- Gestion des utilisateurs -->
+						<a href="/directeur/users" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-users mr-3 text-gray-400"></i>
+							Utilisateurs
+						</a>
+
+						<!-- Gestion des classes -->
+						<a href="/directeur/classes" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-chalkboard mr-3 text-gray-400"></i>
+							Classes
+						</a>
+
+						<!-- Gestion des élèves -->
+						<a href="/directeur/students" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-graduation-cap mr-3 text-gray-400"></i>
+							Élèves
+						</a>
+
+						<!-- Import Excel -->
+						<a href="/directeur/import-excel" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-file-excel mr-3 text-gray-400"></i>
+							Import Excel
+						</a>
+
+						<!-- Demandes d'inscription -->
+						<a href="/directeur/inscriptions" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-file-alt mr-3 text-gray-400"></i>
+							Inscriptions
+						</a>
+
+						<!-- Rendez-vous d'inscription -->
+						<a href="/directeur/rendez-vous-inscriptions" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-calendar-check mr-3 text-gray-400"></i>
+							Rendez-vous
+						</a>
+
+						<!-- Demandes d'identifiants -->
+						<a href="/directeur/credentials" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-key mr-3 text-gray-400"></i>
+							Identifiants
+						</a>
+
+						<!-- Messages de contact -->
+						<a href="/directeur/contact-messages" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-envelope mr-3 text-gray-400"></i>
+							Messages
+						</a>
+
+						<!-- Rapports -->
+						<a href="/directeur/reports" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-chart-bar mr-3 text-gray-400"></i>
+							Rapports
+						</a>
+
+						<!-- Paramètres -->
+						<a href="/directeur/settings" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+							<i class="fas fa-cog mr-3 text-gray-400"></i>
+							Paramètres
+						</a>
+					</div>
+				</nav>
+			</aside>
+
+			<!-- Overlay pour mobile -->
+			<div id="sidebarOverlay" class="fixed inset-0 z-20 bg-black bg-opacity-50 hidden md:hidden"></div>
+
+			<!-- Main content -->
+			<main class="flex-1 p-6"> {% block content %}{% endblock %}
+				</main>
+			</div>
+
+			<!-- JavaScript pour le sidebar mobile -->
+			<script>
+				document.addEventListener('DOMContentLoaded', function () {
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+
+function toggleSidebar() {
+sidebar.classList.toggle('-translate-x-full');
+overlay.classList.toggle('hidden');
+}
+
+sidebarToggle.addEventListener('click', toggleSidebar);
+overlay.addEventListener('click', toggleSidebar);
+
+// Fermer le sidebar sur les liens en mobile
+const sidebarLinks = sidebar.querySelectorAll('a');
+sidebarLinks.forEach(link => {
+link.addEventListener('click', function () {
+if (window.innerWidth < 768) {
+toggleSidebar();
+}
+});
+});
+});
+			</script>
+		</body>
+	</html>

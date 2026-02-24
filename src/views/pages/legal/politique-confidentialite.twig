@@ -1,0 +1,231 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Politique de confidentialité -
+	{{ parent() }}
+{% endblock %}
+
+{% block main %}
+	<div
+		class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+		<!-- Hero Section -->
+		<div class="bg-white shadow-sm">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+				<div class="text-center">
+					<h1 class="text-4xl font-bold text-gray-900 mb-4">
+						Politique de confidentialité
+					</h1>
+					<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+						Protection et utilisation de vos données personnelles
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Contenu principal -->
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+			<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+				<div
+					class="p-8">
+					<!-- Introduction -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Introduction</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								L'École Saint Mathieu s'engage à protéger la vie privée de tous les utilisateurs 
+								                            de son site web et de ses services. Cette politique de confidentialité explique 
+								                            comment nous collectons, utilisons et protégeons vos données personnelles.
+							</p>
+							<p class="text-gray-700">
+								Cette politique est conforme au Règlement Général sur la Protection des Données (RGPD) 
+								                            et à la loi "Informatique et Libertés".
+							</p>
+						</div>
+					</div>
+
+					<!-- Données collectées -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Données personnelles collectées</h2>
+						<div class="bg-blue-50 p-6 rounded-lg mb-4">
+							<h3 class="text-lg font-semibold text-blue-900 mb-3">Données d'inscription</h3>
+							<ul class="list-disc list-inside text-gray-700 space-y-1">
+								<li>Nom et prénom des parents et de l'enfant</li>
+								<li>Adresse email et postale</li>
+								<li>Numéro de téléphone</li>
+								<li>Date de naissance de l'enfant</li>
+								<li>Classe demandée</li>
+							</ul>
+						</div>
+						<div class="bg-green-50 p-6 rounded-lg mb-4">
+							<h3 class="text-lg font-semibold text-green-900 mb-3">Données de connexion</h3>
+							<ul class="list-disc list-inside text-gray-700 space-y-1">
+								<li>Identifiant de connexion</li>
+								<li>Adresse email</li>
+								<li>Rôle (parent, enseignant, administrateur)</li>
+								<li>Date de dernière connexion</li>
+							</ul>
+						</div>
+						<div class="bg-yellow-50 p-6 rounded-lg">
+							<h3 class="text-lg font-semibold text-yellow-900 mb-3">Données techniques</h3>
+							<ul class="list-disc list-inside text-gray-700 space-y-1">
+								<li>Adresse IP</li>
+								<li>Type de navigateur</li>
+								<li>Pages visitées et durée de visite</li>
+								<li>Cookies de session</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Finalités -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Finalités de traitement</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">Nous utilisons vos données personnelles pour :</p>
+							<ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+								<li>Gérer les demandes d'inscription et de pré-inscription</li>
+								<li>Fournir l'accès aux services en ligne (documents, menus, actualités)</li>
+								<li>Communiquer avec les familles</li>
+								<li>Assurer la sécurité du site et des données</li>
+								<li>Respecter nos obligations légales</li>
+								<li>Améliorer nos services</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Base légale -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Base légale du traitement</h2>
+						<div class="bg-gray-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-4">
+								Le traitement de vos données personnelles est fondé sur :
+							</p>
+							<ul class="list-disc list-inside text-gray-700 space-y-2">
+								<li>
+									<strong>L'exécution d'un contrat :</strong>
+									gestion de la scolarité</li>
+								<li>
+									<strong>L'intérêt légitime :</strong>
+									communication avec les familles</li>
+								<li>
+									<strong>L'obligation légale :</strong>
+									tenue des registres scolaires</li>
+								<li>
+									<strong>Le consentement :</strong>
+									pour certaines communications non essentielles</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Partage des données -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Partage et transfert des données</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								Vos données personnelles ne sont pas vendues, louées ou transmises à des tiers 
+								                            à des fins commerciales.
+							</p>
+							<p class="text-gray-700 mb-4">
+								Elles peuvent être partagées uniquement dans les cas suivants :
+							</p>
+							<ul class="list-disc list-inside text-gray-700 space-y-2">
+								<li>Avec l'équipe pédagogique dans le cadre de la scolarité</li>
+								<li>Avec les autorités compétentes si requis par la loi</li>
+								<li>Avec nos prestataires techniques (hébergement) sous contrat de confidentialité</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Conservation -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Durée de conservation</h2>
+						<div class="bg-blue-50 p-6 rounded-lg">
+							<ul class="list-disc list-inside text-gray-700 space-y-2">
+								<li>
+									<strong>Données d'inscription :</strong>
+									3 ans après le refus ou 1 an après la fin de scolarité</li>
+								<li>
+									<strong>Données de connexion :</strong>
+									Pendant la durée d'utilisation du service + 1 an</li>
+								<li>
+									<strong>Données techniques :</strong>
+									13 mois maximum</li>
+								<li>
+									<strong>Dossiers scolaires :</strong>
+									Selon la réglementation de l'Éducation Nationale</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Droits -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Vos droits</h2>
+						<div class="grid md:grid-cols-2 gap-4">
+							<div class="bg-green-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-green-900 mb-2">Droit d'accès</h3>
+								<p class="text-sm text-gray-700">Connaître les données que nous détenons sur vous</p>
+							</div>
+							<div class="bg-blue-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-blue-900 mb-2">Droit de rectification</h3>
+								<p class="text-sm text-gray-700">Corriger vos données inexactes</p>
+							</div>
+							<div class="bg-red-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-red-900 mb-2">Droit d'effacement</h3>
+								<p class="text-sm text-gray-700">Demander la suppression de vos données</p>
+							</div>
+							<div class="bg-yellow-50 p-4 rounded-lg">
+								<h3 class="font-semibold text-yellow-900 mb-2">Droit d'opposition</h3>
+								<p class="text-sm text-gray-700">Vous opposer à certains traitements</p>
+							</div>
+						</div>
+						<div class="mt-4 bg-gray-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-2">
+								<strong>Pour exercer vos droits :</strong>
+							</p>
+							<p class="text-gray-700">
+								Contactez-nous à :
+								<a href="mailto:ecole-saint-mathieu@wanadoo.fr" class="text-blue-600 hover:underline">
+									ecole-saint-mathieu@wanadoo.fr
+								</a>
+							</p>
+						</div>
+					</div>
+
+					<!-- Sécurité -->
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Sécurité des données</h2>
+						<div class="prose prose-lg max-w-none">
+							<p class="text-gray-700 mb-4">
+								Nous mettons en œuvre des mesures techniques et organisationnelles appropriées 
+								                            pour protéger vos données personnelles contre :
+							</p>
+							<ul class="list-disc list-inside text-gray-700 space-y-2">
+								<li>L'accès non autorisé</li>
+								<li>La modification, la divulgation ou la destruction</li>
+								<li>La perte accidentelle</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Contact -->
+					<div>
+						<h2 class="text-2xl font-bold text-gray-900 mb-4">Contact</h2>
+						<div class="bg-blue-50 p-6 rounded-lg">
+							<p class="text-gray-700 mb-4">
+								Pour toute question concernant cette politique de confidentialité ou vos données personnelles :
+							</p>
+							<p class="text-gray-700">
+								<strong>École Saint Mathieu</strong><br>
+								22 Place des Héros, 13013 Marseille<br>
+								<strong>Email :</strong>
+								<a href="mailto:ecole-saint-mathieu@wanadoo.fr" class="text-blue-600 hover:underline">
+									ecole-saint-mathieu@wanadoo.fr
+								</a><br>
+								<strong>Téléphone :</strong>
+								04.91.07.07.18
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

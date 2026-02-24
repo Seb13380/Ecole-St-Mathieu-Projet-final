@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="cupcake" class="h-full">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+			{% block title %}École Saint-Mathieu
+			{% endblock %}
+		</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+		<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+		<link href="/assets/css/tailwind.css?v=20250820" rel="stylesheet">
+		<link rel="stylesheet" href="/assets/css/style.css">
+		{% block styles %}{% endblock %}
+	</head>
+	<body class="bg-[#a7e3dd] min-h-screen font-poppins">
+		{% include "partials/header.twig" %}
+		<main class="min-h-screen pt-4 pb-8">
+			{% block content %}{% endblock %}
+		</main>
+		{% include "partials/footer.twig" %}
+
+		<!-- Script pour le menu mobile responsive -->
+		<script src="/assets/js/mobile-menu.js"></script>
+		{% block scripts %}{% endblock %}
+	</body>
+</html>

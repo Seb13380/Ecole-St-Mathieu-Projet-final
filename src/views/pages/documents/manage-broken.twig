@@ -1,0 +1,361 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Gestion des Documents - École Saint-Mathieu
+{% endblock %}
+
+{% block main %}
+	<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+		<div
+			class="max-w-7xl mx-auto">
+			<!-- Header Section -->
+			<div class="text-center mb-8">
+				<h1 class="text-4xl font-bold text-slate-800 mb-4">
+					<span class="mr-3">📄</span>
+					Gestion des Documents
+				</h1>
+				<p class="text-slate-600">Gérez tous les documents administratifs et pédagogiques de l'école</p>
+			</div>
+
+			<!-- Messages -->
+			{% if success %}
+				<div class="max-w-4xl mx-auto mb-6">
+					<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+						<div class="flex items-center">
+							<svg class="w-5 h-5 mr-2" fill="currentColor" viewbox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+							</svg>
+							{{ success }}
+						</div>
+					</div>
+				</div>
+			{% endif %}
+
+			{% if error %}
+				<div class="max-w-4xl mx-auto mb-6">
+					<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+						<div class="flex items-center">
+							<svg class="w-5 h-5 mr-2" fill="currentColor" viewbox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+							</svg>
+							{{ error }}
+						</div>
+					</div>
+				</div>
+			{% endif %}
+
+			<!-- Formulaire de création -->
+			<div class="mb-8">
+				<div class="bg-white shadow-lg border-l-4 border-blue-500 p-8 max-w-4xl mx-auto">
+					<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
+						<span class="mr-2">✏️</span>
+						Ajouter un Nouveau Document
+					</h2>
+
+					<form action="/documents/admin/create" method="POST" enctype="multipart/form-data" class="space-y-6">
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div class="md:col-span-2">
+								<label for="type" class="block text-sm font-medium text-slate-700 mb-2">
+									Type de document
+									<span class="text-red-500">*</span>
+								</label>
+								<select id="type" name="type" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+									<option value="">Choisissez un type</option>
+									<optgroup label="École">
+										<option value="PROJET_EDUCATIF">Projet éducatif</option>
+										<option value="PROJET_ETABLISSEMENT">Projet d'établissement</option>
+										<option value="REGLEMENT_INTERIEUR">Règlement intérieur</option>
+										<option value="ORGANIGRAMME">Organigramme</option>
+										<option value="AGENDA">Agenda</option>
+									</optgroup>
+									<optgroup label="Chartes">
+										<option value="CHARTE_LAICITE">Charte de la laïcité</option>
+										<option value="CHARTE_NUMERIQUE">Charte du numérique</option>
+										<option value="CHARTE_VIE_SCOLAIRE">Charte de vie scolaire</option>
+										<option value="CHARTE_RESTAURATION">Charte de restauration</option>
+									</optgroup>
+									<optgroup label="Pastorale">
+										<option value="PASTORALE_AXE">Axe Pastoral de l'école</option>
+										<option value="PASTORALE_TEMPS_PRIANT">Temps Priant de l'école</option>
+										<option value="PASTORALE_ENSEMBLE">Ensemble pastoral de l'étoile</option>
+									</optgroup>
+								</select>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="titre" class="block text-sm font-medium text-slate-700 mb-2">
+									Titre du document
+									<span class="text-red-500">*</span>
+								</label>
+								<input type="text" id="titre" name="titre" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Titre du document" required>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="description" class="block text-sm font-medium text-slate-700 mb-2">
+									Description
+								</label>
+								<textarea id="description" name="description" rows="3" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Description courte du document..."></textarea>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="pdf" class="block text-sm font-medium text-slate-700 mb-2">
+									Fichier PDF
+								</label>
+								<input type="file" id="pdf" name="pdf" accept=".pdf,.doc,.docx,.txt" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+								<p class="text-xs text-slate-500 mt-1">Formats acceptés : PDF, Word (.doc, .docx), Texte (.txt) - Max 10MB</p>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="contenu" class="block text-sm font-medium text-slate-700 mb-2">
+									Contenu HTML (optionnel)
+								</label>
+								<textarea id="contenu" name="contenu" rows="8" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Contenu HTML pour affichage sur le site..."></textarea>
+								<p class="text-xs text-slate-500 mt-1">Vous pouvez utiliser des balises HTML pour formater le contenu</p>
+							</div>
+						</div>
+
+						<div class="text-center">
+							<button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 transition-colors inline-flex items-center text-lg">
+								<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+								</svg>
+								Publier le Document
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- Documents existants -->
+			<div class="mb-8">
+				<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
+					<span class="mr-2">📋</span>
+					Documents Existants
+				</h2>
+
+				{% if documentsByType and documentsByType|length > 0 %}
+					{% for type, documents in documentsByType %}
+						<div class="mb-8">
+							<h3 class="text-xl font-bold text-slate-700 mb-4 bg-slate-100 px-4 py-2 rounded-lg">
+								📂
+								{{ type|replace('_', ' ')|title }}
+							</h3>
+
+							<div class="grid gap-4 max-w-6xl mx-auto">
+								{% for document in documents %}
+									<div id="document-{{ document.id }}" class="bg-white shadow-md border-l-4 {{ document.active ? 'border-blue-500' : 'border-slate-300' }} p-6 hover:shadow-lg transition-all duration-300">
+										<div class="flex flex-col md:flex-row md:items-start justify-between">
+											<div class="flex-1">
+												<div class="flex items-center mb-3 flex-wrap gap-2">
+													<h4 class="text-xl font-bold text-slate-800">{{ document.titre }}</h4>
+
+													{% if document.active %}
+														<span class="bg-green-100 text-green-800 px-3 py-1 text-xs font-medium border border-green-200">
+															👁️ ACTIF
+														</span>
+													{% else %}
+														<span class="bg-slate-100 text-slate-600 px-3 py-1 text-xs font-medium border border-slate-200">
+															🚫 INACTIF
+														</span>
+													{% endif %}
+
+													{% if document.pdfUrl %}
+														<span class="bg-blue-100 text-blue-800 px-3 py-1 text-xs font-medium border border-blue-200">
+															📄 PDF
+														</span>
+													{% endif %}
+												</div>
+
+												{% if document.description %}
+													<p class="text-slate-600 mb-4 leading-relaxed">{{ document.description }}</p>
+												{% endif %}
+
+												<div class="text-sm text-slate-500 space-y-1">
+													<div class="flex items-center">
+														<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+														</svg>
+														Par
+														{{ document.auteur.firstName }}
+														{{ document.auteur.lastName }}
+													</div>
+													<div class="flex items-center">
+														<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+														</svg>
+														{{ document.updatedAt|date('d/m/Y à H:i') }}
+													</div>
+												</div>
+											</div>
+
+											<!-- Boutons d'action -->
+											<div class="mt-4 pt-4 border-t border-slate-200">
+												<div
+													class="text-center space-x-2">
+													<!-- Bouton Modifier -->
+													<button onclick="editDocument({{ document.id|default(0) }}, '{{ (document.titre|default(''))|e('js') }}', '{{ (document.description|default(''))|e('js') }}', '{{ (document.contenu|default(''))|e('js') }}')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors inline-block mr-2">
+														✏️ Modifier
+													</button>
+
+													<!-- Bouton Activer/Désactiver -->
+													<form action="/documents/admin/{{ document.id }}/toggle" method="POST" class="inline-block mr-2">
+														<button type="submit" class="{% if document.active %}bg-gray-500 hover:bg-gray-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+															{% if document.active %}
+																👁️ Désactiver
+															{% else %}
+																👁️‍🗨️ Activer
+															{% endif %}
+														</button>
+													</form>
+
+													<!-- Bouton Supprimer -->
+													<button onclick="confirmDelete({{ document.id|default(0) }}, '{{ (document.titre|default('Document'))|e('js') }}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors inline-block">
+														🗑️ Supprimer
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					{% endfor %}
+				{% else %}
+					<div class="text-center py-12">
+						<div class="bg-white shadow-md p-8 max-w-2xl mx-auto">
+							<div class="text-6xl mb-4">📄</div>
+							<h3 class="text-xl font-bold text-slate-800 mb-2">Aucun document</h3>
+							<p class="text-slate-600">Ajoutez votre premier document pour commencer.</p>
+						</div>
+					</div>
+				{% endif %}
+			</div>
+
+			<!-- Information Section -->
+			<div class="bg-blue-50 border border-blue-200 p-6 max-w-4xl mx-auto">
+				<h3 class="text-lg font-bold text-blue-900 mb-3">
+					<span class="mr-2">ℹ️</span>
+					Guide d'utilisation
+				</h3>
+				<div class="text-blue-800 text-sm space-y-2">
+					<p>• Les documents actifs s'affichent automatiquement dans les menus du site.</p>
+					<p>• Vous pouvez ajouter un fichier PDF et/ou du contenu HTML pour chaque document.</p>
+					<p>• Les types de documents correspondent aux menus "École" et "Pastorale".</p>
+					<p>• Les documents inactifs ne sont pas visibles par les visiteurs du site.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal de modification -->
+	<div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center" style="display: none;">
+		<div class="bg-white rounded-xl p-8 max-w-3xl mx-4 shadow-2xl max-h-screen overflow-y-auto border-t-4 border-blue-500">
+			<div class="flex items-center mb-6">
+				<div class="bg-blue-100 rounded-full p-3 mr-4">
+					<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+					</svg>
+				</div>
+				<h3 class="text-2xl font-bold text-slate-800">Modifier le document</h3>
+			</div>
+			<form id="editForm" method="POST" action="" enctype="multipart/form-data">
+				<input type="hidden" name="_method" value="PUT">
+				<div class="space-y-6">
+					<div>
+						<label for="editTitre" class="block text-sm font-medium text-slate-700 mb-2">Titre</label>
+						<input type="text" id="editTitre" name="titre" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+					</div>
+					<div>
+						<label for="editDescription" class="block text-sm font-medium text-slate-700 mb-2">Description</label>
+						<textarea id="editDescription" name="description" rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+					</div>
+					<div>
+						<label for="editPdf" class="block text-sm font-medium text-slate-700 mb-2">Nouveau fichier PDF (optionnel)</label>
+						<input type="file" id="editPdf" name="pdf" accept=".pdf,.doc,.docx,.txt" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+						<p class="text-xs text-slate-500 mt-1">Laissez vide pour garder le fichier actuel</p>
+					</div>
+					<div>
+						<label for="editContenu" class="block text-sm font-medium text-slate-700 mb-2">Contenu HTML</label>
+						<textarea id="editContenu" name="contenu" rows="6" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+					</div>
+				</div>
+				<div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-slate-200">
+					<button type="button" onclick="closeEditModal()" class="bg-slate-500 hover:bg-slate-600 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+						Annuler
+					</button>
+					<button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+						💾 Sauvegarder
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modal de confirmation de suppression -->
+	<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center" style="display: none;">
+		<div class="bg-white rounded-xl p-8 max-w-md mx-4 shadow-2xl border-t-4 border-red-500">
+			<div class="flex items-center mb-6">
+				<div class="bg-red-100 rounded-full p-3 mr-4">
+					<svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+					</svg>
+				</div>
+				<h3 class="text-2xl font-bold text-red-700">Confirmer la suppression</h3>
+			</div>
+			<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+				<p class="text-red-800">
+					⚠️ Êtes-vous sûr de vouloir supprimer le document
+					<span class="font-bold">"<span id="documentTitle"></span>"</span>
+					?
+				</p>
+				<p class="text-red-600 text-sm mt-2">Cette action est irréversible.</p>
+			</div>
+			<div class="flex justify-end space-x-4">
+				<button onclick="closeDeleteModal()" class="bg-slate-500 hover:bg-slate-600 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+					Annuler
+				</button>
+				<form id="deleteForm" method="POST" action="" class="inline">
+					<button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+						🗑️ Supprimer définitivement
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Fonctions JavaScript pour les modaux
+function editDocument(id, titre, description, contenu) {
+document.getElementById('editTitre').value = titre;
+document.getElementById('editDescription').value = description;
+document.getElementById('editContenu').value = contenu;
+document.getElementById('editForm').action = '/documents/admin/' + id;
+document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+document.getElementById('editModal').style.display = 'none';
+}
+
+function confirmDelete(id, titre) {
+document.getElementById('documentTitle').textContent = titre;
+document.getElementById('deleteForm').action = '/documents/admin/' + id + '/delete';
+document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+document.getElementById('deleteModal').style.display = 'none';
+}
+
+// Fermer les modaux en cliquant en dehors
+window.onclick = function (event) {
+const editModal = document.getElementById('editModal');
+const deleteModal = document.getElementById('deleteModal');
+if (event.target === editModal) {
+closeEditModal();
+}
+if (event.target === deleteModal) {
+closeDeleteModal();
+}
+}
+	</script>
+{% endblock %}

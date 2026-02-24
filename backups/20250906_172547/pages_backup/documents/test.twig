@@ -1,0 +1,92 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Test Gestion Documents
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto p-8">
+		<h1 class="text-3xl font-bold mb-4">🧪 Test - Gestion des Documents</h1>
+
+		<div class="bg-white p-6 rounded-lg shadow">
+			<h2 class="text-xl font-semibold mb-4">Informations de débogage</h2>
+
+			<div class="space-y-2">
+				<p>
+					<strong>Utilisateur:</strong>
+					{% if user %}
+						{{ user.firstName }}
+						{{ user.lastName }}
+						({{ user.role }})
+					{% else %}
+						Non connecté
+					{% endif %}
+				</p>
+
+				<p>
+					<strong>Documents par type:</strong>
+					{% if documentsByType %}
+						{{ documentsByType|length }}
+						groupe(s)
+					{% else %}
+						Aucun données
+					{% endif %}
+				</p>
+
+				{% if success %}
+					<div class="bg-green-100 p-3 rounded">✅ Succès:
+						{{ success }}</div>
+				{% endif %}
+
+				{% if error %}
+					<div class="bg-red-100 p-3 rounded">❌ Erreur:
+						{{ error }}</div>
+				{% endif %}
+			</div>
+
+			{% if documentsByType %}
+				<h3 class="text-lg font-semibold mt-6 mb-3">Types de documents trouvés:</h3>
+				<ul class="list-disc list-inside">
+					{% for type, documents in documentsByType %}
+						<li>{{ type }}:
+							{{ documents|length }}
+							document(s)</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<div class="bg-yellow-100 p-4 rounded mt-4">
+					<p>⚠️ Aucun document trouvé. Cela est normal si c'est la première utilisation.</p>
+					<p class="text-sm mt-2">Vous pouvez créer votre premier document ci-dessous.</p>
+				</div>
+			{% endif %}
+		</div>
+
+		<!-- Formulaire simple de test -->
+		<div class="bg-white p-6 rounded-lg shadow mt-6">
+			<h2 class="text-xl font-semibold mb-4">➕ Ajouter un document de test</h2>
+			<form action="/documents/admin/create" method="POST" enctype="multipart/form-data" class="space-y-4">
+				<div>
+					<label class="block text-sm font-medium mb-1">Type:</label>
+					<select name="type" class="w-full border rounded px-3 py-2" required>
+						<option value="">Choisir un type</option>
+						<option value="PROJET_EDUCATIF">Projet éducatif</option>
+						<option value="REGLEMENT_INTERIEUR">Règlement intérieur</option>
+					</select>
+				</div>
+
+				<div>
+					<label class="block text-sm font-medium mb-1">Titre:</label>
+					<input type="text" name="titre" class="w-full border rounded px-3 py-2" placeholder="Titre du document" required>
+				</div>
+
+				<div>
+					<label class="block text-sm font-medium mb-1">Description:</label>
+					<textarea name="description" class="w-full border rounded px-3 py-2" rows="3" placeholder="Description..."></textarea>
+				</div>
+
+				<button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+					Créer le document
+				</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}

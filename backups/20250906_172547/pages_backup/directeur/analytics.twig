@@ -1,0 +1,377 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Analytics et Statistiques - École Saint-Mathieu
+{% endblock %}
+
+{% block styles %}
+	<style>
+		.stats-card {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-radius: 12px;
+			padding: 1.5rem;
+			color: white;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s ease;
+		}
+
+		.stats-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		}
+
+		.stats-number {
+			font-size: 2.5rem;
+			font-weight: bold;
+			margin-bottom: 0.5rem;
+		}
+
+		.stats-label {
+			font-size: 1rem;
+			opacity: 0.9;
+		}
+
+		.chart-container {
+			background: white;
+			border-radius: 12px;
+			padding: 1.5rem;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			margin-bottom: 1.5rem;
+		}
+
+		.metric-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid #e5e7eb;
+			transition: background-color 0.2s ease;
+		}
+
+		.metric-item:hover {
+			background-color: #f9fafb;
+		}
+
+		.metric-item:last-child {
+			border-bottom: none;
+		}
+
+		.progress-bar {
+			width: 100%;
+			height: 8px;
+			background-color: #e5e7eb;
+			border-radius: 4px;
+			overflow: hidden;
+		}
+
+		.progress-fill {
+			height: 100%;
+			background: linear-gradient(90deg, #10b981, #34d399);
+			transition: width 0.3s ease;
+		}
+
+		.device-icon {
+			width: 24px;
+			height: 24px;
+			margin-right: 8px;
+		}
+	</style>
+{% endblock %}
+
+{% block main %}
+	<div
+		class="max-w-7xl mx-auto p-6">
+		<!-- En-tête -->
+		<div class="mb-8">
+			<h1 class="text-4xl font-bold text-gray-900 mb-2">📊 Analytics et Statistiques</h1>
+			<p class="text-gray-600">Tableau de bord des performances du site -
+				{{ period }}</p>
+
+			<!-- Contrôles de période -->
+			<div class="mt-4 flex gap-2">
+				<button onclick="loadPeriod('today')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">Aujourd'hui</button>
+				<button onclick="loadPeriod('week')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">7 jours</button>
+				<button onclick="loadPeriod('month')" class="px-4 py-2 bg-blue-600 text-white rounded">30 jours</button>
+				<button onclick="loadPeriod('year')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">1 an</button>
+				<button onclick="exportLogs()" class="ml-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">📥 Export CSV</button>
+			</div>
+		</div>
+
+		<!-- Statistiques principales -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+			<div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+				<div class="stats-number">{{ stats.totalVisits|number_format }}</div>
+				<div class="stats-label">Total des visites</div>
+			</div>
+
+			<div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+				<div class="stats-number">{{ stats.uniqueVisitors|number_format }}</div>
+				<div class="stats-label">Visiteurs uniques</div>
+			</div>
+
+			<div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+				<div class="stats-number">{{ stats.avgResponseTime }}ms</div>
+				<div class="stats-label">Temps de réponse moyen</div>
+			</div>
+
+			<div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+				<div class="stats-number">{{ ((stats.totalVisits - (stats.topErrors|length)) / stats.totalVisits * 100)|round(1) }}%</div>
+				<div class="stats-label">Taux de succès</div>
+			</div>
+		</div>
+
+		<!-- Graphiques et métriques -->
+		<div
+			class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+			<!-- Visites par jour -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">📈 Visites quotidiennes</h3>
+				<canvas id="dailyVisitsChart" width="400" height="200"></canvas>
+			</div>
+
+			<!-- Types d'appareils -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">📱 Types d'appareils</h3>
+				<div class="space-y-4">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center">
+							<span class="device-icon">💻</span>
+							<span>Desktop</span>
+						</div>
+						<div class="flex items-center gap-3">
+							<div class="progress-bar w-32">
+								<div class="progress-fill" style="width: {{ additionalStats.deviceStats.desktop.percentage }}%"></div>
+							</div>
+							<span class="text-sm font-medium">{{ additionalStats.deviceStats.desktop.percentage }}%</span>
+						</div>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<div class="flex items-center">
+							<span class="device-icon">📱</span>
+							<span>Mobile</span>
+						</div>
+						<div class="flex items-center gap-3">
+							<div class="progress-bar w-32">
+								<div class="progress-fill" style="width: {{ additionalStats.deviceStats.mobile.percentage }}%"></div>
+							</div>
+							<span class="text-sm font-medium">{{ additionalStats.deviceStats.mobile.percentage }}%</span>
+						</div>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<div class="flex items-center">
+							<span class="device-icon">📟</span>
+							<span>Tablette</span>
+						</div>
+						<div class="flex items-center gap-3">
+							<div class="progress-bar w-32">
+								<div class="progress-fill" style="width: {{ additionalStats.deviceStats.tablet.percentage }}%"></div>
+							</div>
+							<span class="text-sm font-medium">{{ additionalStats.deviceStats.tablet.percentage }}%</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Pages les plus visitées -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">🔥 Pages populaires</h3>
+				<div class="space-y-2">
+					{% for page in stats.topPages|slice(0, 8) %}
+						<div class="metric-item">
+							<span class="text-sm truncate">{{ page.url }}</span>
+							<span class="font-medium text-blue-600">{{ page.visits }}</span>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<!-- Connexions par rôle -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">👥 Connexions par rôle</h3>
+				<div class="space-y-2">
+					{% for login in additionalStats.loginsByRole %}
+						<div class="metric-item">
+							<span class="text-sm">
+								{% if login.role == 'PARENT' %}👨‍👩‍👧‍👦 Parents
+									{% elseif login.role == 'ENSEIGNANT' %}👩‍🏫 Enseignants
+									{% elseif login.role == 'DIRECTION' %}🏛️ Direction
+									{% elseif login.role == 'ADMIN' %}⚙️ Administrateurs
+									{% elseif login.role == 'SECRETAIRE_DIRECTION' %}📋 Secrétariat
+									{% elseif login.role == 'RESTAURANT' %}🍽️ Restaurant
+								{% else %}
+									{{ login.role }}
+								{% endif %}
+							</span>
+							<span class="font-medium text-green-600">{{ login.logins }}</span>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<!-- Recherches populaires -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">🔍 Recherches populaires</h3>
+				<div class="space-y-2">
+					{% if additionalStats.topSearches|length > 0 %}
+						{% for search in additionalStats.topSearches|slice(0, 6) %}
+							<div class="metric-item">
+								<span class="text-sm">{{ search.query }}</span>
+								<span class="font-medium text-purple-600">{{ search.count }}</span>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="text-center text-gray-500 py-4">
+							Aucune recherche enregistrée
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Téléchargements populaires -->
+			<div class="chart-container">
+				<h3 class="text-xl font-bold mb-4">📥 Téléchargements populaires</h3>
+				<div class="space-y-2">
+					{% if additionalStats.topDownloads|length > 0 %}
+						{% for download in additionalStats.topDownloads|slice(0, 6) %}
+							<div class="metric-item">
+								<span class="text-sm truncate">{{ download.url|replace({'/download/': '', '/uploads/': ''}) }}</span>
+								<span class="font-medium text-orange-600">{{ download.downloads }}</span>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="text-center text-gray-500 py-4">
+							Aucun téléchargement enregistré
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Trafic par heure -->
+		{% if additionalStats.hourlyTraffic|length > 0 %}
+			<div class="chart-container mt-6">
+				<h3 class="text-xl font-bold mb-4">⏰ Trafic par heure de la journée</h3>
+				<canvas id="hourlyTrafficChart" width="800" height="300"></canvas>
+			</div>
+		{% endif %}
+
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () { // Graphique des visites quotidiennes
+const dailyVisitsData = {{ stats.dailyVisits|json_encode|raw }};
+
+const dailyCtx = document.getElementById('dailyVisitsChart').getContext('2d');
+new Chart(dailyCtx, {
+type: 'line',
+data: {
+labels: dailyVisitsData.map(d => {
+const date = new Date(d.date);
+return date.toLocaleDateString('fr-FR', {
+day: '2-digit',
+month: '2-digit'
+});
+}),
+datasets: [
+{
+label: 'Visites',
+data: dailyVisitsData.map(d => d.visits),
+borderColor: '#667eea',
+backgroundColor: 'rgba(102, 126, 234, 0.1)',
+borderWidth: 3,
+fill: true,
+tension: 0.4
+}
+]
+},
+options: {
+responsive: true,
+scales: {
+y: {
+beginAtZero: true,
+ticks: {
+stepSize: 1
+}
+}
+},
+plugins: {
+legend: {
+display: false
+}
+}
+}
+});
+
+// Graphique du trafic horaire
+{% if additionalStats.hourlyTraffic|length > 0 %}
+const hourlyTrafficData = {{ additionalStats.hourlyTraffic|json_encode|raw }};
+
+const hourlyCtx = document.getElementById('hourlyTrafficChart').getContext('2d');
+new Chart(hourlyCtx, {
+type: 'bar',
+data: {
+labels: hourlyTrafficData.map(h => h.hour + 'h'),
+datasets: [
+{
+label: 'Visites',
+data: hourlyTrafficData.map(h => h.visits),
+backgroundColor: 'rgba(67, 233, 123, 0.7)',
+borderColor: '#43e97b',
+borderWidth: 2
+}
+]
+},
+options: {
+responsive: true,
+scales: {
+y: {
+beginAtZero: true
+}
+},
+plugins: {
+legend: {
+display: false
+}
+}
+}
+});{% endif %}
+});
+
+function loadPeriod(period) { // Mettre à jour l'apparence des boutons
+document.querySelectorAll('button[onclick^="loadPeriod"]').forEach(btn => {
+btn.className = 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors';
+});
+event.target.className = 'px-4 py-2 bg-blue-600 text-white rounded';
+
+// Charger les nouvelles données
+fetch (`/directeur/analytics/data?period=${period}`).then(response => response.json()).then(data => {
+if (data.success) { // Recharger la page avec les nouvelles données
+window.location.reload();
+} else {
+console.error('Erreur lors du chargement des données:', data.message);
+}
+}).catch(error => {
+console.error('Erreur:', error);
+});
+}
+
+function exportLogs() {
+const startDate = new Date();
+startDate.setDate(startDate.getDate() - 30);
+
+const endDate = new Date();
+
+window.open(`/directeur/analytics/export?startDate=${
+startDate.toISOString()
+}&endDate=${
+endDate.toISOString()
+}`);
+}
+	</script>
+{% endblock %}

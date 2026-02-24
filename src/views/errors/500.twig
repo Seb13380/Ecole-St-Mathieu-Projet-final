@@ -1,0 +1,32 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Erreur 500 - Erreur interne
+{% endblock %}
+
+{% block main %}
+	<div class="container mx-auto p-8 text-center">
+		<div class="max-w-md mx-auto">
+			<div class="text-6xl mb-4">⚠️</div>
+			<h1 class="text-3xl font-bold text-slate-800 mb-4">Erreur interne</h1>
+			<p class="text-slate-600 mb-6">
+				Une erreur inattendue s'est produite.
+				{% if error %}
+					<br><small class="text-red-600">{{ error }}</small>
+				{% endif %}
+			</p>
+
+			<div class="space-y-3">
+				<a href="/" class="btn btn-primary">
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+					</svg>
+					Retour à l'accueil
+				</a>
+
+				<button onclick="history.back()" class="btn btn-outline">
+					← Retour à la page précédente
+				</button>
+			</div>
+		</div>
+	</div>
+{% endblock %}
