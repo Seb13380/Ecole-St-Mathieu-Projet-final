@@ -12,7 +12,7 @@
 				{% set approvedCount = 0 %}
 				{% set rejectedCount = 0 %}
 				{% for request in requests %}
-					{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' or request.status == 'EMAIL_PENDING' %}
+					{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' %}
 						{% set pendingCount = pendingCount + 1 %}
 					{% elseif request.status == 'ACCEPTED' or request.status == 'VALIDE' or request.status == 'APPROVED' %}
 						{% set approvedCount = approvedCount + 1 %}
@@ -75,7 +75,7 @@
 						</div>
 
 						<div class="text-right">
-							{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' or request.status == 'EMAIL_PENDING' %}
+							{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' %}
 								<span class="badge badge-warning badge-lg">En attente</span>
 							{% elseif request.status == 'ACCEPTED' or request.status == 'VALIDE' or request.status == 'APPROVED' %}
 								<span class="badge badge-success badge-lg">Approuvée</span>
@@ -194,7 +194,7 @@
 							Voir détails
 						</button>
 
-						{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' or request.status == 'EMAIL_PENDING' %}
+						{% if request.status == 'PENDING' or request.status == 'EN_ATTENTE' %}
 							<button class="btn btn-error" onclick="showRejectModal({{ request.id }})">
 								Refuser
 							</button>
@@ -575,7 +575,7 @@ if (status === 'all') {
 item.style.display = 'block';
 } else {
 const itemStatus = item.dataset.status;
-const show = (status === 'pending' && ['PENDING', 'EN_ATTENTE', 'EMAIL_PENDING'].includes(itemStatus)) || (status === 'approved' && ['ACCEPTED', 'VALIDE', 'APPROVED'].includes(itemStatus)) || (status === 'rejected' && ['REJECTED', 'REFUSE'].includes(itemStatus));
+const show = (status === 'pending' && ['PENDING', 'EN_ATTENTE'].includes(itemStatus)) || (status === 'approved' && ['ACCEPTED', 'VALIDE', 'APPROVED'].includes(itemStatus)) || (status === 'rejected' && ['REJECTED', 'REFUSE'].includes(itemStatus));
 item.style.display = show ? 'block' : 'none';
 }
 });

@@ -1,0 +1,94 @@
+📋 INSTRUCTIONS DE DÉPLOIEMENT VPS
+==================================
+Date: 30/01/2026 14:27
+
+🎯 FICHIERS À TRANSFÉRER:
+-------------------------
+1. src/views/pages/auth/register.twig
+2. src/views/pages/directeur/credentials.twig
+3. src/views/partials/header.twig (si modifié)
+
+📦 COMMANDES À EXÉCUTER SUR LE VPS:
+-----------------------------------
+
+# 1. Se connecter au VPS via SSH
+ssh root@votre-serveur.com
+
+# 2. Aller dans le dossier du projet
+cd /var/www/ecole-st-mathieu
+
+# 3. Créer une sauvegarde
+cp -r src/views src/views-backup-
+
+# 4. Transférer les fichiers (depuis votre PC local):
+# Ouvrir un nouveau terminal PowerShell et exécuter:
+scp src/views/pages/auth/register.twig root@votre-serveur:/var/www/ecole-st-mathieu/src/views/pages/auth/
+scp src/views/pages/directeur/credentials.twig root@votre-serveur:/var/www/ecole-st-mathieu/src/views/pages/directeur/
+scp src/views/partials/header.twig root@votre-serveur:/var/www/ecole-st-mathieu/src/views/partials/
+
+# 5. Vérifier la base de données
+mysql -u root -p
+# Dans MySQL:
+SHOW DATABASES;
+# Si 'EcoleSaint-Mathieu' existe avec underscore, créer avec tiret:
+CREATE DATABASE IF NOT EXISTS `ecolesaint-mathieu` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `ecolesaint-mathieu`;
+EXIT;
+
+# 6. Appliquer les migrations Prisma
+cd /var/www/ecole-st-mathieu
+npx prisma migrate deploy
+
+# 7. Créer les comptes admin (seed.js)
+node seed.js
+
+# 8. Redémarrer le serveur Node.js
+pm2 restart ecole-st-mathieu
+# OU
+systemctl restart ecole-st-mathieu
+# OU
+pkill node && node app.js &
+
+# 9. Vérifier les logs
+pm2 logs ecole-st-mathieu
+# OU
+tail -f /var/log/ecole-st-mathieu.log
+
+✅ MODIFICATIONS APPORTÉES:
+--------------------------
+1. ✅ Correction titre formulaire inscription (register.twig)
+   - Ancien: "Demande d'identifiants de connexion"
+   - Nouveau: "Demande d'inscription élève"
+   - Ajout lien vers /demande-identifiants
+
+2. ✅ Ajout filtres et recherche (credentials.twig)
+   - Recherche textuelle par nom/prénom/email
+   - Filtre par statut (PENDING, PROCESSING, COMPLETED, etc.)
+   - Tri par date (asc/desc) et nom (A-Z/Z-A)
+   - Compteur de résultats dynamique
+
+3. ✅ Correction conflits Git (header.twig)
+   - Nettoyage des marqueurs de conflit
+
+🔐 COMPTES ADMIN CRÉÉS:
+-----------------------
+Email: sgdigitalweb13@gmail.com
+Mot de passe: Seb&paul3726
+
+Email: admin@stmathieu.fr
+Mot de passe: admin123
+
+⚠️  IMPORTANT:
+--------------
+- Vérifier que MySQL est démarré sur le VPS
+- Base de données: 'ecolesaint-mathieu' (avec tiret)
+- Port MySQL: 3306
+- Tester après déploiement: http://votre-domaine.com/directeur/credentials
+
+📞 SUPPORT:
+-----------
+En cas de problème, vérifier:
+1. Les logs du serveur Node.js
+2. Les logs MySQL
+3. Les permissions des fichiers (chmod 644 pour les .twig)
+4. Le service MySQL est actif: systemctl status mysql

@@ -258,7 +258,7 @@ const dossierInscriptionController = {
             }
 
             // Redirection avec message de succès
-            req.flash('success', 'Votre dossier d\'inscription a été soumis avec succès ! Vous recevrez une réponse par email.');
+            req.flash('success', 'Votre demande d\'inscription a été soumise avec succès ! Nous vous remercions pour l\'intérêt porté à notre établissement. Celle-ci n\'est qu\'une étape préalable avant l\'attribution d\'un rendez-vous avec le chef d\'établissement qui sera proposé selon l\'évolution de nos effectifs. Vous recevrez un email de confirmation.');
             res.redirect('/dossier-inscription');
 
         } catch (error) {

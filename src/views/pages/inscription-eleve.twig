@@ -127,50 +127,50 @@
 				</div>
 
 				{# <!-- Annonce Petite Section 2026 -->
-																				{% if config and config.afficherAnnoncePS2026 %}
-																					<div id="annoncePS2026" class="mb-8">
-																						<div
-																							class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
-																							<!-- Icône décorative -->
-																							<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
-																								🎓
-																							</div>
-																
-																							<div class="relative z-10">
-																								<div class="flex items-center mb-4">
-																									<span class="text-3xl mr-3">🌟</span>
-																									<h2 class="text-2xl font-bold text-orange-700">
-																										Inscription Petite Section - Rentrée 2026
-																									</h2>
-																								</div>
-																
-																								<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
-																									<p class="text-lg text-orange-800 mb-3 font-medium">
-																										📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
-																									</p>
-																									<p class="text-orange-700 mb-4">
-																										Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
-																									</p>
-																
-																									<div class="text-center">
-																										<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
-																											<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-																												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
-																											</svg>
-																											Accéder au formulaire d'inscription PS 2026
-																										</a>
+																								{% if config and config.afficherAnnoncePS2026 %}
+																									<div id="annoncePS2026" class="mb-8">
+																										<div
+																											class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-lg p-6 relative overflow-hidden">
+																											<!-- Icône décorative -->
+																											<div class="absolute top-2 right-2 text-yellow-300 text-6xl opacity-20">
+																												🎓
+																											</div>
+																				
+																											<div class="relative z-10">
+																												<div class="flex items-center mb-4">
+																													<span class="text-3xl mr-3">🌟</span>
+																													<h2 class="text-2xl font-bold text-orange-700">
+																														Inscription Petite Section - Rentrée 2026
+																													</h2>
+																												</div>
+																				
+																												<div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-4">
+																													<p class="text-lg text-orange-800 mb-3 font-medium">
+																														📅 Pour toute demande d'inscription en Petite Section pour la rentrée 2026
+																													</p>
+																													<p class="text-orange-700 mb-4">
+																														Veuillez utiliser le formulaire officiel Microsoft Forms dédié :
+																													</p>
+																				
+																													<div class="text-center">
+																														<a href="https://forms.office.com/e/tm7H3nJbbH" target="_blank" rel="noopener" class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105">
+																															<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+																																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 13l3 3 7-7"></path>
+																															</svg>
+																															Accéder au formulaire d'inscription PS 2026
+																														</a>
+																													</div>
+																												</div>
+																				
+																												<div class="text-center">
+																													<p class="text-sm text-orange-600 italic">
+																														⏰ Ce formulaire est spécialement conçu pour les futures petites sections
+																													</p>
+																												</div>
+																											</div>
+																										</div>
 																									</div>
-																								</div>
-																
-																								<div class="text-center">
-																									<p class="text-sm text-orange-600 italic">
-																										⏰ Ce formulaire est spécialement conçu pour les futures petites sections
-																									</p>
-																								</div>
-																							</div>
-																						</div>
-																					</div>
-																				{% endif %} #}
+																								{% endif %} #}
 
 				<!-- Documents à télécharger -->
 				{% if inscriptionDocuments and inscriptionDocuments|length > 0 %}
@@ -462,9 +462,38 @@
 								<li>Après validation, la direction recevra votre demande et reviendra vers vous pour une prise de rendez-vous</li>
 								<li>En cas d'acceptation, vous complèterez le dossier d'inscription avec la secrétaire</li>
 								<li>Vous pourrez ensuite faire une demande d'identifiants sur notre site: https://www.stmathieu.org</li>
-								
+
 							</ul>
 						</div>
+
+						<!-- Champs anti-spam cachés (honeypots) -->
+						<div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+							<label for="floflo">Ne pas remplir ce champ</label>
+							<input type="text" id="floflo" name="floflo" tabindex="-1" autocomplete="off">
+
+							<label for="website">Site web</label>
+							<input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+
+							<label for="homepage">Page d'accueil</label>
+							<input type="text" id="homepage" name="homepage" tabindex="-1" autocomplete="off">
+
+							<label for="url">URL</label>
+							<input type="text" id="url" name="url" tabindex="-1" autocomplete="off">
+
+							<label for="business">Entreprise</label>
+							<input type="text" id="business" name="business" tabindex="-1" autocomplete="off">
+
+							<label for="company">Société</label>
+							<input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
+						</div>
+
+						<!-- Horodatage pour validation temporelle -->
+						<input type="hidden" id="formStartTime" name="formStartTime" value="">
+
+						<script>
+							// Enregistrer l'heure de début du formulaire
+document.getElementById('formStartTime').value = Date.now();
+						</script>
 
 						<!-- Bouton de soumission -->
 						<div class="text-center pt-8">

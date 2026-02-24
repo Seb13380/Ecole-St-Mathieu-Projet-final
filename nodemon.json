@@ -1,3 +1,18 @@
 {
-    "ext" : "html css twig js"
+    "ext": "js,twig",
+    "watch": [
+        "src/views/",
+        "src/controllers/",
+        "app.js"
+    ],
+    "ignore": [
+        "node_modules/",
+        "prisma/",
+        "public/"
+    ],
+    "delay": 500,
+    "env": {
+        "NODE_ENV": "development"
+    },
+    "legacyWatch": true
 }

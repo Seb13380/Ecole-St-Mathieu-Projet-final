@@ -3,31 +3,66 @@
   "version": "1.0.0",
   "main": "app.js",
   "prisma": {
-    "schema": "./prisma"
+    "schema": "./prisma/schema.prisma"
   },
   "scripts": {
     "dev": "nodemon app.js",
-    "build:css": "npx @tailwindcss/cli -i ./public/assets/css/style.css -o ./public/assets/css/tailwind.css --watch"
+    "start": "node app.js",
+    "build:css": "npx @tailwindcss/cli -i ./public/assets/css/style.css -o ./public/assets/css/tailwind.css --watch",
+    "build:tailwind": "npx tailwindcss -i ./styles.css -o ./public/css/output.css",
+    "build:tailwind:watch": "npx tailwindcss -i ./styles.css -o ./public/css/output.css --watch",
+    "build:prod": "npm run build:tailwind",
+    "postinstall": "npm run build:tailwind",
+    "prisma:studio": "npx prisma studio --schema=./prisma/schema.prisma",
+    "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
+    "prisma:push": "npx prisma db push --schema=./prisma/schema.prisma",
+    "seed": "node seed.js"
   },
   "author": "Sebby",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.10.1",
-    "@tailwindcss/cli": "^4.1.10",
+    "@neondatabase/serverless": "^1.0.1",
+    "@prisma/adapter-neon": "^6.11.0",
+    "@prisma/adapter-planetscale": "^6.11.0",
+    "@prisma/client": "^6.12.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
+    "connect-flash": "^0.1.1",
+    "connect-session-sequelize": "^8.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "express-router": "^0.0.1",
-    "express-session": "^1.18.1",
-    "twig": "^1.17.1"
+    "express-rate-limit": "^8.0.1",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.2.1",
+    "flowbite": "^3.1.2",
+    "form-data": "^4.0.4",
+    "geoip-lite": "^1.4.10",
+    "helmet": "^8.1.0",
+    "method-override": "^3.0.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "mysql2": "^3.14.3",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.5",
+    "pdf2pic": "^3.2.0",
+    "pdfkit": "^0.17.2",
+    "puppeteer": "^24.12.0",
+    "session-file-store": "^1.5.0",
+    "tailwindcss": "^3.4.15",
+    "twig": "^1.17.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
-    "daisyui": "^5.0.43",
+    "daisyui": "^5.0.46",
     "nodemon": "^3.1.10",
     "postcss": "^8.5.6",
-    "prisma": "^6.10.1",
-    "tailwindcss": "^4.1.10"
+    "prisma": "^6.12.0"
   }
 }

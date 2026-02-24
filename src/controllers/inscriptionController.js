@@ -188,6 +188,9 @@ const inscriptionController = {
             // Récupérer les pré-inscriptions ET les dossiers d'inscription
             const [preInscriptions, dossierInscriptions] = await Promise.all([
                 prisma.preInscriptionRequest.findMany({
+                    where: {
+                        NOT: { status: 'EMAIL_PENDING' }
+                    },
                     orderBy: { submittedAt: 'desc' },
                     include: { processor: true }
                 }),

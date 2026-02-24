@@ -7,7 +7,26 @@ async function seedData() {
   try {
     console.log('🌱 Initialisation des données de test...');
 
-    // Créer un utilisateur admin
+    // Créer un utilisateur admin principal (Sébastien)
+    const mainAdminPassword = await bcrypt.hash('Seb&paul3726', 10);
+    const mainAdmin = await prisma.user.upsert({
+      where: { email: 'sgdigitalweb13@gmail.com' },
+      update: {
+        password: mainAdminPassword // Mettre à jour le mot de passe si le compte existe
+      },
+      create: {
+        firstName: 'Sébastien',
+        lastName: 'Ceccarelli',
+        email: 'sgdigitalweb13@gmail.com',
+        password: mainAdminPassword,
+        phone: '06.00.00.00.00',
+        adress: 'Marseille',
+        role: 'ADMIN'
+      }
+    });
+    console.log('✅ Compte admin principal créé/mis à jour:', mainAdmin.email);
+
+    // Créer un utilisateur admin de test
     const adminPassword = await bcrypt.hash('admin123', 10);
     const admin = await prisma.user.upsert({
       where: { email: 'admin@stmathieu.fr' },
@@ -22,6 +41,7 @@ async function seedData() {
         role: 'ADMIN'
       }
     });
+    console.log('✅ Compte admin test créé:', admin.email);
 
     // Créer un directeur
     const directionPassword = await bcrypt.hash('direction123', 10);

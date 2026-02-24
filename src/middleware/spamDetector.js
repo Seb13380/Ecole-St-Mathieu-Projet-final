@@ -45,17 +45,24 @@ const spamDetector = {
     },
 
     // ⏱️ VALIDATION TEMPORELLE
-    minFormTime: 30, // secondes minimum pour remplir le formulaire
+    // Trop haut peut créer des faux positifs (autofill, parents rapides)
+    minFormTime: 2, // secondes minimum pour remplir le formulaire
     maxFormTime: 1800, // 30 minutes maximum
 
     // 🚫 RATE LIMITING
-    maxRequestsPerHour: 5,
+    maxRequestsPerHour: 20,
     ipMemory: new Map(),
+
+    normalizeIp: function (ip) {
+        if (!ip) return '';
+        // Express peut renvoyer ::ffff:1.2.3.4
+        return String(ip).replace(/^::ffff:/, '');
+    },
 
     // 🔍 FONCTION PRINCIPALE DE DÉTECTION
     detectSpam: function (req, formStartTime) {
         const reasons = [];
-        const ip = req.ip || req.connection.remoteAddress;
+        const ip = this.normalizeIp(req.ip || req.connection?.remoteAddress);
         const userAgent = req.get('User-Agent') || '';
 
         console.log(`🔍 Analyse anti-spam pour IP: ${ip}`);
@@ -128,7 +135,9 @@ const spamDetector = {
         }
 
         // 7. USER-AGENT SUSPECT
-        if (!userAgent || userAgent.length < 20 || /bot|crawler|spider/i.test(userAgent)) {
+        // Ne pas pénaliser si vide (peut arriver avec proxys / outils de sécurité).
+        // On ne marque que si on détecte explicitement un UA de bot.
+        if (userAgent && /bot|crawler|spider|headless|python-requests|curl|wget/i.test(userAgent)) {
             reasons.push(`User-Agent suspect: ${userAgent}`);
         }
 

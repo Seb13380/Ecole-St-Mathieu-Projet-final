@@ -35,6 +35,35 @@
 					<form
 						action="/pre-inscription" method="POST" class="space-y-6">
 
+						<!-- Champs anti-spam cachés (honeypots) -->
+						<div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+							<label for="floflo">Ne pas remplir ce champ</label>
+							<input type="text" id="floflo" name="floflo" tabindex="-1" autocomplete="off">
+
+							<label for="website">Site web</label>
+							<input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+
+							<label for="homepage">Page d'accueil</label>
+							<input type="text" id="homepage" name="homepage" tabindex="-1" autocomplete="off">
+
+							<label for="url">URL</label>
+							<input type="text" id="url" name="url" tabindex="-1" autocomplete="off">
+
+							<label for="business">Entreprise</label>
+							<input type="text" id="business" name="business" tabindex="-1" autocomplete="off">
+
+							<label for="company">Société</label>
+							<input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
+						</div>
+
+						<!-- Horodatage pour validation temporelle -->
+						<input type="hidden" id="formStartTime" name="formStartTime" value="">
+
+						<script>
+							// Enregistrer l'heure de début du formulaire
+document.getElementById('formStartTime').value = Date.now();
+						</script>
+
 						<!-- Section Parent/Responsable -->
 						<div class="border-b border-gray-200 pb-6">
 							<h2 class="text-2xl font-semibold text-[#304a4d] mb-4">
@@ -48,7 +77,6 @@
 									</label>
 									<input type="text" name="parentFirstName" class="input input-bordered w-full" required>
 								</div>
-								<input class="floflo" type="text" name="status" value="PENDING">
 
 								<div class="form-control">
 									<label class="label">
@@ -82,8 +110,7 @@
 										<label class="label">
 											<span class="label-text font-medium">Mot de passe *</span>
 										</label>
-										<input type="password" name="parentPassword" class="input input-bordered w-full" 
-											   placeholder="Minimum 6 caractères" minlength="6" required>
+										<input type="password" name="parentPassword" class="input input-bordered w-full" placeholder="Minimum 6 caractères" minlength="6" required>
 										<label class="label">
 											<span class="label-text-alt text-gray-500">Au moins 6 caractères avec majuscule, minuscule et chiffre</span>
 										</label>
@@ -93,8 +120,7 @@
 										<label class="label">
 											<span class="label-text font-medium">Confirmer le mot de passe *</span>
 										</label>
-										<input type="password" name="confirmPassword" class="input input-bordered w-full" 
-											   placeholder="Ressaisissez le mot de passe" minlength="6" required>
+										<input type="password" name="confirmPassword" class="input input-bordered w-full" placeholder="Ressaisissez le mot de passe" minlength="6" required>
 									</div>
 								</div>
 							</div>
@@ -245,57 +271,57 @@
 
 	<script>
 		// Validation en temps réel des mots de passe
-		document.addEventListener('DOMContentLoaded', function() {
-			const passwordInput = document.querySelector('input[name="parentPassword"]');
-			const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
-			const form = document.querySelector('form');
+document.addEventListener('DOMContentLoaded', function () {
+const passwordInput = document.querySelector('input[name="parentPassword"]');
+const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
+const form = document.querySelector('form');
 
-			function validatePassword() {
-				const password = passwordInput.value;
-				const confirmPassword = confirmPasswordInput.value;
-				
-				// Validation de la force du mot de passe
-				const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-				
-				if (password.length > 0) {
-					if (!passwordRegex.test(password)) {
-						passwordInput.classList.add('input-error');
-					} else {
-						passwordInput.classList.remove('input-error');
-					}
-				}
+function validatePassword() {
+const password = passwordInput.value;
+const confirmPassword = confirmPasswordInput.value;
 
-				// Validation de la correspondance
-				if (confirmPassword.length > 0) {
-					if (password !== confirmPassword) {
-						confirmPasswordInput.classList.add('input-error');
-					} else {
-						confirmPasswordInput.classList.remove('input-error');
-					}
-				}
-			}
+// Validation de la force du mot de passe
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
 
-			passwordInput.addEventListener('input', validatePassword);
-			confirmPasswordInput.addEventListener('input', validatePassword);
+if (password.length > 0) {
+if (! passwordRegex.test(password)) {
+passwordInput.classList.add('input-error');
+} else {
+passwordInput.classList.remove('input-error');
+}
+}
 
-			// Validation au moment de la soumission
-			form.addEventListener('submit', function(e) {
-				const password = passwordInput.value;
-				const confirmPassword = confirmPasswordInput.value;
-				const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+// Validation de la correspondance
+if (confirmPassword.length > 0) {
+if (password !== confirmPassword) {
+confirmPasswordInput.classList.add('input-error');
+} else {
+confirmPasswordInput.classList.remove('input-error');
+}
+}
+}
 
-				if (!passwordRegex.test(password)) {
-					e.preventDefault();
-					alert('Le mot de passe doit contenir au moins 6 caractères avec une majuscule, une minuscule et un chiffre.');
-					return;
-				}
+passwordInput.addEventListener('input', validatePassword);
+confirmPasswordInput.addEventListener('input', validatePassword);
 
-				if (password !== confirmPassword) {
-					e.preventDefault();
-					alert('Les mots de passe ne correspondent pas.');
-					return;
-				}
-			});
-		});
+// Validation au moment de la soumission
+form.addEventListener('submit', function (e) {
+const password = passwordInput.value;
+const confirmPassword = confirmPasswordInput.value;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+if (! passwordRegex.test(password)) {
+e.preventDefault();
+alert('Le mot de passe doit contenir au moins 6 caractères avec une majuscule, une minuscule et un chiffre.');
+return;
+}
+
+if (password !== confirmPassword) {
+e.preventDefault();
+alert('Les mots de passe ne correspondent pas.');
+return;
+}
+});
+});
 	</script>
 {% endblock %}

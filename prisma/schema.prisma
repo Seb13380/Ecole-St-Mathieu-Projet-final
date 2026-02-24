@@ -1,9 +1,785 @@
 generator client {
-    provider = "prisma-client-js"
-    output = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PARENT
+  ENSEIGNANT
+  ADMIN
+  DIRECTION
+  ASSISTANT_DIRECTION
+  APEL
+  GESTIONNAIRE_SITE
+  SECRETAIRE_DIRECTION
+  RESTAURATION
+}
+
+enum TicketBookletStatus {
+  ACTIVE
+  EXPIRED
+  USED
+}
+
+enum MealReservationStatus {
+  RESERVED
+  CONSUMED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  STRIPE
+  PAYPAL
+  VIREMENT
+  CASH
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  adress           String
+  phone            String
+  email            String    @unique
+  password         String
+  role             UserRole  @default(PARENT)
+  resetToken       String? // Token pour reset de mot de passe
+  resetTokenExpiry DateTime? // Expiration du token de reset
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  students                 Student[]               @relation("StudentParent") // 👈 Ajout de la relation inverse temporaire
+  enfants                  ParentStudent[]         @relation("ParentChildren")
+  messages                 Message[]               @relation("UserMessages")
+  actualites               Actualite[]             @relation("UserActualites")
+  travaux                  Travaux[]               @relation("UserTravaux")
+  menus                    Menu[]                  @relation("UserMenus")
+  carouselImages           CarouselImage[]         @relation("UserCarouselImages")
+  heroCarousel             HeroCarousel[]          @relation("UserHeroCarousel")
+  TicketBooklet            TicketBooklet[]
+  TicketPurchase           TicketPurchase[]
+  inscriptionRequests      InscriptionRequest[]    @relation("InscriptionReviewer")
+  reviewedRequests         InscriptionRequest[]
+  galleryMedia             GalleryMedia[]          @relation("UserGalleryMedia")
+  documents                Document[]              @relation("UserDocuments")
+  processedPreInscriptions PreInscriptionRequest[] @relation("ProcessedPreInscriptions")
+  credentialsForParent     CredentialsRequest[]    @relation("CredentialsForParent")
+  processedCredentials     CredentialsRequest[]    @relation("ProcessedCredentials")
+  agendaEvents             AgendaEvent[]           @relation("UserAgenda")
+  inscriptionConfigs       InscriptionConfig[]     @relation("InscriptionConfigModifier")
+  inscriptionDocuments     InscriptionDocument[]   @relation("InscriptionDocumentAuteur")
+  siteLogs                 SiteLog[]               @relation("UserLogs")
+  dossiersInscription      DossierInscription[]    @relation("DossierInscriptionTraitant")
+}
+
+model Student {
+  id            Int      @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  dateNaissance DateTime
+  parentId      Int? // 👈 RENDU OPTIONNEL pour compatibilité migration
+  classeId      Int? // 👈 Optionnel
+  photoUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  parent          User?             @relation("StudentParent", fields: [parentId], references: [id]) // 👈 RENDU OPTIONNEL
+  classe          Classe?           @relation("ClasseEleves", fields: [classeId], references: [id])
+  parents         ParentStudent[]   @relation("StudentParents")
+  TicketBooklet   TicketBooklet[]
+  MealReservation MealReservation[]
+  TicketPurchase  TicketPurchase[]
+}
+
+// Table de liaison pour relation many-to-many entre parents et enfants
+model ParentStudent {
+  id        Int      @id @default(autoincrement())
+  parentId  Int
+  studentId Int
+  createdAt DateTime @default(now())
+
+  parent  User    @relation("ParentChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation("StudentParents", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, studentId]) // Empêche les doublons
+}
+
+model Classe {
+  id            Int      @id @default(autoincrement())
+  nom           String   @unique
+  niveau        String
+  enseignantId  Int?
+  anneeScolaire String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  eleves Student[] @relation("ClasseEleves")
+}
+
+model Actualite {
+  id              Int      @id @default(autoincrement())
+  titre           String
+  contenu         String   @db.LongText
+  auteurId        Int
+  mediaUrl        String? // URL de l'image ou vidéo attachée
+  mediaType       String? // "image" ou "video"
+  lienUrl         String? // Lien externe cliquable (optionnel)
+  lienTexte       String? // Texte d'affichage du lien (optionnel)
+  datePublication DateTime @default(now())
+  visible         Boolean  @default(true)
+  public          Boolean  @default(false) // true = visible au public, false = réservé aux connectés
+  important       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  auteur User @relation("UserActualites", fields: [auteurId], references: [id], onDelete: Cascade)
+}
+
+model Travaux {
+  id          Int       @id @default(autoincrement())
+  titre       String
+  description String
+  auteurId    Int
+  dateDebut   DateTime?
+  dateFin     DateTime?
+  progression Int       @default(0) // Pourcentage de 0 à 100
+  statut      String    @default("PLANIFIE") // PLANIFIE, EN_COURS, TERMINE, SUSPENDU
+  visible     Boolean   @default(true)
+  important   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auteur User @relation("UserTravaux", fields: [auteurId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id             Int      @id @default(autoincrement())
+  expediteurId   Int
+  destinataireId Int?
+  sujet          String
+  contenu        String
+  lu             Boolean  @default(false)
+  dateEnvoi      DateTime @default(now())
+
+  expediteur User @relation("UserMessages", fields: [expediteurId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  email     String
+  telephone String?
+  sujet     String
+  message   String
+  traite    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model InvitationCode {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  role        String // SUPER_ADMIN, DIRECTEUR, ASSISTANT_DIRECTION, APEL, ENSEIGNANT, PARENT
+  utilisePar  String? // Email de l'utilisateur qui a utilisé le code
+  utilise     Boolean   @default(false)
+  valideJusqu DateTime? // Date d'expiration
+  createdBy   Int // ID de l'admin qui a créé le code
+  createdAt   DateTime  @default(now())
+  usedAt      DateTime?
+}
+
+model ParentInvitation {
+  id                 Int       @id @default(autoincrement())
+  token              String    @unique // Token unique pour le lien
+  parentEmail        String // Email du parent invité
+  parentFirstName    String // Prénom du parent
+  parentLastName     String // Nom du parent
+  childFirstName     String // Prénom de l'enfant
+  childLastName      String // Nom de l'enfant
+  childDateNaissance DateTime? // Date de naissance de l'enfant
+  classeId           Int? // Classe assignée (optionnel)
+  emailSent          Boolean   @default(false) // Email envoyé
+  used               Boolean   @default(false) // Invitation utilisée
+  createdBy          Int // ID du directeur qui a créé l'invitation
+  createdAt          DateTime  @default(now())
+  usedAt             DateTime? // Date d'utilisation
+  expiresAt          DateTime? // Date d'expiration
+}
+
+model Menu {
+  id          Int       @id @default(autoincrement())
+  semaine     String // "Semaine du 15 au 19 Janvier 2025"
+  dateDebut   DateTime? // Date de début de la semaine
+  dateFin     DateTime? // Date de fin de la semaine
+  lundi       String? // Menu du lundi (ancienne version)
+  mardi       String? // Menu du mardi (ancienne version)
+  mercredi    String? // Menu du mercredi (ancienne version)
+  jeudi       String? // Menu du jeudi (ancienne version)
+  vendredi    String? // Menu du vendredi (ancienne version)
+  pdfUrl      String? // URL du fichier PDF
+  pdfFilename String? // Nom original du fichier PDF
+  imageUrls   String? // URLs des images du PDF (JSON array)
+  statut      String    @default("BROUILLON") // BROUILLON, PLANIFIE, ACTIF, ARCHIVE
+  actif       Boolean   @default(false)
+  auteurId    Int // Qui a créé/modifié le menu
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auteur User @relation("UserMenus", fields: [auteurId], references: [id], onDelete: Cascade)
+}
+
+model TicketBooklet {
+  id               Int                 @id @default(autoincrement())
+  parentId         Int
+  studentId        Int
+  ticketsTotal     Int                 @default(10)
+  ticketsRemaining Int                 @default(10)
+  purchaseDate     DateTime            @default(now())
+  price            Decimal             @default(35.00)
+  status           TicketBookletStatus @default(ACTIVE)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  parent          User              @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student         Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  MealReservation MealReservation[]
+
+  @@index([parentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model MealReservation {
+  id              Int                   @id @default(autoincrement())
+  studentId       Int
+  mealDate        DateTime
+  ticketBookletId Int
+  createdAt       DateTime              @default(now())
+  status          MealReservationStatus @default(RESERVED)
+  updatedAt       DateTime              @updatedAt
+
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  ticketBooklet TicketBooklet @relation(fields: [ticketBookletId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, mealDate])
+  @@index([mealDate])
+  @@index([ticketBookletId])
+  @@index([status])
+}
+
+model TicketPurchase {
+  id              Int           @id @default(autoincrement())
+  parentId        Int
+  studentId       Int
+  amount          Decimal
+  ticketsQuantity Int           @default(10)
+  paymentMethod   PaymentMethod @default(STRIPE)
+  paymentStatus   PaymentStatus @default(PENDING)
+  stripePaymentId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  parent  User    @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([parentId])
+  @@index([studentId])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model CarouselImage {
+  id          Int      @id @default(autoincrement())
+  filename    String // Nom du fichier (ex: "photo_2025_01_15.jpg")
+  originalUrl String // URL de l'image originale
+  titre       String? // Titre optionnel de l'image
+  description String? // Description optionnelle
+  ordre       Int      @default(0) // Ordre d'affichage dans le carousel
+  active      Boolean  @default(true) // Image active ou non
+  auteurId    Int // Qui a ajouté l'image
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  auteur User @relation("UserCarouselImages", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([active])
+  @@index([ordre])
+}
+
+model HeroCarousel {
+  id          Int      @id @default(autoincrement())
+  filename    String // Nom du fichier (ex: "hero_photo_2025_01_15.jpg")
+  originalUrl String // URL de l'image originale
+  titre       String? // Titre optionnel de l'image
+  description String? // Description optionnelle
+  ordre       Int      @default(0) // Ordre d'affichage dans le carousel principal
+  active      Boolean  @default(true) // Image active ou non
+  auteurId    Int // Qui a ajouté l'image
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  auteur User @relation("UserHeroCarousel", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([active])
+  @@index([ordre])
+}
+
+enum InscriptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model InscriptionRequest {
+  id              Int       @id @default(autoincrement())
+  parentFirstName String
+  parentLastName  String
+  parentEmail     String    @unique
+  parentPhone     String
+  parentAddress   String
+  password        String
+  children        Json
+  anneeScolaire   String    @default("2025/2026") // Année scolaire pour laquelle l'inscription est demandée
+  status          String    @default("PENDING")
+  reviewedAt      DateTime?
+  reviewedBy      Int?
+  reviewComment   String?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reviewer User? @relation("InscriptionReviewer", fields: [reviewedBy], references: [id])
+  User     User? @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model GalleryTheme {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // "rentrée", "spectacle", "sortie", etc.
+  description String? // Description optionnelle du thème
+  active      Boolean  @default(true)
+  ordre       Int      @default(0) // Ordre d'affichage
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  medias GalleryMedia[]
+
+  @@index([active])
+  @@index([ordre])
+}
+
+model GalleryMedia {
+  id          Int              @id @default(autoincrement())
+  filename    String // Nom du fichier
+  originalUrl String // URL du fichier
+  type        GalleryMediaType // IMAGE ou VIDEO
+  titre       String? // Titre optionnel
+  description String? // Description optionnelle
+  themeId     Int // Thème associé
+  auteurId    Int // Qui a ajouté le média
+  active      Boolean          @default(true)
+  ordre       Int              @default(0) // Ordre dans le thème
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  theme  GalleryTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  auteur User         @relation("UserGalleryMedia", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([themeId])
+  @@index([auteurId])
+  @@index([active])
+  @@index([type])
+}
+
+enum GalleryMediaType {
+  IMAGE
+  VIDEO
+}
+
+model Document {
+  id             Int          @id @default(autoincrement())
+  type           DocumentType // Type de document (PROJET_EDUCATIF, REGLEMENT_INTERIEUR, etc.)
+  titre          String // Titre affiché 
+  description    String? // Description optionnelle
+  contenu        String?      @db.LongText // Contenu HTML (optionnel si juste PDF)
+  pdfUrl         String? // URL du fichier PDF
+  pdfFilename    String? // Nom original du fichier PDF
+  externalUrl    String? // URL externe (lien vers site web, Google Drive, etc.)
+  isExternalLink Boolean      @default(false) // True si c'est un lien externe
+  active         Boolean      @default(true) // Document actif ou archivé
+  ordre          Int          @default(0) // Ordre d'affichage
+  auteurId       Int // Qui a créé/modifié le document
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  auteur User @relation("UserDocuments", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+  @@index([active])
+  @@index([ordre])
+}
+
+enum DocumentType {
+  PROJET_EDUCATIF
+  PROJET_ETABLISSEMENT
+  REGLEMENT_INTERIEUR
+  DOSSIER_INSCRIPTION
+  ORGANIGRAMME
+  CHARTE_LAICITE
+  CHARTE_NUMERIQUE
+  CHARTE_VIE_SCOLAIRE
+  CHARTE_RESTAURATION
+  AGENDA
+  PASTORALE_AXE
+  PASTORALE_TEMPS_PRIANT
+  PASTORALE_ENSEMBLE
+  APEL_COMPTES_RENDUS
+  APEL_PROJETS
+  APEL_INFORMATIONS
+  APEL_EVENEMENTS
+}
+
+model PreInscriptionRequest {
+  id Int @id @default(autoincrement())
+
+  // Informations parent
+  parentFirstName String
+  parentLastName  String
+  parentEmail     String
+  parentPhone     String
+  parentAddress   String?
+  parentPassword  String // Mot de passe choisi par le parent
+
+  // Année scolaire pour laquelle l'inscription est demandée
+  anneeScolaire String @default("2025/2026")
+
+  // Informations des enfants (stockées en JSON)
+  children     Json // Tableau des enfants avec firstName, lastName, birthDate, currentClass, requestedClass, previousSchool
+  specialNeeds String? // Besoins particuliers
+  message      String? @db.Text // Message libre des parents (augmenté pour JSON volumineux)
+
+  // ✉️ VALIDATION EMAIL - NOUVEAUX CHAMPS
+  emailValidated  Boolean   @default(false) // Email validé ou non
+  validationToken String?   @unique // Token unique pour validation
+  tokenExpiresAt  DateTime? // Expiration du token (24h)
+
+  // Statut et suivi
+  status      PreInscriptionStatus @default(EMAIL_PENDING) // Nouveau statut par défaut
+  submittedAt DateTime             @default(now())
+  processedAt DateTime?
+  processedBy Int? // ID de l'utilisateur qui a traité
+  adminNotes  String?              @db.Text // Notes administratives
+
+  // Relations
+  processor User? @relation("ProcessedPreInscriptions", fields: [processedBy], references: [id])
+
+  @@index([status])
+  @@index([submittedAt])
+  @@index([parentEmail])
+  @@index([emailValidated])
+  @@index([validationToken])
+}
+
+model CredentialsRequest {
+  id                 Int     @id @default(autoincrement())
+  requestedEmail     String // Email fourni par le demandeur
+  requestedFirstName String // Prénom fourni
+  requestedLastName  String // Nom fourni
+  requestedPhone     String? // Téléphone fourni (optionnel)
+
+  // Parent trouvé (s'il existe)
+  foundParentId    Int? // ID du parent trouvé en base
+  foundParentEmail String? // Email réel du parent trouvé
+
+  // Statut et traitement
+  status      CredentialsRequestStatus @default(PENDING)
+  processed   Boolean                  @default(false)
+  processedAt DateTime?
+  processedBy Int? // ID de l'admin qui a traité
+
+  // Résultat
+  identifiersSent Boolean @default(false) // Identifiants envoyés ou non
+  errorMessage    String? // Message d'erreur si échec
+  adminNotes      String? @db.Text // Notes de l'admin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  foundParent User? @relation("CredentialsForParent", fields: [foundParentId], references: [id])
+  processor   User? @relation("ProcessedCredentials", fields: [processedBy], references: [id])
+
+  @@index([status])
+  @@index([processed])
+  @@index([createdAt])
+  @@index([requestedEmail])
+}
+
+enum PreInscriptionStatus {
+  EMAIL_PENDING // En attente de validation email
+  PENDING // En attente
+  REVIEWING // En cours d'examen
+  ACCEPTED // Acceptée
+  REJECTED // Refusée
+  COMPLETED // Inscription finalisée
+}
+
+enum CredentialsRequestStatus {
+  PENDING // En attente de traitement
+  PROCESSING // En cours de traitement
+  COMPLETED // Identifiants envoyés
+  FAILED // Échec (parent non trouvé, erreur email, etc.)
+  REJECTED // Rejetée par l'admin
+}
+
+model AgendaEvent {
+  id          Int       @id @default(autoincrement())
+  titre       String
+  description String?   @db.LongText
+  dateDebut   DateTime
+  dateFin     DateTime?
+  heureDebut  String? // Format "09:00"
+  heureFin    String? // Format "17:00"
+  lieu        String?
+  couleur     String    @default("#3b82f6") // Couleur hex pour l'affichage
+  important   Boolean   @default(false)
+  visible     Boolean   @default(true)
+  auteurId    Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auteur User @relation("UserAgenda", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@index([dateDebut])
+  @@index([visible])
+  @@index([important])
+}
+
+// Configuration des inscriptions
+model InscriptionConfig {
+  id                    Int      @id @default(autoincrement())
+  soustitre             String   @default("Demande d'inscription pour l'année scolaire 2025-2026")
+  afficherAnnoncePS2026 Boolean  @default(false) // Afficher l'annonce pour PS 2026
+  actif                 Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  modifiePar            Int
+
+  modificateur User @relation("InscriptionConfigModifier", fields: [modifiePar], references: [id])
+}
+
+// Documents d'inscription (PDF)
+model InscriptionDocument {
+  id          Int     @id @default(autoincrement())
+  nom         String // Nom affiché du document
+  description String? // Description du document
+  type        String  @default("FILE") // "FILE" pour fichier PDF, "LINK" pour lien externe
+
+  // Champs pour les fichiers PDF (optionnels)
+  nomFichier    String? // Nom du fichier sur le serveur
+  cheminFichier String? // Chemin complet vers le fichier  
+  taille        Int? // Taille en bytes
+
+  // Champ pour les liens externes (optionnel)
+  lienExterne String? // URL du lien externe
+
+  ordre     Int      @default(0) // Ordre d'affichage
+  actif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ajoutePar Int // Qui a ajouté le document
+
+  auteur User @relation("InscriptionDocumentAuteur", fields: [ajoutePar], references: [id])
+
+  @@index([actif])
+  @@index([ordre])
+  @@index([type])
+}
+
+model InscriptionConfiguration {
+  id                    Int      @id @default(autoincrement())
+  soustitre             String   @default("Demande d'identifiants pour accéder à l'espace familles")
+  afficherAnnoncePS2026 Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// 📊 SYSTÈME DE LOGS ET ANALYTICS
+model SiteLog {
+  id Int @id @default(autoincrement())
+
+  // Informations de la requête
+  method String // GET, POST, PUT, DELETE
+  url    String  @db.VarChar(500)
+  route  String? // Route Express identifiée
+
+  // Informations utilisateur
+  userId    Int? // ID utilisateur si connecté
+  userRole  String? // Rôle de l'utilisateur
+  userEmail String? // Email pour faciliter les recherches
+  sessionId String? // ID de session
+
+  // Informations techniques
+  ip        String // Adresse IP
+  userAgent String? @db.Text // User Agent complet
+  referer   String? @db.VarChar(500) // Page de référence
+
+  // Informations de performance
+  responseTime Int? // Temps de réponse en ms
+  statusCode   Int? // Code de statut HTTP
+
+  // Métadonnées
+  action       String? // Type d'action (login, view_page, download, etc.)
+  resourceType String? // Type de ressource (actualite, document, menu, etc.)
+  resourceId   Int? // ID de la ressource consultée
+
+  // Données contextuelles
+  searchQuery  String? // Requête de recherche si applicable
+  errorMessage String? @db.Text // Message d'erreur si applicable
+
+  // Géolocalisation (approximative par IP)
+  country String? // Pays
+  city    String? // Ville
+
+  timestamp DateTime @default(now())
+
+  // Relation avec User (optionnelle)
+  user User? @relation("UserLogs", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([timestamp])
+  @@index([userId])
+  @@index([action])
+  @@index([route])
+  @@index([ip])
+  @@index([statusCode])
+}
+
+// Dossiers d'inscription détaillés
+model DossierInscription {
+  id            Int    @id @default(autoincrement())
+  anneeScolaire String @default("2025/2026")
+
+  // Informations parents
+  pereNom           String
+  perePrenom        String
+  pereProfession    String?
+  pereTelephone     String
+  pereEmail         String
+  mereNom           String
+  merePrenom        String
+  mereProfession    String?
+  mereTelephone     String
+  mereEmail         String
+  adresseComplete   String  @db.Text
+  telephoneDomicile String?
+
+  // Situation de famille
+  situationFamiliale  String?
+  nombreEnfantsFoyer  Int?
+  informationsFamille String? @db.Text
+
+  // Informations enfant
+  enfantNom                String
+  enfantPrenom             String
+  enfantDateNaissance      DateTime
+  enfantLieuNaissance      String?
+  enfantNationalite        String?
+  enfantSexe               String
+  enfantClasseDemandee     String
+  enfantClasseActuelle     String?
+  enfantEcoleActuelle      String?
+  enfantVilleEtablissement String?
+  enfantDerniereScolarite  String?
+
+  // Informations médicales
+  medecinTraitantNom       String?
+  medecinTraitantTelephone String?
+  allergies                String? @db.Text
+  traitementsMedicaux      String? @db.Text
+  regimeAlimentaire        String? @db.Text
+  paiNecessaire            Boolean @default(false)
+  besoinsPArticuliers      String? @db.Text
+
+  // Personnes d'urgence
+  urgence1Nom       String?
+  urgence1Prenom    String?
+  urgence1Lien      String?
+  urgence1Telephone String?
+  urgence2Nom       String?
+  urgence2Prenom    String?
+  urgence2Lien      String?
+  urgence2Telephone String?
+
+  // Autorisations
+  autorisationPhoto    Boolean @default(false)
+  autorisationVideo    Boolean @default(false)
+  autorisationSortie   Boolean @default(false)
+  autorisationInternet Boolean @default(false)
+
+  // Services
+  transportSouhaite     Boolean @default(false)
+  restaurationSouhaitee Boolean @default(false)
+  joursRestauration     String?
+
+  // Personnes autorisées à récupérer l'enfant
+  recuperation1Nom       String?
+  recuperation1Prenom    String?
+  recuperation1Telephone String?
+  recuperation1Lien      String?
+  recuperation2Nom       String?
+  recuperation2Prenom    String?
+  recuperation2Telephone String?
+  recuperation2Lien      String?
+
+  // Documents fournis
+  docCertificatRadiation  Boolean @default(false)
+  docLivretFamille        Boolean @default(false)
+  docJustificatifDomicile Boolean @default(false)
+  docAssuranceScolaire    Boolean @default(false)
+  docCarnetSante          Boolean @default(false)
+  docCertificatMedical    Boolean @default(false)
+
+  // Engagements
+  engagementReglement Boolean   @default(false)
+  engagementFinancier Boolean   @default(false)
+  dateSignature       DateTime?
+
+  // Statut et traitement
+  statut               DossierInscriptionStatus @default(EN_ATTENTE)
+  traitePar            Int?
+  dateTraitement       DateTime?
+  notesAdministratives String?                  @db.Text
+  documentPdfGenere    String?
+  statutImpression     Boolean                  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  traitant User? @relation("DossierInscriptionTraitant", fields: [traitePar], references: [id])
+
+  @@index([statut])
+  @@index([anneeScolaire])
+  @@index([createdAt])
+  @@index([enfantClasseDemandee])
+  @@index([pereEmail])
+  @@index([mereEmail])
+}
+
+enum DossierInscriptionStatus {
+  EN_ATTENTE
+  EN_COURS
+  VALIDE
+  REFUSE
+  FINALISE
 }

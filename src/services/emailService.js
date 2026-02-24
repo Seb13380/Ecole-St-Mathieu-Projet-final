@@ -51,11 +51,18 @@ class EmailService {
                             <pre style="color: #333; font-family: Arial; white-space: pre-wrap;">${childrenList}</pre>
                         </div>
                         
+                        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; border: 2px solid #f59e0b; margin: 20px 0;">
+                            <h3 style="color: #92400e; margin-top: 0;">⚠️ Information importante :</h3>
+                            <p style="color: #92400e; line-height: 1.6; margin: 0; font-size: 15px;">
+                                Nous vous remercions pour l'intérêt porté à notre établissement et confirmons la bonne réception de votre demande d'inscription. <strong>Celle-ci n'est qu'une étape préalable avant l'attribution d'un rendez-vous avec le chef d'établissement qui sera proposé selon l'évolution de nos effectifs.</strong>
+                            </p>
+                        </div>
+                        
                         <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
                             <h3 style="color: #856404; margin-top: 0;">⏳ Prochaines étapes :</h3>
                             <ol style="color: #856404; margin: 0; padding-left: 20px;">
                                 <li>Votre demande est en cours d'examen par notre équipe</li>
-                                <li>Nous vous contacterons dans les <strong>2-3 jours ouvrables</strong></li>
+                                <li>Nous vous contacterons selon l'évolution de nos effectifs pour un rendez-vous avec le chef d'établissement</li>
                                 <li>Vous recevrez un email de confirmation ou de demande de complément</li>
                             </ol>
                         </div>
