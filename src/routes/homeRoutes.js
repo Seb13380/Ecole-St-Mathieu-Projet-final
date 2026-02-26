@@ -5,13 +5,28 @@ const legalController = require('../controllers/legalController');
 const inscriptionEleveController = require('../controllers/inscriptionEleveController');
 const credentialsController = require('../controllers/credentialsController');
 const { requireAdmin } = require('../middleware/auth');
+const {
+    inscriptionEleveBurstLimiter,
+    inscriptionEleveHourlyLimiter
+} = require('../middleware/rateLimiters');
+const { createSpamProtection } = require('../middleware/publicFormProtection');
 const router = express.Router();
 
 router.get('/', homeController.getHome);
 router.get('/ogec', ogecController.getOgec);
 router.get('/gestion-ecole', ogecController.getOgec);  // Nouvelle route pour test
 router.get('/inscription-eleve', inscriptionEleveController.getInscriptionEleve);
-router.post('/inscription-eleve', inscriptionEleveController.postInscriptionEleve);
+router.post(
+    '/inscription-eleve',
+    inscriptionEleveBurstLimiter,
+    inscriptionEleveHourlyLimiter,
+    createSpamProtection({
+        endpoint: 'POST /inscription-eleve',
+        mode: 'flash',
+        redirectTo: '/inscription-eleve'
+    }),
+    inscriptionEleveController.postInscriptionEleve
+);
 router.post('/admin/inscription-eleve/respond', requireAdmin, inscriptionEleveController.handleDirectorResponse);
 
 // Routes pour demandes d'identifiants

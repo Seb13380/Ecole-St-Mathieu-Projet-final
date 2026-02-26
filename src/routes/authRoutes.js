@@ -3,6 +3,11 @@ const loginRoutes = require('./loginRoutes');
 const passwordResetRoutes = require('./passwordResetRoutes');
 const parentInvitationController = require('../controllers/parentInvitationController');
 const inscriptionController = require('../controllers/inscriptionController');
+const {
+    authRegisterBurstLimiter,
+    authRegisterHourlyLimiter
+} = require('../middleware/rateLimiters');
+const { createSpamProtection } = require('../middleware/publicFormProtection');
 
 const router = express.Router();
 
@@ -11,7 +16,17 @@ router.use('/', passwordResetRoutes); // Routes pour forgot-password et reset-pa
 
 // Routes pour l'inscription publique
 router.get('/register', inscriptionController.showRegistrationForm);
-router.post('/register', inscriptionController.processRegistration);
+router.post(
+    '/register',
+    authRegisterBurstLimiter,
+    authRegisterHourlyLimiter,
+    createSpamProtection({
+        endpoint: 'POST /auth/register',
+        mode: 'query',
+        redirectTo: '/auth/register'
+    }),
+    inscriptionController.processRegistration
+);
 
 // router.use('/register', registerRoutes); // Fichier non existant
 
