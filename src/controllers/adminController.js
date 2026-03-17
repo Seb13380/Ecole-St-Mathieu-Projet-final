@@ -527,7 +527,7 @@ const adminController = {
                 schoolAddress: '123 Rue de l\'École, 75000 Paris',
                 schoolPhone: '01.23.45.67.89',
                 schoolEmail: 'contact@ecole-saint-mathieu.fr',
-                currentYear: '2024-2025',
+                currentYear: '2025-2026',
                 maxStudentsPerClass: 25,
                 enableNotifications: true,
                 enablePublicRegistration: true

@@ -44,6 +44,42 @@
 		</div>
 	</div>
 
+	{% if actualites and actualites|length > 0 %}
+		<div class="max-w-4xl mx-auto w-full px-4 mt-8">
+			<h2 class="text-2xl font-bold text-[#304a4d] mb-5 text-center">Actualités</h2>
+			<div class="flex flex-col gap-4">
+				{% for actu in actualites %}
+					<div class="bg-white rounded-xl shadow p-5 border {% if actu.important %}border-teal-500{% else %}border-gray-100{% endif %}">
+						{% if actu.important %}
+							<div class="flex items-center gap-2 mb-2">
+								<span class="inline-block bg-teal-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Information importante</span>
+							</div>
+						{% endif %}
+						<h3 class="text-lg font-semibold text-[#304a4d] mb-1">{{ actu.titre }}</h3>
+						<p class="text-sm text-gray-500 mb-2">{{ actu.datePublication|date('d/m/Y') }}</p>
+						<p class="text-gray-700 text-sm line-clamp-3">{{ actu.contenu|slice(0, 200) }}
+							{% if actu.contenu|length > 200 %}…
+							{% endif %}
+						</p>
+						{% if actu.lienUrl %}
+							<a href="{{ actu.lienUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center mt-3 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:from-blue-600 hover:to-blue-700 transition-all">
+								<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+								</svg>
+								{{ actu.lienTexte ? actu.lienTexte : 'En savoir plus' }}
+							</a>
+						{% endif %}
+					</div>
+				{% endfor %}
+			</div>
+			<div class="text-center mt-6">
+				<a href="/actualites" class="inline-flex items-center px-5 py-2 bg-[#304a4d] text-white rounded-lg hover:bg-[#253b3e] transition-colors text-sm font-medium">
+					Voir toutes les actualités →
+				</a>
+			</div>
+		</div>
+	{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
