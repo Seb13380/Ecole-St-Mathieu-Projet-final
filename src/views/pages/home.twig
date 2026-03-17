@@ -45,37 +45,47 @@
 	</div>
 
 	{% if actualites and actualites|length > 0 %}
-		<div class="max-w-4xl mx-auto w-full px-4 mt-8">
-			<h2 class="text-2xl font-bold text-[#304a4d] mb-5 text-center">Actualités</h2>
-			<div class="flex flex-col gap-4">
-				{% for actu in actualites %}
-					<div class="bg-white rounded-xl shadow p-5 border {% if actu.important %}border-teal-500{% else %}border-gray-100{% endif %}">
-						{% if actu.important %}
-							<div class="flex items-center gap-2 mb-2">
-								<span class="inline-block bg-teal-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Information importante</span>
-							</div>
-						{% endif %}
-						<h3 class="text-lg font-semibold text-[#304a4d] mb-1">{{ actu.titre }}</h3>
-						<p class="text-sm text-gray-500 mb-2">{{ actu.datePublication|date('d/m/Y') }}</p>
-						<p class="text-gray-700 text-sm line-clamp-3">{{ actu.contenu|slice(0, 200) }}
-							{% if actu.contenu|length > 200 %}…
+		<div class="w-full px-4 mt-8">
+			<div class="max-w-6xl mx-auto">
+				<h2 class="text-2xl font-bold text-[#304a4d] mb-6 text-center">Actualités</h2>
+				<div class="grid gap-8">
+					{% for actu in actualites %}
+						<article style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%); backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; border: 2px solid #5eead4;" onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 20px 40px rgba(0, 0, 0, 0.15)'; this.style.background='linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 25%, #6ee7b7 50%, #34d399 100%)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(0, 0, 0, 0.1)'; this.style.background='linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%)'">
+							{% if actu.important %}
+								<div style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #134e4a 100%); padding: 14px; position: relative; overflow: hidden;">
+									<div class="flex items-center justify-center">
+										<div style="background: rgba(255,255,255,0.2); border-radius: 50%; padding: 5px; margin-right: 10px;">
+											<svg style="width: 18px; height: 18px; color: #ffffff;" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+											</svg>
+										</div>
+										<span style="color: #ffffff; font-size: 14px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Information Importante</span>
+									</div>
+								</div>
 							{% endif %}
-						</p>
-						{% if actu.lienUrl %}
-							<a href="{{ actu.lienUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center mt-3 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:from-blue-600 hover:to-blue-700 transition-all">
-								<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-								</svg>
-								{{ actu.lienTexte ? actu.lienTexte : 'En savoir plus' }}
-							</a>
-						{% endif %}
-					</div>
-				{% endfor %}
-			</div>
-			<div class="text-center mt-6">
-				<a href="/actualites" class="inline-flex items-center px-5 py-2 bg-[#304a4d] text-white rounded-lg hover:bg-[#253b3e] transition-colors text-sm font-medium">
-					Voir toutes les actualités →
-				</a>
+							<div class="p-6 md:p-8 text-center">
+								<h3 class="text-xl font-bold text-gray-900 mb-2">{{ actu.titre }}</h3>
+								<p class="text-sm text-gray-500 mb-3">{{ actu.datePublication|date('d/m/Y') }}</p>
+								<p class="text-gray-700 text-base leading-relaxed">{{ actu.contenu|slice(0, 200) }}{% if actu.contenu|length > 200 %}…{% endif %}</p>
+								{% if actu.lienUrl %}
+									<div class="mt-5">
+										<a href="{{ actu.lienUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 hover:from-blue-600 hover:to-blue-700 transition-all duration-300 border border-blue-400">
+											<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+											</svg>
+											{{ actu.lienTexte ? actu.lienTexte : 'En savoir plus' }}
+										</a>
+									</div>
+								{% endif %}
+							</div>
+						</article>
+					{% endfor %}
+				</div>
+				<div class="text-center mt-6">
+					<a href="/actualites" class="inline-flex items-center px-5 py-2 bg-[#304a4d] text-white rounded-lg hover:bg-[#253b3e] transition-colors text-sm font-medium">
+						Voir toutes les actualités →
+					</a>
+				</div>
 			</div>
 		</div>
 	{% endif %}
