@@ -65,29 +65,39 @@
 					{% else %}
 					<div class="divide-y divide-slate-100">
 						{% for annee in annees %}
-						<div class="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors" id="row-{{ annee.id }}">
+						<div class="px-5 py-4 flex items-center gap-4 transition-colors {{ annee.ouverte ? 'bg-teal-50 hover:bg-teal-100' : 'bg-slate-50 hover:bg-slate-100' }}" id="row-{{ annee.id }}">
 
-							<!-- Statut ouvert/fermé (toggle) -->
+							<!-- Toggle ouvert/fermé -->
 							<button
-								class="toggle-btn flex-shrink-0 w-14 h-7 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 {{ annee.ouverte ? 'bg-teal-500' : 'bg-slate-300' }}"
+								class="toggle-btn flex-shrink-0 w-14 h-7 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 {{ annee.ouverte ? 'bg-teal-500 focus:ring-teal-500' : 'bg-slate-300 focus:ring-slate-400' }}"
 								data-id="{{ annee.id }}"
-								data-state="{{ annee.ouverte ? 'open' : 'closed' }}"
 								title="{{ annee.ouverte ? 'Cliquer pour fermer' : 'Cliquer pour ouvrir' }}"
 							>
-								<span class="block w-5 h-5 bg-white rounded-full shadow transform transition-transform {{ annee.ouverte ? 'translate-x-8' : 'translate-x-1' }}"></span>
+								<span class="block w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 {{ annee.ouverte ? 'translate-x-8' : 'translate-x-1' }}"></span>
 							</button>
 
-							<!-- Libellé + label -->
+							<!-- Libellé + badges -->
 							<div class="flex-1 min-w-0">
 								<div class="flex items-center gap-2 flex-wrap">
-									<span class="text-lg font-semibold text-slate-800">{{ annee.libelle }}</span>
+									<span class="text-lg font-bold {{ annee.ouverte ? 'text-teal-800' : 'text-slate-400' }}">{{ annee.libelle }}</span>
 									{% if annee.label %}
-									<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">{{ annee.label }}</span>
+									<span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ annee.ouverte ? 'bg-teal-200 text-teal-800' : 'bg-slate-200 text-slate-500' }}">{{ annee.label }}</span>
+									{% endif %}
+									{% if annee.ouverte %}
+									<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-300">
+										<svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+										Ouverte
+									</span>
+									{% else %}
+									<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-500 border border-slate-300">
+										<svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+										Fermée
+									</span>
 									{% endif %}
 								</div>
-								<span class="text-xs {{ annee.ouverte ? 'text-teal-600' : 'text-slate-400' }}">
-									{{ annee.ouverte ? '✓ Ouverte aux inscriptions' : '✗ Fermée' }}
-								</span>
+								<p class="text-xs mt-0.5 {{ annee.ouverte ? 'text-teal-600' : 'text-slate-400' }}">
+									{{ annee.ouverte ? 'Visible dans le formulaire d\'inscription' : 'Masquée dans le formulaire d\'inscription' }}
+								</p>
 							</div>
 
 							<!-- Ordre -->
@@ -98,7 +108,7 @@
 								<!-- Modifier -->
 								<button
 									onclick="openEditModal({{ annee.id }}, '{{ annee.libelle }}', '{{ annee.label }}', {{ annee.ouverte ? 'true' : 'false' }}, {{ annee.ordre }})"
-									class="p-2 text-slate-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+									class="p-2 text-slate-500 hover:text-teal-600 hover:bg-white rounded-lg transition-colors"
 									title="Modifier"
 								>
 									<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,7 +118,7 @@
 								<!-- Supprimer -->
 								<button
 									onclick="confirmDelete({{ annee.id }}, '{{ annee.libelle }}')"
-									class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+									class="p-2 text-slate-500 hover:text-red-600 hover:bg-white rounded-lg transition-colors"
 									title="Supprimer"
 								>
 									<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
