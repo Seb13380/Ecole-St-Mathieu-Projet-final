@@ -2372,6 +2372,109 @@ const directeurController = {
     // === ALIAS POUR COMPATIBILITÉ ===
     getDashboard: function (req, res) {
         return this.dashboard(req, res);
+    },
+
+    // === GESTION DES ANNÉES SCOLAIRES D'INSCRIPTION ===
+
+    async getAnneesInscription(req, res) {
+        try {
+            const annees = await prisma.anneeScolaireInscription.findMany({
+                orderBy: { ordre: 'asc' }
+            });
+            res.render('pages/directeur/annees-inscription', {
+                title: 'Années scolaires – Inscriptions',
+                user: req.session.user,
+                annees,
+                success: req.flash ? req.flash('success') : [],
+                error: req.flash ? req.flash('error') : []
+            });
+        } catch (error) {
+            console.error('Erreur getAnneesInscription:', error);
+            res.status(500).render('pages/error', {
+                message: 'Erreur lors du chargement des années scolaires',
+                user: req.session.user
+            });
+        }
+    },
+
+    async createAnneeScolaireInscription(req, res) {
+        try {
+            const { libelle, label, ouverte, ordre } = req.body;
+            if (!libelle || !/^\d{4}\/\d{4}$/.test(libelle.trim())) {
+                req.flash('error', 'Le libellé doit être au format AAAA/AAAA (ex : 2028/2029).');
+                return res.redirect('/directeur/annees-inscription');
+            }
+            await prisma.anneeScolaireInscription.create({
+                data: {
+                    libelle: libelle.trim(),
+                    label: (label || '').trim(),
+                    ouverte: ouverte === 'on' || ouverte === 'true' || ouverte === true,
+                    ordre: parseInt(ordre) || 0
+                }
+            });
+            req.flash('success', `Année ${libelle.trim()} créée avec succès.`);
+            res.redirect('/directeur/annees-inscription');
+        } catch (error) {
+            if (error.code === 'P2002') {
+                req.flash('error', 'Cette année scolaire existe déjà.');
+            } else {
+                console.error('Erreur createAnneeScolaireInscription:', error);
+                req.flash('error', 'Erreur lors de la création.');
+            }
+            res.redirect('/directeur/annees-inscription');
+        }
+    },
+
+    async toggleAnneeScolaireInscription(req, res) {
+        try {
+            const id = parseInt(req.params.id);
+            const annee = await prisma.anneeScolaireInscription.findUnique({ where: { id } });
+            if (!annee) {
+                return res.status(404).json({ success: false, message: 'Année introuvable.' });
+            }
+            const updated = await prisma.anneeScolaireInscription.update({
+                where: { id },
+                data: { ouverte: !annee.ouverte }
+            });
+            res.json({ success: true, ouverte: updated.ouverte });
+        } catch (error) {
+            console.error('Erreur toggleAnneeScolaireInscription:', error);
+            res.status(500).json({ success: false, message: 'Erreur serveur.' });
+        }
+    },
+
+    async updateAnneeScolaireInscription(req, res) {
+        try {
+            const id = parseInt(req.params.id);
+            const { label, ouverte, ordre } = req.body;
+            await prisma.anneeScolaireInscription.update({
+                where: { id },
+                data: {
+                    label: (label || '').trim(),
+                    ouverte: ouverte === 'on' || ouverte === 'true' || ouverte === true,
+                    ordre: parseInt(ordre) || 0
+                }
+            });
+            req.flash('success', 'Année scolaire mise à jour.');
+            res.redirect('/directeur/annees-inscription');
+        } catch (error) {
+            console.error('Erreur updateAnneeScolaireInscription:', error);
+            req.flash('error', 'Erreur lors de la mise à jour.');
+            res.redirect('/directeur/annees-inscription');
+        }
+    },
+
+    async deleteAnneeScolaireInscription(req, res) {
+        try {
+            const id = parseInt(req.params.id);
+            await prisma.anneeScolaireInscription.delete({ where: { id } });
+            req.flash('success', 'Année scolaire supprimée.');
+            res.redirect('/directeur/annees-inscription');
+        } catch (error) {
+            console.error('Erreur deleteAnneeScolaireInscription:', error);
+            req.flash('error', 'Erreur lors de la suppression.');
+            res.redirect('/directeur/annees-inscription');
+        }
     }
 };
 

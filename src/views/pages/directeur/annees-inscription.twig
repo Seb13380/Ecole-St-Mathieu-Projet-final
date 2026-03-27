@@ -1,0 +1,272 @@
+{% extends "layouts/base.twig" %}
+
+{% block main %}
+<div class="min-h-screen bg-gradient-to-br from-teal-50 to-slate-100">
+	<div class="container mx-auto px-4 py-8">
+
+		<!-- En-tête -->
+		<div class="bg-white rounded-lg shadow-md p-6 mb-8">
+			<div class="flex items-center justify-between flex-wrap gap-4">
+				<div class="flex items-center">
+					<div class="bg-teal-500 p-3 rounded-lg mr-4">
+						<svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+						</svg>
+					</div>
+					<div>
+						<h1 class="text-3xl font-bold text-slate-800">Années scolaires – Inscriptions</h1>
+						<p class="text-slate-600">Ouvrez ou fermez les années disponibles dans le formulaire d'inscription</p>
+					</div>
+				</div>
+				<a href="/directeur/dashboard" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+					<svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+					</svg>
+					Retour au Dashboard
+				</a>
+			</div>
+		</div>
+
+		<!-- Alertes -->
+		{% if success %}
+			{% for msg in success %}
+			<div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between" id="alert-success">
+				<span>{{ msg }}</span>
+				<button onclick="document.getElementById('alert-success').remove()" class="text-green-600 hover:text-green-900 font-bold ml-4">×</button>
+			</div>
+			{% endfor %}
+		{% endif %}
+		{% if error %}
+			{% for msg in error %}
+			<div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between" id="alert-error">
+				<span>{{ msg }}</span>
+				<button onclick="document.getElementById('alert-error').remove()" class="text-red-600 hover:text-red-900 font-bold ml-4">×</button>
+			</div>
+			{% endfor %}
+		{% endif %}
+
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+			<!-- Liste des années -->
+			<div class="lg:col-span-2">
+				<div class="bg-white rounded-lg shadow-md overflow-hidden">
+					<div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+						<h2 class="text-xl font-bold text-slate-800">Années configurées</h2>
+						<span class="text-sm text-slate-500">{{ annees|length }} année(s)</span>
+					</div>
+
+					{% if annees is empty %}
+					<div class="p-8 text-center text-slate-500">
+						<svg class="h-12 w-12 mx-auto mb-3 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+						</svg>
+						<p>Aucune année configurée. Ajoutez-en une ci-contre.</p>
+					</div>
+					{% else %}
+					<div class="divide-y divide-slate-100">
+						{% for annee in annees %}
+						<div class="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors" id="row-{{ annee.id }}">
+
+							<!-- Statut ouvert/fermé (toggle) -->
+							<button
+								class="toggle-btn flex-shrink-0 w-14 h-7 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 {{ annee.ouverte ? 'bg-teal-500' : 'bg-slate-300' }}"
+								data-id="{{ annee.id }}"
+								data-state="{{ annee.ouverte ? 'open' : 'closed' }}"
+								title="{{ annee.ouverte ? 'Cliquer pour fermer' : 'Cliquer pour ouvrir' }}"
+							>
+								<span class="block w-5 h-5 bg-white rounded-full shadow transform transition-transform {{ annee.ouverte ? 'translate-x-8' : 'translate-x-1' }}"></span>
+							</button>
+
+							<!-- Libellé + label -->
+							<div class="flex-1 min-w-0">
+								<div class="flex items-center gap-2 flex-wrap">
+									<span class="text-lg font-semibold text-slate-800">{{ annee.libelle }}</span>
+									{% if annee.label %}
+									<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">{{ annee.label }}</span>
+									{% endif %}
+								</div>
+								<span class="text-xs {{ annee.ouverte ? 'text-teal-600' : 'text-slate-400' }}">
+									{{ annee.ouverte ? '✓ Ouverte aux inscriptions' : '✗ Fermée' }}
+								</span>
+							</div>
+
+							<!-- Ordre -->
+							<span class="text-slate-400 text-sm flex-shrink-0">#{{ annee.ordre }}</span>
+
+							<!-- Actions -->
+							<div class="flex items-center gap-2 flex-shrink-0">
+								<!-- Modifier -->
+								<button
+									onclick="openEditModal({{ annee.id }}, '{{ annee.libelle }}', '{{ annee.label }}', {{ annee.ouverte ? 'true' : 'false' }}, {{ annee.ordre }})"
+									class="p-2 text-slate-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+									title="Modifier"
+								>
+									<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+									</svg>
+								</button>
+								<!-- Supprimer -->
+								<button
+									onclick="confirmDelete({{ annee.id }}, '{{ annee.libelle }}')"
+									class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+									title="Supprimer"
+								>
+									<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+				</div>
+
+				<!-- Info -->
+				<div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700 flex items-start gap-2">
+					<svg class="h-5 w-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+					<span>Seules les années <strong>ouvertes</strong> apparaissent dans le menu déroulant du formulaire d'inscription en ligne.</span>
+				</div>
+			</div>
+
+			<!-- Formulaire d'ajout -->
+			<div>
+				<div class="bg-white rounded-lg shadow-md p-6">
+					<h2 class="text-xl font-bold text-slate-800 mb-4">Ajouter une année</h2>
+					<form method="POST" action="/directeur/annees-inscription">
+						<div class="mb-4">
+							<label class="block text-sm font-semibold text-slate-700 mb-1">Libellé <span class="text-red-500">*</span></label>
+							<input
+								type="text"
+								name="libelle"
+								placeholder="ex: 2028/2029"
+								pattern="^\d{4}\/\d{4}$"
+								required
+								class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+							/>
+							<p class="text-xs text-slate-400 mt-1">Format : AAAA/AAAA</p>
+						</div>
+						<div class="mb-4">
+							<label class="block text-sm font-semibold text-slate-700 mb-1">Étiquette <span class="text-slate-400 font-normal">(optionnel)</span></label>
+							<input
+								type="text"
+								name="label"
+								placeholder="ex: Prochaine, En cours…"
+								maxlength="50"
+								class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+							/>
+						</div>
+						<div class="mb-4">
+							<label class="block text-sm font-semibold text-slate-700 mb-1">Ordre d'affichage</label>
+							<input
+								type="number"
+								name="ordre"
+								value="{{ (annees|length) + 1 }}"
+								min="0"
+								class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+							/>
+						</div>
+						<div class="mb-6 flex items-center gap-2">
+							<input type="checkbox" name="ouverte" id="new-ouverte" value="on" checked class="w-4 h-4 rounded text-teal-500">
+							<label for="new-ouverte" class="text-sm font-semibold text-slate-700">Ouverte aux inscriptions</label>
+						</div>
+						<button type="submit" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+							Ajouter
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal modification -->
+<div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+	<div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+		<h3 class="text-xl font-bold text-slate-800 mb-4">Modifier l'année scolaire</h3>
+		<form id="edit-form" method="POST">
+			<p class="text-slate-600 mb-4 font-medium" id="edit-libelle-display"></p>
+			<div class="mb-4">
+				<label class="block text-sm font-semibold text-slate-700 mb-1">Étiquette</label>
+				<input type="text" name="label" id="edit-label" maxlength="50" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="ex: En cours, Prochaine…">
+			</div>
+			<div class="mb-4">
+				<label class="block text-sm font-semibold text-slate-700 mb-1">Ordre d'affichage</label>
+				<input type="number" name="ordre" id="edit-ordre" min="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+			</div>
+			<div class="mb-6 flex items-center gap-2">
+				<input type="checkbox" name="ouverte" id="edit-ouverte" value="on" class="w-4 h-4 rounded text-teal-500">
+				<label for="edit-ouverte" class="text-sm font-semibold text-slate-700">Ouverte aux inscriptions</label>
+			</div>
+			<div class="flex gap-3">
+				<button type="submit" class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Enregistrer</button>
+				<button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors">Annuler</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal suppression -->
+<div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+	<div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm mx-4">
+		<h3 class="text-xl font-bold text-slate-800 mb-2">Supprimer l'année ?</h3>
+		<p class="text-slate-600 mb-6">Êtes-vous sûr de vouloir supprimer <strong id="delete-libelle"></strong> ? Cette action est irréversible.</p>
+		<div class="flex gap-3">
+			<form id="delete-form" method="POST" class="flex-1">
+				<button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Supprimer</button>
+			</form>
+			<button type="button" onclick="closeDeleteModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors">Annuler</button>
+		</div>
+	</div>
+</div>
+
+<script>
+// Toggle ouvert/fermé via AJAX
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+	btn.addEventListener('click', async () => {
+		const id = btn.dataset.id;
+		try {
+			const resp = await fetch(`/directeur/annees-inscription/${id}/toggle`, { method: 'POST' });
+			const data = await resp.json();
+			if (data.success) {
+				// Recharger la page pour mettre à jour l'affichage complet
+				window.location.reload();
+			} else {
+				alert('Erreur : ' + (data.message || 'Réessayez.'));
+			}
+		} catch (e) {
+			alert('Erreur de connexion.');
+		}
+	});
+});
+
+// Modal modification
+function openEditModal(id, libelle, label, ouverte, ordre) {
+	document.getElementById('edit-libelle-display').textContent = libelle;
+	document.getElementById('edit-label').value = label;
+	document.getElementById('edit-ordre').value = ordre;
+	document.getElementById('edit-ouverte').checked = ouverte;
+	document.getElementById('edit-form').action = `/directeur/annees-inscription/${id}/update`;
+	document.getElementById('edit-modal').classList.remove('hidden');
+}
+function closeEditModal() {
+	document.getElementById('edit-modal').classList.add('hidden');
+}
+
+// Modal suppression
+function confirmDelete(id, libelle) {
+	document.getElementById('delete-libelle').textContent = libelle;
+	document.getElementById('delete-form').action = `/directeur/annees-inscription/${id}/delete`;
+	document.getElementById('delete-modal').classList.remove('hidden');
+}
+function closeDeleteModal() {
+	document.getElementById('delete-modal').classList.add('hidden');
+}
+
+// Fermer les modals en cliquant en dehors
+document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
+document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
+</script>
+{% endblock %}

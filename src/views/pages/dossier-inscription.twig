@@ -160,9 +160,15 @@
 								</span>
 							</label>
 							<select name="anneeScolaire" class="select select-bordered w-full" required>
-								<option value="2025/2026" selected>2025/2026 (En cours)</option>
-								<option value="2026/2027">2026/2027 (Prochaine)</option>
-								<option value="2027/2028">2027/2028</option>
+								{% if anneesInscription is not empty %}
+									{% for annee in anneesInscription %}
+										<option value="{{ annee.libelle }}" {% if loop.first %}selected{% endif %}>
+											{{ annee.libelle }}{% if annee.label %} ({{ annee.label }}){% endif %}
+										</option>
+									{% endfor %}
+								{% else %}
+									<option value="" disabled selected>Aucune année disponible</option>
+								{% endif %}
 							</select>
 						</div>
 					</div>

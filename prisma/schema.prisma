@@ -783,3 +783,17 @@ enum DossierInscriptionStatus {
   REFUSE
   FINALISE
 }
+
+// Gestion des années scolaires ouvertes aux inscriptions
+model AnneeScolaireInscription {
+  id        Int      @id @default(autoincrement())
+  libelle   String   @unique // ex: "2025/2026"
+  label     String   @default("") // ex: "En cours", "Prochaine", laissé vide si neutre
+  ouverte   Boolean  @default(false) // true = visible dans le formulaire d'inscription
+  ordre     Int      @default(0) // ordre d'affichage dans le select
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ouverte])
+  @@index([ordre])
+}

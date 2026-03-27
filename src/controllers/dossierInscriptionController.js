@@ -16,13 +16,20 @@ const dossierInscriptionController = {
                 orderBy: { ordre: 'asc' }
             });
 
+            // Récupérer les années scolaires ouvertes aux inscriptions
+            const anneesInscription = await prisma.anneeScolaireInscription.findMany({
+                where: { ouverte: true },
+                orderBy: { ordre: 'asc' }
+            });
+
             res.render('pages/dossier-inscription', {
                 title: 'Dossier d\'inscription - École Saint-Mathieu',
                 user: req.session.user || null,
                 currentUrl: req.originalUrl,
                 success: req.flash('success'),
                 error: req.flash('error'),
-                documentsRequis
+                documentsRequis,
+                anneesInscription
             });
         } catch (error) {
             console.error('Erreur lors du chargement du formulaire:', error);

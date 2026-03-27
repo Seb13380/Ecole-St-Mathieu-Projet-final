@@ -116,4 +116,11 @@ router.post('/settings', directeurController.updateSettings);
 router.get('/import-excel', directeurController.getImportExcel);
 router.post('/import-excel/process', upload.single('excelFile'), directeurController.processExcelImport);
 
+// Gestion des années scolaires d'inscription
+router.get('/annees-inscription', directeurController.getAnneesInscription);
+router.post('/annees-inscription', directeurController.createAnneeScolaireInscription);
+router.post('/annees-inscription/:id/update', directeurController.updateAnneeScolaireInscription);
+router.post('/annees-inscription/:id/toggle', directeurController.toggleAnneeScolaireInscription);
+router.post('/annees-inscription/:id/delete', directeurController.deleteAnneeScolaireInscription);
+
 module.exports = router;
