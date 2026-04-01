@@ -7,7 +7,9 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<style>
 		/* Masquer le header et footer du site sur cette page */
-		header, footer, nav.site-nav {
+		header,
+		footer,
+		nav.site-nav {
 			display: none !important;
 		}
 		main {
@@ -43,7 +45,7 @@
 
 		.menu-pdf-embed {
 			width: 100vw !important;
-			height: calc(100vh - 140px) !important; /* Moins la barre du haut + navigation */
+			height: calc(100vh - 160px) !important; /* Moins la barre du haut + navigation */
 			border: none !important;
 			margin: 0 !important;
 			padding: 0 !important;
@@ -51,7 +53,7 @@
 
 		/* En-tête avec navigation carrousel */
 		.menu-header-compact {
-			height: 140px;
+			height: 160px;
 			background: linear-gradient(135deg, rgba(249, 250, 251, 0.98), rgba(167, 227, 221, 0.1));
 			backdrop-filter: blur(15px);
 			position: fixed;
@@ -63,7 +65,7 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			padding: 15px 20px;
+			padding: 25px 20px 15px;
 			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 			border-bottom: 3px solid rgba(167, 227, 221, 0.3);
 		}
@@ -302,15 +304,14 @@
 							<span style="color: #374151; font-weight: 500;">Menu de la restauration</span>
 						</div>
 						<div class="carousel-controls">
-							<a href="{{ menu.pdfUrl }}" target="_blank" class="action-btn">&#8659; T&#233;l&#233;charger</a>
 							<button onclick="history.back()" class="action-btn close-btn">&#x2715; Fermer</button>
 						</div>
 					</div>
 
 				</div>
 
-				<div style="margin-top: 140px; height: calc(100vh - 140px);">
-					<embed src="{{ menu.pdfUrl }}" type="application/pdf" class="menu-pdf-embed">
+				<div style="margin-top: 160px; height: calc(100vh - 160px);">
+					<embed src="{{ menu.pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" class="menu-pdf-embed">
 				</div>
 			</div>
 
