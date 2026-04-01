@@ -47,7 +47,6 @@
 
 		.menu-pdf-embed {
 			width: 100% !important;
-			height: 100% !important;
 			border: none !important;
 			margin: 0 !important;
 			padding: 0 !important;
@@ -217,7 +216,7 @@
 		}
 
 		/* Responsive mobile */
-		@media (max-width: 768px) {
+		@media(max-width: 768px) {
 			.menu-header-compact {
 				padding: 6px 10px 5px;
 			}
@@ -267,7 +266,7 @@
 		}
 
 		/* Paysage mobile - masquer éléments non critiques */
-		@media (max-height: 450px) {
+		@media(max-height: 450px) {
 			.carousel-week-dates {
 				display: none;
 			}
@@ -340,9 +339,23 @@
 
 				</div>
 
-				<div style="flex: 1; overflow: hidden;">
-					<embed src="{{ menu.pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" class="menu-pdf-embed">
+				<div id="pdf-wrapper" style="overflow: hidden;">
+					<embed id="pdf-embed" src="{{ menu.pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" class="menu-pdf-embed">
 				</div>
+				<script>
+					function adjustPdfHeight() {
+						var header = document.querySelector('.menu-header-compact');
+						var wrapper = document.getElementById('pdf-wrapper');
+						var embed = document.getElementById('pdf-embed');
+						if (header && wrapper && embed) {
+							var h = window.innerHeight - header.offsetHeight;
+							wrapper.style.height = h + 'px';
+							embed.style.height = h + 'px';
+						}
+					}
+					adjustPdfHeight();
+					window.addEventListener('resize', adjustPdfHeight);
+				</script>
 			</div>
 
 		{% else %}
