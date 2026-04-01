@@ -4,6 +4,7 @@
 {% endblock %}
 
 {% block styles %}
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<style>
 		/* FORCER LE PLEIN ÉCRAN - Éliminer toutes les contraintes */
 		body {
@@ -263,14 +264,11 @@
 						<!-- Bouton semaine précédente -->
 						{% if menuPrecedent %}
 							<a href="/restauration/menus?semaine={{ menuPrecedent.semaineId }}" class="carousel-btn" title="Semaine précédente">
-								<i class="fas fa-chevron-left"></i>
-							</a>
-						{% else %}
-							<button class="carousel-btn" disabled title="Pas de semaine précédente">
-								<i class="fas fa-chevron-left"></i>
-							</button>
-						{% endif %}
-
+									&#8249;
+								</a>
+							{% else %}
+								<button class="carousel-btn" disabled title="Pas de semaine précédente">
+									&#8249;
 						<!-- Centre - Informations de la semaine -->
 						<div class="carousel-center">
 							<div class="carousel-week-title">{{ menu.semaine }}</div>
@@ -295,11 +293,11 @@
 						<!-- Bouton semaine suivante -->
 						{% if menuSuivant %}
 							<a href="/restauration/menus?semaine={{ menuSuivant.semaineId }}" class="carousel-btn" title="Semaine suivante">
-								<i class="fas fa-chevron-right"></i>
-							</a>
-						{% else %}
-							<button class="carousel-btn" disabled title="Pas de semaine suivante">
-								<i class="fas fa-chevron-right"></i>
+									&#8250;
+								</a>
+							{% else %}
+								<button class="carousel-btn" disabled title="Pas de semaine suivante">
+									&#8250;
 							</button>
 						{% endif %}
 					</div>
@@ -307,17 +305,15 @@
 					<!-- Actions -->
 					<div class="carousel-actions">
 						<div class="carousel-info">
-							<i class="fas fa-chef-hat" style="color: #f97316; font-size: 20px;"></i>
+							<span style="color: #f97316; font-size: 20px;">🍽️</span>
 							<span style="color: #374151; font-weight: 500;">Menu de la restauration</span>
 						</div>
 						<div class="carousel-controls">
 							<a href="{{ menu.pdfUrl }}" target="_blank" class="action-btn" title="Télécharger le PDF">
-								<i class="fas fa-download"></i>
-								Télécharger
+								⬇ Télécharger
 							</a>
 							<button onclick="history.back()" class="action-btn close-btn" title="Retour">
-								<i class="fas fa-times"></i>
-								Fermer
+								✕ Fermer
 							</button>
 						</div>
 					</div>
@@ -333,7 +329,7 @@
 			<!-- Aucun menu disponible -->
 			<div class="flex items-center justify-center h-screen">
 				<div class="text-center">
-					<i class="fas fa-chef-hat text-gray-300 text-6xl mb-4"></i>
+				<div style="font-size: 4rem; margin-bottom: 1rem;">🍽️</div>
 					<h2 class="text-2xl font-bold text-gray-800 mb-4">Aucun menu disponible</h2>
 					<p class="text-gray-600 mb-4">
 						{% if todosLesMenus|length > 0 %}
@@ -349,8 +345,7 @@
 							{% set firstMenu = todosLesMenus|first %}
 							{% if firstMenu %}
 								<a href="/restauration/menus?semaine={{ firstMenu.semaineId }}" class="action-btn">
-									<i class="fas fa-arrow-right"></i>
-									Voir les menus disponibles
+									→ Voir les menus disponibles
 								</a>
 							{% endif %}
 						</div>
