@@ -6,6 +6,15 @@
 {% block styles %}
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<style>
+		/* Masquer le header et footer du site sur cette page */
+		header, footer, nav.site-nav {
+			display: none !important;
+		}
+		main {
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+		}
+
 		/* FORCER LE PLEIN ÉCRAN - Éliminer toutes les contraintes */
 		body {
 			background: white !important;
@@ -250,75 +259,75 @@
 {% endblock %}
 
 {% block main %}
-<div class="main-content">
-	{% if menu %}
-		<div class="menu-pdf-container">
-			<div class="menu-header-compact">
+	<div class="main-content">
+		{% if menu %}
+			<div class="menu-pdf-container">
+				<div class="menu-header-compact">
 
-				<div class="carousel-navigation">
-					{% if menuPrecedent %}
-						<a href="/restauration/menus?semaine={{ menuPrecedent.semaineId }}" class="carousel-btn" title="Semaine précédente">&#8249;</a>
-					{% endif %}
-					{% if menuPrecedent is not defined or not menuPrecedent %}
-						<button class="carousel-btn" disabled title="Pas de semaine précédente">&#8249;</button>
-					{% endif %}
+					<div class="carousel-navigation">
+						{% if menuPrecedent %}
+							<a href="/restauration/menus?semaine={{ menuPrecedent.semaineId }}" class="carousel-btn" title="Semaine précédente">&#8249;</a>
+						{% endif %}
+						{% if menuPrecedent is not defined or not menuPrecedent %}
+							<button class="carousel-btn" disabled title="Pas de semaine précédente">&#8249;</button>
+						{% endif %}
 
-					<div class="carousel-center">
-						<div class="carousel-week-title">{{ menu.semaine }}</div>
-						{% if menuActuel %}
-							<div class="carousel-week-dates">{{ menuActuel.nomSemaine }}</div>
-							{% if menuActuel.statutTemporel == 'presente' %}
-								<div class="carousel-status status-presente">Cette semaine</div>
+						<div class="carousel-center">
+							<div class="carousel-week-title">{{ menu.semaine }}</div>
+							{% if menuActuel %}
+								<div class="carousel-week-dates">{{ menuActuel.nomSemaine }}</div>
+								{% if menuActuel.statutTemporel == 'presente' %}
+									<div class="carousel-status status-presente">Cette semaine</div>
+								{% endif %}
+								{% if menuActuel.statutTemporel == 'passee' %}
+									<div class="carousel-status status-passee">Semaine pass&#233;e</div>
+								{% endif %}
+								{% if menuActuel.statutTemporel == 'future' %}
+									<div class="carousel-status status-future">Semaine &#224; venir</div>
+								{% endif %}
 							{% endif %}
-							{% if menuActuel.statutTemporel == 'passee' %}
-								<div class="carousel-status status-passee">Semaine pass&#233;e</div>
-							{% endif %}
-							{% if menuActuel.statutTemporel == 'future' %}
-								<div class="carousel-status status-future">Semaine &#224; venir</div>
-							{% endif %}
+						</div>
+
+						{% if menuSuivant %}
+							<a href="/restauration/menus?semaine={{ menuSuivant.semaineId }}" class="carousel-btn" title="Semaine suivante">&#8250;</a>
+						{% endif %}
+						{% if menuSuivant is not defined or not menuSuivant %}
+							<button class="carousel-btn" disabled title="Pas de semaine suivante">&#8250;</button>
 						{% endif %}
 					</div>
 
-					{% if menuSuivant %}
-						<a href="/restauration/menus?semaine={{ menuSuivant.semaineId }}" class="carousel-btn" title="Semaine suivante">&#8250;</a>
-					{% endif %}
-					{% if menuSuivant is not defined or not menuSuivant %}
-						<button class="carousel-btn" disabled title="Pas de semaine suivante">&#8250;</button>
-					{% endif %}
+					<div class="carousel-actions">
+						<div class="carousel-info">
+							<span style="color: #f97316; font-size: 20px;">&#127869;</span>
+							<span style="color: #374151; font-weight: 500;">Menu de la restauration</span>
+						</div>
+						<div class="carousel-controls">
+							<a href="{{ menu.pdfUrl }}" target="_blank" class="action-btn">&#8659; T&#233;l&#233;charger</a>
+							<button onclick="history.back()" class="action-btn close-btn">&#x2715; Fermer</button>
+						</div>
+					</div>
+
 				</div>
 
-				<div class="carousel-actions">
-					<div class="carousel-info">
-						<span style="color: #f97316; font-size: 20px;">&#127869;</span>
-						<span style="color: #374151; font-weight: 500;">Menu de la restauration</span>
-					</div>
-					<div class="carousel-controls">
-						<a href="{{ menu.pdfUrl }}" target="_blank" class="action-btn">&#8659; T&#233;l&#233;charger</a>
-						<button onclick="history.back()" class="action-btn close-btn">&#x2715; Fermer</button>
-					</div>
+				<div style="margin-top: 140px; height: calc(100vh - 140px);">
+					<embed src="{{ menu.pdfUrl }}" type="application/pdf" class="menu-pdf-embed">
 				</div>
-
 			</div>
 
-			<div style="margin-top: 140px; height: calc(100vh - 140px);">
-				<embed src="{{ menu.pdfUrl }}" type="application/pdf" class="menu-pdf-embed">
-			</div>
-		</div>
-
-	{% else %}
-		<div class="flex items-center justify-center h-screen">
-			<div class="text-center">
-				<div style="font-size: 4rem; margin-bottom: 1rem;">&#127869;</div>
-				<h2 class="text-2xl font-bold text-gray-800 mb-4">Aucun menu disponible</h2>
-				<p class="text-gray-600 mb-4">Les menus de la semaine seront bient&#244;t disponibles.</p>
-				{% if todosLesMenus|length > 0 %}
-					{% set firstMenu = todosLesMenus|first %}
-					{% if firstMenu %}
-						<a href="/restauration/menus?semaine={{ firstMenu.semaineId }}" class="action-btn">&#8594; Voir les menus disponibles</a>
+		{% else %}
+			<div class="flex items-center justify-center h-screen">
+				<div class="text-center">
+					<div style="font-size: 4rem; margin-bottom: 1rem;">&#127869;</div>
+					<h2 class="text-2xl font-bold text-gray-800 mb-4">Aucun menu disponible</h2>
+					<p class="text-gray-600 mb-4">Les menus de la semaine seront bient&#244;t disponibles.</p>
+					{% if todosLesMenus|length > 0 %}
+						{% set firstMenu = todosLesMenus|first %}
+						{% if firstMenu %}
+							<a href="/restauration/menus?semaine={{ firstMenu.semaineId }}" class="action-btn">&#8594; Voir les menus disponibles</a>
+						{% endif %}
 					{% endif %}
-				{% endif %}
+				</div>
 			</div>
-		</div>
-	{% endif %}
-</div>
+		{% endif %}
+	</div>
 {% endblock %}
