@@ -264,99 +264,101 @@
 						<!-- Bouton semaine précédente -->
 						{% if menuPrecedent %}
 							<a href="/restauration/menus?semaine={{ menuPrecedent.semaineId }}" class="carousel-btn" title="Semaine précédente">
-									&#8249;
-								</a>
-							{% else %}
-								<button class="carousel-btn" disabled title="Pas de semaine précédente">
-									&#8249;
-						<!-- Centre - Informations de la semaine -->
-						<div class="carousel-center">
-							<div class="carousel-week-title">{{ menu.semaine }}</div>
-							<div class="carousel-week-dates">
-								{% if menuActuel %}
-									{{ menuActuel.nomSemaine }}
+								&#8249;
+							</a>
+						{% else %}
+							<button class="carousel-btn" disabled title="Pas de semaine précédente">
+								&#8249;
+								<!-- Centre - Informations de la semaine -->
+								<div class="carousel-center">
+									<div class="carousel-week-title">{{ menu.semaine }}</div>
+									<div class="carousel-week-dates">
+										{% if menuActuel %}
+											{{ menuActuel.nomSemaine }}
+										{% endif %}
+									</div>
+									{% if menuActuel %}
+										<div class="carousel-status status-{{ menuActuel.statutTemporel }}">
+											{% if menuActuel.statutTemporel == 'presente' %}
+												Cette semaine
+											{% endif %}
+											{% if menuActuel.statutTemporel == 'passee' %}
+												Semaine passée
+											{% endif %}
+											{% if menuActuel.statutTemporel == 'future' %}
+												Semaine à venir
+											{% endif %}
+										</div>
+									{% endif %}
+								</div>
+
+								<!-- Bouton semaine suivante -->
+								{% if menuSuivant %}
+									<a href="/restauration/menus?semaine={{ menuSuivant.semaineId }}" class="carousel-btn" title="Semaine suivante">
+										&#8250;
+									</a>
+								{% else %}
+									<button class="carousel-btn" disabled title="Pas de semaine suivante">
+										&#8250;
+									</button>
 								{% endif %}
 							</div>
-							{% if menuActuel %}
-								<div class="carousel-status status-{{ menuActuel.statutTemporel }}">
-									{% if menuActuel.statutTemporel == 'presente' %}
-										Cette semaine
-									{% elseif menuActuel.statutTemporel == 'passee' %}
-										Semaine passée
-									{% else %}
-										Semaine à venir
+
+							<!-- Actions -->
+							<div class="carousel-actions">
+								<div class="carousel-info">
+									<span style="color: #f97316; font-size: 20px;">🍽️</span>
+									<span style="color: #374151; font-weight: 500;">Menu de la restauration</span>
+								</div>
+								<div class="carousel-controls">
+									<a href="{{ menu.pdfUrl }}" target="_blank" class="action-btn" title="Télécharger le PDF">
+										⬇ Télécharger
+									</a>
+									<button onclick="history.back()" class="action-btn close-btn" title="Retour">
+										✕ Fermer
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- PDF en plein écran -->
+						<div style="margin-top: 140px; height: calc(100vh - 140px);">
+							<embed src="{{ menu.pdfUrl }}" type="application/pdf" class="menu-pdf-embed menu-transition">
+						</div>
+					</div>
+
+				{% else %}
+					<!-- Aucun menu disponible -->
+					<div class="flex items-center justify-center h-screen">
+						<div class="text-center">
+							<div style="font-size: 4rem; margin-bottom: 1rem;">🍽️</div>
+							<h2 class="text-2xl font-bold text-gray-800 mb-4">Aucun menu disponible</h2>
+							<p class="text-gray-600 mb-4">
+								{% if todosLesMenus|length > 0 %}
+									Naviguez avec les flèches pour voir les autres semaines
+								{% else %}
+									Les menus de la semaine seront bientôt disponibles.
+								{% endif %}
+							</p>
+
+							{% if todosLesMenus|length > 0 %}
+								<!-- Mini carrousel de navigation même sans menu -->
+								<div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px;">
+									{% set firstMenu = todosLesMenus|first %}
+									{% if firstMenu %}
+										<a href="/restauration/menus?semaine={{ firstMenu.semaineId }}" class="action-btn">
+											→ Voir les menus disponibles
+										</a>
 									{% endif %}
 								</div>
 							{% endif %}
 						</div>
-
-						<!-- Bouton semaine suivante -->
-						{% if menuSuivant %}
-							<a href="/restauration/menus?semaine={{ menuSuivant.semaineId }}" class="carousel-btn" title="Semaine suivante">
-									&#8250;
-								</a>
-							{% else %}
-								<button class="carousel-btn" disabled title="Pas de semaine suivante">
-									&#8250;
-							</button>
-						{% endif %}
 					</div>
-
-					<!-- Actions -->
-					<div class="carousel-actions">
-						<div class="carousel-info">
-							<span style="color: #f97316; font-size: 20px;">🍽️</span>
-							<span style="color: #374151; font-weight: 500;">Menu de la restauration</span>
-						</div>
-						<div class="carousel-controls">
-							<a href="{{ menu.pdfUrl }}" target="_blank" class="action-btn" title="Télécharger le PDF">
-								⬇ Télécharger
-							</a>
-							<button onclick="history.back()" class="action-btn close-btn" title="Retour">
-								✕ Fermer
-							</button>
-						</div>
-					</div>
-				</div>
-
-				<!-- PDF en plein écran -->
-				<div style="margin-top: 140px; height: calc(100vh - 140px);">
-					<embed src="{{ menu.pdfUrl }}" type="application/pdf" class="menu-pdf-embed menu-transition">
-				</div>
+				{% endif %}
 			</div>
 
-		{% else %}
-			<!-- Aucun menu disponible -->
-			<div class="flex items-center justify-center h-screen">
-				<div class="text-center">
-				<div style="font-size: 4rem; margin-bottom: 1rem;">🍽️</div>
-					<h2 class="text-2xl font-bold text-gray-800 mb-4">Aucun menu disponible</h2>
-					<p class="text-gray-600 mb-4">
-						{% if todosLesMenus|length > 0 %}
-							Naviguez avec les flèches pour voir les autres semaines
-						{% else %}
-							Les menus de la semaine seront bientôt disponibles.
-						{% endif %}
-					</p>
-
-					{% if todosLesMenus|length > 0 %}
-						<!-- Mini carrousel de navigation même sans menu -->
-						<div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px;">
-							{% set firstMenu = todosLesMenus|first %}
-							{% if firstMenu %}
-								<a href="/restauration/menus?semaine={{ firstMenu.semaineId }}" class="action-btn">
-									→ Voir les menus disponibles
-								</a>
-							{% endif %}
-						</div>
-					{% endif %}
-				</div>
-			</div>
-		{% endif %}
-	</div>
-
-	<script>
-		// Animation de transition lors du changement de page
+			<script>
+				// Animation de transition lors du changement de page
 document.addEventListener('DOMContentLoaded', function () {
 const menuEmbed = document.querySelector('.menu-transition');
 if (menuEmbed) { // Ajouter une classe de chargement lors des clics sur les boutons de navigation
@@ -370,5 +372,5 @@ menuEmbed.classList.add('loading');
 });
 }
 });
-	</script>
-{% endblock %}
+			</script>
+		{% endblock %}
