@@ -345,13 +345,16 @@ const menuPdfController = {
                 }
             }
 
+            const menuActuel = menuSelectionne ? menusAvecNavigation.find(m => m.id === menuSelectionne.id) || null : null;
+
             res.render('pages/restauration/menus-pdf', {
                 title: 'École Saint-Mathieu - Menu de la semaine',
                 menu: menuSelectionne,
+                menuActuel,
                 todosLesMenus: menusAvecNavigation,
                 menuPrecedent,
                 menuSuivant,
-                semaineActuelle: menuSelectionne ? menusAvecNavigation.find(m => m.id === menuSelectionne.id)?.semaineId : null
+                semaineActuelle: menuActuel ? menuActuel.semaineId : null
             });
         } catch (error) {
             console.error('❌ Erreur lors de la récupération du menu actif:', error);

@@ -275,16 +275,15 @@
 						<div class="carousel-center">
 							<div class="carousel-week-title">{{ menu.semaine }}</div>
 							<div class="carousel-week-dates">
-								{% set menuData = todosLesMenus|filter(m => m.id == menu.id)|first %}
-								{% if menuData %}
-									{{ menuData.nomSemaine }}
+								{% if menuActuel %}
+									{{ menuActuel.nomSemaine }}
 								{% endif %}
 							</div>
-							{% if menuData %}
-								<div class="carousel-status status-{{ menuData.statutTemporel }}">
-									{% if menuData.statutTemporel == 'presente' %}
+							{% if menuActuel %}
+								<div class="carousel-status status-{{ menuActuel.statutTemporel }}">
+									{% if menuActuel.statutTemporel == 'presente' %}
 										Cette semaine
-									{% elseif menuData.statutTemporel == 'passee' %}
+									{% elseif menuActuel.statutTemporel == 'passee' %}
 										Semaine passée
 									{% else %}
 										Semaine à venir
