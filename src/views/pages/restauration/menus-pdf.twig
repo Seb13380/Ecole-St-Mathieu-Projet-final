@@ -35,37 +35,35 @@
 			position: fixed;
 			top: 0;
 			left: 0;
-			width: 100vw !important;
-			height: 100vh !important;
+			width: 100vw;
+			height: 100vh;
 			margin: 0;
 			padding: 0;
 			z-index: 1000;
 			background: white;
+			display: flex;
+			flex-direction: column;
 		}
 
 		.menu-pdf-embed {
-			width: 100vw !important;
-			height: calc(100vh - 160px) !important; /* Moins la barre du haut + navigation */
+			width: 100% !important;
+			height: 100% !important;
 			border: none !important;
 			margin: 0 !important;
 			padding: 0 !important;
+			display: block;
 		}
 
 		/* En-tête avec navigation carrousel */
 		.menu-header-compact {
-			height: 160px;
+			flex-shrink: 0;
 			background: linear-gradient(135deg, rgba(249, 250, 251, 0.98), rgba(167, 227, 221, 0.1));
 			backdrop-filter: blur(15px);
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			z-index: 1001;
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			padding: 25px 20px 15px;
+			padding: 12px 20px 10px;
 			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 			border-bottom: 3px solid rgba(167, 227, 221, 0.3);
 		}
@@ -218,34 +216,66 @@
 			overflow: hidden;
 		}
 
-		/* Responsive */
-		@media(max-width: 768px) {
+		/* Responsive mobile */
+		@media (max-width: 768px) {
+			.menu-header-compact {
+				padding: 6px 10px 5px;
+			}
+
 			.carousel-navigation {
-				flex-direction: column;
-				gap: 15px;
-			}
-
-			.carousel-center {
-				padding: 0 10px;
-			}
-
-			.carousel-week-title {
-				font-size: 20px;
-			}
-
-			.carousel-week-dates {
-				font-size: 14px;
+				gap: 6px;
+				margin-bottom: 5px;
 			}
 
 			.carousel-btn {
-				width: 45px;
-				height: 45px;
-				font-size: 16px;
+				width: 34px;
+				height: 34px;
+				font-size: 14px;
+				flex-shrink: 0;
 			}
 
+			.carousel-center {
+				padding: 0 6px;
+			}
+
+			.carousel-week-title {
+				font-size: 13px;
+				margin-bottom: 2px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.carousel-week-dates {
+				font-size: 11px;
+				margin-bottom: 2px;
+			}
+
+			.carousel-status {
+				font-size: 10px;
+				padding: 2px 8px;
+			}
+
+			.carousel-info {
+				display: none;
+			}
+
+			.action-btn {
+				font-size: 12px;
+				padding: 5px 10px;
+			}
+		}
+
+		/* Paysage mobile - masquer éléments non critiques */
+		@media (max-height: 450px) {
+			.carousel-week-dates {
+				display: none;
+			}
+			.carousel-status {
+				display: none;
+			}
 			.carousel-actions {
-				flex-direction: column;
-				gap: 10px;
+				display: none;
 			}
 		}
 
@@ -310,7 +340,7 @@
 
 				</div>
 
-				<div style="margin-top: 160px; height: calc(100vh - 160px);">
+				<div style="flex: 1; overflow: hidden;">
 					<embed src="{{ menu.pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" class="menu-pdf-embed">
 				</div>
 			</div>
