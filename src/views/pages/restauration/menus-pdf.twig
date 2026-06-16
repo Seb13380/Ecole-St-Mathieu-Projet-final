@@ -344,17 +344,17 @@
 				</div>
 				<script>
 					function adjustPdfHeight() {
-						var header = document.querySelector('.menu-header-compact');
-						var wrapper = document.getElementById('pdf-wrapper');
-						var embed = document.getElementById('pdf-embed');
-						if (header && wrapper && embed) {
-							var h = window.innerHeight - header.offsetHeight;
-							wrapper.style.height = h + 'px';
-							embed.style.height = h + 'px';
-						}
-					}
-					adjustPdfHeight();
-					window.addEventListener('resize', adjustPdfHeight);
+var header = document.querySelector('.menu-header-compact');
+var wrapper = document.getElementById('pdf-wrapper');
+var embed = document.getElementById('pdf-embed');
+if (header && wrapper && embed) {
+var h = window.innerHeight - header.offsetHeight;
+wrapper.style.height = h + 'px';
+embed.style.height = h + 'px';
+}
+}
+adjustPdfHeight();
+window.addEventListener('resize', adjustPdfHeight);
 				</script>
 			</div>
 

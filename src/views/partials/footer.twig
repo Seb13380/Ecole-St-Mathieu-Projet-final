@@ -1,5 +1,6 @@
 <footer class="bg-[#a7e3dd] text-[#304a4d]">
-	<div class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+	<div
+		class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
 
 		<!-- Colonne 1 : Identité -->
 		<div>
@@ -15,10 +16,18 @@
 		<div>
 			<h3 class="font-bold text-lg mb-3">Liens utiles</h3>
 			<ul class="text-sm space-y-1">
-				<li><a href="/" class="hover:underline">Accueil</a></li>
-				<li><a href="/contact" class="hover:underline">Contact</a></li>
-				<li><a href="/restauration/menus" class="hover:underline">Menus de la semaine</a></li>
-				<li><a href="/dossier-inscription" class="hover:underline">Inscription</a></li>
+				<li>
+					<a href="/" class="hover:underline">Accueil</a>
+				</li>
+				<li>
+					<a href="/contact" class="hover:underline">Contact</a>
+				</li>
+				<li>
+					<a href="/restauration/menus" class="hover:underline">Menus de la semaine</a>
+				</li>
+				<li>
+					<a href="/dossier-inscription" class="hover:underline">Inscription</a>
+				</li>
 			</ul>
 		</div>
 
@@ -26,12 +35,15 @@
 		<div>
 			<h3 class="font-bold text-lg mb-3">Nous contacter</h3>
 			<p class="text-sm leading-relaxed">
-				✉️ <a href="mailto:ecole-saint-mathieu@wanadoo.fr" class="hover:underline">ecole-saint-mathieu@wanadoo.fr</a>
+				✉️
+				<a href="mailto:ecole-saint-mathieu@wanadoo.fr" class="hover:underline">ecole-saint-mathieu@wanadoo.fr</a>
 			</p>
 		</div>
 
 	</div>
 	<div class="border-t border-[#304a4d]/20 text-center py-4 text-xs text-[#304a4d]/70">
-		© {{ "now"|date("Y") }} École Saint-Mathieu – Tous droits réservés
+		©
+		{{ "now"|date("Y") }}
+		École Saint-Mathieu – Tous droits réservés
 	</div>
 </footer>
