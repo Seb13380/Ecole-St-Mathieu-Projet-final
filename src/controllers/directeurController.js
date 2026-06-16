@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
+const emailService = require('../services/emailService');
 
 const prisma = new PrismaClient();
 
@@ -872,7 +873,50 @@ const directeurController = {
             const { id } = req.params;
             const { notes } = req.body;
 
+            // Récupérer la demande avec le parent lié
+            const credRequest = await prisma.credentialsRequest.findUnique({
+                where: { id: parseInt(id) },
+                include: {
+                    foundParent: {
+                        select: { id: true, firstName: true, lastName: true, email: true }
+                    }
+                }
+            });
 
+            if (!credRequest) {
+                return res.status(404).json({ success: false, message: 'Demande introuvable' });
+            }
+
+            if (!credRequest.foundParent) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Aucun parent lié à cette demande. Veuillez d\'abord lier un parent via "Rechercher parent".'
+                });
+            }
+
+            // Générer un mot de passe temporaire
+            const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase();
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+            // Mettre à jour le mot de passe du parent
+            await prisma.user.update({
+                where: { id: credRequest.foundParent.id },
+                data: { password: hashedPassword }
+            });
+
+            // Envoyer l'email avec les identifiants
+            try {
+                await emailService.sendCredentials({
+                    parentFirstName: credRequest.foundParent.firstName,
+                    parentLastName: credRequest.foundParent.lastName,
+                    parentEmail: credRequest.foundParent.email,
+                    tempPassword
+                });
+            } catch (emailError) {
+                console.error('⚠️ Erreur envoi email identifiants (demande quand même validée):', emailError);
+            }
+
+            // Marquer la demande comme traitée
             await prisma.credentialsRequest.update({
                 where: { id: parseInt(id) },
                 data: {
@@ -886,7 +930,7 @@ const directeurController = {
 
             res.json({
                 success: true,
-                message: 'Demande d\'identifiants approuvée et identifiants envoyés avec succès'
+                message: `Demande approuvée. Les identifiants ont été envoyés à ${credRequest.foundParent.email}`
             });
 
         } catch (error) {
@@ -949,6 +993,70 @@ const directeurController = {
                 success: false,
                 message: 'Erreur lors de la suppression de la demande'
             });
+        }
+    },
+
+    // Rechercher des parents (pour liaison manuelle d'une demande d'identifiants)
+    async searchParentsForCredentials(req, res) {
+        try {
+            const { q } = req.query;
+            if (!q || q.trim().length < 2) {
+                return res.json({ success: true, parents: [] });
+            }
+            const search = q.trim();
+            const parents = await prisma.user.findMany({
+                where: {
+                    role: 'PARENT',
+                    OR: [
+                        { firstName: { contains: search } },
+                        { lastName: { contains: search } },
+                        { email: { contains: search } }
+                    ]
+                },
+                select: { id: true, firstName: true, lastName: true, email: true },
+                take: 10
+            });
+            res.json({ success: true, parents });
+        } catch (error) {
+            console.error('❌ Erreur recherche parents:', error);
+            res.status(500).json({ success: false, message: 'Erreur lors de la recherche' });
+        }
+    },
+
+    // Lier manuellement une demande d'identifiants à un parent existant
+    async linkParentToCredentials(req, res) {
+        try {
+            const { id } = req.params;
+            const { parentId } = req.body;
+
+            if (!parentId) {
+                return res.status(400).json({ success: false, message: 'parentId requis' });
+            }
+
+            const parent = await prisma.user.findUnique({
+                where: { id: parseInt(parentId) },
+                select: { id: true, firstName: true, lastName: true, email: true, role: true }
+            });
+
+            if (!parent || parent.role !== 'PARENT') {
+                return res.status(404).json({ success: false, message: 'Parent introuvable' });
+            }
+
+            await prisma.credentialsRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    foundParentId: parent.id,
+                    foundParentEmail: parent.email,
+                    status: 'PENDING',
+                    processed: false,
+                    errorMessage: null
+                }
+            });
+
+            res.json({ success: true, message: 'Parent lié avec succès', parent });
+        } catch (error) {
+            console.error('❌ Erreur liaison parent:', error);
+            res.status(500).json({ success: false, message: 'Erreur lors de la liaison' });
         }
     },
 

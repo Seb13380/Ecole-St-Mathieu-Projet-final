@@ -43,24 +43,35 @@ const processCredentialsRequest = async (req, res) => {
 
 
         // Chercher si un parent existe avec ces informations
-        const existingParent = await prisma.user.findFirst({
+        // Tentative 1 : email exact (le plus fiable)
+        let existingParent = await prisma.user.findFirst({
             where: {
                 email: email.toLowerCase().trim(),
-                role: 'PARENT',
-                AND: [
-                    {
-                        firstName: {
-                            contains: firstName.trim()
-                        }
-                    },
-                    {
-                        lastName: {
-                            contains: lastName.trim()
-                        }
-                    }
-                ]
+                role: 'PARENT'
             }
         });
+
+        // Tentative 2 : si l'email ne correspond pas, chercher par nom + prénom
+        // (cas où le parent a fourni un email différent de celui enregistré)
+        if (!existingParent) {
+            existingParent = await prisma.user.findFirst({
+                where: {
+                    role: 'PARENT',
+                    AND: [
+                        {
+                            firstName: {
+                                contains: firstName.trim()
+                            }
+                        },
+                        {
+                            lastName: {
+                                contains: lastName.trim()
+                            }
+                        }
+                    ]
+                }
+            });
+        }
 
         if (!existingParent) {
 
