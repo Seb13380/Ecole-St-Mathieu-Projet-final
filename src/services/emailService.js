@@ -176,8 +176,8 @@ class EmailService {
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Support :</h3>
                             <p style="color: #0c5460; margin: 0;">
                                 Besoin d'aide pour vous connecter ?<br>
-                                📧 Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
-                                📞 Téléphone : 01 23 45 67 89
+                                📧 Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                📞 Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -452,8 +452,8 @@ class EmailService {
                         <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Besoin d'aide ?</h3>
                             <p style="color: #0c5460; margin: 0;">
-                                Support technique : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Support technique : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -536,8 +536,8 @@ class EmailService {
                         <div style="background-color: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0;">
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Support :</h3>
                             <p style="color: #0c5460; margin: 0;">
-                                Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -645,7 +645,7 @@ class EmailService {
                             <h3 style="color: #495057; margin-top: 0;">📧 Contact :</h3>
                             <p style="color: #495057; margin: 0; font-size: 14px;">
                                 Pour toute question : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -1198,8 +1198,8 @@ class EmailService {
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Besoin d'aide ?</h3>
                             <p style="color: #0c5460; margin: 0;">
                                 En cas de problème de connexion :<br>
-                                Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
@@ -1283,8 +1283,8 @@ class EmailService {
                             <h3 style="color: #0c5460; margin-top: 0;">📞 Besoin d'aide ?</h3>
                             <p style="color: #0c5460; margin: 0;">
                                 En cas de problème de connexion :<br>
-                                Email : <a href="mailto:support@saint-mathieu.fr" style="color: #304a4d;">support@saint-mathieu.fr</a><br>
-                                Téléphone : 01 23 45 67 89
+                                Email : <a href="mailto:ecole-saint-mathieu@wanadoo.fr" style="color: #304a4d;">ecole-saint-mathieu@wanadoo.fr</a><br>
+                                Téléphone : 04 91 07 07 18
                             </p>
                         </div>
                         
