@@ -996,6 +996,54 @@ const directeurController = {
         }
     },
 
+    // Créer manuellement un parent et le lier à une demande d'identifiants
+    async createParentAndLink(req, res) {
+        try {
+            const { id } = req.params;
+            const { firstName, lastName, email, phone } = req.body;
+
+            if (!firstName || !lastName || !email) {
+                return res.status(400).json({ success: false, message: 'Prénom, nom et email sont obligatoires' });
+            }
+
+            // Vérifier que l'email n'est pas déjà utilisé
+            const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+            if (existing) {
+                return res.status(400).json({ success: false, message: 'Un compte avec cet email existe déjà. Utilisez "Lier un parent" pour le retrouver.' });
+            }
+
+            const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase() + '!';
+            const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+            const newParent = await prisma.user.create({
+                data: {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim().toUpperCase(),
+                    email: email.toLowerCase().trim(),
+                    phone: phone ? phone.trim() : '',
+                    password: hashedPassword,
+                    role: 'PARENT'
+                }
+            });
+
+            await prisma.credentialsRequest.update({
+                where: { id: parseInt(id) },
+                data: {
+                    foundParentId: newParent.id,
+                    foundParentEmail: newParent.email,
+                    status: 'PENDING',
+                    processed: false,
+                    errorMessage: null
+                }
+            });
+
+            res.json({ success: true, message: 'Compte parent créé et lié avec succès', parent: newParent });
+        } catch (error) {
+            console.error('❌ Erreur création parent manuel:', error);
+            res.status(500).json({ success: false, message: 'Erreur lors de la création du compte' });
+        }
+    },
+
     // Rechercher des parents (pour liaison manuelle d'une demande d'identifiants)
     async searchParentsForCredentials(req, res) {
         try {

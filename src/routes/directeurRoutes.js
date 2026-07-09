@@ -106,6 +106,7 @@ router.post('/credentials/:id/approve', directeurController.approveCredentialsRe
 router.post('/credentials/:id/reject', directeurController.rejectCredentialsRequest);
 router.post('/credentials/:id/delete', directeurController.deleteCredentialsRequest);
 router.post('/credentials/:id/link-parent', directeurController.linkParentToCredentials);
+router.post('/credentials/:id/create-parent', directeurController.createParentAndLink);
 
 // Rapports et statistiques
 router.get('/reports', directeurController.getReports);
