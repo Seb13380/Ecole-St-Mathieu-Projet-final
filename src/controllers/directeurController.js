@@ -1010,10 +1010,23 @@ const directeurController = {
                     OR: [
                         { firstName: { contains: search } },
                         { lastName: { contains: search } },
-                        { email: { contains: search } }
+                        { email: { contains: search } },
+                        { phone: { contains: search } },
+                        {
+                            enfants: {
+                                some: {
+                                    student: {
+                                        OR: [
+                                            { firstName: { contains: search } },
+                                            { lastName: { contains: search } }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     ]
                 },
-                select: { id: true, firstName: true, lastName: true, email: true },
+                select: { id: true, firstName: true, lastName: true, email: true, phone: true },
                 take: 10
             });
             res.json({ success: true, parents });
@@ -1920,9 +1933,9 @@ const directeurController = {
                         }
 
 
-                        if (civilite === 'M.' && nom && prenom) {
+                        if (nom && prenom) {
                             pere = {
-                                civilite: 'M.',
+                                civilite: civilite,
                                 firstName: prenom,
                                 lastName: nom,
                                 email: email1,
@@ -1982,9 +1995,9 @@ const directeurController = {
                         }
 
 
-                        if (civilite === 'Mme' && nom && prenom) {
+                        if (nom && prenom) {
                             mere = {
-                                civilite: 'Mme',
+                                civilite: civilite,
                                 firstName: prenom,
                                 lastName: nom,
                                 email: email2,

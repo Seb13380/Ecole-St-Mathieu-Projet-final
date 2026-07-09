@@ -51,26 +51,30 @@ const processCredentialsRequest = async (req, res) => {
             }
         });
 
-        // Tentative 2 : si l'email ne correspond pas, chercher par nom + prénom
+        // Tentative 2 : chercher par nom + prénom
         // (cas où le parent a fourni un email différent de celui enregistré)
         if (!existingParent) {
             existingParent = await prisma.user.findFirst({
                 where: {
                     role: 'PARENT',
                     AND: [
-                        {
-                            firstName: {
-                                contains: firstName.trim()
-                            }
-                        },
-                        {
-                            lastName: {
-                                contains: lastName.trim()
-                            }
-                        }
+                        { firstName: { contains: firstName.trim() } },
+                        { lastName: { contains: lastName.trim() } }
                     ]
                 }
             });
+        }
+
+        // Tentative 3 : chercher par numéro de téléphone (si fourni)
+        if (!existingParent && phone && phone.trim().length >= 6) {
+            const phoneClean = phone.trim().replace(/[\s.\-]/g, '');
+            const allParents = await prisma.user.findMany({
+                where: { role: 'PARENT', phone: { not: null } }
+            });
+            existingParent = allParents.find(p => {
+                const storedPhone = (p.phone || '').replace(/[\s.\-]/g, '');
+                return storedPhone && storedPhone.includes(phoneClean);
+            }) || null;
         }
 
         if (!existingParent) {
