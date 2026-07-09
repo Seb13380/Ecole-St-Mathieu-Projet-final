@@ -1892,7 +1892,8 @@ const directeurController = {
                     let pere = null;
                     if (resp1Match) {
                         const civilite = resp1Match[1];
-                        const nomComplet = resp1Match[2] || '';
+                        // Normaliser les tirets espacés : "HARDY - BISTAGNE" → "HARDY-BISTAGNE"
+                        const nomComplet = (resp1Match[2] || '').replace(/\s+-\s+/g, '-').replace(/\s+/g, ' ').trim();
                         const nomParts = nomComplet.trim().split(' ');
 
                         // Logique intelligente pour séparer nom et prénom (Responsable 1)
@@ -1954,7 +1955,8 @@ const directeurController = {
                     let mere = null;
                     if (resp2Match) {
                         const civilite = resp2Match[1];
-                        const nomComplet = resp2Match[2] || '';
+                        // Normaliser les tirets espacés : "HARDY - BISTAGNE" → "HARDY-BISTAGNE"
+                        const nomComplet = (resp2Match[2] || '').replace(/\s+-\s+/g, '-').replace(/\s+/g, ' ').trim();
                         const nomParts = nomComplet.trim().split(' ');
 
                         // Logique intelligente pour séparer nom et prénom (Responsable 2)
