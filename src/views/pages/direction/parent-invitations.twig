@@ -1,7 +1,6 @@
 {% extends "layouts/base.twig" %}
 
-{% block title %}
-	<title>Demandes d'inscription - École Saint-Mathieu</title>
+{% block title %}Demandes d'inscription - École Saint-Mathieu
 {% endblock %}
 
 {% block main %}
@@ -125,6 +124,7 @@ if (!confirm('Approuver cette demande d\'inscription ?'))
 return;
 
 
+
 try {
 const response = await fetch (`/inscriptions/${id}/approve`, {method: 'POST'});
 
@@ -147,6 +147,7 @@ async function rejectRequest(id) {
 const reason = prompt('Motif du refus (optionnel) :');
 if (reason === null) 
 return;
+
 
 
 try {
