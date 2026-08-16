@@ -12,7 +12,7 @@ const getAgenda = async (req, res) => {
         // Récupérer les événements selon le rôle de l'utilisateur
         let whereClause = {};
 
-        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE' || req.session.user.role === 'SECRETAIRE_DIRECTION') {
+        if (['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             // La direction et la secrétaire voient tous les événements
             whereClause = {};
         } else {
@@ -61,7 +61,7 @@ const getAgenda = async (req, res) => {
 const getAgendaManagement = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             return res.status(403).render('pages/error', {
                 message: 'Accès non autorisé',
                 title: 'Erreur 403',
@@ -106,7 +106,7 @@ const getAgendaManagement = async (req, res) => {
 const createEvent = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             return res.status(403).json({ success: false, message: 'Accès non autorisé' });
         }
 
@@ -157,7 +157,7 @@ const createEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             return res.status(403).json({ success: false, message: 'Accès non autorisé' });
         }
 
@@ -209,7 +209,7 @@ const updateEvent = async (req, res) => {
 const deleteEvent = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             return res.status(403).json({ success: false, message: 'Accès non autorisé' });
         }
 
@@ -239,7 +239,7 @@ const deleteEvent = async (req, res) => {
 const toggleVisibility = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             return res.status(403).json({ success: false, message: 'Accès non autorisé' });
         }
 
@@ -292,7 +292,7 @@ const getEventsAPI = async (req, res) => {
         // Récupérer les événements selon le rôle de l'utilisateur
         let whereClause = {};
 
-        if (req.session.user.role === 'DIRECTION' || req.session.user.role === 'GESTIONNAIRE_SITE' || req.session.user.role === 'SECRETAIRE_DIRECTION') {
+        if (['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             // La direction et la secrétaire voient tous les événements
             whereClause = {};
         } else {
@@ -373,7 +373,7 @@ const getEventsAPI = async (req, res) => {
 const getEventById = async (req, res) => {
     try {
         // Vérifier les droits d'administration
-        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE'].includes(req.session.user.role)) {
+        if (!req.session.user || !['DIRECTION', 'GESTIONNAIRE_SITE', 'SECRETAIRE_DIRECTION', 'ADMIN'].includes(req.session.user.role)) {
             return res.status(403).json({ success: false, message: 'Accès non autorisé' });
         }
 
