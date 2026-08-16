@@ -79,15 +79,17 @@
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
 								<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-										                            {% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
-										                                bg-red-100 text-red-800
-										                            {% elseif user.role == 'ENSEIGNANT' %}
-										                                bg-blue-100 text-blue-800
-										                            {% elseif user.role == 'RESTAURANT' %}
-										                                bg-green-100 text-green-800
-										                            {% else %}
-										                                bg-gray-100 text-gray-800
-										                            {% endif %}">
+																				                            {% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
+																				                                bg-red-100 text-red-800
+																				                            {% elseif user.role == 'ASSISTANT_DIRECTION' or user.role == 'GESTIONNAIRE_SITE' or user.role == 'SECRETAIRE_DIRECTION' %}
+																				                                bg-purple-100 text-purple-800
+																				                            {% elseif user.role == 'ENSEIGNANT' %}
+																				                                bg-blue-100 text-blue-800
+																				                            {% elseif user.role == 'RESTAURATION' %}
+																				                                bg-green-100 text-green-800
+																				                            {% else %}
+																				                                bg-gray-100 text-gray-800
+																				                            {% endif %}">
 									{{ user.role }}
 								</span>
 							</td>
@@ -152,7 +154,12 @@
 							<option value="">Sélectionner un rôle</option>
 							<option value="PARENT">Parent</option>
 							<option value="ENSEIGNANT">Enseignant</option>
-							<option value="RESTAURANT">Restaurant</option>
+							<option value="APEL">APEL</option>
+							<option value="RESTAURATION">Restauration</option>
+							<option value="SECRETAIRE_DIRECTION">Secrétaire de direction</option>
+							<option value="ASSISTANT_DIRECTION">Assistant(e) de direction</option>
+							<option value="GESTIONNAIRE_SITE">Gestionnaire du site</option>
+							<option value="DIRECTION">Direction</option>
 							<option value="ADMIN">Administrateur</option>
 						</select>
 					</div>
@@ -240,38 +247,37 @@ alert('Erreur: ' + data.message);
 
 // Éditer un utilisateur
 async function editUser(userId) {
-    try {
-        // Récupérer les données de l'utilisateur depuis l'API
-        const response = await fetch(`/directeur/users/${userId}`);
-        const data = await response.json();
-        
-        if (!data.success) {
-            alert('Erreur: ' + data.message);
-            return;
-        }
-        
-        const user = data.user;
-        
-        isEditMode = true;
-        currentUserId = userId;
-        document.getElementById('modalTitle').textContent = 'Modifier l\'utilisateur';
-        
-        // Remplir le formulaire avec les données de l'utilisateur
-        document.getElementById('firstName').value = user.firstName || '';
-        document.getElementById('lastName').value = user.lastName || '';
-        document.getElementById('email').value = user.email || '';
-        document.getElementById('phone').value = user.phone || '';
-        document.getElementById('role').value = user.role || '';
-        
-        // Masquer le champ mot de passe pour la modification
-        document.getElementById('passwordField').style.display = 'none';
-        document.getElementById('password').required = false;
-        
-        document.getElementById('userModal').classList.remove('hidden');
-    } catch (error) {
-        console.error('Erreur lors de la récupération des données utilisateur:', error);
-        alert('Erreur lors de la récupération des données utilisateur');
-    }
+try { // Récupérer les données de l'utilisateur depuis l'API
+const response = await fetch (`/directeur/users/${userId}`);
+const data = await response.json();
+
+if (! data.success) {
+alert('Erreur: ' + data.message);
+return;
+}
+
+const user = data.user;
+
+isEditMode = true;
+currentUserId = userId;
+document.getElementById('modalTitle').textContent = 'Modifier l\'utilisateur';
+
+// Remplir le formulaire avec les données de l'utilisateur
+document.getElementById('firstName').value = user.firstName || '';
+document.getElementById('lastName').value = user.lastName || '';
+document.getElementById('email').value = user.email || '';
+document.getElementById('phone').value = user.phone || '';
+document.getElementById('role').value = user.role || '';
+
+// Masquer le champ mot de passe pour la modification
+document.getElementById('passwordField').style.display = 'none';
+document.getElementById('password').required = false;
+
+document.getElementById('userModal').classList.remove('hidden');
+} catch (error) {
+console.error('Erreur lors de la récupération des données utilisateur:', error);
+alert('Erreur lors de la récupération des données utilisateur');
+}
 }
 
 // Supprimer un utilisateur
