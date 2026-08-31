@@ -205,7 +205,7 @@
 						{% else %}
 							<p class="text-gray-600 mb-6">Aucune actualité publique n'est disponible actuellement.<br>Connectez-vous pour accéder à toutes les actualités de l'école.</p>
 							<div class="flex flex-row gap-4 justify-center">
-								<a href="/auth/login" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border border-teal-400">
+								<a href="/auth/login" class="btn-locked-login inline-flex items-center px-6 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
 									<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
 									</svg>
@@ -234,7 +234,7 @@
 						<h3 class="text-xl font-bold text-gray-900 mb-2">Plus d'actualités disponibles</h3>
 						<p class="text-gray-600 mb-6">Connectez-vous pour accéder à toutes les actualités de l'école, y compris les informations réservées aux familles.</p>
 						<div class="flex flex-row gap-4 justify-center">
-							<a href="/auth/login" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border border-teal-400">
+							<a href="/auth/login" class="btn-locked-login inline-flex items-center px-6 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
 								<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
 								</svg>
@@ -254,7 +254,7 @@
 			{% if isAuthenticated %}
 				{% if user.role == 'ADMIN' or user.role == 'DIRECTION' %}
 					<div class="mt-12 text-center">
-						<a href="/actualites/manage" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border border-teal-400">
+						<a href="/actualites/manage" class="btn-locked-login inline-flex items-center px-6 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
 							<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
 							</svg>
@@ -281,6 +281,15 @@
 	</div>
 
 	<style>
+		.btn-locked-login {
+			background: linear-gradient(135deg, #14b8a6, #06b6d4);
+			border: 1px solid #2dd4bf;
+		}
+
+		.btn-locked-login:hover {
+			background: linear-gradient(135deg, #0d9488, #0891b2);
+		}
+
 		.prose {
 			max-width: none !important;
 		}
