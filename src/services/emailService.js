@@ -735,7 +735,7 @@ class EmailService {
                         </div>
                         
                         <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="color: #856404; margin-top: 0;">� Information importante :</h3>
+                            <h3 style="color: #856404; margin-top: 0;">⚠️ Information importante :</h3>
                             <p style="color: #856404; margin: 0;">
                                 L'accès à l'espace parent numérique sera configuré lors de votre rendez-vous avec la secrétaire ou la direction de l'école.
                             </p>

@@ -71,10 +71,18 @@
 
 							<div class="md:col-span-2">
 								<label for="media" class="block text-sm font-medium text-slate-700 mb-2">
-									Image, Vidéo ou Document PDF (optionnel)
+									Image ou Vidéo de mise en avant (optionnel)
 								</label>
-								<input type="file" id="media" name="media" accept="image/*,video/*,.pdf" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-								<p class="text-xs text-slate-500 mt-1">Formats acceptés : JPEG, PNG, GIF, WebP, MP4, WebM, OGG, PDF (Max 50MB)</p>
+								<input type="file" id="media" name="media" accept="image/*,video/*" class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+								<p class="text-xs text-slate-500 mt-1">Formats acceptés : JPEG, PNG, GIF, WebP, MP4, WebM, OGG (Max 50MB)</p>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="documents" class="block text-sm font-medium text-slate-700 mb-2">
+									Documents joints (optionnel, plusieurs fichiers possibles)
+								</label>
+								<input type="file" id="documents" name="documents" accept=".pdf" multiple class="w-full px-4 py-3 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+								<p class="text-xs text-slate-500 mt-1">Vous pouvez sélectionner plusieurs documents PDF à la fois (Max 50MB par fichier)</p>
 							</div>
 
 							<!-- Section Lien externe -->
@@ -256,13 +264,13 @@
 									{% if actualite.mediaUrl %}
 										<div class="mb-4 flex justify-start">
 											{% if actualite.mediaType == 'pdf' %}
-												<div class="w-48 h-32 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center p-4">
+												<div class="w-48 h-32 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center p-4">
 													<div class="text-center">
-														<svg class="w-8 h-8 text-red-600 mx-auto mb-2" fill="currentColor" viewbox="0 0 20 20">
+														<svg class="w-8 h-8 text-slate-600 mx-auto mb-2" fill="currentColor" viewbox="0 0 20 20">
 															<path d="M4 18h12V6h-4V2H4v16zm8-14v4h4l-4-4z"/>
 														</svg>
-														<p class="text-xs text-red-800 font-medium">Document PDF</p>
-														<a href="{{ actualite.mediaUrl }}" target="_blank" class="text-xs text-red-600 hover:text-red-800 underline">Télécharger</a>
+														<p class="text-xs text-slate-700 font-medium">Document</p>
+														<a href="{{ actualite.mediaUrl }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 underline">Télécharger</a>
 													</div>
 												</div>
 											{% else %}
@@ -277,6 +285,26 @@
 													{% endif %}
 												</div>
 											{% endif %}
+										</div>
+									{% endif %}
+
+									{% if actualite.documents and actualite.documents|length > 0 %}
+										<div class="mb-4">
+											<p class="text-sm font-medium text-slate-700 mb-2">Documents joints ({{ actualite.documents|length }})</p>
+											<div class="flex flex-col gap-2 max-w-md">
+												{% for document in actualite.documents %}
+													<div class="flex items-center justify-between gap-3 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg">
+														<a href="{{ document.url }}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800 underline truncate">{{ document.nom }}</a>
+														<form action="/actualites/{{ actualite.id }}/documents/{{ document.id }}/delete" method="POST" onsubmit="return confirm('Supprimer ce document ?');">
+															<button type="submit" class="text-red-500 hover:text-red-700" title="Supprimer">
+																<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+																</svg>
+															</button>
+														</form>
+													</div>
+												{% endfor %}
+											</div>
 										</div>
 									{% endif %}
 
@@ -370,9 +398,14 @@
 						<textarea id="editContenu" name="contenu" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" required></textarea>
 					</div>
 					<div>
-						<label for="editMedia" class="block text-sm font-medium text-slate-700 mb-2">Nouvelle Image, Vidéo ou Document PDF (optionnel)</label>
-						<input type="file" id="editMedia" name="media" accept="image/*,video/*,.pdf" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-						<p class="text-xs text-slate-500 mt-1">Laissez vide pour garder le média actuel. Formats : JPEG, PNG, GIF, WebP, MP4, WebM, OGG, PDF (Max 50MB)</p>
+						<label for="editMedia" class="block text-sm font-medium text-slate-700 mb-2">Nouvelle Image ou Vidéo de mise en avant (optionnel)</label>
+						<input type="file" id="editMedia" name="media" accept="image/*,video/*" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+						<p class="text-xs text-slate-500 mt-1">Laissez vide pour garder le média actuel. Formats : JPEG, PNG, GIF, WebP, MP4, WebM, OGG (Max 50MB)</p>
+					</div>
+					<div>
+						<label for="editDocuments" class="block text-sm font-medium text-slate-700 mb-2">Ajouter des documents (optionnel, plusieurs fichiers possibles)</label>
+						<input type="file" id="editDocuments" name="documents" accept=".pdf" multiple class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+						<p class="text-xs text-slate-500 mt-1">Les documents existants restent disponibles ; utilisez le bouton supprimer sur chaque document pour les retirer.</p>
 					</div>
 
 					<!-- Section Lien externe dans l'édition -->

@@ -24,6 +24,9 @@ const actualiteController = {
         include: {
           auteur: {
             select: { firstName: true, lastName: true, role: true }
+          },
+          documents: {
+            orderBy: { createdAt: 'asc' }
           }
         },
         orderBy: [
@@ -57,6 +60,9 @@ const actualiteController = {
         include: {
           auteur: {
             select: { firstName: true, lastName: true, role: true }
+          },
+          documents: {
+            orderBy: { createdAt: 'asc' }
           }
         },
         orderBy: { datePublication: 'desc' }
@@ -86,22 +92,32 @@ const actualiteController = {
         datePublicationFinal = new Date(datePublication);
       }
 
-      // Gestion du fichier média
+      // Gestion du fichier média (image/vidéo/pdf de mise en avant)
+      const mediaFile = req.files && req.files.media ? req.files.media[0] : null;
       let mediaUrl = null;
       let mediaType = null;
-      if (req.file) {
+      if (mediaFile) {
         // Déterminer le type de média selon le MIME type
-        if (req.file.mimetype.startsWith('image/')) {
+        if (mediaFile.mimetype.startsWith('image/')) {
           mediaType = 'image';
-          mediaUrl = `/uploads/actualites/${req.file.filename}`;
-        } else if (req.file.mimetype.startsWith('video/')) {
+          mediaUrl = `/uploads/actualites/${mediaFile.filename}`;
+        } else if (mediaFile.mimetype.startsWith('video/')) {
           mediaType = 'video';
-          mediaUrl = `/uploads/actualites/${req.file.filename}`;
-        } else if (req.file.mimetype === 'application/pdf') {
+          mediaUrl = `/uploads/actualites/${mediaFile.filename}`;
+        } else if (mediaFile.mimetype === 'application/pdf') {
           mediaType = 'pdf';
-          mediaUrl = `/assets/documents/actualites/${req.file.filename}`;
+          mediaUrl = `/assets/documents/actualites/${mediaFile.filename}`;
         }
       }
+
+      // Gestion des documents multiples (PDF, etc.)
+      const documentFiles = (req.files && req.files.documents) || [];
+      const documentsData = documentFiles.map(file => ({
+        url: file.mimetype === 'application/pdf'
+          ? `/assets/documents/actualites/${file.filename}`
+          : `/uploads/actualites/${file.filename}`,
+        nom: file.originalname
+      }));
 
       const actualite = await prisma.actualite.create({
         data: {
@@ -115,7 +131,8 @@ const actualiteController = {
           important: important === 'true',
           visible: visible === 'true',
           public: isPublic === 'true',
-          datePublication: datePublicationFinal
+          datePublication: datePublicationFinal,
+          documents: documentsData.length ? { create: documentsData } : undefined
         },
         include: {
           auteur: {
@@ -123,7 +140,7 @@ const actualiteController = {
           }
         }
       });
-    
+
       if (visible === 'true') {
         try {
 
@@ -182,17 +199,31 @@ const actualiteController = {
         public: isPublic === 'true'
       };
 
-      if (req.file) {
-        if (req.file.mimetype.startsWith('image/')) {
+      const mediaFile = req.files && req.files.media ? req.files.media[0] : null;
+      if (mediaFile) {
+        if (mediaFile.mimetype.startsWith('image/')) {
           updateData.mediaType = 'image';
-          updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;
-        } else if (req.file.mimetype.startsWith('video/')) {
+          updateData.mediaUrl = `/uploads/actualites/${mediaFile.filename}`;
+        } else if (mediaFile.mimetype.startsWith('video/')) {
           updateData.mediaType = 'video';
-          updateData.mediaUrl = `/uploads/actualites/${req.file.filename}`;
-        } else if (req.file.mimetype === 'application/pdf') {
+          updateData.mediaUrl = `/uploads/actualites/${mediaFile.filename}`;
+        } else if (mediaFile.mimetype === 'application/pdf') {
           updateData.mediaType = 'pdf';
-          updateData.mediaUrl = `/assets/documents/actualites/${req.file.filename}`;
+          updateData.mediaUrl = `/assets/documents/actualites/${mediaFile.filename}`;
         }
+      }
+
+      // Ajout de documents supplémentaires (les documents existants ne sont pas remplacés)
+      const documentFiles = (req.files && req.files.documents) || [];
+      if (documentFiles.length) {
+        updateData.documents = {
+          create: documentFiles.map(file => ({
+            url: file.mimetype === 'application/pdf'
+              ? `/assets/documents/actualites/${file.filename}`
+              : `/uploads/actualites/${file.filename}`,
+            nom: file.originalname
+          }))
+        };
       }
 
       const actualite = await prisma.actualite.update({
@@ -204,6 +235,21 @@ const actualiteController = {
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'actualité:', error);
       res.redirect(`/actualites/manage?error=${encodeURIComponent('Erreur lors de la mise à jour de l\'actualité')}#actualite-${id || ''}`);
+    }
+  },
+
+  async deleteDocument(req, res) {
+    try {
+      const { id, documentId } = req.params;
+
+      await prisma.actualiteDocument.delete({
+        where: { id: parseInt(documentId) }
+      });
+
+      res.redirect(`/actualites/manage?success=${encodeURIComponent('Document supprimé avec succès')}#actualite-${id}`);
+    } catch (error) {
+      console.error('Erreur lors de la suppression du document:', error);
+      res.redirect(`/actualites/manage?error=${encodeURIComponent('Erreur lors de la suppression du document')}#actualite-${req.params.id || ''}`);
     }
   },
 

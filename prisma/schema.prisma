@@ -143,7 +143,20 @@ model Actualite {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  auteur User @relation("UserActualites", fields: [auteurId], references: [id], onDelete: Cascade)
+  auteur    User                @relation("UserActualites", fields: [auteurId], references: [id], onDelete: Cascade)
+  documents ActualiteDocument[]
+}
+
+model ActualiteDocument {
+  id          Int      @id @default(autoincrement())
+  actualiteId Int
+  url         String
+  nom         String // nom original du fichier affiché
+  createdAt   DateTime @default(now())
+
+  actualite Actualite @relation(fields: [actualiteId], references: [id], onDelete: Cascade)
+
+  @@index([actualiteId])
 }
 
 model Travaux {

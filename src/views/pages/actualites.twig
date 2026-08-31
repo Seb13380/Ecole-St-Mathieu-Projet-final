@@ -2,8 +2,7 @@
 
 {% block main %}
 	<div class="min-h-screen bg-gradient-to-br from-teal-50 to-cyan-100 py-12">
-		<div
-			class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="text-center mb-12">
 				<h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-4">
 					Actualités et informations familles
@@ -15,8 +14,7 @@
 
 			<div class="grid gap-8 md:gap-10">
 				{% for actualite in actualites %}
-					<article
-						style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%); backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; border: 2px solid #5eead4;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 20px 40px rgba(0, 0, 0, 0.15)'; this.style.background='linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 25%, #6ee7b7 50%, #34d399 100%)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(0, 0, 0, 0.1)'; this.style.background='linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%)'">
+					<article style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%); backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; border: 2px solid #5eead4;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 20px 40px rgba(0, 0, 0, 0.15)'; this.style.background='linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 25%, #6ee7b7 50%, #34d399 100%)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(0, 0, 0, 0.1)'; this.style.background='linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 100%)'">
 						{% if actualite.important %}
 							<div
 								style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #134e4a 100%); padding: 16px; position: relative; overflow: hidden;">
@@ -29,7 +27,7 @@
 										</svg>
 									</div>
 									<span style="color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-size: 16px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">
-										� Information Importante
+										Information Importante
 									</span>
 								</div>
 							</div>
@@ -45,10 +43,8 @@
 							</style>
 						{% endif %}
 
-						<div
-							class="p-8 md:p-10">
-							<div
-								class="mb-6 text-center">
+						<div class="p-8 md:p-10">
+							<div class="mb-6 text-center">
 								<div class="flex flex-wrap items-center justify-center gap-4 mb-4">
 									<div class="flex items-center text-sm text-gray-500">
 										<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -126,25 +122,45 @@
 										</div>
 									{% elseif actualite.mediaType == 'pdf' %}
 										<div class="mt-6 pt-4 border-t border-gray-100">
-											<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+											<div class="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
 												<div class="flex items-center justify-center mb-4">
-													<div class="bg-red-100 rounded-full p-3">
-														<svg class="w-8 h-8 text-red-600" fill="currentColor" viewbox="0 0 20 20">
+													<div class="bg-slate-100 rounded-full p-3">
+														<svg class="w-8 h-8 text-slate-600" fill="currentColor" viewbox="0 0 20 20">
 															<path d="M4 18h12V6h-4V2H4v16zm8-14v4h4l-4-4z"/>
 														</svg>
 													</div>
 												</div>
-												<h4 class="font-semibold text-red-800 mb-2">Document PDF joint</h4>
-												<p class="text-red-700 text-sm mb-4">Un document PDF est disponible en téléchargement pour cette actualité.</p>
-												<a href="{{ actualite.mediaUrl }}" target="_blank" download class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 hover:from-red-600 hover:to-red-700 transition-all duration-300 border border-red-400">
+												<h4 class="font-semibold text-slate-800 mb-2">Document joint</h4>
+												<p class="text-slate-600 text-sm mb-4">Un document est disponible en téléchargement pour cette actualité.</p>
+												<a href="{{ actualite.mediaUrl }}" target="_blank" download class="inline-flex items-center px-6 py-3 bg-slate-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:bg-slate-800 transition-all duration-300">
 													<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 													</svg>
-													📄 Télécharger le document
+													Télécharger le document
 												</a>
 											</div>
 										</div>
 									{% endif %}
+								{% endif %}
+
+								{% if actualite.documents and actualite.documents|length > 0 %}
+									<div class="mt-6 pt-4 border-t border-gray-100 w-full">
+										<h4 class="font-semibold text-slate-800 mb-3 text-center">
+											{{ actualite.documents|length > 1 ? 'Documents joints' : 'Document joint' }}
+										</h4>
+										<div class="flex flex-col gap-2 max-w-md mx-auto">
+											{% for document in actualite.documents %}
+												<a href="{{ document.url }}" target="_blank" download class="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors">
+													<div class="bg-slate-100 rounded-full p-2 flex-shrink-0">
+														<svg class="w-5 h-5 text-slate-600" fill="currentColor" viewbox="0 0 20 20">
+															<path d="M4 18h12V6h-4V2H4v16zm8-14v4h4l-4-4z"/>
+														</svg>
+													</div>
+													<span class="text-slate-800 font-medium text-sm truncate">{{ document.nom }}</span>
+												</a>
+											{% endfor %}
+										</div>
+									</div>
 								{% endif %}
 							</div>
 
