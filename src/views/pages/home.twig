@@ -14,28 +14,28 @@
 	</div>
 	<div class="carousel w-full">
 		<div id="slide1" class="carousel-item relative w-full">
-			<img src="/assets/images/20250326_114849.jpg" class="w-full h-64 sm:h-80 md:h-[420px] lg:h-[80vh] lg:max-h-[700px] object-cover"/>
+			<img src="/assets/images/20250326_114849.jpg" class="w-full carousel-slide-img"/>
 			<div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
 				<a href="#slide4" class="carousel-nav-btn">❮</a>
 				<a href="#slide2" class="carousel-nav-btn">❯</a>
 			</div>
 		</div>
 		<div id="slide2" class="carousel-item relative w-full">
-			<img src="/assets/images/20250326_114954.jpg" class="w-full h-64 sm:h-80 md:h-[420px] lg:h-[80vh] lg:max-h-[700px] object-cover"/>
+			<img src="/assets/images/20250326_114954.jpg" class="w-full carousel-slide-img"/>
 			<div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
 				<a href="#slide1" class="carousel-nav-btn">❮</a>
 				<a href="#slide3" class="carousel-nav-btn">❯</a>
 			</div>
 		</div>
 		<div id="slide3" class="carousel-item relative w-full">
-			<img src="/assets/images/20250514_114720.jpg" class="w-full h-64 sm:h-80 md:h-[420px] lg:h-[80vh] lg:max-h-[700px] object-cover"/>
+			<img src="/assets/images/20250514_114720.jpg" class="w-full carousel-slide-img"/>
 			<div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
 				<a href="#slide2" class="carousel-nav-btn">❮</a>
 				<a href="#slide4" class="carousel-nav-btn">❯</a>
 			</div>
 		</div>
 		<div id="slide4" class="carousel-item relative w-full">
-			<img src="/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg" class="w-full h-64 sm:h-80 md:h-[420px] lg:h-[80vh] lg:max-h-[700px] object-cover"/>
+			<img src="/assets/images/47d2b2f0-69d4-4913-b80c-5da660a12e2e.jpg" class="w-full carousel-slide-img"/>
 			<div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
 				<a href="#slide3" class="carousel-nav-btn">❮</a>
 				<a href="#slide1" class="carousel-nav-btn">❯</a>
@@ -51,6 +51,31 @@
 
 		.carousel-item {
 			scroll-snap-align: start;
+		}
+
+		.carousel-slide-img {
+			height: 16rem;
+			object-fit: cover;
+			display: block;
+		}
+
+		@media (min-width: 640px) {
+			.carousel-slide-img {
+				height: 20rem;
+			}
+		}
+
+		@media (min-width: 768px) {
+			.carousel-slide-img {
+				height: 420px;
+			}
+		}
+
+		@media (min-width: 1024px) {
+			.carousel-slide-img {
+				height: 80vh;
+				max-height: 700px;
+			}
 		}
 
 		.carousel-nav-btn {
