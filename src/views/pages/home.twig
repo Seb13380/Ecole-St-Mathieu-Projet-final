@@ -45,8 +45,7 @@
 
 	<style>
 		.carousel {
-			scroll-behavior: smooth;
-			scroll-snap-type: x mandatory;
+			scroll-snap-type: none;
 		}
 
 		.carousel-item {
@@ -156,9 +155,31 @@
 const carousel = document.querySelector('.carousel');
 const items = document.querySelectorAll('.carousel-item');
 let index = 0;
+
+function easeInOutQuad(t) {
+return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function smoothScrollTo(target, duration) {
+const start = carousel.scrollLeft;
+const distance = target - start;
+const startTime = performance.now();
+
+function step(now) {
+const elapsed = now - startTime;
+const progress = Math.min(elapsed / duration, 1);
+carousel.scrollLeft = start + distance * easeInOutQuad(progress);
+if (progress < 1) {
+requestAnimationFrame(step);
+}
+}
+
+requestAnimationFrame(step);
+}
+
 setInterval(() => {
 index = (index + 1) % items.length;
-carousel.scrollLeft = items[index].offsetLeft;
+smoothScrollTo(items[index].offsetLeft, 1800);
 }, 7000);
 });
 	</script>
