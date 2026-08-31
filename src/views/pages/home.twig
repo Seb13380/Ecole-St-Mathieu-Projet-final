@@ -44,6 +44,15 @@
 	</div>
 
 	<style>
+		.carousel {
+			scroll-behavior: smooth;
+			scroll-snap-type: x mandatory;
+		}
+
+		.carousel-item {
+			scroll-snap-align: start;
+		}
+
 		.carousel-nav-btn {
 			pointer-events: auto;
 			display: flex;
@@ -125,7 +134,7 @@ let index = 0;
 setInterval(() => {
 index = (index + 1) % items.length;
 carousel.scrollLeft = items[index].offsetLeft;
-}, 6000);
+}, 7000);
 });
 	</script>
 {% endblock %}
